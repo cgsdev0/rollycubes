@@ -1,7 +1,7 @@
-#include "App.h"
 #include <string>
 #include <regex>
 #include <iostream>
+#include "App.h"
 
 std::regex sessionRegex("_session=([^;]*)");
 
@@ -15,9 +15,12 @@ std::string getSession(uWS::HttpRequest* req) {
 int main() {
 	/* Overly simple hello world app */
 	uWS::App().get("/", [](auto *res, auto *req) {
-            res->writeHeader("Set-Cookie", "_session=spaghetti");
+            std::string session = getSession(req);
+            if(session == "") {
+                res->writeHeader("Set-Cookie", "_session=");
+            }
+            else std::cout << session << std::endl;
 	    res->end("Hello world!");
-            std::cout << getSession(req) << std::endl;
 	}).listen(3000, [](auto *token) {
 	    if (token) {
 		std::cout << "Listening on port " << 3000 << std::endl;
