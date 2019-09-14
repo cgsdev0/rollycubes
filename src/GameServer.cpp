@@ -1,3 +1,4 @@
+#include "Game.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -9,40 +10,8 @@
 #include <string>
 #include <unordered_map>
 #include "App.h"
-
-const unsigned int MAX_PLAYERS = 4;
-const unsigned int DICE_COUNT = 2;
-const unsigned int SESSION_BYTES = 16;
-const unsigned int ROOM_LEN = 6;
-const unsigned int PORT = 3001;
-const std::chrono::system_clock::duration EVICT_AFTER = 60s;
-
-class Player {
-   public:
-    Player() {}
-
-   private:
-    std::string session;
-    std::string name;
-    int score;
-    int win_count;
-    bool connected;
-};
-
-class Game {
-   public:
-    Game() : turn_index(0), player_count(0) {}
-
-    bool isInitialized() { return player_count > 0; }
-
-   private:
-    Player players[MAX_PLAYERS];
-    int player_count;
-    int turn_index;
-    int roll[DICE_COUNT];
-    bool used[DICE_COUNT];
-    bool initialized;
-};
+#include "Consts.h"
+#include "Player.h"
 
 std::unordered_map<std::string, Game *> games;
 std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
