@@ -1,4 +1,3 @@
-#include "Game.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -9,8 +8,10 @@
 #include <streambuf>
 #include <string>
 #include <unordered_map>
+
 #include "App.h"
 #include "Consts.h"
+#include "Game.h"
 #include "Player.h"
 
 std::unordered_map<std::string, Game *> games;
