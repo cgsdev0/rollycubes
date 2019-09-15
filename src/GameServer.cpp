@@ -1,6 +1,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <json.hpp>
 #include <queue>
 #include <random>
 #include <regex>
@@ -14,6 +15,8 @@
 #include "Game.h"
 #include "Player.h"
 
+// for convenience
+using json = nlohmann::json;
 std::unordered_map<std::string, Game *> games;
 std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
     eviction_queue;
@@ -145,6 +148,7 @@ int main() {
                                  userData->room = std::string(room);
                                  userData->session = std::string(session);
                              }
+                             ws->subscribe(room);
                              std::cout << "Socket initiated" << std::endl;
                          } else {
                              // Connecting to a non-existant room
@@ -153,8 +157,38 @@ int main() {
                          }
                      }
                  },
-             .message = [](auto *ws, std::string_view message,
-                           uWS::OpCode opCode) { ws->send(message, opCode); },
+             .message =
+                 [](auto *ws, std::string_view message, uWS::OpCode opCode) {
+                     PerSocketData *userData =
+                         (PerSocketData *)ws->getUserData();
+                     std::string room = userData->room;
+                     std::string session = userData->session;
+                     json response;
+                     try {
+                         auto data = json::parse(message);
+                         auto it = games.find(room);
+                         if (it != games.end()) {
+                             Game *g = it->second;
+                             try {
+                                 g->handleMessage(
+                                     [&ws](auto s) { ws->send(s); },
+                                     [&ws, &room](auto s) {
+                                         ws->publish(room, s);
+                                     },
+                                     data, session);
+                             } catch (GameError &e) {
+                                 response["error"] = e.what();
+                             }
+                         } else {
+                             response["error"] = "Room not found";
+                         }
+                     } catch (nlohmann::detail::parse_error &e) {
+                         std::cout << "RECEIVED BAD JSON: " << message
+                                   << std::endl;
+                         response["error"] = e.what();
+                     }
+                     if (!response.is_null()) ws->send(response.dump());
+                 },
              .drain =
                  [](auto *ws) {
                      /* Check getBufferedAmount here */
@@ -172,9 +206,6 @@ int main() {
                      std::cout << "CLOSING" << std::endl;
                      PerSocketData *userData =
                          (PerSocketData *)ws->getUserData();
-                     if (!userData) {
-                         std::cout << "shocking" << std::endl;
-                     }
                      std::string room = userData->room;
                      std::string session = userData->session;
                      std::cout << "room: " << room << std::endl;

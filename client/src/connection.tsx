@@ -14,7 +14,7 @@ class Connection extends React.Component<Props> {
 
   onOpen = (e: Event) => {
     console.log(e);
-    this.websocket!.send("hey")
+    this.websocket!.send(JSON.stringify({type: "ACTION"}))
   };
 
   onMessage = (e: MessageEvent) => {

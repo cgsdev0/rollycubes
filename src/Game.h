@@ -3,9 +3,15 @@
 #include "Consts.h"
 #include "Player.h"
 
+#include <functional>
+#include <json.hpp>
+#include <vector>
+
+using json = nlohmann::json;
+
 class Game {
    public:
-    Game() : turn_index(0), player_count(0) {}
+    Game() : turn_index(0) { players.reserve(MAX_PLAYERS); }
 
     bool isInitialized();
 
@@ -14,13 +20,25 @@ class Game {
 
     bool disconnectPlayer(std::string id);
 
+    void handleMessage(std::function<void(std::string)> send,
+                       std::function<void(std::string)> broadcast, json& data,
+                       const std::string& session);
+
     int connectedPlayerCount();
 
    private:
-    Player players[MAX_PLAYERS];
-    int player_count;
+    std::vector<Player> players;
     int turn_index;
     int roll[DICE_COUNT];
     bool used[DICE_COUNT];
-    bool initialized;
+};
+
+class GameError {
+   public:
+    GameError(std::string err) : err(err) {}
+
+    const std::string& what() { return err; }
+
+   private:
+    std::string err;
 };

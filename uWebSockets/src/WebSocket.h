@@ -18,10 +18,10 @@
 #ifndef UWS_WEBSOCKET_H
 #define UWS_WEBSOCKET_H
 
-#include "WebSocketData.h"
-#include "WebSocketProtocol.h"
 #include "AsyncSocket.h"
 #include "WebSocketContextData.h"
+#include "WebSocketData.h"
+#include "WebSocketProtocol.h"
 
 #include <string_view>
 
@@ -29,19 +29,24 @@ namespace uWS {
 
 template <bool SSL, bool isServer>
 struct WebSocket : AsyncSocket<SSL> {
-    template <bool> friend struct TemplatedApp;
-private:
+    template <bool>
+    friend struct TemplatedApp;
+
+   private:
     typedef AsyncSocket<SSL> Super;
 
-    void *init(bool perMessageDeflate, bool slidingCompression, std::string &&backpressure) {
-        new (us_socket_ext(SSL, (us_socket_t *) this)) WebSocketData(perMessageDeflate, slidingCompression, std::move(backpressure));
+    void *init(bool perMessageDeflate, bool slidingCompression,
+               std::string &&backpressure) {
+        new (us_socket_ext(SSL, (us_socket_t *)this)) WebSocketData(
+            perMessageDeflate, slidingCompression, std::move(backpressure));
         return this;
     }
-public:
 
+   public:
     /* Returns pointer to the per socket user data */
     void *getUserData() {
-        WebSocketData *webSocketData = (WebSocketData *) us_socket_ext(SSL, (us_socket_t *) this);
+        WebSocketData *webSocketData =
+            (WebSocketData *)us_socket_ext(SSL, (us_socket_t *)this);
         /* We just have it overallocated by sizeof type */
         return (webSocketData + 1);
     }
@@ -53,20 +58,26 @@ public:
     /* Simple, immediate close of the socket. Emits close event */
     using Super::close;
 
-    /* Send or buffer a WebSocket frame, compressed or not. Returns false on increased user space backpressure. */
-    bool send(std::string_view message, uWS::OpCode opCode = uWS::OpCode::BINARY, bool compress = false) {
+    /* Send or buffer a WebSocket frame, compressed or not. Returns false on
+     * increased user space backpressure. */
+    bool send(std::string_view message, uWS::OpCode opCode = uWS::OpCode::TEXT,
+              bool compress = false) {
         /* Transform the message to compressed domain if requested */
         if (compress) {
-            WebSocketData *webSocketData = (WebSocketData *) Super::getAsyncSocketData();
+            WebSocketData *webSocketData =
+                (WebSocketData *)Super::getAsyncSocketData();
 
             /* Check and correct the compress hint */
-            if (opCode < 3 && webSocketData->compressionStatus == WebSocketData::ENABLED) {
+            if (opCode < 3 &&
+                webSocketData->compressionStatus == WebSocketData::ENABLED) {
                 LoopData *loopData = Super::getLoopData();
                 /* Compress using either shared or dedicated deflationStream */
                 if (webSocketData->deflationStream) {
-                    message = webSocketData->deflationStream->deflate(loopData->zlibContext, message, false);
+                    message = webSocketData->deflationStream->deflate(
+                        loopData->zlibContext, message, false);
                 } else {
-                    message = loopData->deflationStream->deflate(loopData->zlibContext, message, true);
+                    message = loopData->deflationStream->deflate(
+                        loopData->zlibContext, message, true);
                 }
             } else {
                 compress = false;
@@ -75,8 +86,11 @@ public:
 
         /* Get size, alloate size, write if needed */
         size_t messageFrameSize = protocol::messageFrameSize(message.length());
-        auto[sendBuffer, requiresWrite] = Super::getSendBuffer(messageFrameSize);
-        protocol::formatMessage<isServer>(sendBuffer, message.data(), message.length(), opCode, message.length(), compress);
+        auto[sendBuffer, requiresWrite] =
+            Super::getSendBuffer(messageFrameSize);
+        protocol::formatMessage<isServer>(sendBuffer, message.data(),
+                                          message.length(), opCode,
+                                          message.length(), compress);
         if (requiresWrite) {
             auto[written, failed] = Super::write(sendBuffer, messageFrameSize);
 
@@ -94,7 +108,8 @@ public:
     /* Send websocket close frame, emit close event, send FIN if successful */
     void end(int code, std::string_view message = {}) {
         /* Check if we already called this one */
-        WebSocketData *webSocketData = (WebSocketData *) us_socket_ext(SSL, (us_socket_t *) this);
+        WebSocketData *webSocketData =
+            (WebSocketData *)us_socket_ext(SSL, (us_socket_t *)this);
         if (webSocketData->isShuttingDown) {
             return;
         }
@@ -106,23 +121,28 @@ public:
         static const int MAX_CLOSE_PAYLOAD = 123;
         int length = std::min<size_t>(MAX_CLOSE_PAYLOAD, message.length());
         char closePayload[MAX_CLOSE_PAYLOAD + 2];
-        int closePayloadLength = protocol::formatClosePayload(closePayload, code, message.data(), length);
-        bool ok = send(std::string_view(closePayload, closePayloadLength), OpCode::CLOSE);
+        int closePayloadLength = protocol::formatClosePayload(
+            closePayload, code, message.data(), length);
+        bool ok = send(std::string_view(closePayload, closePayloadLength),
+                       OpCode::CLOSE);
 
         /* FIN if we are ok and not corked */
-        WebSocket<SSL, true> *webSocket = (WebSocket<SSL, true> *) this;
+        WebSocket<SSL, true> *webSocket = (WebSocket<SSL, true> *)this;
         if (!webSocket->isCorked()) {
             if (ok) {
-                /* If we are not corked, and we just sent off everything, we need to FIN right here.
-                 * In all other cases, we need to fin either if uncork was successful, or when drainage is complete. */
+                /* If we are not corked, and we just sent off everything, we
+                 * need to FIN right here.
+                 * In all other cases, we need to fin either if uncork was
+                 * successful, or when drainage is complete. */
                 webSocket->shutdown();
             }
         }
 
         /* Emit close event */
-        WebSocketContextData<SSL> *webSocketContextData = (WebSocketContextData<SSL> *) us_socket_context_ext(SSL,
-            (us_socket_context_t *) us_socket_context(SSL, (us_socket_t *) this)
-        );
+        WebSocketContextData<SSL> *webSocketContextData =
+            (WebSocketContextData<SSL> *)us_socket_context_ext(
+                SSL, (us_socket_context_t *)us_socket_context(
+                         SSL, (us_socket_t *)this));
         if (webSocketContextData->closeHandler) {
             webSocketContextData->closeHandler(this, code, message);
         }
@@ -133,30 +153,36 @@ public:
 
     /* Subscribe to a topic according to MQTT rules and syntax */
     void subscribe(std::string_view topic) {
-        WebSocketContextData<SSL> *webSocketContextData = (WebSocketContextData<SSL> *) us_socket_context_ext(SSL,
-            (us_socket_context_t *) us_socket_context(SSL, (us_socket_t *) this)
-        );
+        WebSocketContextData<SSL> *webSocketContextData =
+            (WebSocketContextData<SSL> *)us_socket_context_ext(
+                SSL, (us_socket_context_t *)us_socket_context(
+                         SSL, (us_socket_t *)this));
 
         /* Fix this up */
         bool *valid = new bool;
         *valid = true;
-        webSocketContextData->topicTree.subscribe(std::string(topic), this, valid);
+        webSocketContextData->topicTree.subscribe(std::string(topic), this,
+                                                  valid);
     }
 
     /* Publish a message to a topic according to MQTT rules and syntax */
     void publish(std::string_view topic, std::string_view message) {
-        WebSocketContextData<SSL> *webSocketContextData = (WebSocketContextData<SSL> *) us_socket_context_ext(SSL,
-            (us_socket_context_t *) us_socket_context(SSL, (us_socket_t *) this)
-        );
+        WebSocketContextData<SSL> *webSocketContextData =
+            (WebSocketContextData<SSL> *)us_socket_context_ext(
+                SSL, (us_socket_context_t *)us_socket_context(
+                         SSL, (us_socket_t *)this));
 
-        /* We frame the message right here and only pass raw bytes to the pub/subber */
+        /* We frame the message right here and only pass raw bytes to the
+         * pub/subber */
         char dst[1024];
-        size_t dst_length = protocol::formatMessage<true>(dst, message.data(), message.length(), OpCode::TEXT, message.length(), false);
+        size_t dst_length = protocol::formatMessage<true>(
+            dst, message.data(), message.length(), OpCode::TEXT,
+            message.length(), false);
 
-        webSocketContextData->topicTree.publish(std::string(topic), dst, dst_length);
+        webSocketContextData->topicTree.publish(std::string(topic), dst,
+                                                dst_length);
     }
 };
-
 }
 
-#endif // UWS_WEBSOCKET_H
+#endif  // UWS_WEBSOCKET_H

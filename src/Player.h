@@ -9,11 +9,11 @@ class Player {
 
     Player(std::string session);
 
-    const std::string& getSession();
+    const std::string& getSession() const;
 
     void disconnect();
 
-    bool isConnected();
+    bool isConnected() const;
 
    private:
     std::string session;
