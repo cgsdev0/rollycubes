@@ -24,9 +24,7 @@ std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
 typedef uWS::HttpResponse<false> HttpResponse;
 typedef uWS::HttpRequest HttpRequest;
 
-unsigned int srandom_char(std::string seed, int k = 255) {
-    std::seed_seq s(seed.begin(), seed.end());
-    std::mt19937 gen(s);
+unsigned int srandom_char(std::mt19937 &gen, int k = 255) {
     std::uniform_int_distribution<> dis(0, k);
     return dis(gen);
 }
@@ -38,13 +36,15 @@ unsigned int random_char(int k = 255) {
     return dis(gen);
 }
 
-std::string generate_code(const unsigned int len) {
+std::string generate_code(const unsigned int len, std::string seed = "") {
+    std::seed_seq s(seed.begin(), seed.end());
+    std::mt19937 gen(s);
     const std::string chars =
         "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUV23456789";
     const unsigned int l = chars.length() - 1;
     std::stringstream ss;
     for (auto i = 0; i < len; i++) {
-        ss << chars[random_char(l)];
+        ss << chars[seed == "" ? random_char(l) : srandom_char(gen, l)];
     }
     return ss.str();
 }
@@ -61,12 +61,14 @@ std::string generate_hex(const unsigned int len) {
 }
 
 void runEviction() {
+    std::cout << "Running eviction algorithm!" << std::endl;
     while (!eviction_queue.empty()) {
         auto i = eviction_queue.front();
         if (i.first < std::chrono::system_clock::now() - EVICT_AFTER) {
             auto it = games.find(i.second);
+            std::cout << "Checking room " << i.second << std::endl;
             if (it != games.end()) {
-                if (!it->second->isInitialized()) {
+                if (!it->second->connectedPlayerCount()) {
                     std::cout << "EVICTING GAME: " << i.second << std::endl;
                     Game *g = it->second;
                     games.erase(it);
@@ -93,6 +95,20 @@ struct PerSocketData {
     std::string room;
 };
 
+std::string createRoom(std::string seed = "") {
+    runEviction();
+    Game *g = new Game();
+    std::string id;
+    do {
+        id = generate_code(ROOM_LEN, seed);
+        std::cout << "trying id " << id << std::endl;
+    } while (games.find(id) != games.end());
+    games.insert({id, g});
+    eviction_queue.push({std::chrono::system_clock::now(), id});
+    std::cout << "New game session starting: " << id << std::endl;
+    return id;
+}
+
 /* Very simple WebSocket echo server */
 int main() {
     /* Overly simple hello world app */
@@ -106,27 +122,15 @@ int main() {
                  }
                  res->end();
              })
-        .get(
-            "/create",
-            [](auto *res, auto *req) {
-                std::string session = getSession(req);
-                if (session == "") {
-                    res->end();
-                } else {
-                    runEviction();
-                    Game *g = new Game();
-                    std::string id;
-                    do {
-                        id = generate_code(ROOM_LEN);
-                        std::cout << "trying id " << id << std::endl;
-                    } while (games.find(id) != games.end());
-                    games.insert({id, g});
-                    eviction_queue.push({std::chrono::system_clock::now(), id});
-                    res->end(id);
-                    std::cout << "New game session starting: " << id
-                              << std::endl;
-                }
-            })
+        .get("/create",
+             [](auto *res, auto *req) {
+                 std::string session = getSession(req);
+                 if (session == "") {
+                     res->end();
+                 } else {
+                     res->end(createRoom());
+                 }
+             })
         .ws<PerSocketData>(
             "/ws/:room",
             {/* Settings */
@@ -143,6 +147,7 @@ int main() {
                          ws->close();
                          std::cout << "Closing: no session" << std::endl;
                      } else {
+                         runEviction();
                          std::string room = std::string(req->getParameter(0));
                          std::cout << "Connection opening to room " << room
                                    << std::endl;
@@ -169,8 +174,16 @@ int main() {
                              std::cout << "Socket initiated" << std::endl;
                          } else {
                              // Connecting to a non-existant room
-                             std::cout << "Closing: invalid game" << std::endl;
-                             ws->close();
+                             // let's migrate them to a new room
+                             room = createRoom(room);
+                             json route;
+                             route["type"] = "redirect";
+                             route["room"] = room;
+                             userData->room = std::string(room);
+                             userData->session = std::string(session);
+                             ws->send(route.dump());
+                             std::cout << "Invalid game, re-routing to " << room
+                                       << std::endl;
                          }
                      }
                  },
