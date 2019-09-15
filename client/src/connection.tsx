@@ -21,7 +21,7 @@ class Connection extends React.Component<Props> {
     console.log(JSON.parse(e.data));
   };
   openSocket = () => {
-    this.websocket = new WebSocket(`ws://localhost:3000/ws/${this.props.room}`);
+    this.websocket = new WebSocket(`ws://${window.location.hostname}:3000/ws/${this.props.room}`);
     this.websocket.addEventListener('close', this.onClose);
     this.websocket.addEventListener('open', this.onOpen);
     this.websocket.addEventListener('message', this.onMessage);

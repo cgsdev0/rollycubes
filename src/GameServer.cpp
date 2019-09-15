@@ -97,12 +97,18 @@ struct PerSocketData {
 
 std::string createRoom(std::string seed = "") {
     runEviction();
-    Game *g = new Game();
     std::string id;
     do {
         id = generate_code(ROOM_LEN, seed);
+        if (games.find(id) != games.end() && seed != "") {
+            // Short circuit to prevent infinite loop
+            // in the case of a seeded redirect already
+            // existing
+            return id;
+        }
         std::cout << "trying id " << id << std::endl;
     } while (games.find(id) != games.end());
+    Game *g = new Game();
     games.insert({id, g});
     eviction_queue.push({std::chrono::system_clock::now(), id});
     std::cout << "New game session starting: " << id << std::endl;
@@ -163,9 +169,9 @@ int main() {
                                  } else {
                                      ws->publish(room, resp.dump());
                                  }
-                                 userData->room = std::string(room);
-                                 userData->session = std::string(session);
                              }
+                             userData->room = std::string(room);
+                             userData->session = std::string(session);
                              json welcome;
                              welcome["type"] = "welcome";
                              welcome["game"] = g->toJson();
@@ -213,7 +219,7 @@ int main() {
                                  response["error"] = e.what();
                              }
                          } else {
-                             response["error"] = "Room not found";
+                             response["error"] = "Room not found: " + room;
                          }
                      } catch (nlohmann::detail::parse_error &e) {
                          std::cout << "RECEIVED BAD JSON: " << message
