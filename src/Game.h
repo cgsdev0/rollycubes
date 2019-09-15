@@ -9,6 +9,11 @@
 
 using json = nlohmann::json;
 
+typedef std::function<void(std::string)> SendFunc;
+
+#define HANDLER_ARGS \
+    SendFunc send, SendFunc broadcast, json &data, const ::std::string &session
+
 class Game {
    public:
     Game() : turn_index(0) { players.reserve(MAX_PLAYERS); }
@@ -20,9 +25,9 @@ class Game {
 
     bool disconnectPlayer(std::string id);
 
-    void handleMessage(std::function<void(std::string)> send,
-                       std::function<void(std::string)> broadcast, json& data,
-                       const std::string& session);
+    void handleMessage(HANDLER_ARGS);
+
+    void chat(HANDLER_ARGS);
 
     int connectedPlayerCount();
 
@@ -37,7 +42,7 @@ class GameError {
    public:
     GameError(std::string err) : err(err) {}
 
-    const std::string& what() { return err; }
+    const std::string &what() { return err; }
 
    private:
     std::string err;

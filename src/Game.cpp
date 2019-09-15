@@ -1,6 +1,8 @@
-#include "Game.h"
+#include <iostream>
 #include <unordered_map>
+
 #include "Consts.h"
+#include "Game.h"
 
 bool Game::isInitialized() { return players.size() > 0; }
 
@@ -31,23 +33,27 @@ bool Game::disconnectPlayer(std::string id) {
     return false;
 }
 
-typedef std::function<void(std::string)> SendFunc;
+void Game::chat(HANDLER_ARGS) {
+    json res;
+    if (!data["msg"].is_string()) throw GameError("Message must be a string");
+    res["type"] = data["type"];
+    res["msg"] = data["msg"];
+    std::cout << res["msg"] << std::endl;
+    broadcast(res.dump());
+};
 
-const auto actionHandler = [](auto send, auto broadcast, auto data,
-                              auto session) { send("holy shit it works"); };
 const std::unordered_map<
     std::string,
-    std::function<void(SendFunc&, SendFunc&, json&, const std::string&)>>
-    action_map = {{"ACTION", actionHandler}};
+    std::function<void(Game*, SendFunc, SendFunc, json&, const std::string&)>>
+    action_map = {{"CHAT", std::mem_fn(&Game::chat)}};
 
-void Game::handleMessage(SendFunc send, SendFunc broadcast, json& data,
-                         const std::string& session) {
+void Game::handleMessage(HANDLER_ARGS) {
     if (!data["type"].is_string())
         throw GameError("Type is not specified correctly");
     auto action_type = data["type"].get<std::string>();
     auto it = action_map.find(action_type);
     if (it != action_map.end()) {
-        it->second(send, broadcast, data, session);
+        it->second(this, send, broadcast, data, session);
     } else {
         throw GameError("Unknown action type");
     }
