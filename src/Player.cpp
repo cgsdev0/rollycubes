@@ -11,22 +11,24 @@ void Player::disconnect() { connected = false; }
 bool Player::isConnected() const { return connected; }
 
 int Player::addScore(int n) {
-    score + n;
+    score += n;
     return score;
 }
 
 int Player::addWin(int n) {
-    win_count + n;
+    win_count += n;
     return win_count;
 }
 
-void Player::reset() { int score = 0; }
+void Player::reset() { this->score = 0; }
 
 void Player::setName(std::string& name) {
     this->name = name.substr(0, MAX_PLAYER_NAME);
 }
 
 const std::string& Player::getName() { return this->name; }
+
+int Player::getScore() { return this->score; }
 
 json Player::toJson() const {
     json result;

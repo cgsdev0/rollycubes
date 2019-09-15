@@ -168,7 +168,7 @@ void Game::leave(HANDLER_ARGS) {
                 json turn;
                 turn["type"] = "update_turn";
                 turn["id"] = turn_index;
-                broadcast(res.dump());
+                broadcast(turn.dump());
             }
             players.erase(players.begin() + i);
             broadcast(res.dump());
@@ -193,7 +193,7 @@ void Game::kick(HANDLER_ARGS) {
         json turn;
         turn["type"] = "update_turn";
         turn["id"] = turn_index;
-        broadcast(res.dump());
+        broadcast(turn.dump());
     }
     players.erase(players.begin() + id);
     broadcast(res.dump());
@@ -206,6 +206,7 @@ void Game::restart(HANDLER_ARGS) {
 
     json res;
     for (auto& player : players) player.reset();
+    victory = false;
     advanceTurn();
     res["type"] = "restart";
     res["id"] = this->turn_index;
@@ -236,22 +237,27 @@ void Game::roll(HANDLER_ARGS) {
     if (session != this->turn_token) throw GameError("not your turn");
     if (rolled) throw GameError("now's not the time for that");
     if (players.size() <= 1) throw GameError("invite some friends first!");
+    json resp;
+    resp["type"] = "roll";
     for (int i = 0; i < DICE_COUNT; ++i) {
-        rolls[i] = dis(gen);
+        rolls[i] = dis(std::m19937(std::random_device()));
+        resp["rolls"].push_back(rolls[i]);
     }
+    rolled = true;
+    broadcast(resp.dump());
 }
 
 void Game::add(HANDLER_ARGS) {
     this->guardUpdate(session);
     if (this->isSplit()) throw GameError("you must add invdividually");
-    data = this->totalRoll();
+    data = json(this->totalRoll());
     this->update(send, broadcast, data, session);
 }
 
 void Game::sub(HANDLER_ARGS) {
     this->guardUpdate(session);
     if (this->isSplit()) throw GameError("you must add invdividually");
-    data = -this->totalRoll();
+    data = json(-this->totalRoll());
     this->update(send, broadcast, data, session);
 }
 
@@ -268,14 +274,14 @@ int Game::guardNth(const json& data) {
 void Game::add_nth(HANDLER_ARGS) {
     this->guardUpdate(session);
     int n = this->guardNth(data["n"]);
-    data = rolls[n];
+    data = json(rolls[n]);
     this->update(send, broadcast, data, session);
 }
 
 void Game::sub_nth(HANDLER_ARGS) {
     this->guardUpdate(session);
     int n = this->guardNth(data["n"]);
-    data = -rolls[n];
+    data = json(-rolls[n]);
     this->update(send, broadcast, data, session);
 }
 
@@ -295,18 +301,48 @@ void Game::update(HANDLER_ARGS) {
         if (!this->isDoubles()) {
             if (TARGET_SCORES.count(score)) {
                 // WIN CONDITION
+                json win;
                 players[i].addWin(1);
-                res["type"] = "win";
-                res["id"] = i;
+                win["type"] = "win";
+                win["id"] = i;
                 victory = true;
+                broadcast(win.dump());
             } else {
+                for (int i = 0; i < players.size(); ++i) {
+                    if (session == players[i].getSession()) {
+                        continue;
+                    }
+                    if (score == players[i].getScore()) {
+                        players[i].reset();
+                        json update;
+                        update["type"] = "update";
+                        update["id"] = i;
+                        update["score"] = 0;
+                        broadcast(update.dump());
+                        break;
+                    }
+                }
                 this->advanceTurn();
                 json turn;
                 turn["type"] = "update_turn";
                 turn["id"] = turn_index;
-                broadcast(res.dump());
+                broadcast(turn.dump());
             }
         } else {
+            for (int i = 0; i < players.size(); ++i) {
+                if (session == players[i].getSession()) {
+                    continue;
+                }
+                if (score == players[i].getScore()) {
+                    players[i].reset();
+                    json update;
+                    update["type"] = "update";
+                    update["id"] = i;
+                    update["score"] = 0;
+                    broadcast(update.dump());
+                    break;
+                }
+            }
             clearTurn();
             json rollAgain;
             rollAgain["type"] = "roll_again";

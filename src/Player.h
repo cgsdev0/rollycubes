@@ -20,6 +20,8 @@ class Player {
 
     int addScore(int n);
 
+    int getScore();
+
     int addWin(int n);
 
     void reset();

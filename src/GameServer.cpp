@@ -212,9 +212,11 @@ int main() {
                                          ws->publish(room, s);
                                      },
                                      data, session);
-                                 if (data["type"] == "leave") {
-                                     ws->close();
-                                 }
+                                 /*if (data["type"].is_string()) {
+                                     if (data["type"] == "leave") {
+                                         ws->close();
+                                     }
+                                 }*/
                              } catch (GameError &e) {
                                  response["error"] = e.what();
                              }
@@ -253,7 +255,9 @@ int main() {
                      if (it != games.end()) {
                          Game *g = it->second;
                          json resp = g->disconnectPlayer(session);
-                         ws->publish(room, resp.dump());
+                         if (!resp.is_null()) {
+                             ws->publish(room, resp.dump());
+                         }
                          if (!g->connectedPlayerCount()) {
                              eviction_queue.push(
                                  {std::chrono::system_clock::now(), room});

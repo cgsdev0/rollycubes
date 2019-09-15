@@ -17,11 +17,7 @@ typedef std::function<void(std::string)> SendFunc;
 
 class Game {
    public:
-    Game()
-        : gen(std::random_device()()),
-          dis(1, 6),
-          victory(false),
-          rolled(false) {
+    Game() : dis(1, 6), victory(false), rolled(false) {
         players.reserve(MAX_PLAYERS);
         for (int i = 0; i < DICE_COUNT; ++i) {
             rolls[i] = 1;
@@ -73,7 +69,6 @@ class Game {
     int turn_index;
     int rolls[DICE_COUNT];
     bool used[DICE_COUNT];
-    std::mt19937 gen;
     std::uniform_int_distribution<int> dis;
     bool rolled;
     bool victory;
