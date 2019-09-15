@@ -18,7 +18,7 @@ class Connection extends React.Component<Props> {
   };
 
   onMessage = (e: MessageEvent) => {
-    console.log(e);
+    console.log(JSON.parse(e.data));
   };
   openSocket = () => {
     this.websocket = new WebSocket(`ws://localhost:3000/ws/${this.props.room}`);
@@ -36,6 +36,12 @@ class Connection extends React.Component<Props> {
         this.websocket.close();
       }
       this.openSocket();
+    }
+  }
+
+  componentWillUnmount() {
+    if(this.websocket) {
+      this.websocket.close();
     }
   }
   render() {

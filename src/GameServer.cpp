@@ -24,6 +24,13 @@ std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
 typedef uWS::HttpResponse<false> HttpResponse;
 typedef uWS::HttpRequest HttpRequest;
 
+unsigned int srandom_char(std::string seed, int k = 255) {
+    std::seed_seq s(seed.begin(), seed.end());
+    std::mt19937 gen(s);
+    std::uniform_int_distribution<> dis(0, k);
+    return dis(gen);
+}
+
 unsigned int random_char(int k = 255) {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -144,10 +151,20 @@ int main() {
                              // Connecting to a valid game
                              Game *g = it->second;
                              if (!g->hasPlayer(session)) {
-                                 g->addPlayer(session);
+                                 json resp = g->addPlayer(session);
+                                 if (resp.is_null()) {
+                                     // room is full
+                                     ws->close();
+                                 } else {
+                                     ws->publish(room, resp.dump());
+                                 }
                                  userData->room = std::string(room);
                                  userData->session = std::string(session);
                              }
+                             json welcome;
+                             welcome["type"] = "welcome";
+                             welcome["game"] = g->toJson();
+                             ws->send(welcome.dump());
                              ws->subscribe(room);
                              std::cout << "Socket initiated" << std::endl;
                          } else {
@@ -176,6 +193,9 @@ int main() {
                                          ws->publish(room, s);
                                      },
                                      data, session);
+                                 if (data["type"] == "leave") {
+                                     ws->close();
+                                 }
                              } catch (GameError &e) {
                                  response["error"] = e.what();
                              }
@@ -213,7 +233,8 @@ int main() {
                      auto it = games.find(room);
                      if (it != games.end()) {
                          Game *g = it->second;
-                         g->disconnectPlayer(session);
+                         json resp = g->disconnectPlayer(session);
+                         ws->publish(room, resp.dump());
                          if (!g->connectedPlayerCount()) {
                              eviction_queue.push(
                                  {std::chrono::system_clock::now(), room});

@@ -1,7 +1,10 @@
 #pragma once
+#include <json.hpp>
 #include <string>
 
 #include "Consts.h"
+
+using json = nlohmann::json;
 
 class Player {
    public:
@@ -14,6 +17,18 @@ class Player {
     void disconnect();
 
     bool isConnected() const;
+
+    int addScore(int n);
+
+    int addWin(int n);
+
+    void reset();
+
+    void setName(std::string& name);
+
+    const std::string& getName();
+
+    json toJson() const;
 
    private:
     std::string session;
