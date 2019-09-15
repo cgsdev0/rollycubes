@@ -42,11 +42,15 @@ void Game::chat(HANDLER_ARGS) {
     broadcast(res.dump());
 };
 
+#define ACTION(x) \
+    { #x, std::mem_fn(&Game::x) }
+
 const std::unordered_map<
     std::string,
     std::function<void(Game*, SendFunc, SendFunc, json&, const std::string&)>>
-    action_map = {{"CHAT", std::mem_fn(&Game::chat)}};
+    action_map = {ACTION(chat)};
 
+#undef ACTION
 void Game::handleMessage(HANDLER_ARGS) {
     if (!data["type"].is_string())
         throw GameError("Type is not specified correctly");
