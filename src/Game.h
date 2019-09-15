@@ -9,6 +9,13 @@ class Game {
 
     bool isInitialized();
 
+    bool hasPlayer(std::string id);
+    bool addPlayer(std::string id);
+
+    bool disconnectPlayer(std::string id);
+
+    int connectedPlayerCount();
+
    private:
     Player players[MAX_PLAYERS];
     int player_count;

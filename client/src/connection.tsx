@@ -1,6 +1,10 @@
 import React from 'react';
 
-class Connection extends React.Component {
+interface Props {
+  room: string;
+}
+
+class Connection extends React.Component<Props> {
   websocket?: WebSocket;
 
   onClose = (e: CloseEvent) => {
@@ -17,13 +21,22 @@ class Connection extends React.Component {
     console.log(e);
   };
   openSocket = () => {
-    this.websocket = new WebSocket("ws://localhost:3000/ws");
+    this.websocket = new WebSocket(`ws://localhost:3000/ws/${this.props.room}`);
     this.websocket.addEventListener('close', this.onClose);
     this.websocket.addEventListener('open', this.onOpen);
     this.websocket.addEventListener('message', this.onMessage);
   };
   componentDidMount() {
     this.openSocket();
+  }
+
+  componentDidUpdate(prev: Props) {
+    if(prev.room !== this.props.room) {
+      if(this.websocket) {
+        this.websocket.close();
+      }
+      this.openSocket();
+    }
   }
   render() {
     return null;
