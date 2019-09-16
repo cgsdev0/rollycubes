@@ -19,6 +19,7 @@ export interface ReduxState {
     self_index: number;
     game_over: boolean;
     socket?: WebSocket;
+    rollCount: number;
 }
 
 const initialState: ReduxState = {
@@ -28,6 +29,7 @@ const initialState: ReduxState = {
     turn_index: 0,
     self_index: 0,
     game_over: false,
+    rollCount: 0,
 }
 
 const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, action: AnyAction) => {
@@ -91,6 +93,7 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 ...state,
                 rolls: action.rolls.map((roll: number) => ({ value: roll, used: false })),
                 rolled: true,
+                rollCount: state.rollCount + 1,
             }
         default:
             console.error("RECEIVED UNKNOWN ACTION", action);

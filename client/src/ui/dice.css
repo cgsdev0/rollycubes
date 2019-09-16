@@ -1,0 +1,93 @@
+.dice {
+    background: url(./dice.png) left top;
+    height: 106px;
+    width: 106px;
+    display: inline-block;
+  }
+
+  .diceBox {
+      display: flex;
+  }
+
+.rolling1 {
+    background-position: 0px 0px;
+    animation: roll1 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.rolled1 {
+    background-position: 0px 0px;
+}
+
+.rolling2 {
+    background-position: 525px 0px;
+    animation: roll2 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.rolled2 {
+    background-position: 525px 0px;
+}
+
+.rolling3 {
+    background-position: 420px 0px;
+    animation: roll3 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.rolled3 {
+    background-position: 420px 0px;
+}
+
+.rolling4 {
+    background-position: 315px 0px;
+    animation: roll4 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.rolled4 {
+    background-position: 315px 0px;
+}
+
+.rolling5 {
+    background-position: 210px 0px;
+    animation: roll5 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.rolled5 {
+    background-position: 210px 0px;
+}
+
+.rolling6 {
+    background-position: 105px 0px;
+    animation: roll6 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.rolled6 {
+    background-position: 105px 0px;
+}
+
+@keyframes roll1 {
+    100% { background-position: 0px -2520px; }
+ }
+ @keyframes roll2 {
+    100% { background-position: 525px -2520px; }
+ }
+
+ @keyframes roll3 {
+    100% { background-position: 420px -2520px; }
+ }
+
+ @keyframes roll4 {
+    100% { background-position: 315px -2520px; }
+ }
+
+ @keyframes roll5 {
+    100% { background-position: 210px -2520px; }
+ }
+
+ @keyframes roll6 {
+    100% { background-position: 105px -2520px; }
+ }
