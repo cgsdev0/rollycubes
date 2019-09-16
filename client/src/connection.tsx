@@ -1,36 +1,39 @@
 import React from 'react';
 import { History } from 'history';
+import { connect, DispatchProp } from 'react-redux';
 
 interface Props {
   room: string;
   history: History;
 }
 
-class Connection extends React.Component<Props> {
+class Connection extends React.Component<Props & DispatchProp> {
   websocket?: WebSocket;
   timer?: any;
 
   onClose = (e: CloseEvent) => {
-    console.error(e);
+    console.error("Socket closed", e);
     this.timer = setTimeout(this.openSocket, 5000);
   };
 
   onOpen = (e: Event) => {
-    console.log(e);
-    this.websocket!.send(JSON.stringify({ type: "roll", n: 0, msg: "Hello world!" }))
+    console.log("Socket opened", e);
+    //this.websocket!.send(JSON.stringify({ type: "roll", n: 0, msg: "Hello world!" }))
   };
 
   onMessage = (e: MessageEvent) => {
     const data: any = JSON.parse(e.data);
-    console.log(data);
     if (!data) {
       console.error("empty action from server")
     }
-    else if(Object.keys(data).find(k => k === "error")) {
-      console.error(data.error);
+    else if("error" in data) {
+      console.error(data || data.error);
     }
     else if (data.type === "redirect") {
       this.props.history.replace(`/room/${data.room}`)
+    }
+    else {
+      this.props.dispatch(data);
     }
   };
 
@@ -40,6 +43,7 @@ class Connection extends React.Component<Props> {
       this.websocket.addEventListener('close', this.onClose);
       this.websocket.addEventListener('open', this.onOpen);
       this.websocket.addEventListener('message', this.onMessage);
+      this.props.dispatch({ type: "WEBSOCKET", socket: this.websocket});
     }
   };
 
@@ -58,6 +62,7 @@ class Connection extends React.Component<Props> {
   }
 
   componentWillUnmount() {
+    this.props.dispatch({ type: "WEBSOCKET", socket: undefined});
     if (this.websocket) {
       if(this.timer) {
         clearTimeout(this.timer);
@@ -74,4 +79,4 @@ class Connection extends React.Component<Props> {
   }
 }
 
-export default Connection;
+export default connect()(Connection);

@@ -166,15 +166,20 @@ int main() {
                                  if (resp.is_null()) {
                                      // room is full
                                      ws->close();
+                                     return;
                                  } else {
                                      ws->publish(room, resp.dump());
                                  }
+                             } else {
+                                 json resp = g->reconnectPlayer(session);
+                                 ws->publish(room, resp.dump());
                              }
                              userData->room = std::string(room);
                              userData->session = std::string(session);
                              json welcome;
                              welcome["type"] = "welcome";
                              welcome["game"] = g->toJson();
+                             welcome["id"] = g->getPlayerId(session);
                              ws->send(welcome.dump());
                              ws->subscribe(room);
                              std::cout << "Socket initiated" << std::endl;

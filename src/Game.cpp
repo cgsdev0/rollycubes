@@ -22,13 +22,22 @@ bool Game::isDoubles() {
     return true;
 }
 
-bool Game::hasPlayer(std::string id) {
+bool Game::hasPlayer(std::string& id) {
     for (const auto& player : players) {
         if (player.getSession() == id) {
             return true;
         }
     }
     return false;
+}
+
+int Game::getPlayerId(std::string& id) {
+    for (int i = 0; i < players.size(); ++i) {
+        if (players[i].getSession() == id) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 json Game::addPlayer(std::string id) {
@@ -240,7 +249,9 @@ void Game::roll(HANDLER_ARGS) {
     json resp;
     resp["type"] = "roll";
     for (int i = 0; i < DICE_COUNT; ++i) {
-        rolls[i] = dis(std::m19937(std::random_device()));
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        rolls[i] = dis(gen);
         resp["rolls"].push_back(rolls[i]);
     }
     rolled = true;
@@ -295,6 +306,7 @@ void Game::update(HANDLER_ARGS) {
     int score = players[i].addScore(change);
     res["type"] = "update";
     res["score"] = score;
+    res["used"] = used;
     res["id"] = i;
     broadcast(res.dump());
     if (!this->isSplit() || this->allUsed()) {

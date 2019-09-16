@@ -27,8 +27,9 @@ class Game {
 
     bool isInitialized();
 
-    bool hasPlayer(std::string id);
+    bool hasPlayer(std::string &id);
     json addPlayer(std::string id);
+    int getPlayerId(std::string &id);
 
     json disconnectPlayer(std::string id);
     json reconnectPlayer(std::string id);

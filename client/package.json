@@ -7,7 +7,9 @@
     "@types/node": "12.7.5",
     "@types/react": "16.9.2",
     "@types/react-dom": "16.9.0",
+    "@types/react-redux": "^7.1.2",
     "@types/react-router-dom": "^4.3.5",
+    "@types/reselect": "^2.2.0",
     "prettier": "^1.18.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -15,6 +17,7 @@
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1",
+    "reselect": "^4.0.0",
     "typescript": "3.6.3"
   },
   "scripts": {
