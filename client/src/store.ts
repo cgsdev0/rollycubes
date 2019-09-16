@@ -46,9 +46,15 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
             }
             return Object.assign({}, state, initialState, game, { players: game.players }, { self_index: action.id }, { rolls })
         case "join":
+            if(!state.players.length) {
+                return state;
+            }
+            if(action.id === state.self_index) {
+                return state;
+            }
             return {
                 ...state,
-                players: state.players.concat({ connected: true, name: "Loading...", score: 0, win_count: 0 })
+                players: state.players.concat({ connected: true, name: "", score: 0, win_count: 0 })
             }
 
         case "disconnect":

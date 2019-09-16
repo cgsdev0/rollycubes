@@ -12,7 +12,7 @@ interface Props {
 class Die extends React.Component<Props> {
     render() {
         const { roll, buttons, n } = this.props;
-        return (<div>{roll.value} | {JSON.stringify(roll.used)} | {buttons && !roll.used ? <AddSubButton n={n} /> : null}</div>);
+        return (<div>Die {JSON.stringify(n+1)}: {roll.value} {buttons && !roll.used ? <AddSubButton n={n} /> : null}</div>);
     }
 }
 

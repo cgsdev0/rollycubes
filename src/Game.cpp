@@ -238,11 +238,13 @@ void Game::update_name(HANDLER_ARGS) {
     }
 }
 void Game::guardUpdate(const std::string& session) {
+    if (victory) throw GameError("game is over");
     if (session != this->turn_token) throw GameError("not your turn");
     if (!rolled) throw GameError("you need to roll first");
 }
 
 void Game::roll(HANDLER_ARGS) {
+    if (victory) throw GameError("game is over");
     if (session != this->turn_token) throw GameError("not your turn");
     if (rolled) throw GameError("now's not the time for that");
     if (players.size() <= 1) throw GameError("invite some friends first!");

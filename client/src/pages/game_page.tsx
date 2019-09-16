@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import Connection from '../connection';
-import Dice from '../ui/dice';
+import Players from '../ui/players';
 import GamePanel from '../ui/game_panel';
 
 
@@ -25,7 +25,7 @@ class GamePage extends React.Component<Props> {
         return (
         <React.Fragment>
             <Connection room={this.props.route.match.params.room} history={this.props.route.history} />
-            <Dice />
+            <Players />
             <GamePanel />
         </React.Fragment>
         );

@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player() : name("Loading..."), score(0), win_count(0) {}
+Player::Player() : name(""), score(0), win_count(0) {}
 
 Player::Player(std::string session) : session(session) { Player(); }
 

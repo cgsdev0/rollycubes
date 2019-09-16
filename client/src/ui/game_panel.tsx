@@ -4,6 +4,7 @@ import { selectShouldShowRoll, selectShouldShowAddSub } from '../selectors/game_
 import { ReduxState } from '../store';
 import RollButton from './buttons/roll_button';
 import AddSubButton from './buttons/add_sub_button';
+import Dice from './dice';
 
 interface Props {
     roll: boolean;
@@ -18,7 +19,7 @@ class GamePanel extends React.Component<Props> {
         return (this.props.addSub ? (<AddSubButton />) : null);
     }
     render() {
-        return (<div>{this.renderRoll()}{this.renderAddSub()}</div>);
+        return (<div><Dice />{this.renderRoll()}{this.renderAddSub()}</div>);
     }
 }
 
