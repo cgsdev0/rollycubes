@@ -3,6 +3,7 @@ import { selectState } from "../store";
 
 export const selectDiceRolls = createSelector(selectState, state => state.rolls);
 export const selectPlayers = createSelector(selectState, state => state.players);
+export const selectSelfIndex = createSelector(selectState, state=> state.self_index);
 
 export const selectIsMyTurn = createSelector(selectState, state => state.self_index === state.turn_index);
 

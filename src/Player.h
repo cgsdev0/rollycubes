@@ -15,6 +15,7 @@ class Player {
     const std::string& getSession() const;
 
     void disconnect();
+    void reconnect();
 
     bool isConnected() const;
 

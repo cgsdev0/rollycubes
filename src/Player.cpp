@@ -1,12 +1,14 @@
 #include "Player.h"
 
-Player::Player() : name(""), score(0), win_count(0) {}
+Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
-Player::Player(std::string session) : session(session) { Player(); }
+Player::Player(std::string session) : Player() { this->session = session; }
 
 const std::string& Player::getSession() const { return session; }
 
 void Player::disconnect() { connected = false; }
+
+void Player::reconnect() { connected = true; }
 
 bool Player::isConnected() const { return connected; }
 

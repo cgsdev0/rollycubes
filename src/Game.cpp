@@ -115,7 +115,7 @@ json Game::reconnectPlayer(std::string id) {
     json result;
     for (int i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == id) {
-            players[i].disconnect();
+            players[i].reconnect();
             result["type"] = "reconnect";
             result["id"] = i;
             break;

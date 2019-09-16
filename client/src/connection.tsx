@@ -39,7 +39,11 @@ class Connection extends React.Component<Props & DispatchProp> {
 
   openSocket = () => {
     if (!this.websocket || this.websocket.readyState === WebSocket.CLOSED || this.websocket.readyState === WebSocket.CLOSING) {
-      this.websocket = new WebSocket(`ws://${window.location.hostname}:3000/ws/${this.props.room}`);
+      let portString = '';
+      if(window.location.port !== '80') {
+        portString = `:${window.location.port}`
+      }
+      this.websocket = new WebSocket(`ws://${window.location.hostname}${portString}/ws/${this.props.room}`);
       this.websocket.addEventListener('close', this.onClose);
       this.websocket.addEventListener('open', this.onOpen);
       this.websocket.addEventListener('message', this.onMessage);

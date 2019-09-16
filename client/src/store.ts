@@ -61,12 +61,12 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
         case "reconnect":
             return {
                 ...state,
-                players: state.players.map((p: Player, i: number) => (i !== action.id) ? { ...p, connected: action.type === "reconnect" } : p),
+                players: state.players.map((p: Player, i: number) => (i !== action.id) ? p : { ...p, connected: action.type === "reconnect" }),
             }
         case "update":
             return {
                 ...state,
-                players: state.players.map((p: Player, i: number) => (i !== action.id) ? { ...p, score: action.score } : p),
+                players: state.players.map((p: Player, i: number) => (i !== action.id) ? p : { ...p, score: action.score } ),
                 rolls: "used" in action ? action.used.map((used: boolean, i: number) => ({ used, value: state.rolls[i].value })) : state.rolls,
             }
         case "update_turn":
