@@ -1,35 +1,69 @@
 .App {
-  text-align: center;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 100vh;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+.GamePanel {
+  display: flex;
+  flex-direction: column;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.PlayerPanel {
+  flex-direction: column;
+  align-self: stretch;
+  margin: 50px;
+  display: flex;
+  border: 1px solid #ccc;
+  border-bottom-width: 0px;
+}
+
+.Player {
+  flex-grow: 1;
+  display: flex;
+  border-bottom: solid 1px #ccc;
+  flex-basis: 100%;
+  justify-content: space-between;
+  padding: 8px;
+}
+
+.Turn {
+  background-color: #aaeeaa;
+}
+
+.Disconnected {
+  background-color: #eeaaaa;
+}
+
+.Player .Name {
+  justify-content: flex-start;
+  display: flex;
+}
+
+.Player .Name .You {
+  margin-left: 1em;
+}
+
+.Player .Score { 
+  align-content: flex-end;
+}
+
+.ButtonPanel {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: stretch;
+  flex-basis: 100%;
+  min-height: 40px;
+  margin-bottom: 56px;
+}
+
+.GamePage {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  height: 100%;
+  width: 100%;
+  justify-content: inherit;
 }

@@ -1,0 +1,13 @@
+button {
+    flex-basis: 100%;
+}
+
+.buttonColumn {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    flex-grow: 1;
+    align-content: stretch;
+    flex-basis: 100%;
+}

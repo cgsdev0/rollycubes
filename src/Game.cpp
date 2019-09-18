@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <unordered_map>
 
@@ -190,8 +191,6 @@ void Game::kick(HANDLER_ARGS) {
     if (!data["id"].is_number()) throw GameError("pass a number please");
     int id = data["id"].get<int>();
     if (players.empty()) throw GameError("uhhh this should never happen");
-    if (players[0].getSession() != session) throw GameError("You are not host");
-    if (id == 0) throw GameError("why are you kicking yourself");
     if (id >= players.size()) throw GameError("out of bounds");
 
     json res;

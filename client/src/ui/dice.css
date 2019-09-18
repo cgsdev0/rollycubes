@@ -2,11 +2,13 @@
     background: url(./dice.png) left top;
     height: 106px;
     width: 106px;
-    display: inline-block;
   }
 
   .diceBox {
       display: flex;
+      justify-content: center;
+      flex-direction: row;
+      flex-basis: 100%;
   }
 
 .rolling1 {

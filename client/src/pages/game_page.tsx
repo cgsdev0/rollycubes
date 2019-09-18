@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import Connection from '../connection';
 import Players from '../ui/players';
 import GamePanel from '../ui/game_panel';
-
+import '../App.css';
 
 interface TParams {
     room: string;
@@ -23,11 +23,11 @@ class GamePage extends React.Component<Props> {
             return null;
         }
         return (
-        <React.Fragment>
+        <div className="GamePage">
             <Connection room={this.props.route.match.params.room} history={this.props.route.history} />
             <Players />
             <GamePanel />
-        </React.Fragment>
+        </div>
         );
     }
 }

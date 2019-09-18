@@ -29,10 +29,11 @@ class AddSubButton extends React.Component<Props> {
     }
 
     render() {
-        return (<p>
+        return (
+        <React.Fragment>
             <button onClick={this.onAdd}>+</button>
             <button onClick={this.onSub}>-</button>
-            </p>
+        </React.Fragment>
             );
     }
 }

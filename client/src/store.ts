@@ -48,10 +48,10 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
             }
             return Object.assign({}, state, initialState, game, { players: game.players }, { self_index: action.id }, { rolls })
         case "join":
-            if(!state.players.length) {
+            if (!state.players.length) {
                 return state;
             }
-            if(action.id === state.self_index) {
+            if (action.id === state.self_index) {
                 return state;
             }
             return {
@@ -68,8 +68,14 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
         case "update":
             return {
                 ...state,
-                players: state.players.map((p: Player, i: number) => (i !== action.id) ? p : { ...p, score: action.score } ),
+                players: state.players.map((p: Player, i: number) => (i !== action.id) ? p : { ...p, score: action.score }),
                 rolls: "used" in action ? action.used.map((used: boolean, i: number) => ({ used, value: state.rolls[i].value })) : state.rolls,
+            }
+        case "update_name":
+        console.warn(action);
+            return {
+                ...state,
+                players: state.players.map((p: Player, i: number) => (i !== action.id) ? p : { ...p, name: action.name }),
             }
         case "update_turn":
             return {
@@ -77,7 +83,7 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 turn_index: action.id,
                 rolled: false,
             }
-            case "roll_again":
+        case "roll_again":
             return {
                 ...state,
                 rolled: false,

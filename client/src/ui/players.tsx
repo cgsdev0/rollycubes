@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { selectPlayers } from '../selectors/game_selectors';
 import { Player, ReduxState } from '../store';
 import PlayerComponent from './player';
+import '../App.css';
 
 interface Props {
     players: ReduxState["players"];
@@ -10,7 +11,7 @@ interface Props {
 
 class Players extends React.Component<Props> {
     render() {
-        return (<div>{this.props.players.map((player: Player, i: number) => (<PlayerComponent key={i} n={i} player={player} />))}</div>);
+        return (<div className="PlayerPanel">{this.props.players.map((player: Player, i: number) => (<PlayerComponent key={`${i}${player.name}`} n={i} player={player} />))}</div>);
     }
 }
 
