@@ -9,6 +9,7 @@ export const selectRollCount = createSelector(selectState, state => state.rollCo
 export const selectIsGameOver = createSelector(selectState, state => state.victory);
 export const selectDoublesCount = createSelector(selectState, state => state.doublesCount);
 export const selectIsReset = createSelector(selectState, state => state.reset);
+export const selectCheats = createSelector(selectState, state => state.cheats);
 
 export const selectSelf = createSelector(selectPlayers, selectSelfIndex, (players, self) => players[self]);
 
@@ -17,15 +18,15 @@ export const selectSelfScore = createSelector(selectSelf, self => self.score);
 const createDeepArraySelector = createSelectorCreator(
     defaultMemoize,
     (current: any, prev: any) => {
-        if(current === prev) {
+        if (current === prev) {
             return true;
         }
-        if(Array.isArray(current) && Array.isArray(prev)) {
-            if(current.length !== prev.length) {
+        if (Array.isArray(current) && Array.isArray(prev)) {
+            if (current.length !== prev.length) {
                 return false;
             }
-            for(let i = 0; i < current.length; ++i) {
-                if(current[i] !== prev[i]) {
+            for (let i = 0; i < current.length; ++i) {
+                if (current[i] !== prev[i]) {
                     return false;
                 }
             }
@@ -81,52 +82,58 @@ export const selectShouldShowSplitButtons = createSelector(selectIsMyTurn,
 
 
 const makeCreateAddSubClassSelector = (n: number | "add" | "sub") => {
-    return createDeepArraySelector(selectOtherPlayerScores, selectDiceRolls, selectTotalRoll, selectSelfScore, selectIsDoubles, (reset_targets, dice, total, self, isDoubles) => {
-        if(!("cheatMode" in window)) {
-            return "";
-        }
-        const dir = typeof n === "number" ? Math.sign(n) : n === "add" ? 1 : -1;
-        const computedN = typeof n === "number" ? Math.abs(n) - 1 : 0;
-        if (isDoubles) {
-            return "";
-        }
-        if (typeof n !== "number") {
-            if (TARGET_SCORES.find(t => t === self + total * dir)) {
-                return " Victory";
+    return createDeepArraySelector(selectOtherPlayerScores,
+        selectDiceRolls,
+        selectTotalRoll,
+        selectSelfScore,
+        selectIsDoubles,
+        selectCheats,
+        (reset_targets, dice, total, self, isDoubles, cheats) => {
+            if (!cheats) {
+                return "";
             }
-            if (reset_targets.find(t => t === self + total * dir)) {
-                return " Reset";
+            const dir = typeof n === "number" ? Math.sign(n) : n === "add" ? 1 : -1;
+            const computedN = typeof n === "number" ? Math.abs(n) - 1 : 0;
+            if (isDoubles) {
+                return "";
             }
-        }
-        else {
-            const thisRoll = dice[computedN].value;
-            const others = dice.filter((v, i) => i !== computedN && !v.used).map(v => v.value);
-            let solutions = [];
-            const combinations = Math.pow(2, others.length);
-            for (let i = 0; i < combinations; ++i) {
-                let solution = self;
-                for (let j = 0; j < others.length; ++j) {
-                    if (i & (1 << j)) {
-                        solution += others[j];
-                    }
-                    else {
-                        solution -= others[j];
-                    }
-                }
-                solutions.push(solution);
-            }
-            console.log(solutions)
-            for (const solution of solutions) {
-                if (TARGET_SCORES.find(t => t === solution + thisRoll * dir)) {
+            if (typeof n !== "number") {
+                if (TARGET_SCORES.find(t => t === self + total * dir)) {
                     return " Victory";
                 }
-                if (reset_targets.find(t => t === solution + thisRoll * dir)) {
+                if (reset_targets.find(t => t === self + total * dir)) {
                     return " Reset";
                 }
             }
-        }
-        return "";
-    });
+            else {
+                const thisRoll = dice[computedN].value;
+                const others = dice.filter((v, i) => i !== computedN && !v.used).map(v => v.value);
+                let solutions = [];
+                const combinations = Math.pow(2, others.length);
+                for (let i = 0; i < combinations; ++i) {
+                    let solution = self;
+                    for (let j = 0; j < others.length; ++j) {
+                        if (i & (1 << j)) {
+                            solution += others[j];
+                        }
+                        else {
+                            solution -= others[j];
+                        }
+                    }
+                    solutions.push(solution);
+                }
+                console.log(solutions)
+                for (const solution of solutions) {
+                    if (TARGET_SCORES.find(t => t === solution + thisRoll * dir)) {
+                        return " Victory";
+                    }
+                    if (reset_targets.find(t => t === solution + thisRoll * dir)) {
+                        return " Reset";
+                    }
+                }
+            }
+            return "";
+        });
 }
 let selectorMap: Record<number | "add" | "sub", ReturnType<typeof makeCreateAddSubClassSelector>> = {
     add: makeCreateAddSubClassSelector("add"),

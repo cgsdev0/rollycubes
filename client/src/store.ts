@@ -23,6 +23,7 @@ export interface ReduxState {
     doublesCount: number;
     chat: string[];
     reset: boolean;
+    cheats: boolean;
 }
 
 const initialState: ReduxState = {
@@ -36,6 +37,7 @@ const initialState: ReduxState = {
     doublesCount: 0,
     chat: [],
     reset: false,
+    cheats: false,
 }
 
 export const TARGET_SCORES = [ 33, 66, 67, 98, 99, 100 ];
@@ -49,8 +51,12 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 ...state,
                 socket: action.socket
             }
+        case "CHEATS":
+            return {
+                ...state,
+                cheats: true,
+            }
         case "welcome":
-            console.log(action);
             const { game } = action;
             const rolls = [];
             for (let i = 0; i < game.rolls.length; ++i) {

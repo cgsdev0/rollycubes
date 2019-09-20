@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { connect } from 'react-redux';
+import { connect, DispatchProp } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import '../App.css';
 import Connection from '../connection';
@@ -10,6 +10,7 @@ import Players from '../ui/players';
 
 interface TParams {
     room: string;
+    cheats?: string;
 }
 interface Props {
     route: RouteComponentProps<TParams>;
@@ -21,15 +22,20 @@ interface Props {
     turn: number;
 }
 
-class GamePage extends React.Component<Props> {
+class GamePage extends React.Component<Props & DispatchProp> {
     inputRef: React.RefObject<HTMLInputElement>;
-    constructor(props: Props) {
+    constructor(props: Props & DispatchProp) {
         super(props);
         this.inputRef = React.createRef();
     }
     componentDidMount() {
         if (!document.cookie.includes("_session")) {
             this.props.route.history.replace("/", { redirect: this.props.route.history.location.pathname })
+        }
+        if (this.props.route.match.params.cheats === "cheats") {
+            console.log("CHEATS ENABLED");
+            this.props.dispatch({type: "CHEATS"})
+            this.props.route.history.replace("/room/"+this.props.route.match.params.room)
         }
     }
 
