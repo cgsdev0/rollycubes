@@ -25,7 +25,7 @@ class App extends React.Component<Props, State> {
           <div className="App">
             <Route path="/" exact component={CookiePage} />
             <Route path="/home" component={HomePage} />
-            <Route path="/room/:room/:cheats?" component={GamePage} />
+            <Route path="/room/:room" component={GamePage} />
           </div>
         </Router>
       </Provider>

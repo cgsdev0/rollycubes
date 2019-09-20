@@ -51,10 +51,13 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 socket: action.socket
             }
         case "CHEATS":
-            return {
+            const newCheatState = {
                 ...state,
-                cheats: true,
+                chat: [`Hints ${state.cheats ? "disabled" : "enabled"}.`, ...state.chat],
+                cheats: !state.cheats,
             }
+            newCheatState.chat.length = Math.min(newCheatState.chat.length, CHAT_BUFFER_LENGTH);
+            return newCheatState;
         case "welcome":
             const { game } = action;
             const rolls = [];

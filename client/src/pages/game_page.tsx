@@ -10,8 +10,8 @@ import Players from '../ui/players';
 
 interface TParams {
     room: string;
-    cheats?: string;
 }
+
 interface Props {
     route: RouteComponentProps<TParams>;
     socket?: WebSocket;
@@ -32,17 +32,39 @@ class GamePage extends React.Component<Props & DispatchProp> {
         if (!document.cookie.includes("_session")) {
             this.props.route.history.replace("/", { redirect: this.props.route.history.location.pathname })
         }
-        if (this.props.route.match.params.cheats === "cheats") {
-            console.log("CHEATS ENABLED");
-            this.props.dispatch({type: "CHEATS"})
-            this.props.route.history.replace("/room/"+this.props.route.match.params.room)
-        }
     }
 
     sendChat = (e: FormEvent) => {
         if (this.props.socket) {
             if (this.inputRef.current && this.inputRef.current.value) {
-                this.props.socket.send(JSON.stringify({ type: "chat", msg: this.inputRef.current.value }));
+                switch(this.inputRef.current.value.toLowerCase().split(' ')[0]) {
+                    case "/help":
+                        const helpString = 
+`--------------------HELP--------------------
+/name [string] - change your username
+/hints - toggle gameplay hints
+----------------------------------------------
+`;
+                        helpString.split('\n').forEach(msg => this.props.dispatch({type: "chat", msg}))
+                    break;
+                    case "/name":
+                    case "/username":
+                    case "/n":
+                    case "/u":
+                        const name = this.inputRef.current.value.split(' ').slice(1).join(' ')
+                        this.props.socket.send(JSON.stringify({ type: "update_name", name }));
+                        localStorage.setItem("name", name);
+                    break;
+                    case "/hints":
+                    case "/hint":
+                    case "/cheat":
+                    case "/cheats":
+                    case "/guide":
+                        this.props.dispatch({ type: "CHEATS" })
+                        break;
+                    default:
+                    this.props.socket.send(JSON.stringify({ type: "chat", msg: this.inputRef.current.value }));
+                }
                 this.inputRef.current.value = "";
             }
         }
