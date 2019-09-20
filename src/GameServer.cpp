@@ -66,8 +66,10 @@ std::string generate_hex(const unsigned int len) {
 
 void runEviction() {
     bool popSet = true;
+    int kills = 0;
     std::cout << "Running eviction algorithm!" << std::endl;
     while (!eviction_queue.empty()) {
+        if (kills >= EVICTION_LIMIT) break;
         auto i = eviction_queue.front();
         if (i.first < std::chrono::system_clock::now() - EVICT_AFTER) {
             auto it = games.find(i.second);
@@ -79,6 +81,7 @@ void runEviction() {
                         std::cout << "EVICTING GAME: " << i.second << std::endl;
                         games.erase(it);
                         delete g;
+                        ++kills;
                     } else {
                         eviction_queue.push(
                             {std::chrono::system_clock::now(), i.second});
@@ -95,6 +98,7 @@ void runEviction() {
         }
     }
 }
+
 std::string getSession(HttpRequest *req) {
     const std::regex sessionRegex("_session=([^;]*)");
     std::smatch cookies;
