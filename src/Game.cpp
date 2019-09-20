@@ -67,6 +67,9 @@ json Game::toJson() {
         result["rolls"].push_back(rolls[i]);
         result["used"].push_back(used[i]);
     }
+    for (const auto& msg : chatLog) {
+        result["chat"].push_back(msg);
+    }
     result["turn_index"] = turn_index;
     result["victory"] = victory;
     result["rolled"] = rolled;
@@ -170,7 +173,15 @@ void Game::chat(HANDLER_ARGS) {
             if (name == "") {
                 name = "User" + std::to_string(i + 1);
             }
-            res["msg"] = name + ": " + msg;
+            std::string fullMsg = name + ": " + msg;
+            if (fullMsg.length() > MAX_CHAT_LEN) {
+                fullMsg = fullMsg.substr(0, MAX_CHAT_LEN);
+            }
+            chatLog.push_front(fullMsg);
+            if (chatLog.size() > MAX_CHAT_LOG) {
+                chatLog.pop_back();
+            }
+            res["msg"] = fullMsg;
             std::cout << res["msg"] << std::endl;
             broadcast(res.dump());
             return;

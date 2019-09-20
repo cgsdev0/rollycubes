@@ -4,6 +4,7 @@
 #include "Player.h"
 
 #include <chrono>
+#include <deque>
 #include <functional>
 #include <json.hpp>
 #include <random>
@@ -73,6 +74,7 @@ class Game {
 
    private:
     std::vector<Player> players;
+    std::deque<std::string> chatLog;
     std::string turn_token;
     std::uniform_int_distribution<int> dis;
     std::chrono::system_clock::time_point updated;

@@ -89,7 +89,6 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 reset: action.reset,
             }
         case "update_name":
-            console.warn(action);
             return {
                 ...state,
                 players: state.players.map((p: Player, i: number) => (i !== action.id) ? p : { ...p, name: action.name }),
@@ -138,6 +137,7 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 players: state.players.map(p => ({ ...p, score: 0 })),
                 turn_index: action.id,
                 self_index: state.self_index,
+                chat: state.chat,
                 socket: state.socket,
             }
         case "chat":
