@@ -20,7 +20,7 @@ class Dice extends React.Component<Props> {
         const { dice, rolling } = this.props;
         return (
                 <div className="diceBox">
-                    {dice.map((die: DieRoll, i: number) => (<Die key={i} roll={die} rolling={rolling} />))}
+                    {dice.map((die: DieRoll, i: number) => (<Die key={i} roll={die} n={i} rolling={rolling} />))}
                 </div>
         );
     }

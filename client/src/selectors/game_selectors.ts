@@ -6,6 +6,7 @@ export const selectPlayers = createSelector(selectState, state => state.players)
 export const selectSelfIndex = createSelector(selectState, state=> state.self_index);
 export const selectTurnIndex = createSelector(selectState, state=> state.turn_index);
 export const selectRollCount = createSelector(selectState, state => state.rollCount);
+export const selectIsGameOver = createSelector(selectState, state => state.victory);
 
 export const selectIsMyTurn = createSelector(selectSelfIndex, selectTurnIndex, (self, turn) => self === turn);
 

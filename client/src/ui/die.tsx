@@ -5,6 +5,7 @@ import './dice.css';
 interface Props {
     roll: DieRoll;
     rolling: "rolling" | "rolled";
+    n: number;
 }
 
 
@@ -12,8 +13,8 @@ interface Props {
 class Die extends React.Component<Props> {
 
     render() {
-        const { roll, rolling } = this.props;
-        return (<div className={`dice ${rolling}${roll.value}`} />);
+        const { roll, rolling, n } = this.props;
+        return (<div className={`dice ${rolling === "rolling" ? ("LR"[n % 2]) : ""}${rolling}${roll.value}`} />);
     }
 }
 

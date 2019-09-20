@@ -11,3 +11,7 @@ button {
     align-content: stretch;
     flex-basis: 100%;
 }
+
+.topButton {
+    min-height: 40px;
+}

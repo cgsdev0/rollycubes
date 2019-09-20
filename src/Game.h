@@ -3,6 +3,7 @@
 #include "Consts.h"
 #include "Player.h"
 
+#include <chrono>
 #include <functional>
 #include <json.hpp>
 #include <random>
@@ -17,7 +18,11 @@ typedef std::function<void(std::string)> SendFunc;
 
 class Game {
    public:
-    Game() : dis(1, 6), victory(false), rolled(false) {
+    Game()
+        : dis(1, 6),
+          updated(std::chrono::system_clock::now()),
+          victory(false),
+          rolled(false) {
         players.reserve(MAX_PLAYERS);
         for (int i = 0; i < DICE_COUNT; ++i) {
             rolls[i] = 1;
@@ -36,6 +41,8 @@ class Game {
 
     void advanceTurn();
     void clearTurn();
+
+    std::chrono::system_clock::time_point getUpdated() { return this->updated; }
 
     int totalRoll();
     bool isSplit();
@@ -67,10 +74,11 @@ class Game {
    private:
     std::vector<Player> players;
     std::string turn_token;
+    std::uniform_int_distribution<int> dis;
+    std::chrono::system_clock::time_point updated;
     int turn_index;
     int rolls[DICE_COUNT];
     bool used[DICE_COUNT];
-    std::uniform_int_distribution<int> dis;
     bool rolled;
     bool victory;
 };

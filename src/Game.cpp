@@ -156,15 +156,26 @@ void Game::handleMessage(HANDLER_ARGS) {
     } else {
         throw GameError("Unknown action type");
     }
+    updated = std::chrono::system_clock::now();
 }
 
 void Game::chat(HANDLER_ARGS) {
     json res;
     if (!data["msg"].is_string()) throw GameError("Message must be a string");
-    res["type"] = data["type"];
-    res["msg"] = data["msg"];
-    std::cout << res["msg"] << std::endl;
-    broadcast(res.dump());
+    for (int i = 0; i < players.size(); ++i) {
+        if (players[i].getSession() == session) {
+            res["type"] = data["type"];
+            auto msg = data["msg"].get<std::string>();
+            std::string name = players[i].getName();
+            if (name == "") {
+                name = "User" + std::to_string(i + 1);
+            }
+            res["msg"] = name + ": " + msg;
+            std::cout << res["msg"] << std::endl;
+            broadcast(res.dump());
+            return;
+        }
+    }
 };
 
 void Game::leave(HANDLER_ARGS) {
@@ -209,7 +220,6 @@ void Game::kick(HANDLER_ARGS) {
 
 void Game::restart(HANDLER_ARGS) {
     if (players.empty()) throw GameError("uhhh this should never happen");
-    if (players[0].getSession() != session) throw GameError("You are not host");
     if (!victory) throw GameError("game still in progress");
 
     json res;

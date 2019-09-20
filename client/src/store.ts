@@ -17,9 +17,10 @@ export interface ReduxState {
     rolled: false;
     turn_index: number;
     self_index: number;
-    game_over: boolean;
+    victory: boolean;
     socket?: WebSocket;
     rollCount: number;
+    chat: string[];
 }
 
 const initialState: ReduxState = {
@@ -28,9 +29,12 @@ const initialState: ReduxState = {
     rolled: false,
     turn_index: 0,
     self_index: 0,
-    game_over: false,
+    victory: false,
     rollCount: 0,
+    chat: [],
 }
+
+const CHAT_BUFFER_LENGTH = 200;
 
 const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, action: AnyAction) => {
     switch (action.type) {
@@ -72,7 +76,7 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 rolls: "used" in action ? action.used.map((used: boolean, i: number) => ({ used, value: state.rolls[i].value })) : state.rolls,
             }
         case "update_name":
-        console.warn(action);
+            console.warn(action);
             return {
                 ...state,
                 players: state.players.map((p: Player, i: number) => (i !== action.id) ? p : { ...p, name: action.name }),
@@ -101,6 +105,26 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 rolled: true,
                 rollCount: state.rollCount + 1,
             }
+        case "win":
+            return {
+                ...state,
+                victory: true,
+            }
+        case "restart":
+            console.warn(action);
+            return {
+                ...initialState,
+                rolls: state.rolls,
+                players: state.players.map(p => ({ ...p, score: 0 }))
+            }
+        case "chat":
+            console.log(action);
+            const newState = {
+                ...state,
+                chat: [action.msg, ...state.chat]
+            }
+            newState.chat.length = Math.min(newState.chat.length, CHAT_BUFFER_LENGTH);
+            return newState;
         default:
             console.error("RECEIVED UNKNOWN ACTION", action);
     }

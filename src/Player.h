@@ -21,7 +21,7 @@ class Player {
 
     int addScore(int n);
 
-    int getScore();
+    int getScore() const;
 
     int addWin(int n);
 
@@ -29,7 +29,7 @@ class Player {
 
     void setName(std::string& name);
 
-    const std::string& getName();
+    const std::string& getName() const;
 
     json toJson() const;
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { selectShouldShowRoll, selectShouldShowAddSub, selectRollCount, selectShouldShowSplitButtons, selectDiceRolls } from '../selectors/game_selectors';
+import { selectShouldShowRoll, selectShouldShowAddSub, selectRollCount, selectShouldShowSplitButtons, selectDiceRolls, selectIsGameOver } from '../selectors/game_selectors';
 import { ReduxState, DieRoll } from '../store';
 import RollButton from './buttons/roll_button';
+import RestartButton from './buttons/restart_button';
 import AddSubButton from './buttons/add_sub_button';
 import Dice from './dice';
 import '../App.css';
@@ -13,6 +14,7 @@ interface Props {
     addSub: boolean;
     rollCount: number;
     dice: DieRoll[];
+    victory: boolean;
     buttons: boolean;
 }
 
@@ -54,15 +56,19 @@ class GamePanel extends React.Component<Props, State> {
             : null;
     }
     render() {
+        const { victory } = this.props;
         const { rolling } = this.state;
         return (
             <div className="GamePanel">
+            <div className="GamePanelInner">
+            {victory ? <RestartButton /> : null}
                 <Dice rolling={rolling} />
                 <div className="ButtonPanel">
                     {this.renderRoll()}
                     {this.renderAddSub()}
                     {this.renderSplit()}
                 </div>
+            </div>
             </div>
         );
     }
@@ -75,6 +81,7 @@ const mapStateToProps = (state: ReduxState) => {
         rollCount: selectRollCount(state),
         dice: selectDiceRolls(state),
         buttons: selectShouldShowSplitButtons(state),
+        victory: selectIsGameOver(state),
     }
 }
 

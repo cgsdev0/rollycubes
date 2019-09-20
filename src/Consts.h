@@ -2,7 +2,7 @@
 #include <chrono>
 #include <unordered_set>
 
-static const unsigned int MAX_PLAYERS = 4;
+static const unsigned int MAX_PLAYERS = 8;
 static const unsigned int DICE_COUNT = 2;
 static const unsigned int SESSION_BYTES = 16;
 static const unsigned int ROOM_LEN = 6;

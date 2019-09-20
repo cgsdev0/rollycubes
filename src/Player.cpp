@@ -28,9 +28,9 @@ void Player::setName(std::string& name) {
     this->name = name.substr(0, MAX_PLAYER_NAME);
 }
 
-const std::string& Player::getName() { return this->name; }
+const std::string& Player::getName() const { return this->name; }
 
-int Player::getScore() { return this->score; }
+int Player::getScore() const { return this->score; }
 
 json Player::toJson() const {
     json result;

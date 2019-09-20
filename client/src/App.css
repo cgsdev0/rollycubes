@@ -3,29 +3,94 @@
   justify-content: space-between;
   flex-direction: column;
   height: 100vh;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.GamePanelInner {
+  display: flex;
+  flex-direction: column;
+  margin-top: 56px;
 }
 
 .GamePanel {
   display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 206px;
+}
+
+.Rules {
+  display: flex;
   flex-direction: column;
+  flex-basis: 100%;
 }
 
 .PlayerPanel {
-  flex-direction: column;
-  align-self: stretch;
-  margin: 50px;
   display: flex;
   border: 1px solid #ccc;
   border-bottom-width: 0px;
+  flex-direction: column;
+  flex-shrink: 1;
+  margin-top: 56px;
+}
+
+#PlayerChatWrapper {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  margin: 0px 50px;
+  flex-basis: 100%;
+}
+
+.TabHeader {
+  flex-direction: row;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0;
+  margin: 0;
+  min-height: 40px;
+  list-style: none;
+}
+
+.TabContainer {
+  display: flex;
+  flex-grow: 1;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+.TabHeader a {
+  justify-content: center;
+  text-decoration: none;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  background-color: lightgray;
+  color: black;
+}
+
+.TabHeader a:active {
+  color:white;
+  background-color: lightslategray;
+}
+
+.TabHeader a:visited {
+  color: black;
+}
+
+.TabHeader a.selected {
+  background-color: skyblue;
 }
 
 .Player {
-  flex-grow: 1;
   display: flex;
   border-bottom: solid 1px #ccc;
   flex-basis: 100%;
   justify-content: space-between;
   padding: 8px;
+  min-height: 24px;
 }
 
 .Turn {
@@ -33,7 +98,7 @@
 }
 
 .Disconnected {
-  background-color: #eeaaaa;
+  color: red;
 }
 
 .Player .Name {
@@ -54,16 +119,92 @@
   flex-direction: row;
   align-items: stretch;
   justify-content: stretch;
-  flex-basis: 100%;
   min-height: 40px;
-  margin-bottom: 56px;
+  max-height: 40px;
+}
+
+.Chat {
+  padding: 0px;
+  position: relative;
+  display: flex;
+  flex-basis: 0px;
+  flex-direction: column-reverse;
+  overflow: hidden;
+  border-bottom: 0;
 }
 
 .GamePage {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
   width: 100%;
   justify-content: inherit;
+}
+
+.Chat form {
+  flex-direction: row;
+  display: flex;
+  max-height: 40px;
+  min-height: 40px;
+}
+
+.Chat form input {
+  flex-grow: 9;
+  width: 100%;
+}
+
+.Chat form button {
+  max-width: 60px;
+}
+
+.Chat .Messages {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 8px;
+}
+
+.Chat .Messages p {
+  margin: 0px;
+}
+
+@media screen and (max-width: 960px) {
+  .HideMobile {
+    display: none;
+  }
+  .GamePanelInner {
+    flex-direction: column-reverse;
+  }
+  .TabContainer {
+    max-height: 40vh;
+    min-height: 40vh;
+  }
+  .GamePage {
+    padding-bottom: 56px;
+  }
+}
+
+@media screen and (min-width: 961px) {
+  .TabHeader {
+    display: none;
+  }
+  .Rules {
+    position: absolute;
+    display: inline-block;
+    flex-direction: column;
+    left: 100%;
+    width: 240px;
+    overflow: auto;
+  }
+  .Chat {
+    margin: 50px 0px;
+    overflow: hidden;
+  }
+  .GamePage {
+    flex-direction: column-reverse;
+    width: 50%;
+    max-width: 768px;
+  }
 }

@@ -9,6 +9,7 @@
 #include <streambuf>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "App.h"
 #include "Consts.h"
@@ -17,7 +18,10 @@
 
 // for convenience
 using json = nlohmann::json;
+
 std::unordered_map<std::string, Game *> games;
+
+std::unordered_set<std::string> eviction_set;
 std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
     eviction_queue;
 
@@ -61,6 +65,7 @@ std::string generate_hex(const unsigned int len) {
 }
 
 void runEviction() {
+    bool popSet = true;
     std::cout << "Running eviction algorithm!" << std::endl;
     while (!eviction_queue.empty()) {
         auto i = eviction_queue.front();
@@ -68,12 +73,21 @@ void runEviction() {
             auto it = games.find(i.second);
             std::cout << "Checking room " << i.second << std::endl;
             if (it != games.end()) {
-                if (!it->second->connectedPlayerCount()) {
-                    std::cout << "EVICTING GAME: " << i.second << std::endl;
-                    Game *g = it->second;
-                    games.erase(it);
-                    delete g;
+                Game *g = it->second;
+                if (!g->connectedPlayerCount()) {
+                    if (g->getUpdated() < i.first) {
+                        std::cout << "EVICTING GAME: " << i.second << std::endl;
+                        games.erase(it);
+                        delete g;
+                    } else {
+                        eviction_queue.push(
+                            {std::chrono::system_clock::now(), i.second});
+                        popSet = false;
+                    }
                 }
+            }
+            if (popSet) {
+                eviction_set.erase(i.second);
             }
             eviction_queue.pop();
         } else {
@@ -110,7 +124,10 @@ std::string createRoom(std::string seed = "") {
     } while (games.find(id) != games.end());
     Game *g = new Game();
     games.insert({id, g});
-    eviction_queue.push({std::chrono::system_clock::now(), id});
+    if (!eviction_set.count(id)) {
+        eviction_queue.push({std::chrono::system_clock::now(), id});
+        eviction_set.insert(id);
+    }
     std::cout << "New game session starting: " << id << std::endl;
     return id;
 }
@@ -153,7 +170,6 @@ int main() {
                          ws->close();
                          std::cout << "Closing: no session" << std::endl;
                      } else {
-                         runEviction();
                          std::string room = std::string(req->getParameter(0));
                          std::cout << "Connection opening to room " << room
                                    << std::endl;
@@ -264,8 +280,11 @@ int main() {
                              ws->publish(room, resp.dump());
                          }
                          if (!g->connectedPlayerCount()) {
-                             eviction_queue.push(
-                                 {std::chrono::system_clock::now(), room});
+                             if (!eviction_set.count(room)) {
+                                 eviction_queue.push(
+                                     {std::chrono::system_clock::now(), room});
+                                 eviction_set.insert(room);
+                             }
                              std::cout << "Scheduling " << room
                                        << " for eviction" << std::endl;
                          }
