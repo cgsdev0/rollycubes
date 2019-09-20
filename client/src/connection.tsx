@@ -12,12 +12,16 @@ class Connection extends React.Component<Props & DispatchProp> {
   timer?: any;
 
   onClose = (e: CloseEvent) => {
-    console.error("Socket closed", e);
+    console.error("Socket closed, reconnecting...");
     this.timer = setTimeout(this.openSocket, 5000);
   };
 
   onOpen = (e: Event) => {
-    console.log("Socket opened", e);
+    console.log("Socket opened to room", this.props.room);
+    const name = localStorage.getItem("name");
+    if(this.websocket && name) {
+      this.websocket.send(JSON.stringify({ type: "update_name", name}))
+    }
     //this.websocket!.send(JSON.stringify({ type: "roll", n: 0, msg: "Hello world!" }))
   };
 
@@ -52,7 +56,6 @@ class Connection extends React.Component<Props & DispatchProp> {
   };
 
   componentDidMount() {
-    console.log(this.props)
     this.openSocket();
   }
 

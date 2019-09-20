@@ -209,6 +209,9 @@ void Game::kick(HANDLER_ARGS) {
     res["id"] = id;
     if (turn_token == players[id].getSession()) {
         this->advanceTurn();
+        if (turn_index > id) {
+            turn_index--;
+        }
         json turn;
         turn["type"] = "update_turn";
         turn["id"] = turn_index;
@@ -341,6 +344,7 @@ void Game::update(HANDLER_ARGS) {
                         update["type"] = "update";
                         update["id"] = i;
                         update["score"] = 0;
+                        update["reset"] = true;
                         broadcast(update.dump());
                         break;
                     }

@@ -19,6 +19,7 @@ class PlayerComponent extends React.Component<Props> {
         if (e === null) return;
         if (this.props.socket) {
             this.props.socket.send(JSON.stringify({ type: "update_name", name: e }))
+            localStorage.setItem("name", e);
         }
     }
 

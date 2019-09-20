@@ -1,5 +1,17 @@
 button {
     flex-basis: 100%;
+    background-color: lightgray;
+    border: 0;
+    margin: 0px 5px;
+    border-radius: 8px;
+}
+
+button:focus {
+    outline: 0;
+}
+
+button:active {
+    background-color: lightslategray;
 }
 
 .buttonColumn {
@@ -14,4 +26,44 @@ button {
 
 .topButton {
     min-height: 40px;
+    max-height: 40px;
+    z-index: 40;
+}
+
+button.Add {
+    background-color: #007bff;
+    color: white;
+    font-size: 18pt;
+    font-weight: bold;
+}
+
+button.Add:active {
+    background-color: lightskyblue;
+}
+
+button.Subtract {
+    background-color: #6c757d;
+    color: white;
+    font-size: 18pt;
+    font-weight: bold;
+}
+
+button.Subtract:active {
+    background-color: #cccccc;
+}
+
+button.Reset {
+    background-color: #dc3545;
+}
+
+button.Reset:active {
+    background-color: #eecccc;
+}
+
+button.Victory {
+    background-color: #ffc107;
+}
+
+button.Victory:active {
+    background-color: #ffee77;
 }

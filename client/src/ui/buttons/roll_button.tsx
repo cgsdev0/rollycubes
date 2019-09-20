@@ -2,9 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { ReduxState } from '../../store';
 import './buttons.css';
+import { selectHasMultiplePlayers } from '../../selectors/game_selectors';
 
 interface Props {
     socket?: WebSocket;
+    hasEnoughPlayers: boolean;
 }
 
 class RollButton extends React.Component<Props> {
@@ -15,6 +17,7 @@ class RollButton extends React.Component<Props> {
         }
     }
     render() {
+        if(!this.props.hasEnoughPlayers) return (<p>Waiting for players...</p>);
         return (<button onClick={this.onClick}>Roll</button>);
     }
 }
@@ -23,6 +26,7 @@ class RollButton extends React.Component<Props> {
 const mapStateToProps = (state: ReduxState) => {
     return {
         socket: state.socket,
+        hasEnoughPlayers: selectHasMultiplePlayers(state),
     }
 }
 
