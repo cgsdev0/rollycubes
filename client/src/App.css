@@ -7,6 +7,10 @@
   overflow-x: hidden;
 }
 
+body {
+  background-color: white;
+}
+
 h6 {
   position: absolute;
   display: flex;
