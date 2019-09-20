@@ -67,18 +67,15 @@ std::string generate_hex(const unsigned int len) {
 void runEviction() {
     bool popSet = true;
     int kills = 0;
-    std::cout << "Running eviction algorithm!" << std::endl;
     while (!eviction_queue.empty()) {
         if (kills >= EVICTION_LIMIT) break;
         auto i = eviction_queue.front();
         if (i.first < std::chrono::system_clock::now() - EVICT_AFTER) {
             auto it = games.find(i.second);
-            std::cout << "Checking room " << i.second << std::endl;
             if (it != games.end()) {
                 Game *g = it->second;
                 if (!g->connectedPlayerCount()) {
                     if (g->getUpdated() < i.first) {
-                        std::cout << "EVICTING GAME: " << i.second << std::endl;
                         games.erase(it);
                         delete g;
                         ++kills;
@@ -97,6 +94,7 @@ void runEviction() {
             break;
         }
     }
+    std::cout << "Evicted " << kills << " games during creation of room ";
 }
 
 std::string getSession(HttpRequest *req) {
@@ -122,17 +120,18 @@ std::string createRoom(std::string seed = "") {
             // Short circuit to prevent infinite loop
             // in the case of a seeded redirect already
             // existing
+            std::cout << id << " (noop)" << std::endl;
             return id;
         }
-        std::cout << "trying id " << id << std::endl;
     } while (games.find(id) != games.end());
+    std::cout << id << std::endl;
+    std::cout << "New room count: " << games.size() << std::endl;
     Game *g = new Game();
     games.insert({id, g});
     if (!eviction_set.count(id)) {
         eviction_queue.push({std::chrono::system_clock::now(), id});
         eviction_set.insert(id);
     }
-    std::cout << "New game session starting: " << id << std::endl;
     return id;
 }
 
@@ -172,11 +171,8 @@ int main() {
                      std::string session = getSession(req);
                      if (session == "") {
                          ws->close();
-                         std::cout << "Closing: no session" << std::endl;
                      } else {
                          std::string room = std::string(req->getParameter(0));
-                         std::cout << "Connection opening to room " << room
-                                   << std::endl;
                          auto it = games.find(room);
                          if (it != games.end()) {
                              // Connecting to a valid game
@@ -202,7 +198,6 @@ int main() {
                              welcome["id"] = g->getPlayerId(session);
                              ws->send(welcome.dump());
                              ws->subscribe(room);
-                             std::cout << "Socket initiated" << std::endl;
                          } else {
                              // Connecting to a non-existant room
                              // let's migrate them to a new room
@@ -213,8 +208,6 @@ int main() {
                              userData->room = std::string(room);
                              userData->session = std::string(session);
                              ws->send(route.dump());
-                             std::cout << "Invalid game, re-routing to " << room
-                                       << std::endl;
                          }
                      }
                  },
@@ -269,13 +262,10 @@ int main() {
                  },
              .close =
                  [](auto *ws, int code, std::string_view message) {
-                     std::cout << "CLOSING" << std::endl;
                      PerSocketData *userData =
                          (PerSocketData *)ws->getUserData();
                      std::string room = userData->room;
                      std::string session = userData->session;
-                     std::cout << "room: " << room << std::endl;
-                     std::cout << "session: " << session << std::endl;
                      auto it = games.find(room);
                      if (it != games.end()) {
                          Game *g = it->second;
@@ -289,11 +279,8 @@ int main() {
                                      {std::chrono::system_clock::now(), room});
                                  eviction_set.insert(room);
                              }
-                             std::cout << "Scheduling " << room
-                                       << " for eviction" << std::endl;
                          }
                      }
-                     std::cout << "CLOSED" << std::endl;
                      userData->~PerSocketData();
                  }})
         .listen(PORT,

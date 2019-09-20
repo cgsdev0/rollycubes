@@ -182,7 +182,6 @@ void Game::chat(HANDLER_ARGS) {
                 chatLog.pop_back();
             }
             res["msg"] = fullMsg;
-            std::cout << res["msg"] << std::endl;
             broadcast(res.dump());
             return;
         }
