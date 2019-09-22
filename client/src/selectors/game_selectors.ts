@@ -122,7 +122,6 @@ const makeCreateAddSubClassSelector = (n: number | "add" | "sub") => {
                     }
                     solutions.push(solution);
                 }
-                console.log(solutions)
                 for (const solution of solutions) {
                     if (TARGET_SCORES.find(t => t === solution + thisRoll * dir)) {
                         return " Victory";
