@@ -49,10 +49,11 @@ class AddSubButton extends React.Component<Props> {
 
 
 const mapStateToProps = (state: ReduxState, ownProps: OwnProps): StateProps => {
+    console.warn(ownProps);
     return {
         socket: state.socket,
-        addClass: getAddSubButtonClassSelector(ownProps.n ? ownProps.n + 1 : "add")(state),
-        subClass: getAddSubButtonClassSelector(ownProps.n ? -(ownProps.n + 1) : "sub")(state),
+        addClass: getAddSubButtonClassSelector(typeof ownProps.n === "number" ? ownProps.n + 1 : "add")(state),
+        subClass: getAddSubButtonClassSelector(typeof ownProps.n === "number" ? -(ownProps.n + 1) : "sub")(state),
     }
 }
 
