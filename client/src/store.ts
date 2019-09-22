@@ -140,6 +140,7 @@ const rootReducer: Reducer<ReduxState> = (state: ReduxState = initialState, acti
                 turn_index: action.id,
                 self_index: state.self_index,
                 chat: state.chat,
+                cheats: state.cheats,
                 socket: state.socket,
             }
         case "chat":
