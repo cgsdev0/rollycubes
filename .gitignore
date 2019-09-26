@@ -1,3 +1,5 @@
 GameServer
 *.o
 *.a
+terminal/env
+*.pyc
