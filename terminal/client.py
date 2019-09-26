@@ -3,16 +3,9 @@
 import json
 import asyncio
 import websockets
-import ssl
 import sys
 import curses
 import curses.textpad
-
-from prompt_toolkit import prompt
-from prompt_toolkit.eventloop.defaults import use_asyncio_event_loop
-from prompt_toolkit.patch_stdout import patch_stdout
-
-use_asyncio_event_loop()
 
 SERVER_DOMAIN = "insecure-as-heck.thedicega.me"
 SERVER_WS = "ws://"+SERVER_DOMAIN+"/ws/"
