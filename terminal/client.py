@@ -17,12 +17,15 @@ async def redirect(action, ws, state):
     await ws.close()
 
 async def welcome(action, ws, state):
+    chat = state['game']['chat']
     state['game'] = action['game']
+    if 'chat' not in state['game']:
+        state['game']['chat'] = chat
     state['self_index'] = action['id']
 
 async def join(action, ws, state):
     if action['id'] >= len(state['game']['players']):
-        state['game']['players'].append({'name': '', 'score': 0, 'win_count': 0})
+        state['game']['players'].append({'name': '', 'score': 0, 'win_count': 0, 'connected': True})
 
 async def disconnect(action, ws, state):
     state['game']['players'][action['id']]['connected'] = False
@@ -175,14 +178,12 @@ class GameUI:
         self.dice.insstr(5, 1, "     |       |    |       |      ")
         self.dice.insstr(6, 1, "     |       |    |       |      ")
         self.dice.insstr(7, 1, "     \-------/    \-------/      ")
-        self.dice.delch(4, 8)
-        self.dice.insch(4, 8, 'o')
         pips = []
         pips.append([(4, 8), (4, 12), (5, 8), (5, 10), (5, 12), (6, 8), (6, 12)])
         pips.append([(y, x + 13) for (y, x) in pips[0]])
         rolls = {
             1: [3],
-            2: [0, 7],
+            2: [0, 6],
             3: [0, 3, 6],
             4: [0, 1, 5, 6],
             5: [0, 1, 3, 5, 6],
@@ -293,6 +294,7 @@ def main(scr):
         'room': "bill",
         'self_index': 0,
         'game': {
+            'chat': [],
             'players': [],
             'rolled': False,
             'rolls': [],
