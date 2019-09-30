@@ -6,6 +6,8 @@ import websockets
 import sys
 import curses
 import curses.textpad
+import os
+import binascii
 
 SERVER_DOMAIN = "insecure-as-heck.thedicega.me"
 SERVER_WS = "ws://"+SERVER_DOMAIN+"/ws/"
@@ -21,6 +23,7 @@ async def welcome(action, ws, state):
     state['game'] = action['game']
     if 'chat' not in state['game']:
         state['game']['chat'] = chat
+    state['game']['chat'].insert(0, "Joined room: " + state['room'])
     state['self_index'] = action['id']
 
 async def join(action, ws, state):
@@ -276,7 +279,11 @@ class GameUI:
                     state['game']['chat'].insert(0, "/[h]elp - show this page")
                     state['game']['chat'].insert(0, "/restart - start a new game")
                     state['game']['chat'].insert(0, "/rules - show an overview of the game")
+                    state['game']['chat'].insert(0, "/link - display the room link")
                     state['game']['chat'].insert(0, "")
+                    self.render(state)
+                elif "/link" in cmd:
+                    state['game']['chat'].insert(0, "https://rollycubes.com/"+state['room'])
                     self.render(state)
                 else:
                     state['game']['chat'].insert(0, "Unknown command. Try /help")
@@ -290,8 +297,11 @@ class GameUI:
         #self.tb.edit(self.validate)
 
 def main(scr):
+    room = str(binascii.b2a_hex(os.urandom(6)))
+    if len(sys.argv) > 1:
+        room = sys.argv[1]
     game_state = {
-        'room': "bill",
+        'room': room,
         'self_index': 0,
         'game': {
             'chat': [],
