@@ -1,42 +1,200 @@
-const SERVER_DOMAIN = "insecure-as-heck.thedicega.me"
-const SERVER_WS = "ws://"+SERVER_DOMAIN+"/ws/"
+var blessed = require('blessed');
 
+const WebSocket = require('ws');
+
+const state = {
+    'room': 'Qx8KTy',
+    'self_index': 0,
+    'game': {
+        'chat': [],
+        'players': [],
+        'rolled': false,
+        'rolls': [],
+        'used': [],
+        'victory': false,
+        'turn_index': 0,
+    }
+}
+
+async function redirect(action) {
+    state.room = action.room
+    await ws.close()
+}
+
+async function welcome(action) {
+    chat = state.game.chat
+    state.game = action.game
+    if (!state.game.hasOwnProperty('chat')) {
+        state.game.chat = chat
+    }
+    state.game.chat.unshift("Joined room: " + state.room)
+    state.self_index = action.id
+}
+
+async function join(action) {
+    if (action.id >= len(state.game.players)) {
+        state.game.players.append({'name': '', 'score': 0, 'win_count': 0, 'connected': true})
+    }
+}
+
+async function disconnect(action) {
+    state.game.players[action.id].connected = false
+}
+
+async function reconnect(action) {
+    state.game.players[action.id].connected = true
+}
+
+async function roll(action) {
+    state.game.rolls = action.rolls
+    state.game.rolled = true
+}
+
+async function update(action) {
+    state.game.players[action.id].score = action.score
+}
+
+async function update_turn(action) {
+    state.game.rolled = false
+    state.game.used = new Array(state.game.used.length)
+    state.game.turn_index = action.id
+}
+
+async function chat(action) {
+    state.game.chat.unshift(action.msg)
+}
+
+async function kick(action) {
+    await ws.close()
+}
+
+async function leave(action) {
+    await ws.close()
+}
+
+async function roll_again(action) {
+    state.game.rolled = false
+    state.game.used = new Array(state.game.used.length)
+}
+
+async function update_name(action) {
+    state.game.players[action.id].name = action.name
+}
+
+async function win(action) {
+    state.game.players[action.id].win_count += 1
+    state.game.victory = true
+}
+
+async function restart(action) {
+    state.game.used = [false] * len(state.game.used)
+    for (const player of state.game.players) {
+        player.score = 0
+    }
+    turn_index += 1
+    turn_index %= len(state.game.players)
+    victory = false
+}
+
+const ACTION_MAP = {
+    'redirect': redirect,
+    'welcome': welcome,
+    'join': join,
+    'reconnect': reconnect,
+    'disconnect': disconnect,
+    'roll': roll,
+    'update': update,
+    'update_turn': update_turn,
+    'chat': chat,
+    'kick': kick,
+    'leave': leave,
+    'roll_again': roll_again,
+    'update_name': update_name,
+    'win': win,
+    'restart': restart,
+}
+
+function setupSocket(ws) {
+    const s = new WebSocket(`wss://rollycubes.com/ws/${state.room}`, {
+        headers: {
+            Cookie: '_session=nomnomjs',
+        }
+    });
+
+    s.on('open', () => {
+        console.log("opened!")
+    });
+
+    s.on('close', () => {
+        console.log("reconnecting!");
+        setupSocket(ws);
+    });
+
+    s.on('message', async (data) => {
+        action = JSON.parse(data);
+        if(action) {
+            await ACTION_MAP[action.type](action)
+        }
+    });
+
+    ws = s;
+}
+
+let ws = undefined;
+setupSocket(ws);
+
+var screen = blessed.screen({
+    smartCSR: true
+});
+
+var inp = blessed.textbox({
+    parent: screen,
+    left: 0,
+    inputOnFocus: true,
+    top: 0,
+    width: '100%',
+    height: 1,
+});
+
+inp.focus()
+
+screen.render()
 /*async def redirect(action, ws, state):
-    state['room'] = action['room']
+    state.room = action.room
     await ws.close()
 
 async def welcome(action, ws, state):
-    chat = state['game']['chat']
-    state['game'] = action['game']
-    if 'chat' not in state['game']:
-        state['game']['chat'] = chat
-    state['game']['chat'].insert(0, "Joined room: " + state['room'])
-    state['self_index'] = action['id']
+    chat = state.game.chat
+    state.game = action.game
+    if 'chat' not in state.game:
+        state.game.chat = chat
+    state.game.chat.insert(0, "Joined room: " + state.room)
+    state['self_index'] = action.id
 
 async def join(action, ws, state):
-    if action['id'] >= len(state['game']['players']):
-        state['game']['players'].append({'name': '', 'score': 0, 'win_count': 0, 'connected': True})
+    if action.id >= len(state.game.players):
+        state.game.players.append({'name': '', 'score': 0, 'win_count': 0, 'connected': True})
 
 async def disconnect(action, ws, state):
-    state['game']['players'][action['id']]['connected'] = False
+    state.game.players[action.id].connected = False
 
 async def reconnect(action, ws, state):
-    state['game']['players'][action['id']]['connected'] = True
+    state.game.players[action.id].connected = True
 
 async def roll(action, ws, state):
-    state['game']['rolls'] = action['rolls']
-    state['game']['rolled'] = True
+    state.game.rolls = action.rolls
+    state.game.rolled = True
 
 async def update(action, ws, state):
-    state['game']['players'][action['id']]['score'] = action['score']
+    state.game.players[action.id].score = action.score
 
 async def update_turn(action, ws, state):
-    state['game']['rolled'] = False
-    state['game']['used'] = [False] * len(state['game']['used'])
-    state['game']['turn_index'] = action['id']
+    state.game.rolled = False
+    state.game.used = [False] * len(state.game.used)
+    state.game['turn_index'] = action.id
 
 async def chat(action, ws, state):
-    state['game']['chat'].insert(0, action['msg'])
+    state.game.chat.insert(0, action.msg)
 
 async def kick(action, ws, state):
     # Mega hack: reconnect to avoid computing
@@ -47,22 +205,22 @@ async def leave(action, ws, state):
     ws.close()
 
 async def roll_again(action, ws, state):
-    state['game']['rolled'] = False
-    state['game']['used'] = [False] * len(state['game']['used'])
+    state.game.rolled = False
+    state.game.used = [False] * len(state.game.used)
 
 async def update_name(action, ws, state):
-    state['game']['players'][action['id']]['name'] = action['name']
+    state.game.players[action.id].name = action.name
 
 async def win(action, ws, state):
-    state['game']['players'][action['id']]['win_count'] += 1
-    state['game']['victory'] = True
+    state.game.players[action.id]['win_count'] += 1
+    state.game.victory = True
 
 async def restart(action, ws, state):
-    state['game']['used'] = [False] * len(state['game']['used'])
-    for player in state['game']['players']:
-        player['score'] = 0
+    state.game.used = [False] * len(state.game.used)
+    for player in state.game.players:
+        player.score = 0
     turn_index += 1
-    turn_index %= len(state['game']['players'])
+    turn_index %= len(state.game.players)
     victory = False
     pass
 
@@ -86,16 +244,16 @@ ACTION_MAP = {
 
 async def handle_action(action, ws, state):
     #scr.addstr(json.dumps(action))
-    await ACTION_MAP[action['type']](action, ws, state)
+    await ACTION_MAP[action.type](action, ws, state)
 
 async def consumer_handler(websocket, ui, state):
     async for message in websocket:
         action = json.loads(message)
         if 'error' in action:
-            if state['game']['chat'] and state['game']['chat'][0] == action['error']:
+            if state.game.chat and state.game.chat[0] == action.error:
                 pass
             else:
-                state['game']['chat'].insert(0, action['error'])
+                state.game.chat.insert(0, action.error)
                 ui.render(state)
         else:
             await handle_action(action, websocket, state)
@@ -137,7 +295,7 @@ class GameUI:
     def render(self, state):
         wh, ww = self.main.getmaxyx()
         self.main.erase()
-        for i, chat in enumerate(state['game']['chat']):
+        for i, chat in enumerate(state.game.chat):
             self.main.insstr(wh - (i + 1), 0, chat)
             if i + 1 >= wh:
                 break
@@ -145,20 +303,20 @@ class GameUI:
         self.players.erase()
         self.players.insstr(1, 1, "  ---------- PLAYERS ----------  ")
         ph, pw = self.players.getmaxyx()
-        for i, player in enumerate(state['game']['players']):
-            name = player['name']
+        for i, player in enumerate(state.game.players):
+            name = player.name
             if name == "":
                 name = "User"+str(i+1)
             turn_str = "  "
-            if state['game']['turn_index'] == i:
+            if state.game['turn_index'] == i:
                 turn_str = "> "
             col = curses.color_pair(1)
-            if state['game']['victory'] and state['game']['turn_index'] == i:
+            if state.game.victory and state.game['turn_index'] == i:
                 col = curses.color_pair(3)
-            if not player['connected']:
+            if not player.connected:
                 col = curses.color_pair(2)
             self.players.insstr(3 + i, 1, turn_str + name, col)
-            self.players.insstr(3 + i, pw-(3 + len(str(player['score']))), str(player['score']))
+            self.players.insstr(3 + i, pw-(3 + len(str(player.score))), str(player.score))
         self.players.refresh()
         self.dice.erase()
         self.dice.insstr(1, 1, "  ----------- DICE ------------  ")
@@ -179,7 +337,7 @@ class GameUI:
             5: [0, 1, 3, 5, 6],
             6: [0, 1, 2, 4, 5, 6]
         }
-        for i, r in enumerate(state['game']['rolls']):
+        for i, r in enumerate(state.game.rolls):
             for c in rolls[r]:
                 self.dice.delch(*pips[i][c])
                 self.dice.insch(*pips[i][c], 'o')
@@ -205,22 +363,22 @@ class GameUI:
             self.inp.refresh()
             if cmd and cmd[0] == '/':
                 if "/rules" in cmd:
-                    state['game']['chat'].insert(0, "")
-                    state['game']['chat'].insert(0, "****** Game Overview ******")
-                    state['game']['chat'].insert(0, "Take turns rolling both dice. Each turn,")
-                    state['game']['chat'].insert(0, "choose to add or subtract the dice from your score.")
-                    state['game']['chat'].insert(0, "Your goal is to get a score of either:")
-                    state['game']['chat'].insert(0, "")
-                    state['game']['chat'].insert(0, "    33")
-                    state['game']['chat'].insert(0, "  66  67")
-                    state['game']['chat'].insert(0, " 98 99 100")
-                    state['game']['chat'].insert(0, "")
-                    state['game']['chat'].insert(0, "Additional rules:")
-                    state['game']['chat'].insert(0, "Doubles - you MUST roll again.")
-                    state['game']['chat'].insert(0, "Sevens - SPLIT: add each die individually")
-                    state['game']['chat'].insert(0, "Reset - Match another player's score, and their")
-                    state['game']['chat'].insert(0, "score will be reset to zero.")
-                    state['game']['chat'].insert(0, "")
+                    state.game.chat.insert(0, "")
+                    state.game.chat.insert(0, "****** Game Overview ******")
+                    state.game.chat.insert(0, "Take turns rolling both dice. Each turn,")
+                    state.game.chat.insert(0, "choose to add or subtract the dice from your score.")
+                    state.game.chat.insert(0, "Your goal is to get a score of either:")
+                    state.game.chat.insert(0, "")
+                    state.game.chat.insert(0, "    33")
+                    state.game.chat.insert(0, "  66  67")
+                    state.game.chat.insert(0, " 98 99 100")
+                    state.game.chat.insert(0, "")
+                    state.game.chat.insert(0, "Additional rules:")
+                    state.game.chat.insert(0, "Doubles - you MUST roll again.")
+                    state.game.chat.insert(0, "Sevens - SPLIT: add each die individually")
+                    state.game.chat.insert(0, "Reset - Match another player's score, and their")
+                    state.game.chat.insert(0, "score will be reset to zero.")
+                    state.game.chat.insert(0, "")
                     self.render(state)
                 elif "/restart" in cmd:
                     asyncio.async(queue.put({'type': 'restart'}))
@@ -233,13 +391,13 @@ class GameUI:
                     asyncio.async(queue.put({'type': 'add_nth', 'n': 0}))
                     asyncio.async(queue.put({'type': 'sub_nth', 'n': 1}))
                 elif "/a" in cmd:
-                    if sum(state['game']['rolls']) == 7:
+                    if sum(state.game.rolls) == 7:
                         asyncio.async(queue.put({'type': 'add_nth', 'n': 0}))
                         asyncio.async(queue.put({'type': 'add_nth', 'n': 1}))
                     else:
                         asyncio.async(queue.put({'type': 'add'}))
                 elif "/s" in cmd:
-                    if sum(state['game']['rolls']) == 7:
+                    if sum(state.game.rolls) == 7:
                         asyncio.async(queue.put({'type': 'sub_nth', 'n': 0}))
                         asyncio.async(queue.put({'type': 'sub_nth', 'n': 1}))
                     else:
@@ -254,26 +412,26 @@ class GameUI:
                 elif "/q" in cmd:
                     sys.exit(0);
                 elif "/h" in cmd:
-                    state['game']['chat'].insert(0, "")
-                    state['game']['chat'].insert(0, "****** Possible commands ******")
-                    state['game']['chat'].insert(0, "/[r]oll - roll the dice")
-                    state['game']['chat'].insert(0, "/[a]dd - add both to your score")
-                    state['game']['chat'].insert(0, "/[s]ubtract - subtract both from your score")
-                    state['game']['chat'].insert(0, "/as - split: add first, subtract second")
-                    state['game']['chat'].insert(0, "/sa - split: subtract first, add second")
-                    state['game']['chat'].insert(0, "/[q]uit - quit the game :(")
-                    state['game']['chat'].insert(0, "/[n]ame - set or clear your name")
-                    state['game']['chat'].insert(0, "/[h]elp - show this page")
-                    state['game']['chat'].insert(0, "/restart - start a new game")
-                    state['game']['chat'].insert(0, "/rules - show an overview of the game")
-                    state['game']['chat'].insert(0, "/link - display the room link")
-                    state['game']['chat'].insert(0, "")
+                    state.game.chat.insert(0, "")
+                    state.game.chat.insert(0, "****** Possible commands ******")
+                    state.game.chat.insert(0, "/[r]oll - roll the dice")
+                    state.game.chat.insert(0, "/[a]dd - add both to your score")
+                    state.game.chat.insert(0, "/[s]ubtract - subtract both from your score")
+                    state.game.chat.insert(0, "/as - split: add first, subtract second")
+                    state.game.chat.insert(0, "/sa - split: subtract first, add second")
+                    state.game.chat.insert(0, "/[q]uit - quit the game :(")
+                    state.game.chat.insert(0, "/[n]ame - set or clear your name")
+                    state.game.chat.insert(0, "/[h]elp - show this page")
+                    state.game.chat.insert(0, "/restart - start a new game")
+                    state.game.chat.insert(0, "/rules - show an overview of the game")
+                    state.game.chat.insert(0, "/link - display the room link")
+                    state.game.chat.insert(0, "")
                     self.render(state)
                 elif "/link" in cmd:
-                    state['game']['chat'].insert(0, "https://rollycubes.com/"+state['room'])
+                    state.game.chat.insert(0, "https://rollycubes.com/"+state.room)
                     self.render(state)
                 else:
-                    state['game']['chat'].insert(0, "Unknown command. Try /help")
+                    state.game.chat.insert(0, "Unknown command. Try /help")
                     self.render(state)
             elif cmd:
                 asyncio.async(queue.put({'type': 'chat', 'msg': cmd}))
@@ -307,7 +465,7 @@ def main(scr):
     while True:
         loop = asyncio.get_event_loop()
         loop.add_reader(sys.stdin, user_input, ui, game_state)
-        loop.run_until_complete((handler(SERVER_WS+game_state['room'], ui, game_state)))
+        loop.run_until_complete((handler(SERVER_WS+game_state.room, ui, game_state)))
 
 curses.wrapper(main)
     */
