@@ -3,3 +3,4 @@ GameServer
 *.a
 terminal/env
 *.pyc
+node_modules
