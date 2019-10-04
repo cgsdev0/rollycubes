@@ -246,9 +246,9 @@ async function restart(action) {
   for (const player of state.game.players) {
     player.score = 0;
   }
-  turn_index += 1;
-  turn_index %= state.game.players.length;
-  victory = false;
+  state.game.turn_index += 1;
+  state.game.turn_index %= state.game.players.length;
+  state.game.victory = false;
   printPlayers();
 }
 
