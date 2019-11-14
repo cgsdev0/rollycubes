@@ -6,6 +6,7 @@ an old classic, reimagined
 To run the dice game on your local machine, there are a few requirements.
 * You will need a compiler with C++17 support (g++ preferred)
 * You will need the yarn package manager (https://yarnpkg.com/lang/en/)
+* You will almost certainly want to be on linux
 
 ### Run the server
 Use `./run-server.sh` (linux only)
