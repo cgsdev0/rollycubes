@@ -219,13 +219,13 @@ void Game::kick(HANDLER_ARGS) {
     res["id"] = id;
     if (turn_token == players[id].getSession()) {
         this->advanceTurn();
-        if (turn_index > id) {
-            turn_index--;
-        }
         json turn;
         turn["type"] = "update_turn";
         turn["id"] = turn_index;
         broadcast(turn.dump());
+    }
+    else if (turn_index > id) {
+        turn_index--;
     }
     players.erase(players.begin() + id);
     broadcast(res.dump());
