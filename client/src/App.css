@@ -9,6 +9,7 @@
 
 body {
   background-color: white;
+  color: black;
 }
 
 h6 {
@@ -43,14 +44,14 @@ h6 {
 
 @keyframes fadeOutUp {
   0% {
-     opacity: 1;
-     transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
   100% {
-     opacity: 0;
-     transform: translateY(-20px);
+    opacity: 0;
+    transform: translateY(-20px);
   }
-} 
+}
 
 .GamePanelInner {
   display: flex;
@@ -123,16 +124,12 @@ h6 {
 }
 
 .TabHeader a:active {
-  color:white;
+  color: white;
   background-color: lightslategray;
 }
 
 .TabHeader a:visited {
   color: black;
-}
-
-.TabHeader a.selected {
-  background-color: skyblue;
 }
 
 .Player {
@@ -142,10 +139,6 @@ h6 {
   justify-content: space-between;
   padding: 8px;
   min-height: 24px;
-}
-
-.Turn {
-  background-color: #aaeeaa;
 }
 
 .Disconnected {
@@ -161,7 +154,7 @@ h6 {
   margin-left: 1em;
 }
 
-.Player .Score { 
+.Player .Score {
   align-content: flex-end;
 }
 
