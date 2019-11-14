@@ -213,12 +213,15 @@ void Game::kick(HANDLER_ARGS) {
     int id = data["id"].get<int>();
     if (players.empty()) throw GameError("uhhh this should never happen");
     if (id >= players.size()) throw GameError("out of bounds");
-
+    
     json res;
     res["type"] = "kick";
     res["id"] = id;
     if (turn_token == players[id].getSession()) {
         this->advanceTurn();
+        if (turn_index > id) {
+            turn_index--;
+        }
         json turn;
         turn["type"] = "update_turn";
         turn["id"] = turn_index;
