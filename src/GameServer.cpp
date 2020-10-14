@@ -1,5 +1,7 @@
 #include <chrono>
+#include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <json.hpp>
 #include <queue>
@@ -8,6 +10,7 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -18,6 +21,16 @@
 
 // for convenience
 using json = nlohmann::json;
+
+using time_point = std::chrono::system_clock::time_point;
+std::string serializeTimePoint(const time_point &time,
+                               const std::string &format) {
+    std::time_t tt = std::chrono::system_clock::to_time_t(time);
+    std::tm tm = *std::gmtime(&tt); // GMT (UTC)
+    std::stringstream ss;
+    ss << std::put_time(&tm, format.c_str());
+    return ss.str();
+}
 
 std::unordered_map<std::string, Game *> games;
 
@@ -68,7 +81,8 @@ void runEviction() {
     bool popSet = true;
     int kills = 0;
     while (!eviction_queue.empty()) {
-        if (kills >= EVICTION_LIMIT) break;
+        if (kills >= EVICTION_LIMIT)
+            break;
         auto i = eviction_queue.front();
         if (i.first < std::chrono::system_clock::now() - EVICT_AFTER) {
             auto it = games.find(i.second);
@@ -111,7 +125,7 @@ struct PerSocketData {
     std::string room;
 };
 
-std::string createRoom(std::string seed = "") {
+std::string createRoom(bool isPrivate, std::string seed = "") {
     runEviction();
     std::string id;
     do {
@@ -126,7 +140,7 @@ std::string createRoom(std::string seed = "") {
     } while (games.find(id) != games.end());
     std::cout << id << std::endl;
     std::cout << "New room count: " << games.size() << std::endl;
-    Game *g = new Game();
+    Game *g = new Game(isPrivate);
     games.insert({id, g});
     if (!eviction_set.count(id)) {
         eviction_queue.push({std::chrono::system_clock::now(), id});
@@ -148,13 +162,36 @@ int main() {
                  }
                  res->end();
              })
+        .get("/list",
+             [](auto *res, auto *req) {
+                 res->writeHeader("Content-Type", "application/json");
+                 json respList = json::array();
+                 for (auto const &[code, game] : games) {
+                     if (game->isPrivate()) {
+                         continue;
+                     }
+                     std::string updated = serializeTimePoint(
+                         game->getUpdated(), "UTC: %Y-%m-%d %H:%M:%S");
+                     respList.push_back(
+                         {{"code", code},
+                          {"playerCount", game->connectedPlayerCount()},
+                          {"lastUpdated", updated},
+                          {"hostName", game->hostName()}});
+                 }
+                 res->write(respList.dump());
+                 res->end();
+             })
         .get("/create",
              [](auto *res, auto *req) {
                  std::string session = getSession(req);
+                 bool isPrivate = true;
+                 if (req->getQuery().find("public") != std::string::npos) {
+                     isPrivate = false;
+                 }
                  if (session == "") {
                      res->end();
                  } else {
-                     res->end(createRoom());
+                     res->end(createRoom(isPrivate));
                  }
              })
         .ws<PerSocketData>(
@@ -201,7 +238,7 @@ int main() {
                          } else {
                              // Connecting to a non-existant room
                              // let's migrate them to a new room
-                             room = createRoom(room);
+                             room = createRoom(true, room);
                              json route;
                              route["type"] = "redirect";
                              route["room"] = room;
@@ -246,7 +283,8 @@ int main() {
                                    << std::endl;
                          response["error"] = e.what();
                      }
-                     if (!response.is_null()) ws->send(response.dump());
+                     if (!response.is_null())
+                         ws->send(response.dump());
                  },
              .drain =
                  [](auto *ws) {

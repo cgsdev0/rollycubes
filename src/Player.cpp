@@ -4,7 +4,7 @@ Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
 Player::Player(std::string session) : Player() { this->session = session; }
 
-const std::string& Player::getSession() const { return session; }
+const std::string &Player::getSession() const { return session; }
 
 void Player::disconnect() { connected = false; }
 
@@ -24,11 +24,11 @@ int Player::addWin(int n) {
 
 void Player::reset() { this->score = 0; }
 
-void Player::setName(std::string& name) {
+void Player::setName(std::string &name) {
     this->name = name.substr(0, MAX_PLAYER_NAME);
 }
 
-const std::string& Player::getName() const { return this->name; }
+const std::string &Player::getName() const { return this->name; }
 
 int Player::getScore() const { return this->score; }
 

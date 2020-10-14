@@ -7,12 +7,12 @@
 using json = nlohmann::json;
 
 class Player {
-   public:
+  public:
     Player();
 
     Player(std::string session);
 
-    const std::string& getSession() const;
+    const std::string &getSession() const;
 
     void disconnect();
     void reconnect();
@@ -27,13 +27,13 @@ class Player {
 
     void reset();
 
-    void setName(std::string& name);
+    void setName(std::string &name);
 
-    const std::string& getName() const;
+    const std::string &getName() const;
 
     json toJson() const;
 
-   private:
+  private:
     std::string session;
     std::string name;
     int score;

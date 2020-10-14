@@ -14,16 +14,14 @@ using json = nlohmann::json;
 
 typedef std::function<void(std::string)> SendFunc;
 
-#define HANDLER_ARGS \
+#define HANDLER_ARGS                                                           \
     SendFunc send, SendFunc broadcast, json &data, const ::std::string &session
 
 class Game {
-   public:
-    Game()
-        : dis(1, 6),
-          updated(std::chrono::system_clock::now()),
-          victory(false),
-          rolled(false) {
+  public:
+    Game(bool isPrivate)
+        : dis(1, 6), updated(std::chrono::system_clock::now()), victory(false),
+          rolled(false), privateSession(isPrivate) {
         players.reserve(MAX_PLAYERS);
         for (int i = 0; i < DICE_COUNT; ++i) {
             rolls[i] = 1;
@@ -32,6 +30,8 @@ class Game {
     }
 
     bool isInitialized();
+    bool isPrivate() const;
+    std::string hostName() const;
 
     bool hasPlayer(std::string &id);
     json addPlayer(std::string id);
@@ -72,7 +72,7 @@ class Game {
 
     json toJson();
 
-   private:
+  private:
     std::vector<Player> players;
     std::deque<std::string> chatLog;
     std::string turn_token;
@@ -83,14 +83,15 @@ class Game {
     bool used[DICE_COUNT];
     bool rolled;
     bool victory;
+    bool privateSession;
 };
 
 class GameError {
-   public:
+  public:
     GameError(std::string err) : err(err) {}
 
     const std::string &what() { return err; }
 
-   private:
+  private:
     std::string err;
 };

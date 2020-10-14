@@ -6,10 +6,18 @@
 #include "Game.h"
 
 bool Game::isInitialized() { return players.size() > 0; }
+bool Game::isPrivate() const { return privateSession; }
+
+std::string Game::hostName() const {
+    if (players.size() < 1)
+        return "unknown";
+    return players[0].getName();
+}
 
 int Game::totalRoll() {
     int total = 0;
-    for (int i = 0; i < DICE_COUNT; ++i) total += rolls[i];
+    for (int i = 0; i < DICE_COUNT; ++i)
+        total += rolls[i];
     return total;
 }
 
@@ -18,13 +26,14 @@ bool Game::isSplit() { return this->totalRoll() == 7; }
 bool Game::isDoubles() {
     int roll1 = rolls[0];
     for (int i = 1; i < DICE_COUNT; ++i) {
-        if (rolls[i] != roll1) return false;
+        if (rolls[i] != roll1)
+            return false;
     }
     return true;
 }
 
-bool Game::hasPlayer(std::string& id) {
-    for (const auto& player : players) {
+bool Game::hasPlayer(std::string &id) {
+    for (const auto &player : players) {
         if (player.getSession() == id) {
             return true;
         }
@@ -32,7 +41,7 @@ bool Game::hasPlayer(std::string& id) {
     return false;
 }
 
-int Game::getPlayerId(std::string& id) {
+int Game::getPlayerId(std::string &id) {
     for (int i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == id) {
             return i;
@@ -60,14 +69,14 @@ json Game::addPlayer(std::string id) {
 
 json Game::toJson() {
     json result;
-    for (const auto& player : players) {
+    for (const auto &player : players) {
         result["players"].push_back(player.toJson());
     }
     for (int i = 0; i < DICE_COUNT; ++i) {
         result["rolls"].push_back(rolls[i]);
         result["used"].push_back(used[i]);
     }
-    for (const auto& msg : chatLog) {
+    for (const auto &msg : chatLog) {
         result["chat"].push_back(msg);
     }
     result["turn_index"] = turn_index;
@@ -86,7 +95,8 @@ void Game::clearTurn() {
 
 bool Game::allUsed() {
     for (int i = 0; i < DICE_COUNT; ++i) {
-        if (!used[i]) return false;
+        if (!used[i])
+            return false;
     }
     return true;
 }
@@ -130,18 +140,19 @@ json Game::reconnectPlayer(std::string id) {
 
 int Game::connectedPlayerCount() {
     int count = 0;
-    for (const auto& player : players) {
-        if (player.isConnected()) ++count;
+    for (const auto &player : players) {
+        if (player.isConnected())
+            ++count;
     }
     return count;
 }
 
-#define ACTION(x) \
+#define ACTION(x)                                                              \
     { #x, std::mem_fn(&Game::x) }
 
 static const std::unordered_map<
-    std::string,
-    std::function<void(Game*, SendFunc, SendFunc, json&, const std::string&)>>
+    std::string, std::function<void(Game *, SendFunc, SendFunc, json &,
+                                    const std::string &)>>
     action_map = {ACTION(chat),    ACTION(leave),       ACTION(kick),
                   ACTION(restart), ACTION(update_name), ACTION(roll),
                   ACTION(add),     ACTION(sub),         ACTION(add_nth),
@@ -164,7 +175,8 @@ void Game::handleMessage(HANDLER_ARGS) {
 
 void Game::chat(HANDLER_ARGS) {
     json res;
-    if (!data["msg"].is_string()) throw GameError("Message must be a string");
+    if (!data["msg"].is_string())
+        throw GameError("Message must be a string");
     for (int i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == session) {
             res["type"] = data["type"];
@@ -209,11 +221,14 @@ void Game::leave(HANDLER_ARGS) {
 }
 
 void Game::kick(HANDLER_ARGS) {
-    if (!data["id"].is_number()) throw GameError("pass a number please");
+    if (!data["id"].is_number())
+        throw GameError("pass a number please");
     int id = data["id"].get<int>();
-    if (players.empty()) throw GameError("uhhh this should never happen");
-    if (id >= players.size()) throw GameError("out of bounds");
-    
+    if (players.empty())
+        throw GameError("uhhh this should never happen");
+    if (id >= players.size())
+        throw GameError("out of bounds");
+
     json res;
     res["type"] = "kick";
     res["id"] = id;
@@ -226,8 +241,7 @@ void Game::kick(HANDLER_ARGS) {
         turn["type"] = "update_turn";
         turn["id"] = turn_index;
         broadcast(turn.dump());
-    }
-    else if (turn_index > id) {
+    } else if (turn_index > id) {
         turn_index--;
     }
     players.erase(players.begin() + id);
@@ -235,11 +249,14 @@ void Game::kick(HANDLER_ARGS) {
 }
 
 void Game::restart(HANDLER_ARGS) {
-    if (players.empty()) throw GameError("uhhh this should never happen");
-    if (!victory) throw GameError("game still in progress");
+    if (players.empty())
+        throw GameError("uhhh this should never happen");
+    if (!victory)
+        throw GameError("game still in progress");
 
     json res;
-    for (auto& player : players) player.reset();
+    for (auto &player : players)
+        player.reset();
     victory = false;
     advanceTurn();
     res["type"] = "restart";
@@ -248,7 +265,8 @@ void Game::restart(HANDLER_ARGS) {
 }
 
 void Game::update_name(HANDLER_ARGS) {
-    if (!data["name"].is_string()) throw GameError("name must be a string");
+    if (!data["name"].is_string())
+        throw GameError("name must be a string");
     std::string name = data["name"].get<std::string>();
     for (int i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == session) {
@@ -262,17 +280,24 @@ void Game::update_name(HANDLER_ARGS) {
         }
     }
 }
-void Game::guardUpdate(const std::string& session) {
-    if (victory) throw GameError("game is over");
-    if (session != this->turn_token) throw GameError("not your turn");
-    if (!rolled) throw GameError("you need to roll first");
+void Game::guardUpdate(const std::string &session) {
+    if (victory)
+        throw GameError("game is over");
+    if (session != this->turn_token)
+        throw GameError("not your turn");
+    if (!rolled)
+        throw GameError("you need to roll first");
 }
 
 void Game::roll(HANDLER_ARGS) {
-    if (victory) throw GameError("game is over");
-    if (session != this->turn_token) throw GameError("not your turn");
-    if (rolled) throw GameError("now's not the time for that");
-    if (players.size() <= 1) throw GameError("invite some friends first!");
+    if (victory)
+        throw GameError("game is over");
+    if (session != this->turn_token)
+        throw GameError("not your turn");
+    if (rolled)
+        throw GameError("now's not the time for that");
+    if (players.size() <= 1)
+        throw GameError("invite some friends first!");
     json resp;
     resp["type"] = "roll";
     for (int i = 0; i < DICE_COUNT; ++i) {
@@ -287,24 +312,30 @@ void Game::roll(HANDLER_ARGS) {
 
 void Game::add(HANDLER_ARGS) {
     this->guardUpdate(session);
-    if (this->isSplit()) throw GameError("you must add invdividually");
+    if (this->isSplit())
+        throw GameError("you must add invdividually");
     data = json(this->totalRoll());
     this->update(send, broadcast, data, session);
 }
 
 void Game::sub(HANDLER_ARGS) {
     this->guardUpdate(session);
-    if (this->isSplit()) throw GameError("you must add invdividually");
+    if (this->isSplit())
+        throw GameError("you must add invdividually");
     data = json(-this->totalRoll());
     this->update(send, broadcast, data, session);
 }
 
-int Game::guardNth(const json& data) {
-    if (!this->isSplit()) throw GameError("This is not a split");
-    if (!data.is_number()) throw GameError("NaN");
+int Game::guardNth(const json &data) {
+    if (!this->isSplit())
+        throw GameError("This is not a split");
+    if (!data.is_number())
+        throw GameError("NaN");
     int n = data.get<int>();
-    if (n >= DICE_COUNT) throw GameError("too high");
-    if (used[n]) throw GameError("already spent");
+    if (n >= DICE_COUNT)
+        throw GameError("too high");
+    if (used[n])
+        throw GameError("already spent");
     used[n] = true;
     return n;
 }
@@ -328,7 +359,8 @@ void Game::update(HANDLER_ARGS) {
     json res;
     int i;
     for (i = 0; i < players.size(); ++i) {
-        if (players[i].getSession() == session) break;
+        if (players[i].getSession() == session)
+            break;
     }
     int score = players[i].addScore(change);
     res["type"] = "update";
