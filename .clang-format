@@ -1,10 +1,8 @@
 ---
 AllowShortIfStatementsOnASingleLine: 'true'
-BreakBeforeBraces: Allman
 ColumnLimit: '0'
 IndentCaseLabels: 'false'
 IndentWidth: '4'
 NamespaceIndentation: All
-UseTab: Never
 
 ...

@@ -147,15 +147,17 @@ int Game::connectedPlayerCount() {
     return count;
 }
 
-#define ACTION(x)                                                              \
-    { #x, std::mem_fn(&Game::x) }
+#define ACTION(x)                 \
+    {                             \
+#x, std::mem_fn(&Game::x) \
+    }
 
 static const std::unordered_map<
     std::string, std::function<void(Game *, SendFunc, SendFunc, json &,
                                     const std::string &)>>
-    action_map = {ACTION(chat),    ACTION(leave),       ACTION(kick),
+    action_map = {ACTION(chat), ACTION(leave), ACTION(kick),
                   ACTION(restart), ACTION(update_name), ACTION(roll),
-                  ACTION(add),     ACTION(sub),         ACTION(add_nth),
+                  ACTION(add), ACTION(sub), ACTION(add_nth),
                   ACTION(sub_nth)};
 
 #undef ACTION

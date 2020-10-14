@@ -14,7 +14,7 @@ using json = nlohmann::json;
 
 typedef std::function<void(std::string)> SendFunc;
 
-#define HANDLER_ARGS                                                           \
+#define HANDLER_ARGS \
     SendFunc send, SendFunc broadcast, json &data, const ::std::string &session
 
 class Game {
