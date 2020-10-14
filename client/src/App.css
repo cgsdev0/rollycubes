@@ -260,3 +260,15 @@ h6 {
     max-width: 768px;
   }
 }
+
+.lobby-table {
+  width: 600px;
+}
+
+.lobby-table {
+  text-align: right;
+}
+
+.host {
+  text-align: left;
+}
