@@ -17,6 +17,7 @@ interface State {
   hasData: boolean;
 }
 class HomePage extends React.Component<Props, State> {
+  amIMounted: boolean = false;
   constructor(props: Props) {
     super(props);
     this.state = { pressed: false, games: [], hasData: false };
@@ -28,6 +29,10 @@ class HomePage extends React.Component<Props, State> {
       });
     }
     this.fetchGameList();
+    this.amIMounted = true;
+  }
+  componentWillUnmount() {
+    this.amIMounted = false;
   }
   fetchGameList = async () => {
     try {
@@ -49,7 +54,9 @@ class HomePage extends React.Component<Props, State> {
         });
       this.setState({ games, hasData: true });
     } finally {
-      setTimeout(this.fetchGameList, 1000);
+      if (this.amIMounted) {
+        setTimeout(this.fetchGameList, 2000);
+      }
     }
   };
   onStart = (priv: boolean) => async () => {

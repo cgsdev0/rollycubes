@@ -262,13 +262,23 @@ h6 {
 }
 
 .lobby-table {
-  width: 600px;
+  width: 100%;
 }
 
+td {
+  max-width: 180px;
+  min-width: 40px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 .lobby-table {
   text-align: right;
 }
 
 .host {
   text-align: left;
+}
+
+a {
+  color: #999;
 }
