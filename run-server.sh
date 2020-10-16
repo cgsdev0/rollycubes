@@ -3,7 +3,7 @@
 while true;
 do
     pkill GameServer
-    make
+    make debug
     ./GameServer &
     inotifywait src -e MODIFY
 done
