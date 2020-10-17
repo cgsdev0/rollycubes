@@ -31,11 +31,11 @@ interface Props {
 
 const clearSelection = () => {
   if (window.getSelection) {
-      if (window.getSelection()!.empty) {  // Chrome
-            window.getSelection()!.empty();
-          } else if (window.getSelection()!.removeAllRanges) {  // Firefox
-                window.getSelection()!.removeAllRanges();
-              }
+    if (window.getSelection()!.empty as any) {  // Chrome
+      window.getSelection()!.empty();
+    } else if (window.getSelection()!.removeAllRanges as any) {  // Firefox
+      window.getSelection()!.removeAllRanges();
+    }
   }
 }
 

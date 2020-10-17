@@ -1,9 +1,9 @@
 #include <chrono>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <json.hpp>
 #include <queue>
 #include <random>
 #include <regex>
@@ -13,6 +13,9 @@
 #include <string_view>
 #include <unordered_map>
 #include <unordered_set>
+
+#include <json.hpp>
+#include <jwt-cpp/jwt.h>
 
 #include "App.h"
 #include "Consts.h"
@@ -156,6 +159,25 @@ int main(int argc, char **argv) {
         // try to read a port as arg 2
         port = atoi(argv[1]);
     }
+    std::string publicKey = R"(-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArtuCBy5AHnShYnWmkFV4
+wvaoAINJw6tiYDQR8Er5Z+h9xSIYreZv/OPxDLJI6JDEziHujaTiY/lTa+tFT0Yg
+XjxG/wjpeAMEYg2+SAT2uGwEI7hmkO3yHNM0Tu/FgmnhVO9MXWZVoRv+cGLig3nb
+P0YZrPRJ7U1+sXm13j0a6SMOvoNfhw/PRwIv72DhZ4Sd+Kh8dCqHhwcyfbNN7yFh
+IBDQjC/MhR8cYShrxG+YXQTjShovjOauDhyjZVtD+O/QMcnk6krTrM2XIqVWpdjp
+9sflk5ie8H5KXGaQAayLfZwODq+TQfMAR6iDj3TzCpz4328ngYxg4IzsOcnuX30k
+pwIDAQAB
+-----END PUBLIC KEY-----)";
+    std::string issuer = "https://rollycubes.com/auth/realms/rollycubes";
+
+    if (const char *env_p = std::getenv("ROLLY_LOCAL_DEV"))
+        issuer = "http://localhost:8080/auth/realms/rollycubes";
+
+    auto verifier = jwt::verify()
+                        .allow_algorithm(jwt::algorithm::rs256{publicKey})
+                        .with_issuer(issuer);
+
+    //verifier.verify(decoded_token);
     /* Overly simple hello world app */
     uWS::App()
         .get("/cookie",
@@ -200,13 +222,13 @@ int main(int argc, char **argv) {
                  }
              })
         .ws<PerSocketData>(
-            "/ws/:room",
+            "/ws/:room/:token",
             {/* Settings */
              .compression = uWS::SHARED_COMPRESSOR,
              .maxPayloadLength = 16 * 1024,
              /* Handlers */
              .open =
-                 [](auto *ws, auto *req) {
+                 [verifier](auto *ws, auto *req) {
                      PerSocketData *userData =
                          (PerSocketData *)ws->getUserData();
                      new (userData) PerSocketData();
@@ -215,12 +237,48 @@ int main(int argc, char **argv) {
                          ws->close();
                      } else {
                          std::string room = std::string(req->getParameter(0));
+                         std::string token = std::string(req->getParameter(1));
+                         bool verified = false;
+                         PlayerClaim pc;
+
+                         if (token.size() > 1) {
+                             try {
+                                 auto decoded = jwt::decode(token);
+                                 try {
+                                     verifier.verify(decoded);
+                                     pc.verified = true;
+                                     if (decoded.has_payload_claim("picture")) {
+                                         pc.picture_url = decoded.get_payload_claim("picture").as_string();
+                                     }
+                                     if (decoded.has_payload_claim("preferred_username")) {
+                                         pc.username = decoded.get_payload_claim("preferred_username").as_string();
+                                     }
+                                     pc.sub = decoded.get_subject();
+                                     std::cout << pc.username << " joined " << room << std::endl;
+                                 } catch (jwt::error::signature_verification_exception &e) {
+                                     ws->close();
+                                     return;
+                                 }
+                             } catch (std::runtime_error &e) {
+                                 ws->close();
+                                 return;
+                             } catch (std::invalid_argument &e) {
+                                 ws->close();
+                                 return;
+                             }
+                         }
+                         std::string oldSession;
+                         if (pc.verified) {
+                             session = pc.sub;
+                         } else {
+                             session = "UNVERIFIED_" + session;
+                         }
                          auto it = games.find(room);
                          if (it != games.end()) {
                              // Connecting to a valid game
                              Game *g = it->second;
-                             if (!g->hasPlayer(session)) {
-                                 json resp = g->addPlayer(session);
+                             if (!g->hasPlayer(session) && !(pc.verified && g->hasPlayer(oldSession))) {
+                                 json resp = g->addPlayer(session, pc);
                                  if (resp.is_null()) {
                                      // room is full
                                      ws->close();
@@ -229,7 +287,7 @@ int main(int argc, char **argv) {
                                      ws->publish(room, resp.dump());
                                  }
                              } else {
-                                 json resp = g->reconnectPlayer(session);
+                                 json resp = g->reconnectPlayer(session, pc, oldSession);
                                  ws->publish(room, resp.dump());
                              }
                              userData->room = std::string(room);
@@ -336,3 +394,4 @@ int main(int argc, char **argv) {
 
     std::cout << "Failed to listen on port " << port << std::endl;
 }
+

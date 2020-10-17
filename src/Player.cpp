@@ -2,7 +2,10 @@
 
 Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
-Player::Player(std::string session) : Player() { this->session = session; }
+Player::Player(std::string session, PlayerClaim claim) : Player() {
+    this->session = session;
+    this->claim = claim;
+}
 
 const std::string &Player::getSession() const { return session; }
 
@@ -28,15 +31,29 @@ void Player::setName(std::string &name) {
     this->name = name.substr(0, MAX_PLAYER_NAME);
 }
 
-const std::string &Player::getName() const { return this->name; }
+void Player::setSession(std::string session) {
+    this->session = session;
+}
+
+const std::string &Player::getName() const {
+    if (this->claim.verified && this->name == "") {
+        return this->claim.username;
+    }
+    return this->name;
+}
 
 int Player::getScore() const { return this->score; }
 
 json Player::toJson() const {
     json result;
-    result["name"] = this->name;
+    result["name"] = this->getName();
     result["score"] = this->score;
     result["win_count"] = this->win_count;
     result["connected"] = this->connected;
+    if (this->claim.verified) {
+        result["verified"] = true;
+        result["sub"] = this->claim.sub;
+        result["picture"] = this->claim.picture_url;
+    }
     return result;
 }

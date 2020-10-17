@@ -4,6 +4,6 @@ while true;
 do
     pkill GameServer
     make debug
-    ./GameServer &
+    ROLLY_LOCAL_DEV=true ./GameServer &
     inotifywait src -e MODIFY
 done
