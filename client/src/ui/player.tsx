@@ -4,6 +4,7 @@ import '../App.css';
 import {selectSelfIndex, selectTurnIndex} from '../selectors/game_selectors';
 import {Player, ReduxState} from '../store';
 import {ThemeContext} from '../themes';
+import * as BABYLON from "babylonjs";
 
 interface Props {
   player: Player;
@@ -22,6 +23,17 @@ const PlayerComponent = (props: Props) => {
       localStorage.setItem('name', e);
     }
   };
+
+  const doSome3Dstuff = () => {
+      var canvas: any = document.getElementById('renderCanvas');
+      // Load the 3D engine
+      const engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true});
+      const scene = new BABYLON.Scene(engine);
+      const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new BABYLON.Vector3(0, 0, 0), scene);
+      camera.attachControl(canvas, true);
+      const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+      const box = BABYLON.MeshBuilder.CreateBox("box", {}, scene);
+  }
 
   const onKick = () => {
     const {player, n} = props;
