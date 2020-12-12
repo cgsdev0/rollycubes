@@ -10,6 +10,7 @@
     "@types/react-redux": "^7.1.2",
     "@types/react-router-dom": "^4.3.5",
     "@types/reselect": "^2.2.0",
+    "babylonjs": "^4.2.0",
     "prettier": "^1.18.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
