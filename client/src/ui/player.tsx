@@ -33,7 +33,6 @@ const PlayerComponent = (props: Props) => {
 
   const {n, player, self_index, turn_index} = props;
   const theme = React.useContext(ThemeContext);
-  console.log(theme);
   return (
     <div
       className={`Player${!player.connected ? ' Disconnected' : ''}`}

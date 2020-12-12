@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "babylonjs": "^4.2.0"
+  }
+}
