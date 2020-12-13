@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/PhysicsSim.dir/Simulator.o CMakeFiles/PhysicsSim.dir/lib/LoadMeshFromCollada.o CMakeFiles/PhysicsSim.dir/lib/tinyxml2.o  -o PhysicsSim ../../lib/libBulletDynamics.a ../../lib/libBulletCollision.a ../../lib/libLinearMath.a ../../lib/libBullet3Common.a 

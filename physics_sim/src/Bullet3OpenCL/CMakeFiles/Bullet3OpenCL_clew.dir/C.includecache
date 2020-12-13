@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/shane/dice-game/physics_server/src/clew/clew.c
+clew.h
+/home/shane/dice-game/physics_server/src/clew/clew.h
+windows.h
+-
+dlfcn.h
+-
+stdlib.h
+-
+
+/home/shane/dice-game/physics_server/src/clew/clew.h
+AvailabilityMacros.h
+-
+stdint.h
+-
+stddef.h
+-
+altivec.h
+-
+intrin.h
+-
+xmmintrin.h
+-
+intrin.h
+-
+emmintrin.h
+-
+mmintrin.h
+-
+intrin.h
+-
+immintrin.h
+-
+

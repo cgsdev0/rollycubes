@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../lib/libBullet3Collision.a  CMakeFiles/Bullet3Collision.dir/BroadPhaseCollision/b3DynamicBvh.o CMakeFiles/Bullet3Collision.dir/BroadPhaseCollision/b3DynamicBvhBroadphase.o CMakeFiles/Bullet3Collision.dir/BroadPhaseCollision/b3OverlappingPairCache.o CMakeFiles/Bullet3Collision.dir/NarrowPhaseCollision/b3ConvexUtility.o CMakeFiles/Bullet3Collision.dir/NarrowPhaseCollision/b3CpuNarrowPhase.o
+/usr/bin/ranlib ../../lib/libBullet3Collision.a

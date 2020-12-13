@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../../lib/libBullet2FileLoader.a  CMakeFiles/Bullet2FileLoader.dir/b3BulletFile.o CMakeFiles/Bullet2FileLoader.dir/b3Chunk.o CMakeFiles/Bullet2FileLoader.dir/b3DNA.o CMakeFiles/Bullet2FileLoader.dir/b3File.o CMakeFiles/Bullet2FileLoader.dir/b3Serializer.o
+/usr/bin/ranlib ../../../lib/libBullet2FileLoader.a

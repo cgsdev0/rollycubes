@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../../lib/libBulletInverseDynamics.a  CMakeFiles/BulletInverseDynamics.dir/IDMath.o CMakeFiles/BulletInverseDynamics.dir/MultiBodyTree.o CMakeFiles/BulletInverseDynamics.dir/details/MultiBodyTreeInitCache.o CMakeFiles/BulletInverseDynamics.dir/details/MultiBodyTreeImpl.o
+/usr/bin/ranlib ../../lib/libBulletInverseDynamics.a
