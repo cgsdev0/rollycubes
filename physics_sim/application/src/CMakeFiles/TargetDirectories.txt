@@ -1,3 +1,0 @@
-/home/shane/dice-game/physics_server/application/HelloWorld/CMakeFiles/rebuild_cache.dir
-/home/shane/dice-game/physics_server/application/HelloWorld/CMakeFiles/App_HelloWorld.dir
-/home/shane/dice-game/physics_server/application/HelloWorld/CMakeFiles/edit_cache.dir

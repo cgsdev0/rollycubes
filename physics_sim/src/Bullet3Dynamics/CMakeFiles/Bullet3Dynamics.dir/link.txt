@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../lib/libBullet3Dynamics.a  CMakeFiles/Bullet3Dynamics.dir/b3CpuRigidBodyPipeline.o CMakeFiles/Bullet3Dynamics.dir/ConstraintSolver/b3FixedConstraint.o CMakeFiles/Bullet3Dynamics.dir/ConstraintSolver/b3Generic6DofConstraint.o CMakeFiles/Bullet3Dynamics.dir/ConstraintSolver/b3PgsJacobiSolver.o CMakeFiles/Bullet3Dynamics.dir/ConstraintSolver/b3Point2PointConstraint.o CMakeFiles/Bullet3Dynamics.dir/ConstraintSolver/b3TypedConstraint.o
-/usr/bin/ranlib ../../lib/libBullet3Dynamics.a

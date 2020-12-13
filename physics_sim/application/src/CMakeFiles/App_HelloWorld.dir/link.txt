@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/App_HelloWorld.dir/Simulator.o CMakeFiles/App_HelloWorld.dir/lib/LoadMeshFromCollada.o CMakeFiles/App_HelloWorld.dir/lib/tinyxml2.o  -o App_HelloWorld ../../lib/libBulletDynamics.a ../../lib/libBulletCollision.a ../../lib/libLinearMath.a ../../lib/libBullet3Common.a 
