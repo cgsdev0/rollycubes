@@ -1,5 +1,5 @@
-import {AnyAction, createStore, Reducer} from 'redux';
-import {Theme, themes} from './themes';
+import { AnyAction, createStore, Reducer } from "redux";
+import { Theme, themes } from "./themes";
 
 export interface Player {
   connected: boolean;
@@ -40,7 +40,7 @@ const initialState: ReduxState = {
   chat: [],
   reset: false,
   theme:
-    themes[(localStorage.getItem('theme') || 'light') as keyof typeof themes] ||
+    themes[(localStorage.getItem("theme") || "light") as keyof typeof themes] ||
     themes.light,
 };
 
@@ -50,56 +50,56 @@ const CHAT_BUFFER_LENGTH = 200;
 
 const rootReducer: Reducer<ReduxState> = (
   state: ReduxState = initialState,
-  action: AnyAction,
+  action: AnyAction
 ) => {
   switch (action.type) {
-    case 'WEBSOCKET':
+    case "WEBSOCKET":
       return {
         ...state,
         socket: action.socket,
       };
-    case 'THEME_DARK':
-      localStorage.setItem('theme', 'dark');
+    case "THEME_DARK":
+      localStorage.setItem("theme", "dark");
       return {
         ...state,
         theme: themes.dark,
       };
-    case 'THEME_LIGHT':
-      localStorage.setItem('theme', 'light');
+    case "THEME_LIGHT":
+      localStorage.setItem("theme", "light");
       return {
         ...state,
         theme: themes.light,
       };
-    case 'CHEATS':
+    case "CHEATS":
       const newCheatState = {
         ...state,
         chat: [
-          `Hints ${state.cheats ? 'disabled' : 'enabled'}.`,
+          `Hints ${state.cheats ? "disabled" : "enabled"}.`,
           ...state.chat,
         ],
         cheats: !state.cheats,
       };
       newCheatState.chat.length = Math.min(
         newCheatState.chat.length,
-        CHAT_BUFFER_LENGTH,
+        CHAT_BUFFER_LENGTH
       );
       return newCheatState;
-    case 'welcome':
-      const {game} = action;
+    case "welcome":
+      const { game } = action;
       const rolls = [];
       for (let i = 0; i < game.rolls.length; ++i) {
-        rolls.push({used: game.used[i], value: game.rolls[i]});
+        rolls.push({ used: game.used[i], value: game.rolls[i] });
       }
       return Object.assign(
         {},
         state,
         initialState,
         game,
-        {players: game.players},
-        {self_index: action.id},
-        {rolls},
+        { players: game.players },
+        { self_index: action.id },
+        { rolls }
       );
-    case 'join':
+    case "join":
       if (!state.players.length) {
         return state;
       }
@@ -110,28 +110,28 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         players: state.players.concat({
           connected: true,
-          name: '',
+          name: "",
           score: 0,
           win_count: 0,
         }),
       };
 
-    case 'disconnect':
-    case 'reconnect':
+    case "disconnect":
+    case "reconnect":
       return {
         ...state,
         players: state.players.map((p: Player, i: number) =>
-          i !== action.id ? p : {...p, connected: action.type === 'reconnect'},
+          i !== action.id ? p : { ...p, connected: action.type === "reconnect" }
         ),
       };
-    case 'update':
+    case "update":
       return {
         ...state,
         players: state.players.map((p: Player, i: number) =>
-          i !== action.id ? p : {...p, score: action.score},
+          i !== action.id ? p : { ...p, score: action.score }
         ),
         rolls:
-          'used' in action
+          "used" in action
             ? action.used.map((used: boolean, i: number) => ({
                 used,
                 value: state.rolls[i].value,
@@ -139,29 +139,29 @@ const rootReducer: Reducer<ReduxState> = (
             : state.rolls,
         reset: action.reset,
       };
-    case 'update_name':
+    case "update_name":
       return {
         ...state,
         players: state.players.map((p: Player, i: number) =>
-          i !== action.id ? p : {...p, name: action.name},
+          i !== action.id ? p : { ...p, name: action.name }
         ),
       };
-    case 'update_turn':
+    case "update_turn":
       return {
         ...state,
         turn_index: action.id,
         rolled: false,
       };
-    case 'roll_again':
+    case "roll_again":
       return {
         ...state,
         rolled: false,
       };
-    case 'leave':
-    case 'kick':
+    case "leave":
+    case "kick":
       if (state.self_index === action.id) {
         // We've been kicked, uh oh
-        window.history.replaceState({}, '', '/home');
+        window.history.replaceState({}, "", "/home");
         return {
           ...initialState,
         };
@@ -177,44 +177,50 @@ const rootReducer: Reducer<ReduxState> = (
             ? state.self_index - 1
             : state.self_index,
       };
-    case 'roll':
+    case "roll":
+      document.dispatchEvent(
+        new CustomEvent<any>("roll", { detail: action.rolls })
+      );
       return {
         ...state,
-        rolls: action.rolls.map((roll: number) => ({value: roll, used: false})),
+        rolls: action.rolls.map((roll: number) => ({
+          value: roll,
+          used: false,
+        })),
         rolled: true,
         rollCount: state.rollCount + 1,
       };
-    case 'win':
+    case "win":
       return {
         ...state,
         victory: true,
       };
-    case 'restart':
+    case "restart":
       return {
         ...initialState,
         rolls: state.rolls,
-        players: state.players.map(p => ({...p, score: 0})),
+        players: state.players.map((p) => ({ ...p, score: 0 })),
         turn_index: action.id,
         self_index: state.self_index,
         chat: state.chat,
         cheats: state.cheats,
         socket: state.socket,
       };
-    case 'chat':
+    case "chat":
       const newState = {
         ...state,
         chat: [action.msg, ...state.chat],
       };
       newState.chat.length = Math.min(newState.chat.length, CHAT_BUFFER_LENGTH);
       return newState;
-    case 'DOUBLES':
+    case "DOUBLES":
       return {
         ...state,
         doublesCount: state.doublesCount + 1,
       };
     default:
-      if (!action.type.includes('@@'))
-        console.error('RECEIVED UNKNOWN ACTION', action);
+      if (!action.type.includes("@@"))
+        console.error("RECEIVED UNKNOWN ACTION", action);
   }
   return state;
 };
@@ -224,5 +230,5 @@ export const selectState = (state: ReduxState) => state;
 export const store = createStore(
   rootReducer,
   (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
-    (window as any).__REDUX_DEVTOOLS_EXTENSION__(),
+    (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );

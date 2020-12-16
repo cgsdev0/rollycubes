@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/cannon": "^0.1.5",
     "@types/jest": "24.0.18",
     "@types/node": "12.7.5",
     "@types/react": "16.9.2",
@@ -12,6 +13,7 @@
     "@types/reselect": "^2.2.0",
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
+    "cannon": "^0.6.2",
     "prettier": "^1.18.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",

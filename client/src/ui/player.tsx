@@ -25,7 +25,7 @@ const PlayerComponent = (props: Props) => {
     }
   };
 
-  const doSome3Dstuff = () => initScene();
+  const doSome3Dstuff = () => { initScene() };
 
   const onKick = () => {
     const {player, n} = props;
