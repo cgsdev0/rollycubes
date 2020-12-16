@@ -68,15 +68,22 @@ const rootReducer: Reducer<ReduxState> = (
       localStorage.setItem("theme", "dark");
       return {
         ...state,
-        theme: themes.dark,
+        settings: {
+          ...state.settings,
+          theme: themes.dark,
+        },
       };
     case "THEME_LIGHT":
       localStorage.setItem("theme", "light");
       return {
         ...state,
-        theme: themes.light,
+        settings: {
+          ...state.settings,
+          theme: themes.light,
+        },
       };
     case "CHEATS":
+      localStorage.setItem("cheats", JSON.stringify(!state.settings.cheats));
       const newCheatState = {
         ...state,
         chat: [

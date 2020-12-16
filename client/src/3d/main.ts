@@ -5,7 +5,14 @@ import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import { store } from "../store";
 
+const frameRate = 60;
+
 var cannonPlugin = new CannonJSPlugin(true, 10, cannon);
+
+function rand<T>(items: T[]): T {
+  // "|" for a kinda "int div"
+  return items[(items.length * Math.random()) | 0];
+}
 
 const lookupTable: Record<string, number> = {
   "00": 1,
@@ -18,8 +25,8 @@ const lookupTable: Record<string, number> = {
   "13": 4,
   "30": 3,
   "31": 3,
-  "32": 1,
-  "33": 6,
+  "32": 3,
+  "33": 3,
 };
 const quatToRoll = (q: BABYLON.Quaternion) => {
   let { x, z } = q.toEulerAngles();
@@ -33,11 +40,11 @@ const quatToRoll = (q: BABYLON.Quaternion) => {
 // prettier-ignore
 const diceUVBuffers = [
 [0.75,1,0.5,1,0.5,0.5,0.75,0.5,1,1,0.75,1,0.75,0.5,1,0.5,0.5,1,0.25,1,0.25,0.5,0.5,0.5,0.5,0.5,0.25,0.5,0.25,0,0.5,0,0.25,1,0,1,0,0.5,0.25,0.5,0.75,0.5,0.5,0.5,0.5,0,0.75,0],
-[1, 1, 0.75, 1, 0.75, 0.5, 1, 0.5, 0.5, 0.5, 0.25, 0.5, 0.25, 0, 0.5, 0, 0.75, 1, 0.5, 1, 0.5, 0.5, 0.75, 0.5, 0.75, 0.5, 0.5, 0.5, 0.5, 0, 0.75, 0, 0.5, 1, 0.25, 1, 0.25, 0.5, 0.5, 0.5, 0.25, 1, 0, 1, 0, 0.5, 0.25, 0.5],
-[0.5, 0.5, 0.25, 0.5, 0.25, 0, 0.5, 0, 0.75, 0.5, 0.5, 0.5, 0.5, 0, 0.75, 0, 1, 1, 0.75, 1, 0.75, 0.5, 1, 0.5, 0.25, 1, 0, 1, 0, 0.5, 0.25, 0.5, 0.75, 1, 0.5, 1, 0.5, 0.5, 0.75, 0.5, 0.5, 1, 0.25, 1, 0.25, 0.5, 0.5, 0.5],
-[0.75, 0.5, 0.5, 0.5, 0.5, 0, 0.75, 0, 0.25, 1, 0, 1, 0, 0.5, 0.25, 0.5, 0.5, 0.5, 0.25, 0.5, 0.25, 0, 0.5, 0, 0.5, 1, 0.25, 1, 0.25, 0.5, 0.5, 0.5, 1, 1, 0.75, 1, 0.75, 0.5, 1, 0.5, 0.75, 1, 0.5, 1, 0.5, 0.5, 0.75, 0.5],
-[0.25, 1, 0, 1, 0, 0.5, 0.25, 0.5, 0.5, 1, 0.25, 1, 0.25, 0.5, 0.5, 0.5, 0.75, 0.5, 0.5, 0.5, 0.5, 0, 0.75, 0, 0.75, 1, 0.5, 1, 0.5, 0.5, 0.75, 0.5, 0.5, 0.5, 0.25, 0.5, 0.25, 0, 0.5, 0, 1, 1, 0.75, 1, 0.75, 0.5, 1, 0.5],
-[0.5, 1, 0.25, 1, 0.25, 0.5, 0.5, 0.5, 0.75, 1, 0.5, 1, 0.5, 0.5, 0.75, 0.5, 0.25, 1, 0, 1, 0, 0.5, 0.25, 0.5, 1, 1, 0.75, 1, 0.75, 0.5, 1, 0.5, 0.75, 0.5, 0.5, 0.5, 0.5, 0, 0.75, 0, 0.5, 0.5, 0.25, 0.5, 0.25, 0, 0.5, 0],
+[1,1,0.75,1,0.75,0.5,1,0.5,0.5,0.5,0.25,0.5,0.25,0,0.5,0,0.75,1,0.5,1,0.5,0.5,0.75,0.5,0.75,0.5,0.5,0.5,0.5,0,0.75,0,0.5,1,0.25,1,0.25,0.5,0.5,0.5,0.25,1,0,1,0,0.5,0.25,0.5],
+[0.5,0.5,0.25,0.5,0.25,0,0.5,0,0.75,0.5,0.5,0.5,0.5,0,0.75,0,1,1,0.75,1,0.75,0.5,1,0.5,0.25,1,0,1,0,0.5,0.25,0.5,0.75,1,0.5,1,0.5,0.5,0.75,0.5,0.5,1,0.25,1,0.25,0.5,0.5,0.5],
+[0.75,0.5,0.5,0.5,0.5,0,0.75,0,0.25,1,0,1,0,0.5,0.25,0.5,0.5,0.5,0.25,0.5,0.25,0,0.5,0,0.5,1,0.25,1,0.25,0.5,0.5,0.5,1,1,0.75,1,0.75,0.5,1,0.5,0.75,1,0.5,1,0.5,0.5,0.75,0.5],
+[0.25,1,0,1,0,0.5,0.25,0.5,0.5,1,0.25,1,0.25,0.5,0.5,0.5,0.75,0.5,0.5,0.5,0.5,0,0.75,0,0.75,1,0.5,1,0.5,0.5,0.75,0.5,0.5,0.5,0.25,0.5,0.25,0,0.5,0,1,1,0.75,1,0.75,0.5,1,0.5],
+[0.5,1,0.25,1,0.25,0.5,0.5,0.5,0.75,1,0.5,1,0.5,0.5,0.75,0.5,0.25,1,0,1,0,0.5,0.25,0.5,1,1,0.75,1,0.75,0.5,1,0.5,0.75,0.5,0.5,0.5,0.5,0,0.75,0,0.5,0.5,0.25,0.5,0.25,0,0.5,0],
 ];
 
 const createDiceUVs = (fudge: number) => {
@@ -64,10 +71,7 @@ const createDie = (() => {
   return (scene: BABYLON.Scene) => {
     if (!diceMat) {
       diceMat = new BABYLON.StandardMaterial("diceMat", scene);
-      diceMat.diffuseTexture = new BABYLON.Texture(
-        "http://localhost:3000/dice.png",
-        scene
-      );
+      diceMat.diffuseTexture = new BABYLON.Texture("/dice.png", scene);
       diceMat.ambientColor = scene.ambientColor;
     }
     const diceUV = createDiceUVs(0);
@@ -86,6 +90,12 @@ const createDie = (() => {
     die.material = diceMat;
     //let buffer = die.getVerticesData(BABYLON.VertexBuffer.UVKind);
     //console.log(buffer);
+    die.physicsImpostor = new BABYLON.PhysicsImpostor(
+      die,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 2, restitution: 0.9 },
+      scene
+    );
     return die;
   };
 })();
@@ -121,13 +131,14 @@ export const initScene = async () => {
   sceneInit = true;
   // const result = await window.fetch("http://localhost:3000/simulated.txt");
   // const data = await result.text();
-  const dice: any = [[], []];
+  const diceCount = 2;
+  const dice: BABYLON.AbstractMesh[] = [];
   // let frame: any = {};
   // const splitted = data
   //   .split("\n")
   //   .filter((a) => a)
   //   .map((d) => d.split(",").filter((a) => a))
-  //   .forEach((arr, j) => {
+  //   .forEach((arr,j) => {
   //     dice[j] = [];
   //     for (let i = 0; i < arr.length; ++i) {
   //       if (i % 20 === 0 && i) {
@@ -151,123 +162,129 @@ export const initScene = async () => {
     new BABYLON.Vector3(0, 10, 1),
     scene
   );
+  camera.attachControl(canvas, true);
   camera.setTarget(BABYLON.Vector3.Zero());
   const light = new BABYLON.HemisphericLight(
     "light",
     new BABYLON.Vector3(-1, 1, 0),
     scene
   );
+
   light.intensity = 0.5;
-  // var lensFlareSystem = new BABYLON.LensFlareSystem("lensFlareSystem", light, scene);
+
+  var gravityVector = new BABYLON.Vector3(0, -9.81, 0);
+  scene.enablePhysics(gravityVector, cannonPlugin);
+
   // make some dice
   //
-  const die1 = createDie(scene);
-  die1.position.y = 3;
-  const frameRate = 60;
-  // const xSlide2 = new BABYLON.Animation(
-  //   "xSlide2",
-  //   "position",
-  //   frameRate,
-  //   BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-  //   BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-  // );
-  // const xRot2 = new BABYLON.Animation(
-  //   "xRot2",
-  //   "rotation",
-  //   frameRate,
-  //   BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
-  //   BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-  // );
-  // console.log(dice[0].map((a: any) => ({ frame: a.frame, value: a.y })));
-  // xSlide.setKeys(
-  //   dice[0].map((a: any) => ({
-  //     frame: Number(a.frame),
-  //     value: new BABYLON.Vector3(Number(a.x), Number(a.y), Number(a.z)),
-  //   }))
-  // );
-  // xRot.setKeys(
-  //   dice[0].map((a: any) => ({
-  //     frame: Number(a.frame),
-  //     value: new BABYLON.Quaternion(
-  //       Number(a.rx),
-  //       Number(a.ry),
-  //       Number(a.rz),
-  //       Number(a.rw)
-  //     ),
-  //   }))
-  // );
-  // xSlide2.setKeys(
-  //   dice[1].map((a: any) => ({
-  //     frame: Number(a.frame),
-  //     value: new BABYLON.Vector3(Number(a.x), Number(a.y), Number(a.z)),
-  //   }))
-  // );
-  // xRot2.setKeys(
-  //   dice[1].map((a: any) => ({
-  //     frame: Number(a.frame),
-  //     value: new BABYLON.Quaternion(
-  //       Number(a.rx),
-  //       Number(a.ry),
-  //       Number(a.rz),
-  //       Number(a.rw)
-  //     ),
-  //   }))
-  // );
-  const die2 = createDie(scene);
-  die2.position.y = 2;
-  die2.position.x = 0.2;
-  // die2.animations.push(xSlide2);
-  // die2.animations.push(xRot2);
-  // scene.beginAnimation(die1, 0, 5 * frameRate, true);
-  // scene.beginAnimation(die2, 0, 5 * frameRate, true);
+  for (let i = 0; i < diceCount; ++i) {
+    dice[i] = createDie(scene);
+  }
+  dice[0].position.y = 3;
+  dice[1].position.y = 2;
+  dice[1].position.x = 0.2;
 
   var greenMat = new BABYLON.StandardMaterial("GREENmat", scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 0.35, 0);
-  /*const table = [];
-  for (let i = 0; i < 8; ++i) {
-    var box = BABYLON.MeshBuilder.CreateBox(`box${i}`, { width: 2 }, scene);
-    box.material = greenMat;
-    box.rotate(new BABYLON.Vector3(0, 1, 0), (Math.PI / 4) * i);
-    box.translate(new BABYLON.Vector3(1, 0, 0), Math.sqrt(2) / 2 - 0.5);
-    table.push(box);
-  }
-  const ground = BABYLON.MeshBuilder.CreateGround(
-    "ground",
-    { width: 10, height: 10 },
-    scene
-  );
-  BABYLON.MeshBuilder.CreatePlane("north", { width: 10, height: 10 }).translate(
-    new BABYLON.Vector3(0, 1, 1),
-    5
-  );
-  BABYLON.MeshBuilder.CreatePlane("east", { width: 10, height: 10 })
-    .translate(new BABYLON.Vector3(1, 1, 0), 5)
-    .rotate(new BABYLON.Vector3(0, 1, 0), Math.PI / 2);
-  BABYLON.MeshBuilder.CreatePlane("south", { width: 10, height: 10 })
-    .translate(new BABYLON.Vector3(0, 1, -1), 5)
-    .rotate(new BABYLON.Vector3(0, 1, 0), Math.PI);
-  BABYLON.MeshBuilder.CreatePlane("west", { width: 10, height: 10 })
-    .translate(new BABYLON.Vector3(-1, 1, 0), 5)
-    .rotate(new BABYLON.Vector3(0, 1, 0), Math.PI * 1.5);
-    */
 
-  // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
-  var ground = BABYLON.Mesh.CreateGround("ground1", 32, 32, 0, scene);
+  // Our built-in 'ground' shape. Params: name,width,depth,subdivs,scene
+  var ground = BABYLON.Mesh.CreateGround("ground1", 128, 128, 0, scene);
+
+  const makePicker = (
+    scene: BABYLON.Scene,
+    camera: BABYLON.Camera,
+    ground: BABYLON.AbstractMesh
+  ) => {
+    return (x: number, y: number) => {
+      const result = scene.pick(
+        x,
+        y,
+        (mesh: BABYLON.AbstractMesh) => mesh == ground,
+        false,
+        camera
+      );
+      if (!result) {
+        return BABYLON.Vector3.Zero();
+      }
+      return result.pickedPoint || BABYLON.Vector3.Zero();
+    };
+  };
+
+  const picker = makePicker(scene, camera, ground);
+
+  var northWall = BABYLON.MeshBuilder.CreateBox(
+    "northWall",
+    { width: 128, height: 15, depth: 1, updatable: true },
+    scene
+  );
+  var southWall = BABYLON.MeshBuilder.CreateBox(
+    "southWall",
+    { width: 128, height: 15, depth: 1, updatable: true },
+    scene
+  );
+  console.log(southWall);
+  var eastWall = BABYLON.MeshBuilder.CreateBox(
+    "eastWall",
+    { width: 1, depth: 128, height: 15, updatable: true },
+    scene
+  );
+  var westWall = BABYLON.MeshBuilder.CreateBox(
+    "westWall",
+    { width: 1, depth: 128, height: 15, updatable: true },
+    scene
+  );
+
+  const walls = [northWall, southWall, eastWall, westWall];
+
+  // const updateWallPhysics = (wall: any) => {
+  //   {
+  //     const { x, y, z } = wall.scaling;
+  //     wall.physicsImpostor.physicsBody.shapes[0].halfExtents.set(
+  //       Math.abs(x / 2),
+  //       Math.abs(y / 2),
+  //       Math.abs(z / 2)
+  //     );
+  //   }
+  //   {
+  //     const { x, y, z } = wall.position;
+  //     wall.physicsImpostor.physicsBody.position.set(x, y, z);
+  //   }
+  //   wall.physicsImpostor.physicsBody.computeAABB();
+  //   wall.physicsImpostor.physicsBody.shapes[0].updateBoundingSphereRadius();
+  //   wall.physicsImpostor.physicsBody.shapes[0].updateConvexPolyhedronRepresentation();
+  //   console.log(wall.physicsImpostor.physicsBody);
+  // };
+  walls.forEach((wall) => {
+    wall.physicsImpostor = new BABYLON.PhysicsImpostor(
+      wall,
+      BABYLON.PhysicsImpostor.BoxImpostor,
+      { mass: 0, restitution: 0.9 },
+      scene
+    );
+  });
+  const resizeWalls = () => {
+    scene.physicsEnabled = true;
+    const leftTop = picker(0, 0);
+    const rightTop = picker(camera.viewport.width * canvas.width, 0);
+    const leftBottom = picker(0, camera.viewport.height * canvas.height);
+    const rightBottom = picker(
+      camera.viewport.width * canvas.width,
+      camera.viewport.height * canvas.height
+    );
+    northWall.position.z = (rightTop.z + leftTop.z) / 2;
+    southWall.position.z = (rightBottom.z + leftBottom.z) / 2;
+    eastWall.position.x = (rightTop.x + rightBottom.x) / 2;
+    westWall.position.x = (leftTop.x + leftBottom.x) / 2;
+
+    scene.physicsEnabled = false;
+  };
+  resizeWalls();
+
+  walls.forEach((wall) => {
+    wall.material = greenMat;
+    wall.visibility = 0;
+  });
   ground.visibility = 0;
-  var gravityVector = new BABYLON.Vector3(0, -9.81, 0);
-  scene.enablePhysics(gravityVector, cannonPlugin);
-  die1.physicsImpostor = new BABYLON.PhysicsImpostor(
-    die1,
-    BABYLON.PhysicsImpostor.BoxImpostor,
-    { mass: 2, restitution: 0.9 },
-    scene
-  );
-  die2.physicsImpostor = new BABYLON.PhysicsImpostor(
-    die2,
-    BABYLON.PhysicsImpostor.BoxImpostor,
-    { mass: 2, restitution: 0.9 },
-    scene
-  );
   ground.physicsImpostor = new BABYLON.PhysicsImpostor(
     ground,
     BABYLON.PhysicsImpostor.BoxImpostor,
@@ -275,112 +292,106 @@ export const initScene = async () => {
     scene
   );
 
-  // die1.physicsImpostor.applyImpulse(
-  //   new BABYLON.Vector3(1, 3, 0),
-  //   new BABYLON.Vector3(1, 2, 0)
-  // );
+  // TRANSPARENT BG
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 
-  const roll = (a: number, b: number) => {
+  const directions = [
+    { name: "north", v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+    { name: "south", v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+    { name: "east", v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+    { name: "west", v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+  ];
+  const roll = (serverRoll: number[]) => {
     scene.physicsEnabled = false;
+    const direction = rand(directions);
+    console.log(direction);
+    const wall = walls[directions.indexOf(direction)];
+    wall.position.y = -5.5;
+    scene.physicsEnabled = true;
     const positions: any[][] = [[], []];
     const rotations: any[][] = [[], []];
-    die1.position.x = 0;
-    die1.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
-    die1.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
-    die2.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
-    die2.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
-    die1.position.y = 3;
-    die1.position.z = 0;
-    die2.position.y = 4;
-    die2.position.x = 0.2;
-    die2.position.z = 0;
+    dice[0].position.x = 0;
+    dice[0].position.y = 3;
+    dice[0].position.z = 0;
+    dice[1].position.y = 4;
+    dice[1].position.x = 0.2;
+    dice[1].position.z = 0;
+
+    dice.forEach((die) => {
+      die.position.addInPlace(wall.position.multiply(direction.v).scale(1.5));
+      die.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
+      const force = direction.v.scale(direction.u).scale(20);
+      const rotation = ((Math.random() - 0.5) * Math.PI) / 6;
+      const matrix = BABYLON.Matrix.RotationAxis(BABYLON.Axis.Y, rotation);
+      die.physicsImpostor!.applyImpulse(
+        BABYLON.Vector3.TransformCoordinates(force, matrix),
+        die.getAbsolutePosition()
+      );
+      die.physicsImpostor!.setAngularVelocity(
+        new BABYLON.Vector3(
+          (Math.random() - 0.5) * 10,
+          (Math.random() - 0.5) * 10,
+          (Math.random() - 0.5) * 10
+        )
+      );
+    });
+    const impostors = [
+      ...dice.map((die) => die.physicsImpostor!),
+      ...walls.map((wall) => wall.physicsImpostor!),
+    ];
     for (let i = 0; i < 500; ++i) {
       scene!
         .getPhysicsEngine()!
         .getPhysicsPlugin()!
-        .executeStep(0.01667, [die1.physicsImpostor!, die2.physicsImpostor!]);
-      {
-        const { x, y, z } = die1.position;
-        positions[0].push({
+        .executeStep(0.01667, impostors);
+      dice.forEach((die, j) => {
+        const { x, y, z } = die.position;
+        positions[j].push({
           frame: i,
           value: new BABYLON.Vector3(x, y, z),
         });
-        const { x: rx, y: ry, z: rz, w: rw } = die1.rotationQuaternion!;
-        rotations[0].push({
+        const { x: rx, y: ry, z: rz, w: rw } = die.rotationQuaternion!;
+        rotations[j].push({
           frame: i,
           value: new BABYLON.Quaternion(rx, ry, rz, rw),
         });
-      }
-      {
-        const { x, y, z } = die2.position;
-        positions[1].push({
-          frame: i,
-          value: new BABYLON.Vector3(x, y, z),
-        });
-        const { x: rx, y: ry, z: rz, w: rw } = die2.rotationQuaternion!;
-        rotations[1].push({
-          frame: i,
-          value: new BABYLON.Quaternion(rx, ry, rz, rw),
-        });
-      }
+      });
     }
-    const r1 = quatToRoll(die1.rotationQuaternion!);
-    const r2 = quatToRoll(die2.rotationQuaternion!);
-    die1.updateVerticesData(
-      BABYLON.VertexBuffer.UVKind,
-      diceUVBuffers[(6 + a - r1) % 6]
-    );
-    die2.updateVerticesData(
-      BABYLON.VertexBuffer.UVKind,
-      diceUVBuffers[(6 + b - r2) % 6]
-    );
-    console.log("locally rolled: ", r1, r2);
-    const xSlide = new BABYLON.Animation(
-      "xSlide",
-      "position",
-      frameRate,
-      BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-    );
-    const xRot = new BABYLON.Animation(
-      "xRot",
-      "rotationQuaternion",
-      frameRate,
-      BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-    );
-    const xSlide2 = new BABYLON.Animation(
-      "xSlide2",
-      "position",
-      frameRate,
-      BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-    );
-    const xRot2 = new BABYLON.Animation(
-      "xRot2",
-      "rotationQuaternion",
-      frameRate,
-      BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-    );
-    xSlide.setKeys(positions[0]);
-    xRot.setKeys(rotations[0]);
-    xSlide2.setKeys(positions[1]);
-    xRot2.setKeys(rotations[1]);
-    die1.animations = [];
-    die1.animations.push(xSlide);
-    die1.animations.push(xRot);
-    die2.animations = [];
-    die2.animations.push(xSlide2);
-    die2.animations.push(xRot2);
-    scene.beginAnimation(die1, 0, 500, false);
-    scene.beginAnimation(die2, 0, 500, false);
+    wall.position.y = 0;
+    scene.physicsEnabled = false;
+    dice.forEach((die, i) => {
+      const localRoll = quatToRoll(die.rotationQuaternion!);
+      console.log("locally rolled: ", localRoll);
+      die.updateVerticesData(
+        BABYLON.VertexBuffer.UVKind,
+        diceUVBuffers[(6 + serverRoll[i] - localRoll) % 6]
+      );
+      const xSlide = new BABYLON.Animation(
+        `xSide${i}`,
+        "position",
+        frameRate,
+        BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+      );
+      const xRot = new BABYLON.Animation(
+        `xRot${i}`,
+        "rotationQuaternion",
+        frameRate,
+        BABYLON.Animation.ANIMATIONTYPE_QUATERNION,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+      );
+      xSlide.setKeys(positions[i]);
+      xRot.setKeys(rotations[i]);
+      die.animations = [];
+      die.animations.push(xSlide);
+      die.animations.push(xRot);
+      scene.beginAnimation(die, 0, 500, false);
+    });
   };
   document.addEventListener(
     "roll",
     (e: any) => {
-      roll(e.detail[0], e.detail[1]);
+      roll(e.detail);
     },
     false
   );
@@ -388,7 +399,7 @@ export const initScene = async () => {
     switch (kbInfo.type) {
       case BABYLON.KeyboardEventTypes.KEYDOWN:
         if (kbInfo.event.key === "r") {
-          roll(1, 1);
+          roll([1, 1]);
         }
         break;
       case BABYLON.KeyboardEventTypes.KEYUP:
@@ -413,5 +424,6 @@ export const initScene = async () => {
   });
   window.addEventListener("resize", function() {
     engine.resize();
+    resizeWalls();
   });
 };
