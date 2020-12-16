@@ -16,7 +16,7 @@ interface State {}
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    theme: state.theme,
+    theme: state.settings.theme,
   };
 };
 

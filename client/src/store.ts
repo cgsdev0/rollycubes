@@ -24,8 +24,10 @@ export interface ReduxState {
   doublesCount: number;
   chat: string[];
   reset: boolean;
-  cheats?: boolean;
-  theme: Theme;
+  settings: {
+    cheats: boolean;
+    theme: Theme;
+  };
 }
 
 const initialState: ReduxState = {
@@ -39,9 +41,13 @@ const initialState: ReduxState = {
   doublesCount: 0,
   chat: [],
   reset: false,
-  theme:
-    themes[(localStorage.getItem("theme") || "light") as keyof typeof themes] ||
-    themes.light,
+  settings: {
+    cheats: (localStorage.getItem("cheats") || "false") === "true",
+    theme:
+      themes[
+        (localStorage.getItem("theme") || "light") as keyof typeof themes
+      ] || themes.light,
+  },
 };
 
 export const TARGET_SCORES = [33, 66, 67, 98, 99, 100];
@@ -74,10 +80,13 @@ const rootReducer: Reducer<ReduxState> = (
       const newCheatState = {
         ...state,
         chat: [
-          `Hints ${state.cheats ? "disabled" : "enabled"}.`,
+          `Hints ${state.settings.cheats ? "disabled" : "enabled"}.`,
           ...state.chat,
         ],
-        cheats: !state.cheats,
+        settings: {
+          ...state.settings,
+          cheats: !state.settings.cheats,
+        },
       };
       newCheatState.chat.length = Math.min(
         newCheatState.chat.length,
@@ -97,7 +106,8 @@ const rootReducer: Reducer<ReduxState> = (
         game,
         { players: game.players },
         { self_index: action.id },
-        { rolls }
+        { rolls },
+        { settings: state.settings }
       );
     case "join":
       if (!state.players.length) {
@@ -203,7 +213,7 @@ const rootReducer: Reducer<ReduxState> = (
         turn_index: action.id,
         self_index: state.self_index,
         chat: state.chat,
-        cheats: state.cheats,
+        settings: state.settings,
         socket: state.socket,
       };
     case "chat":
