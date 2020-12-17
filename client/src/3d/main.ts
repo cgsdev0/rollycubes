@@ -3,7 +3,7 @@ import { CannonJSPlugin } from "babylonjs";
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
-import { store } from "../store";
+import { store, ReduxState } from "../store";
 
 const frameRate = 60;
 
@@ -32,7 +32,7 @@ const quatToRoll = (q: BABYLON.Quaternion) => {
   let { x, z } = q.toEulerAngles();
   x = (Math.round((x / Math.PI) * 2) + 4) % 4;
   z = (Math.round((z / Math.PI) * 2) + 4) % 4;
-  console.log(x, z);
+  //console.log(x, z);
 
   return lookupTable[`${x}${z}`] || 0;
 };
@@ -65,7 +65,9 @@ const createDiceUVs = (fudge: number) => {
   return diceUV;
 };
 
-const createDie = (() => {
+const diceSize = 0.5;
+
+const makeDieCreator = () => {
   var diceMat: BABYLON.StandardMaterial;
   var i = 0;
   return (scene: BABYLON.Scene) => {
@@ -75,7 +77,6 @@ const createDie = (() => {
       diceMat.ambientColor = scene.ambientColor;
     }
     const diceUV = createDiceUVs(0);
-    const diceSize = 0.5;
     const die = BABYLON.MeshBuilder.CreateBox(
       `die${i++}`,
       {
@@ -87,6 +88,7 @@ const createDie = (() => {
       },
       scene
     );
+    die.isPickable = true;
     die.material = diceMat;
     //let buffer = die.getVerticesData(BABYLON.VertexBuffer.UVKind);
     //console.log(buffer);
@@ -96,9 +98,35 @@ const createDie = (() => {
       { mass: 2, restitution: 0.9 },
       scene
     );
+
+    // make that shit draggable
+    var pointerDragBehavior = new BABYLON.PointerDragBehavior({
+      dragPlaneNormal: new BABYLON.Vector3(0, 1, 0),
+    });
+    // Use drag plane in world space
+    pointerDragBehavior.useObjectOrientationForDragging = false;
+    //pointerDragBehavior.dragDeltaRatio = 1;
+    pointerDragBehavior.onDragStartObservable.add((event) => {
+      killAnimation(die);
+    });
+    die.addBehavior(pointerDragBehavior);
     return die;
   };
-})();
+};
+
+const killAnimation = (die: BABYLON.AbstractMesh) => {
+  if (!scene) {
+    return;
+  }
+  if (die.animations.length < 2) {
+    return;
+  }
+  scene.stopAnimation(die);
+  const keys = die.animations[1].getKeys();
+  const lastKeyframe = keys[keys.length - 1];
+  die.rotationQuaternion = lastKeyframe.value;
+  die.position.y = diceSize / 2;
+};
 
 const dataLabels = [
   "frame",
@@ -124,7 +152,29 @@ const dataLabels = [
 ];
 
 let sceneInit = false;
-export const initScene = async () => {
+let scene: BABYLON.Scene | undefined;
+let engine: BABYLON.Engine | undefined;
+let rollListener: any;
+
+export const destroyScene = async () => {
+  if (!sceneInit) {
+    return;
+  }
+  sceneInit = false;
+
+  var canvas: any = document.getElementById("renderCanvas");
+  canvas.setAttribute("class", "hidden");
+
+  if (scene) {
+    scene.dispose();
+  }
+  if (engine) {
+    engine.dispose();
+  }
+  document.removeEventListener("roll", rollListener);
+  rollListener = undefined;
+};
+export const initScene = async (state: ReduxState) => {
   if (sceneInit) {
     return;
   }
@@ -151,18 +201,19 @@ export const initScene = async () => {
   var canvas: any = document.getElementById("renderCanvas");
   canvas.classList.remove("hidden");
   // Load the 3D engine
-  const engine = new BABYLON.Engine(canvas, true, {
+  engine = new BABYLON.Engine(canvas, true, {
     preserveDrawingBuffer: true,
     stencil: true,
   });
-  const scene = new BABYLON.Scene(engine);
+  scene = new BABYLON.Scene(engine);
+
   scene.ambientColor = new BABYLON.Color3(1, 1, 1);
   const camera = new BABYLON.FreeCamera(
     "camera",
     new BABYLON.Vector3(0, 10, 1),
     scene
   );
-  camera.attachControl(canvas, true);
+  //camera.attachControl(canvas, true);
   camera.setTarget(BABYLON.Vector3.Zero());
   const light = new BABYLON.HemisphericLight(
     "light",
@@ -177,18 +228,18 @@ export const initScene = async () => {
 
   // make some dice
   //
+  const createDie = makeDieCreator();
   for (let i = 0; i < diceCount; ++i) {
     dice[i] = createDie(scene);
+    //dice[i].position = new BABYLON.Vector3(1000 + i, 1000, 1000);
   }
-  dice[0].position.y = 3;
-  dice[1].position.y = 2;
-  dice[1].position.x = 0.2;
 
   var greenMat = new BABYLON.StandardMaterial("GREENmat", scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 0.35, 0);
 
   // Our built-in 'ground' shape. Params: name,width,depth,subdivs,scene
   var ground = BABYLON.Mesh.CreateGround("ground1", 128, 128, 0, scene);
+  var ground2 = BABYLON.Mesh.CreateGround("ground2", 128, 128, 20, scene);
 
   const makePicker = (
     scene: BABYLON.Scene,
@@ -214,23 +265,22 @@ export const initScene = async () => {
 
   var northWall = BABYLON.MeshBuilder.CreateBox(
     "northWall",
-    { width: 128, height: 15, depth: 1, updatable: true },
+    { width: 128, height: 40, depth: 1, updatable: true },
     scene
   );
   var southWall = BABYLON.MeshBuilder.CreateBox(
     "southWall",
-    { width: 128, height: 15, depth: 1, updatable: true },
+    { width: 128, height: 40, depth: 1, updatable: true },
     scene
   );
-  console.log(southWall);
   var eastWall = BABYLON.MeshBuilder.CreateBox(
     "eastWall",
-    { width: 1, depth: 128, height: 15, updatable: true },
+    { width: 1, depth: 128, height: 40, updatable: true },
     scene
   );
   var westWall = BABYLON.MeshBuilder.CreateBox(
     "westWall",
-    { width: 1, depth: 128, height: 15, updatable: true },
+    { width: 1, depth: 128, height: 40, updatable: true },
     scene
   );
 
@@ -261,8 +311,12 @@ export const initScene = async () => {
       { mass: 0, restitution: 0.9 },
       scene
     );
+    wall.isPickable = false;
   });
   const resizeWalls = () => {
+    if (!scene) {
+      return;
+    }
     scene.physicsEnabled = true;
     const leftTop = picker(0, 0);
     const rightTop = picker(camera.viewport.width * canvas.width, 0);
@@ -285,14 +339,23 @@ export const initScene = async () => {
     wall.visibility = 0;
   });
   ground.visibility = 0;
+  ground2.visibility = 0;
   ground.physicsImpostor = new BABYLON.PhysicsImpostor(
     ground,
     BABYLON.PhysicsImpostor.BoxImpostor,
     { mass: 0, restitution: 0.9 },
     scene
   );
+  ground2.physicsImpostor = new BABYLON.PhysicsImpostor(
+    ground2,
+    BABYLON.PhysicsImpostor.BoxImpostor,
+    { mass: 0, restitution: 0.9 },
+    scene
+  );
 
   // TRANSPARENT BG
+  // if you're on acid
+  //scene.autoClear = false;
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 
   const directions = [
@@ -301,13 +364,21 @@ export const initScene = async () => {
     { name: "east", v: new BABYLON.Vector3(1, 0, 0), u: 1 },
     { name: "west", v: new BABYLON.Vector3(1, 0, 0), u: -1 },
   ];
-  const roll = (serverRoll: number[]) => {
+  const roll = (serverRoll: number[]): void => {
+    console.log(serverRoll);
+    if (serverRoll.length === 0) {
+      serverRoll = [3, 4];
+    }
+    if (!scene) {
+      return;
+    }
     scene.physicsEnabled = false;
     const direction = rand(directions);
-    console.log(direction);
-    const wall = walls[directions.indexOf(direction)];
-    wall.position.y = -5.5;
     scene.physicsEnabled = true;
+    //console.log(direction);
+    const wall = walls[directions.indexOf(direction)];
+    wall.position.y = -40;
+    let wallIsOpen = true;
     const positions: any[][] = [[], []];
     const rotations: any[][] = [[], []];
     dice[0].position.x = 0;
@@ -318,7 +389,11 @@ export const initScene = async () => {
     dice[1].position.z = 0;
 
     dice.forEach((die) => {
-      die.position.addInPlace(wall.position.multiply(direction.v).scale(1.5));
+      die.position.addInPlace(
+        wall.position
+          .multiply(direction.v)
+          .add(direction.v.scale(-direction.u * 2))
+      );
       die.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
       const force = direction.v.scale(direction.u).scale(20);
       const rotation = ((Math.random() - 0.5) * Math.PI) / 6;
@@ -339,11 +414,33 @@ export const initScene = async () => {
       ...dice.map((die) => die.physicsImpostor!),
       ...walls.map((wall) => wall.physicsImpostor!),
     ];
-    for (let i = 0; i < 500; ++i) {
+    let hasSignaledDone = false;
+    for (let i = 0; i < 600; ++i) {
       scene!
         .getPhysicsEngine()!
         .getPhysicsPlugin()!
         .executeStep(0.01667, impostors);
+      if (
+        wallIsOpen &&
+        dice.every((die) => {
+          if (
+            die.position
+              .multiply(direction.v)
+              .scale(direction.u)
+              .lengthSquared() <
+            wall.position
+              .multiply(direction.v)
+              .scale(direction.u)
+              .lengthSquared()
+          ) {
+            return true;
+          }
+          return false;
+        })
+      ) {
+        wallIsOpen = false;
+        wall.position.y = 0;
+      }
       dice.forEach((die, j) => {
         const { x, y, z } = die.position;
         positions[j].push({
@@ -356,12 +453,51 @@ export const initScene = async () => {
           value: new BABYLON.Quaternion(rx, ry, rz, rw),
         });
       });
+      if (
+        dice.every((die, i) => {
+          if (
+            die.physicsImpostor!.getLinearVelocity()!.lengthSquared() < 0.05 &&
+            die.physicsImpostor!.getAngularVelocity()!.lengthSquared() < 0.05
+          ) {
+            return true;
+          }
+          return false;
+        })
+      ) {
+        if (!hasSignaledDone) {
+          hasSignaledDone = true;
+          console.log("triggering thingy on iteration", i);
+          // if (i < 400) {
+          //   return roll(serverRoll);
+          // }
+          setTimeout(() => {
+            if (scene) {
+              scene.physicsEnabled = true;
+            }
+            console.log("thingy!");
+          }, Math.round(i * 16.66667));
+          break;
+        }
+      }
+    }
+    if (!hasSignaledDone) {
+      hasSignaledDone = true;
+      console.log("doing it live");
+      setTimeout(() => {
+        if (scene) {
+          scene.physicsEnabled = true;
+        }
+        console.log("thingy!");
+      }, Math.round(500 * 16.66667));
     }
     wall.position.y = 0;
     scene.physicsEnabled = false;
     dice.forEach((die, i) => {
+      if (!scene) {
+        return;
+      }
       const localRoll = quatToRoll(die.rotationQuaternion!);
-      console.log("locally rolled: ", localRoll);
+      //console.log("locally rolled: ", localRoll);
       die.updateVerticesData(
         BABYLON.VertexBuffer.UVKind,
         diceUVBuffers[(6 + serverRoll[i] - localRoll) % 6]
@@ -385,16 +521,30 @@ export const initScene = async () => {
       die.animations = [];
       die.animations.push(xSlide);
       die.animations.push(xRot);
-      scene.beginAnimation(die, 0, 500, false);
+      scene.beginAnimation(die, 0, 500, false, 1);
     });
   };
-  document.addEventListener(
-    "roll",
-    (e: any) => {
-      roll(e.detail);
-    },
-    false
-  );
+
+  setTimeout(() => {
+    // do a fake roll on init
+    state.rolls.forEach((roll, i) => {
+      const die = dice[i];
+      die.updateVerticesData(
+        BABYLON.VertexBuffer.UVKind,
+        diceUVBuffers[(6 + roll.value - 1) % 6]
+      );
+      die.position.y = diceSize / 1.2;
+      die.position.x = i;
+      die.position.z = Math.random();
+      die.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
+      die.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
+    });
+  }, 10);
+
+  rollListener = (e: any) => {
+    roll(e.detail);
+  };
+  document.addEventListener("roll", rollListener, false);
   scene.onKeyboardObservable.add((kbInfo) => {
     switch (kbInfo.type) {
       case BABYLON.KeyboardEventTypes.KEYDOWN:
@@ -411,7 +561,6 @@ export const initScene = async () => {
     //   .getPhysicsEngine()!
     //   .getPhysicsPlugin()!
     //   .executeStep(0.02, [die1!.physicsImpostor!]);
-    scene.physicsEnabled = false;
   });
   // BABYLON.SceneLoader.Append(
   //   "http://localhost:3000/",
@@ -420,10 +569,14 @@ export const initScene = async () => {
   //   function(scene) {}
   // );
   engine.runRenderLoop(function() {
-    scene.render();
+    if (scene) {
+      scene.render();
+    }
   });
   window.addEventListener("resize", function() {
-    engine.resize();
-    resizeWalls();
+    if (engine) {
+      engine.resize();
+      resizeWalls();
+    }
   });
 };

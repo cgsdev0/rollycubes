@@ -5,7 +5,6 @@ import {selectSelfIndex, selectTurnIndex} from '../selectors/game_selectors';
 import {Player, ReduxState} from '../store';
 import {ThemeContext} from '../themes';
 
-import {initScene} from "../3d/main";
 
 interface Props {
   player: Player;
@@ -25,8 +24,6 @@ const PlayerComponent = (props: Props) => {
     }
   };
 
-  const doSome3Dstuff = () => { initScene() };
-
   const onKick = () => {
     const {player, n} = props;
     const e = window.confirm(`Are you sure you want to kick ${player.name}?`);
@@ -35,7 +32,6 @@ const PlayerComponent = (props: Props) => {
     }
   };
 
-  React.useEffect(() => doSome3Dstuff(), []);
   const {n, player, self_index, turn_index} = props;
   const theme = React.useContext(ThemeContext);
   return (

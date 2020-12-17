@@ -1,3 +1,16 @@
+.bigDiceText {
+    height: 98px;
+    width: 98px;
+    text-align: center;
+    line-height: 98px;
+    font-size: 32pt;
+    font-weight: bold;
+    border-width: 1px;
+    border-color: #ccc;
+    border-style: solid;
+    border-radius: 8px;
+    margin: 4px;
+  }
 .dice {
     background: url(./dice.png) left top;
     height: 106px;

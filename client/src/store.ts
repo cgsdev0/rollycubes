@@ -1,6 +1,8 @@
 import { AnyAction, createStore, Reducer } from "redux";
 import { Theme, themes } from "./themes";
 
+import { initScene, destroyScene } from "./3d/main";
+
 export interface Player {
   connected: boolean;
   name: string;
@@ -26,6 +28,7 @@ export interface ReduxState {
   reset: boolean;
   settings: {
     cheats: boolean;
+    sick3dmode: boolean;
     theme: Theme;
   };
 }
@@ -43,6 +46,7 @@ const initialState: ReduxState = {
   reset: false,
   settings: {
     cheats: (localStorage.getItem("cheats") || "false") === "true",
+    sick3dmode: (localStorage.getItem("sick3dmode") || "false") === "true",
     theme:
       themes[
         (localStorage.getItem("theme") || "light") as keyof typeof themes
@@ -82,6 +86,30 @@ const rootReducer: Reducer<ReduxState> = (
           theme: themes.light,
         },
       };
+    case "TOGGLE_3D":
+      const new3dmode = !state.settings.sick3dmode;
+      if (new3dmode) {
+        initScene(state);
+      } else {
+        destroyScene();
+      }
+      localStorage.setItem("sick3dmode", JSON.stringify(new3dmode));
+      const new3dState = {
+        ...state,
+        chat: [
+          `3D mode ${state.settings.sick3dmode ? "disabled" : "enabled"}.`,
+          ...state.chat,
+        ],
+        settings: {
+          ...state.settings,
+          sick3dmode: new3dmode,
+        },
+      };
+      new3dState.chat.length = Math.min(
+        new3dState.chat.length,
+        CHAT_BUFFER_LENGTH
+      );
+      return new3dState;
     case "CHEATS":
       localStorage.setItem("cheats", JSON.stringify(!state.settings.cheats));
       const newCheatState = {
@@ -106,7 +134,7 @@ const rootReducer: Reducer<ReduxState> = (
       for (let i = 0; i < game.rolls.length; ++i) {
         rolls.push({ used: game.used[i], value: game.rolls[i] });
       }
-      return Object.assign(
+      const welcomeState = Object.assign(
         {},
         state,
         initialState,
@@ -116,6 +144,10 @@ const rootReducer: Reducer<ReduxState> = (
         { rolls },
         { settings: state.settings }
       );
+      if (state.settings.sick3dmode) {
+        initScene(welcomeState);
+      }
+      return welcomeState;
     case "join":
       if (!state.players.length) {
         return state;

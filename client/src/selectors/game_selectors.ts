@@ -5,6 +5,11 @@ import {
 } from "reselect";
 import { selectState, TARGET_SCORES } from "../store";
 
+export const selectIs3d = createSelector(
+  selectState,
+  (state) => state.settings.sick3dmode
+);
+
 export const selectDiceRolls = createSelector(
   selectState,
   (state) => state.rolls
@@ -82,6 +87,11 @@ export const selectOtherPlayerScores = createSelector(
 export const selectHasMultiplePlayers = createSelector(
   selectPlayers,
   (players) => Boolean(players.length > 1)
+);
+
+export const selectHitboxType = createSelector(
+  selectState,
+  (state) => (state.settings.sick3dmode ? "hitbox" : "shitbox")
 );
 
 export const selectWinner = createSelector(

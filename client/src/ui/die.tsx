@@ -6,6 +6,7 @@ interface Props {
     roll: DieRoll;
     rolling: "rolling" | "rolled";
     n: number;
+    is3d: boolean;
 }
 
 
@@ -13,7 +14,10 @@ interface Props {
 class Die extends React.Component<Props> {
 
     render() {
-        const { roll, rolling, n } = this.props;
+        const { roll, rolling, n, is3d } = this.props;
+        if(is3d) {
+            return (<div className={`bigDiceText`}>{`${roll.value}`}</div>);
+        }
         return (<div className={`dice ${rolling === "rolling" ? ("LR"[n % 2]) : ""}${rolling}${roll.value}`} />);
     }
 }

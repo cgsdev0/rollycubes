@@ -8,6 +8,7 @@ import {
   selectIsReset,
   selectTurnIndex,
   selectWinner,
+  selectHitboxType,
 } from '../selectors/game_selectors';
 import {Player, ReduxState} from '../store';
 import GamePanel from '../ui/game_panel';
@@ -25,6 +26,7 @@ interface Props {
   doublesCount: number;
   winner?: Player;
   reset: boolean;
+  hitboxType: string;
   turn: number;
 }
 
@@ -84,6 +86,9 @@ class GamePage extends React.Component<Props & DispatchProp> {
           case '/guide':
             this.props.dispatch({type: 'CHEATS'});
             break;
+          case '/3d':
+            this.props.dispatch({type: 'TOGGLE_3D'});
+            break;
           default:
             this.props.socket.send(
               JSON.stringify({type: 'chat', msg: this.inputRef.current.value}),
@@ -96,7 +101,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
   };
 
   render() {
-    const {route, doublesCount, winner, reset, turn} = this.props;
+    const {route, doublesCount, winner, reset, turn, hitboxType} = this.props;
     const {location} = route;
     const {hash} = location;
 
@@ -188,11 +193,14 @@ class GamePage extends React.Component<Props & DispatchProp> {
                     hash !== '#chat' ? ' HideMobile' : ''
                   }`}>
                   <form onSubmit={this.sendChat}>
+                    <div className={hitboxType} onClick={() => { this.inputRef.current!.focus()}}></div>
                     <input
                       ref={this.inputRef}
                       maxLength={400}
                       placeholder="Type a message..."></input>
-                    <button type="submit">Send</button>
+                    <button type="submit">
+                      <div className={hitboxType} onClick={this.sendChat}></div>
+                    Send</button>
                   </form>
                   <div className="Messages">
                     {this.props.chat.map((msg, i) => (
@@ -218,6 +226,7 @@ const mapStateToProps = (state: ReduxState) => {
     winner: selectWinner(state),
     turn: selectTurnIndex(state),
     reset: selectIsReset(state),
+    hitboxType: selectHitboxType(state),
   };
 };
 
