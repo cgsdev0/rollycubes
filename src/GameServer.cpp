@@ -150,7 +150,12 @@ std::string createRoom(bool isPrivate, std::string seed = "") {
 }
 
 /* Very simple WebSocket echo server */
-int main() {
+int main(int argc, char **argv) {
+    int port = DEFAULT_PORT;
+    if (argc == 2) {
+        // try to read a port as arg 2
+        port = atoi(argv[1]);
+    }
     /* Overly simple hello world app */
     uWS::App()
         .get("/cookie",
@@ -321,13 +326,13 @@ int main() {
                      }
                      userData->~PerSocketData();
                  }})
-        .listen(PORT,
-                [](auto *token) {
+        .listen(port,
+                [port](auto *token) {
                     if (token) {
-                        std::cout << "Listening on port " << PORT << std::endl;
+                        std::cout << "Listening on port " << port << std::endl;
                     }
                 })
         .run();
 
-    std::cout << "Failed to listen on port " << PORT << std::endl;
+    std::cout << "Failed to listen on port " << port << std::endl;
 }
