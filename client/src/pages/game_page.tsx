@@ -8,12 +8,12 @@ import {
   selectIsReset,
   selectTurnIndex,
   selectWinner,
-  selectHitboxType,
 } from '../selectors/game_selectors';
 import {Player, ReduxState} from '../store';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
 import {ThemeContext} from '../themes';
+import {destroyScene} from '../3d/main';
 
 interface TParams {
   room: string;
@@ -26,12 +26,26 @@ interface Props {
   doublesCount: number;
   winner?: Player;
   reset: boolean;
-  hitboxType: string;
   turn: number;
 }
 
+const clearSelection = () => {
+  if (window.getSelection) {
+      if (window.getSelection()!.empty) {  // Chrome
+            window.getSelection()!.empty();
+          } else if (window.getSelection()!.removeAllRanges) {  // Firefox
+                window.getSelection()!.removeAllRanges();
+              }
+  }
+}
+
+
+const zones = [ "App", "GamePanel", "GamePage", "EmptyDiceBox", "PlayerChatWrapper" ];
 class GamePage extends React.Component<Props & DispatchProp> {
   inputRef: React.RefObject<HTMLInputElement>;
+  listeners: any[] = [];
+  doubleTap: boolean = false;
+  doubleTapTimer: number | undefined;
   constructor(props: Props & DispatchProp) {
     super(props);
     this.inputRef = React.createRef();
@@ -42,6 +56,37 @@ class GamePage extends React.Component<Props & DispatchProp> {
         redirect: this.props.route.history.location.pathname,
       });
     }
+    else {
+      // setup click handlers
+      const mouseClick = (e: any) => {
+        if(zones.includes(e.target.id || e.target.className.split(" ")[0])) {
+          if(this.doubleTap) {
+            document.dispatchEvent(new CustomEvent('snapDice' ,{ detail: { x: e.x / window.innerWidth, y: e.y / window.innerHeight} }));
+            this.doubleTap = false;
+            if(this.doubleTapTimer) {
+              clearTimeout(this.doubleTapTimer);
+              this.doubleTapTimer = undefined;
+            }
+            clearSelection();
+            e.preventDefault();
+          }
+          else {
+            this.doubleTap = true;
+            this.doubleTapTimer = setTimeout(() => {
+              this.doubleTap = false;
+              this.doubleTapTimer = undefined;
+            }, 300) as any;
+          }
+        }
+      };
+      document.body.addEventListener('click', mouseClick,true);
+      this.listeners.push('click', mouseClick);
+    }
+  }
+
+  componentWillUnmount() {
+    this.listeners.forEach(l => document.body.removeEventListener(l.type, l.fn, true))
+    destroyScene();
   }
 
   sendChat = (e: FormEvent) => {
@@ -54,6 +99,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
 /hints - toggle gameplay hints
 /dark - night mode
 /light - day mode
+/3d - 3D dice! [EXPERIMENTAL]
 ----------------------------------------------
 `;
             helpString
@@ -101,7 +147,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
   };
 
   render() {
-    const {route, doublesCount, winner, reset, turn, hitboxType} = this.props;
+    const {route, doublesCount, winner, reset, turn } = this.props;
     const {location} = route;
     const {hash} = location;
 
@@ -159,6 +205,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
                   </a>
                 </ul>
                 <div
+                  id="RuleBox"
                   className={`TabContainer Rules ${
                     hash && hash !== '#rules' ? ' HideMobile' : ''
                   }`}>
@@ -193,13 +240,11 @@ class GamePage extends React.Component<Props & DispatchProp> {
                     hash !== '#chat' ? ' HideMobile' : ''
                   }`}>
                   <form onSubmit={this.sendChat}>
-                    <div className={hitboxType} onClick={() => { this.inputRef.current!.focus()}}></div>
                     <input
                       ref={this.inputRef}
                       maxLength={400}
                       placeholder="Type a message..."></input>
                     <button type="submit">
-                      <div className={hitboxType} onClick={this.sendChat}></div>
                     Send</button>
                   </form>
                   <div className="Messages">
@@ -226,7 +271,6 @@ const mapStateToProps = (state: ReduxState) => {
     winner: selectWinner(state),
     turn: selectTurnIndex(state),
     reset: selectIsReset(state),
-    hitboxType: selectHitboxType(state),
   };
 };
 

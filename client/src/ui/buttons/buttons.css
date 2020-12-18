@@ -35,7 +35,6 @@ button.Add {
     color: white;
     font-size: 18pt;
     font-weight: bold;
-    z-index: 500;
 }
 
 button.Add:active {
@@ -47,7 +46,6 @@ button.Subtract {
     color: white;
     font-size: 18pt;
     font-weight: bold;
-    z-index: 500;
 }
 
 button.Subtract:active {

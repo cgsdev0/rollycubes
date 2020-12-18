@@ -18,6 +18,7 @@ export interface ReduxState {
   players: Player[];
   rolls: DieRoll[];
   rolled: false;
+  rolled3d: false;
   turn_index: number;
   self_index: number;
   victory: boolean;
@@ -37,6 +38,7 @@ const initialState: ReduxState = {
   players: [],
   rolls: [],
   rolled: false,
+  rolled3d: false,
   turn_index: 0,
   self_index: 0,
   victory: false,
@@ -68,6 +70,11 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         socket: action.socket,
       };
+    case "FINISH_3D_ROLL":
+      return {
+        ...state,
+        rolled3d: true,
+      };
     case "THEME_DARK":
       localStorage.setItem("theme", "dark");
       return {
@@ -75,6 +82,19 @@ const rootReducer: Reducer<ReduxState> = (
         settings: {
           ...state.settings,
           theme: themes.dark,
+        },
+      };
+    case "TOGGLE_THEME":
+      localStorage.setItem(
+        "theme",
+        state.settings.theme === themes.dark ? "light" : "dark"
+      );
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          theme:
+            state.settings.theme === themes.dark ? themes.light : themes.dark,
         },
       };
     case "THEME_LIGHT":
@@ -142,7 +162,8 @@ const rootReducer: Reducer<ReduxState> = (
         { players: game.players },
         { self_index: action.id },
         { rolls },
-        { settings: state.settings }
+        { settings: state.settings },
+        { rolled3d: state.rolled3d }
       );
       if (state.settings.sick3dmode) {
         initScene(welcomeState);
@@ -200,11 +221,13 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         turn_index: action.id,
         rolled: false,
+        rolled3d: false,
       };
     case "roll_again":
       return {
         ...state,
         rolled: false,
+        rolled3d: false,
       };
     case "leave":
     case "kick":
@@ -228,7 +251,9 @@ const rootReducer: Reducer<ReduxState> = (
       };
     case "roll":
       document.dispatchEvent(
-        new CustomEvent<any>("roll", { detail: action.rolls })
+        new CustomEvent<any>("roll", {
+          detail: { rolls: action.rolls, turn_index: state.turn_index },
+        })
       );
       return {
         ...state,

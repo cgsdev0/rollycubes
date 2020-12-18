@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect, DispatchProp } from 'react-redux';
-import { selectShouldShowRoll, selectShouldShowAddSub, selectRollCount, selectShouldShowSplitButtons, selectDiceRolls, selectIsGameOver, selectIsDoubles } from '../selectors/game_selectors';
+import { selectShouldShowRoll, selectShouldShowAddSub, selectRollCount, selectShouldShowSplitButtons, selectDiceRolls, selectIsGameOver, selectIsDoubles, selectIs3dRollHappening, selectIs3d } from '../selectors/game_selectors';
 import { ReduxState, DieRoll } from '../store';
 import RollButton from './buttons/roll_button';
 import RestartButton from './buttons/restart_button';
@@ -17,6 +17,8 @@ interface Props {
     victory: boolean;
     isDoubles: boolean;
     buttons: boolean;
+    is3d: boolean;
+    is3dRolling: boolean;
 }
 
 interface State {
@@ -31,7 +33,7 @@ class GamePanel extends React.Component<Props & DispatchProp, State> {
 
     stopRolling = () => {
         this.setState({ rolling: "rolled" })
-        if(this.props.isDoubles) {
+        if(this.props.isDoubles && !this.props.is3d) {
             this.props.dispatch({type: "DOUBLES"})
         }
     }
@@ -43,18 +45,21 @@ class GamePanel extends React.Component<Props & DispatchProp, State> {
         }
     }
 
+    isRollComplete = () => {
+        if (this.props.is3d) return !this.props.is3dRolling;
+        return this.state.rolling === "rolled";
+    }
     renderRoll = () => {
         return (this.props.roll ? <RollButton /> : null);
     }
     renderAddSub = () => {
         if(this.props.victory) return null;
-        return (this.state.rolling === "rolled" && this.props.addSub ? (<AddSubButton />) : null);
+        return (this.isRollComplete() && this.props.addSub ? (<AddSubButton />) : null);
     }
     renderSplit = () => {
         const { dice, buttons, victory } = this.props;
         if(victory) return null;
-        const { rolling } = this.state;
-        return buttons && rolling === "rolled" ?
+        return buttons && this.isRollComplete() ?
             dice.map((die: DieRoll, n: number) =>
                 (<div key={`buttonColumn${n}`} className="buttonColumn">
                     {!die.used ? <AddSubButton n={n} /> : null}
@@ -89,6 +94,8 @@ const mapStateToProps = (state: ReduxState) => {
         dice: selectDiceRolls(state),
         buttons: selectShouldShowSplitButtons(state),
         victory: selectIsGameOver(state),
+        is3d: selectIs3d(state),
+        is3dRolling: selectIs3dRollHappening(state),
     }
 }
 

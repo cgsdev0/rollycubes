@@ -4,10 +4,16 @@ import {
   createSelectorCreator,
 } from "reselect";
 import { selectState, TARGET_SCORES } from "../store";
+import { themes } from "../themes";
 
 export const selectIs3d = createSelector(
   selectState,
   (state) => state.settings.sick3dmode
+);
+
+export const selectIsDarkTheme = createSelector(
+  selectState,
+  (state) => state.settings.theme === themes.dark
 );
 
 export const selectDiceRolls = createSelector(
@@ -89,11 +95,6 @@ export const selectHasMultiplePlayers = createSelector(
   (players) => Boolean(players.length > 1)
 );
 
-export const selectHitboxType = createSelector(
-  selectState,
-  (state) => (state.settings.sick3dmode ? "hitbox" : "shitbox")
-);
-
 export const selectWinner = createSelector(
   selectPlayers,
   selectIsGameOver,
@@ -145,18 +146,39 @@ export const selectTotalRoll = createSelector(
     rolls.map((roll) => roll.value).reduce((v: number, t: number) => v + t, 0)
 );
 
+export const selectIs3dRollHappening = createSelector(
+  selectState,
+  (state) => state.settings.sick3dmode && !state.rolled3d
+);
+
+export const selectShouldShowDiceBoxes = createSelector(
+  selectIs3d,
+  selectIsMyTurn,
+  selectIs3dRollHappening,
+  selectHasRolled,
+  selectHasMultiplePlayers,
+  selectTotalRoll,
+  (is3d, myTurn, stillRolling, hasRolled, enoughPlayers, total) =>
+    is3d
+      ? myTurn && !stillRolling && hasRolled && enoughPlayers && total === 7
+      : true
+);
 export const selectShouldShowAddSub = createSelector(
   selectIsMyTurn,
   selectHasRolled,
   selectTotalRoll,
-  (myTurn, hasRolled, total) => myTurn && hasRolled && total !== 7
+  selectIs3dRollHappening,
+  (myTurn, hasRolled, total, stillRolling) =>
+    !stillRolling && myTurn && hasRolled && total !== 7
 );
 
 export const selectShouldShowSplitButtons = createSelector(
   selectIsMyTurn,
   selectHasRolled,
   selectTotalRoll,
-  (myTurn, hasRolled, total) => myTurn && hasRolled && total === 7
+  selectIs3dRollHappening,
+  (myTurn, hasRolled, total, stillRolling) =>
+    !stillRolling && myTurn && hasRolled && total === 7
 );
 
 const makeCreateAddSubClassSelector = (n: number | "add" | "sub") => {
@@ -228,4 +250,3 @@ export const getAddSubButtonClassSelector = (n: number | "add" | "sub") => {
   }
   return selectorMap[n];
 };
-

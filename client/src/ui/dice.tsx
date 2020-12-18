@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { selectDiceRolls, selectIs3d, selectIsMyTurn } from '../selectors/game_selectors';
+import { selectDiceRolls, selectIs3d, selectIsMyTurn, selectHasMultiplePlayers, selectShouldShowDiceBoxes } from '../selectors/game_selectors';
 import { DieRoll, ReduxState } from '../store';
 import './buttons/buttons.css';
 import './dice.css';
@@ -10,7 +10,7 @@ interface Props {
     dice: ReduxState["rolls"];
     rolling: "rolled" | "rolling";
     is3d: boolean;
-    isMyTurn: boolean;
+    showDiceBoxes: boolean;
 }
 
 
@@ -19,9 +19,9 @@ class Dice extends React.Component<Props> {
 
 
     render() {
-        const { dice, rolling, is3d, isMyTurn } = this.props;
-        if(is3d && !isMyTurn) {
-            return null;
+        const { dice, rolling, is3d, showDiceBoxes } = this.props;
+        if(!showDiceBoxes) {
+            return <div id="EmptyDiceBox" className="diceBox" />;
         }
         return (
                 <div className="diceBox">
@@ -35,7 +35,7 @@ const mapStateToProps = (state: ReduxState) => {
     return {
         dice: selectDiceRolls(state),
         is3d: selectIs3d(state),
-        isMyTurn: selectIsMyTurn(state),
+        showDiceBoxes: selectShouldShowDiceBoxes(state),
     }
 }
 

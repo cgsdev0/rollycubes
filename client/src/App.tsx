@@ -9,6 +9,7 @@ import CookiePage from './pages/cookie_page';
 import {connect} from 'react-redux';
 import {ReduxState} from './store';
 import {ThemeContext} from './themes';
+import SettingsMenu from './ui/settings';
 
 interface Props {}
 
@@ -41,6 +42,7 @@ const AppInner = () => {
   return (
     <Router>
       <div className="App" style={theme.app}>
+        <SettingsMenu />
         <Route path="/" exact component={CookiePage} />
         <Route path="/home" component={HomePage} />
         <Route path="/room/:room" component={GamePage} />
