@@ -34,11 +34,11 @@ class Game {
     std::string hostName() const;
 
     bool hasPlayer(std::string &id);
-    json addPlayer(std::string id, PlayerClaim pc);
+    json addPlayer(std::string id);
     int getPlayerId(std::string &id);
 
     json disconnectPlayer(std::string id);
-    json reconnectPlayer(std::string id, PlayerClaim pc, std::string oldSession);
+    json reconnectPlayer(std::string id);
 
     void advanceTurn();
     void clearTurn();

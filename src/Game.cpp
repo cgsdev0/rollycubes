@@ -4,13 +4,11 @@
 
 #include "Consts.h"
 #include "Game.h"
-#include "Player.h"
 
 bool Game::isInitialized() { return players.size() > 0; }
 bool Game::isPrivate() const { return privateSession; }
 
-std::string
-Game::hostName() const {
+std::string Game::hostName() const {
     if (players.size() < 1)
         return "unknown";
     return players[0].getName();
@@ -52,12 +50,12 @@ int Game::getPlayerId(std::string &id) {
     return -1;
 }
 
-json Game::addPlayer(std::string id, PlayerClaim claim) {
+json Game::addPlayer(std::string id) {
     json result;
     if (players.size() >= MAX_PLAYERS) {
         return result;
     }
-    players.emplace_back(id, claim);
+    players.emplace_back(id);
     result["type"] = "join";
     result["id"] = players.size() - 1;
     // This is our first player joining
@@ -127,19 +125,10 @@ json Game::disconnectPlayer(std::string id) {
     return result;
 }
 
-json Game::reconnectPlayer(std::string id, PlayerClaim pc, std::string oldSession) {
+json Game::reconnectPlayer(std::string id) {
     json result;
     for (int i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == id) {
-            players[i].claim = pc;
-            players[i].reconnect();
-            result["type"] = "reconnect";
-            result["id"] = i;
-            break;
-        }
-        if (players[i].getSession() == oldSession) {
-            players[i].setSession(id);
-            players[i].claim = pc;
             players[i].reconnect();
             result["type"] = "reconnect";
             result["id"] = i;

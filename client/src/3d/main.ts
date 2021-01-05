@@ -20,6 +20,11 @@ const signalRolled3D = (doubles: boolean) => {
   }, 0);
 };
 
+function rand<T>(items: T[]): T {
+  // "|" for a kinda "int div"
+  return items[(items.length * Math.random()) | 0];
+}
+
 const lookupTable: Record<string, number> = {
   "00": 1,
   "01": 2,
@@ -238,7 +243,7 @@ export const initScene = async (state: ReduxState) => {
       const result = scene.pick(
         x,
         y,
-        (mesh: BABYLON.AbstractMesh) => mesh === ground,
+        (mesh: BABYLON.AbstractMesh) => mesh == ground,
         false,
         camera
       );
@@ -542,7 +547,6 @@ export const initScene = async (state: ReduxState) => {
       signaler = undefined;
     }
     signalRolled3D(lastRollWasDoubles);
-    lastRollWasDoubles = false;
     var snapGroup = new BABYLON.AnimationGroup("SnapGroup");
     const center = picker(x * canvas.width, y * canvas.height);
     dice.sort((a, b) => a.position.x - b.position.x);

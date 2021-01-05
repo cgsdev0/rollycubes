@@ -6,21 +6,13 @@
 
 using json = nlohmann::json;
 
-struct PlayerClaim {
-    bool verified;
-    std::string picture_url;
-    std::string username;
-    std::string sub;
-};
-
 class Player {
   public:
     Player();
 
-    Player(std::string session, PlayerClaim claim);
+    Player(std::string session);
 
     const std::string &getSession() const;
-    void setSession(std::string session);
 
     void disconnect();
     void reconnect();
@@ -40,8 +32,6 @@ class Player {
     const std::string &getName() const;
 
     json toJson() const;
-
-    PlayerClaim claim;
 
   private:
     std::string session;

@@ -1,7 +1,7 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {selectDiceRolls, selectIs3d, selectShouldShowDiceBoxes} from '../selectors/game_selectors';
-import {DieRoll, ReduxState} from '../store';
+import { connect } from 'react-redux';
+import { selectDiceRolls, selectIs3d, selectIsMyTurn, selectHasMultiplePlayers, selectShouldShowDiceBoxes } from '../selectors/game_selectors';
+import { DieRoll, ReduxState } from '../store';
 import './buttons/buttons.css';
 import './dice.css';
 import Die from './die';
