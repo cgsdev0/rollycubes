@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@types/cannon": "^0.1.5",
-    "@react-keycloak/web": "^3.0.0",
     "@types/jest": "24.0.18",
     "@types/node": "12.7.5",
     "@types/react": "16.9.2",
@@ -15,7 +14,6 @@
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
     "cannon": "^0.6.2",
-    "keycloak-js": "^11.0.2",
     "prettier": "^1.18.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
