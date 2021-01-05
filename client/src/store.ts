@@ -262,7 +262,6 @@ const rootReducer: Reducer<ReduxState> = (
           used: false,
         })),
         rolled: true,
-        rolled3d: false,
         rollCount: state.rollCount + 1,
       };
     case "win":
