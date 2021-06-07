@@ -1,0 +1,45 @@
+name: Deploy to Digital Ocean (Beta)
+
+on:
+  workflow_dispatch
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy:
+    name: Deploy (Beta)
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+    # Set up
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15.x'
+        
+    # Build server + client
+    - run: make release
+    - run: yarn install && ( yarn build || echo "errors are delicious nom nom nom" )
+      working-directory: client
+    
+    # Deploy it
+    - name: ssh-scp-ssh-pipelines
+      uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
+      with:
+        host: rollycubes.com
+        user: root
+        key: ${{ secrets.PROD_DEPLOY_KEY }}
+        first_ssh: |
+          sudo rm -rf /var/www/beta
+          systemctl stop dice_beta
+        # scp from local to remote
+        scp: |
+          GameServer => '/usr/bin/GameServer_beta'
+          client/build => '/var/www/beta'
+        # execute post-commands after scp
+        last_ssh: systemctl start dice_beta
