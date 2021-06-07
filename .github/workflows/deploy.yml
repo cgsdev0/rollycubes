@@ -17,12 +17,18 @@ jobs:
       contents: read
 
     steps:
+    # Set up
     - uses: actions/checkout@v2
-    - name: build-server
-      run: make release
-    - name: build-client
-      run: yarn build
-      working-directory: client
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15.x'
+        
+    # Build server + client
+    - run: make release
+    - run: yarn install
+    - run: yarn build
+    
+    # Deploy it
     - name: ssh-scp-ssh-pipelines
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
       with:
