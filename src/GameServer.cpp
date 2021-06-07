@@ -288,7 +288,7 @@ int main(int argc, char **argv) {
                                    << std::endl << e.what() << std::endl;
                          response["error"] = e.what();
                      } catch (nlohmann::detail::type_error &e) {
-                         std::cout << "RECEIVED BAD JSON (type_error): " << message
+                         std::cout << "HANDLED BAD JSON (type_error): " << message
                                    << std::endl << e.what() << std::endl;
                          response["error"] = e.what();
                      }
