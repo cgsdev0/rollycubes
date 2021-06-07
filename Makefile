@@ -1,4 +1,4 @@
-SRC_FILES := GameServer Player Game
+SRC_FILES := GameServer Player Game StringUtils
 override CXXFLAGS += -std=c++17 -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes
 override LDFLAGS += uWebSockets/uSockets/*.o -lz
 
