@@ -4,6 +4,6 @@
 #include <string>
 
 // Trims a string to a certain amount of characters (unicode aware).
-std::string trimString(const std::string& a, int len);
+std::string trimString(const std::string& a, int len, bool strict = false);
 
 #endif
