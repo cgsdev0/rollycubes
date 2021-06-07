@@ -535,7 +535,7 @@ export const initScene = async (state: ReduxState) => {
       die.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
       die.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
     });
-    signalRolled3D(state.rolls.every((v) => v.value === state.rolls[0].value));
+    signalRolled3D(false);
   }, 10);
 
   const snap = ({ x, y }: { x: number; y: number }) => {
