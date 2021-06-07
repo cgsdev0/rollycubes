@@ -1,19 +1,19 @@
-import React, {FormEvent} from 'react';
-import {connect, DispatchProp} from 'react-redux';
-import {RouteComponentProps} from 'react-router-dom';
-import '../App.css';
-import Connection from '../connection';
+import React, { FormEvent } from "react";
+import { connect, DispatchProp } from "react-redux";
+import { RouteComponentProps } from "react-router-dom";
+import "../App.css";
+import Connection from "../connection";
 import {
   selectDoublesCount,
   selectIsReset,
   selectTurnIndex,
   selectWinner,
-} from '../selectors/game_selectors';
-import {Player, ReduxState} from '../store';
-import GamePanel from '../ui/game_panel';
-import Players from '../ui/players';
-import {ThemeContext} from '../themes';
-import {destroyScene} from '../3d/main';
+} from "../selectors/game_selectors";
+import { Player, ReduxState } from "../store";
+import GamePanel from "../ui/game_panel";
+import Players from "../ui/players";
+import { ThemeContext } from "../themes";
+import { destroyScene } from "../3d/main";
 
 interface TParams {
   room: string;
@@ -31,16 +31,23 @@ interface Props {
 
 const clearSelection = () => {
   if (window.getSelection) {
-      if (window.getSelection()!.empty) {  // Chrome
-            window.getSelection()!.empty();
-          } else if (window.getSelection()!.removeAllRanges) {  // Firefox
-                window.getSelection()!.removeAllRanges();
-              }
+    if (window.getSelection()!.hasOwnProperty("empty")) {
+      // Chrome
+      window.getSelection()!.empty();
+    } else if (window.getSelection()!.hasOwnProperty("removeAllRanges")) {
+      // Firefox
+      window.getSelection()!.removeAllRanges();
+    }
   }
-}
+};
 
-
-const zones = [ "App", "GamePanel", "GamePage", "EmptyDiceBox", "PlayerChatWrapper" ];
+const zones = [
+  "App",
+  "GamePanel",
+  "GamePage",
+  "EmptyDiceBox",
+  "PlayerChatWrapper",
+];
 class GamePage extends React.Component<Props & DispatchProp> {
   inputRef: React.RefObject<HTMLInputElement>;
   listeners: any[] = [];
@@ -51,26 +58,31 @@ class GamePage extends React.Component<Props & DispatchProp> {
     this.inputRef = React.createRef();
   }
   componentDidMount() {
-    if (!document.cookie.includes('_session')) {
-      this.props.route.history.replace('/', {
+    if (!document.cookie.includes("_session")) {
+      this.props.route.history.replace("/", {
         redirect: this.props.route.history.location.pathname,
       });
-    }
-    else {
+    } else {
       // setup click handlers
       const mouseClick = (e: any) => {
-        if(zones.includes(e.target.id || e.target.className.split(" ")[0])) {
-          if(this.doubleTap) {
-            document.dispatchEvent(new CustomEvent('snapDice' ,{ detail: { x: e.x / window.innerWidth, y: e.y / window.innerHeight} }));
+        if (zones.includes(e.target.id || e.target.className.split(" ")[0])) {
+          if (this.doubleTap) {
+            document.dispatchEvent(
+              new CustomEvent("snapDice", {
+                detail: {
+                  x: e.x / window.innerWidth,
+                  y: e.y / window.innerHeight,
+                },
+              })
+            );
             this.doubleTap = false;
-            if(this.doubleTapTimer) {
+            if (this.doubleTapTimer) {
               clearTimeout(this.doubleTapTimer);
               this.doubleTapTimer = undefined;
             }
             clearSelection();
             e.preventDefault();
-          }
-          else {
+          } else {
             this.doubleTap = true;
             this.doubleTapTimer = setTimeout(() => {
               this.doubleTap = false;
@@ -79,21 +91,23 @@ class GamePage extends React.Component<Props & DispatchProp> {
           }
         }
       };
-      document.body.addEventListener('click', mouseClick,true);
-      this.listeners.push('click', mouseClick);
+      document.body.addEventListener("click", mouseClick, true);
+      this.listeners.push("click", mouseClick);
     }
   }
 
   componentWillUnmount() {
-    this.listeners.forEach(l => document.body.removeEventListener(l.type, l.fn, true))
+    this.listeners.forEach((l) =>
+      document.body.removeEventListener(l.type, l.fn, true)
+    );
     destroyScene();
   }
 
   sendChat = (e: FormEvent) => {
     if (this.props.socket) {
       if (this.inputRef.current && this.inputRef.current.value) {
-        switch (this.inputRef.current.value.toLowerCase().split(' ')[0]) {
-          case '/help':
+        switch (this.inputRef.current.value.toLowerCase().split(" ")[0]) {
+          case "/help":
             const helpString = `--------------------HELP--------------------
 /name [string] - change your username
 /hints - toggle gameplay hints
@@ -103,64 +117,66 @@ class GamePage extends React.Component<Props & DispatchProp> {
 ----------------------------------------------
 `;
             helpString
-              .split('\n')
-              .forEach(msg => this.props.dispatch({type: 'chat', msg}));
+              .split("\n")
+              .forEach((msg) => this.props.dispatch({ type: "chat", msg }));
             break;
-          case '/name':
-          case '/username':
-          case '/n':
-          case '/u':
+          case "/name":
+          case "/username":
+          case "/n":
+          case "/u":
             const name = this.inputRef.current.value
-              .split(' ')
+              .split(" ")
               .slice(1)
-              .join(' ');
-            this.props.socket.send(JSON.stringify({type: 'update_name', name}));
-            localStorage.setItem('name', name);
+              .join(" ");
+            this.props.socket.send(
+              JSON.stringify({ type: "update_name", name })
+            );
+            localStorage.setItem("name", name);
             break;
-          case '/night':
-          case '/dark':
-            this.props.dispatch({type: 'THEME_DARK'});
+          case "/night":
+          case "/dark":
+            this.props.dispatch({ type: "THEME_DARK" });
             break;
-          case '/day':
-          case '/light':
-            this.props.dispatch({type: 'THEME_LIGHT'});
+          case "/day":
+          case "/light":
+            this.props.dispatch({ type: "THEME_LIGHT" });
             break;
-          case '/hints':
-          case '/hint':
-          case '/cheat':
-          case '/cheats':
-          case '/guide':
-            this.props.dispatch({type: 'CHEATS'});
+          case "/hints":
+          case "/hint":
+          case "/cheat":
+          case "/cheats":
+          case "/guide":
+            this.props.dispatch({ type: "CHEATS" });
             break;
-          case '/3d':
-            this.props.dispatch({type: 'TOGGLE_3D'});
+          case "/3d":
+            this.props.dispatch({ type: "TOGGLE_3D" });
             break;
           default:
             this.props.socket.send(
-              JSON.stringify({type: 'chat', msg: this.inputRef.current.value}),
+              JSON.stringify({ type: "chat", msg: this.inputRef.current.value })
             );
         }
-        this.inputRef.current.value = '';
+        this.inputRef.current.value = "";
       }
     }
     e.preventDefault();
   };
 
   render() {
-    const {route, doublesCount, winner, reset, turn } = this.props;
-    const {location} = route;
-    const {hash} = location;
+    const { route, doublesCount, winner, reset, turn } = this.props;
+    const { location } = route;
+    const { hash } = location;
 
-    const rulesSel = !hash || hash === '#rules';
-    const chatSel = hash === '#chat';
+    const rulesSel = !hash || hash === "#rules";
+    const chatSel = hash === "#chat";
     const minimized = !rulesSel && !chatSel;
 
-    if (!document.cookie.includes('_session')) {
+    if (!document.cookie.includes("_session")) {
       return null;
     }
     return (
       <ThemeContext.Consumer>
-        {theme => (
+        {(theme) => (
           <React.Fragment>
             {doublesCount ? (
               <h6 key={doublesCount} id="Doubles">
@@ -184,7 +200,8 @@ class GamePage extends React.Component<Props & DispatchProp> {
                       ...theme.tab,
                       ...(rulesSel ? theme.tabHighlight : {}),
                     }}
-                    href="#rules">
+                    href="#rules"
+                  >
                     <li>Rules</li>
                   </a>
                   <a
@@ -192,7 +209,8 @@ class GamePage extends React.Component<Props & DispatchProp> {
                       ...theme.tab,
                       ...(chatSel ? theme.tabHighlight : {}),
                     }}
-                    href="#chat">
+                    href="#chat"
+                  >
                     <li>Chat</li>
                   </a>
                   <a
@@ -200,15 +218,17 @@ class GamePage extends React.Component<Props & DispatchProp> {
                       ...theme.tab,
                       ...(minimized ? theme.tabHighlight : {}),
                     }}
-                    href="#minimized">
+                    href="#minimized"
+                  >
                     <li>Minimize</li>
                   </a>
                 </ul>
                 <div
                   id="RuleBox"
                   className={`TabContainer Rules ${
-                    hash && hash !== '#rules' ? ' HideMobile' : ''
-                  }`}>
+                    hash && hash !== "#rules" ? " HideMobile" : ""
+                  }`}
+                >
                   <h2 className="HideMobile">Rules</h2>
                   <p>
                     Each roll, you may add or subtract the total value shown on
@@ -226,7 +246,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
                       If you roll doubles, you <strong>must</strong> roll again.
                     </li>
                     <li>
-                      If you match a player's score, they are{' '}
+                      If you match a player's score, they are{" "}
                       <strong>reset</strong> to 0.
                     </li>
                     <li>
@@ -237,15 +257,16 @@ class GamePage extends React.Component<Props & DispatchProp> {
                 </div>
                 <div
                   className={`TabContainer Chat ${
-                    hash !== '#chat' ? ' HideMobile' : ''
-                  }`}>
+                    hash !== "#chat" ? " HideMobile" : ""
+                  }`}
+                >
                   <form onSubmit={this.sendChat}>
                     <input
                       ref={this.inputRef}
                       maxLength={400}
-                      placeholder="Type a message..."></input>
-                    <button type="submit">
-                    Send</button>
+                      placeholder="Type a message..."
+                    ></input>
+                    <button type="submit">Send</button>
                   </form>
                   <div className="Messages">
                     {this.props.chat.map((msg, i) => (
