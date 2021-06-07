@@ -1,3 +1,4 @@
+/* eslint no-loop-func: "off" */
 import * as cannon from "cannon";
 import { CannonJSPlugin } from "babylonjs";
 
@@ -19,11 +20,6 @@ const signalRolled3D = (doubles: boolean) => {
     }
   }, 0);
 };
-
-function rand<T>(items: T[]): T {
-  // "|" for a kinda "int div"
-  return items[(items.length * Math.random()) | 0];
-}
 
 const lookupTable: Record<string, number> = {
   "00": 1,
@@ -243,7 +239,7 @@ export const initScene = async (state: ReduxState) => {
       const result = scene.pick(
         x,
         y,
-        (mesh: BABYLON.AbstractMesh) => mesh == ground,
+        (mesh: BABYLON.AbstractMesh) => mesh === ground,
         false,
         camera
       );
