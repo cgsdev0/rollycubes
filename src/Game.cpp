@@ -190,7 +190,7 @@ void Game::chat(HANDLER_ARGS) {
             }
             std::string fullMsg = name + ": " + msg;
             if (fullMsg.length() > MAX_CHAT_LEN) {
-                fullMsg = trimString(fullMsg, MAX_CHAT_LEN);
+                fullMsg = trimString(fullMsg, MAX_CHAT_LEN, true);
             }
             chatLog.push_front(fullMsg);
             if (chatLog.size() > MAX_CHAT_LOG) {
