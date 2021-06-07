@@ -4,6 +4,7 @@
 
 #include "Consts.h"
 #include "Game.h"
+#include "StringUtils.h"
 
 bool Game::isInitialized() { return players.size() > 0; }
 bool Game::isPrivate() const { return privateSession; }
@@ -189,7 +190,7 @@ void Game::chat(HANDLER_ARGS) {
             }
             std::string fullMsg = name + ": " + msg;
             if (fullMsg.length() > MAX_CHAT_LEN) {
-                fullMsg = fullMsg.substr(0, MAX_CHAT_LEN);
+                fullMsg = trimString(fullMsg, MAX_CHAT_LEN);
             }
             chatLog.push_front(fullMsg);
             if (chatLog.size() > MAX_CHAT_LOG) {
