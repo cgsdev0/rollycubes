@@ -284,8 +284,12 @@ int main(int argc, char **argv) {
                              response["error"] = "Room not found: " + room;
                          }
                      } catch (nlohmann::detail::parse_error &e) {
-                         std::cout << "RECEIVED BAD JSON: " << message
-                                   << std::endl;
+                         std::cout << "RECEIVED BAD JSON (parse_error): " << message
+                                   << std::endl << e.what() << std::endl;
+                         response["error"] = e.what();
+                     } catch (nlohmann::detail::type_error &e) {
+                         std::cout << "RECEIVED BAD JSON (type_error): " << message
+                                   << std::endl << e.what() << std::endl;
                          response["error"] = e.what();
                      }
                      if (!response.is_null())
