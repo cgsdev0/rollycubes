@@ -267,17 +267,26 @@ void Game::restart(HANDLER_ARGS) {
 }
 
 void Game::update_name(HANDLER_ARGS) {
+    std::cout << "A" << std::endl;
     if (!data["name"].is_string())
         throw GameError("name must be a string");
+    std::cout << "B" << std::endl;
     std::string name = data["name"].get<std::string>();
+    std::cout << "C" << std::endl;
     for (int i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == session) {
+            std::cout << "D" << std::endl;
             players[i].setName(name);
+            std::cout << "E" << std::endl;
             json msg;
             msg["type"] = "update_name";
+            std::cout << "F" << std::endl;
             msg["name"] = players[i].getName();
+            std::cout << "G" << std::endl;
             msg["id"] = i;
+            std::cout << "H" << std::endl;
             broadcast(msg.dump());
+            std::cout << "I" << std::endl;
             return;
         }
     }
