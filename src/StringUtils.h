@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 
 // Trims a string to a certain amount of characters (unicode aware).
