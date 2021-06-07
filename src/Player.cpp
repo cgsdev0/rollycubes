@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "StringUtils.h"
 
 Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
@@ -25,7 +26,7 @@ int Player::addWin(int n) {
 void Player::reset() { this->score = 0; }
 
 void Player::setName(std::string &name) {
-    this->name = name.substr(0, MAX_PLAYER_NAME);
+    this->name = trimString(name, MAX_PLAYER_NAME);
 }
 
 const std::string &Player::getName() const { return this->name; }
