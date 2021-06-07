@@ -31,7 +31,7 @@ std::string toHex(std::string a) {
 	return res.str();
 }
 
-std::string trimString(const std::string& a, int len) {
+std::string trimString(const std::string& a, int len, bool strict = false) {
   std::string res;
   if(!len) return res;
   res.reserve(len);
@@ -44,11 +44,16 @@ std::string trimString(const std::string& a, int len) {
 	// std::cout << "symbol (" << count << "): '" << symbol << "' " << toHex(symbol) << std::endl;
 	// std::cout << "\tnext (" << count << "): '" << next << "' " << toHex(next) << std::endl;
 	
-	// Eat the ZWJ and another symbol
-	if(next == zwj) count--;
-	// Eat the variation selector
-    else if(!isVariationSelector(next)) count++;
-    if (count >= len) break;
+	if(strict) {
+		count++;
+	}
+	else {
+		// Eat the ZWJ and another symbol
+		if(next == zwj) count--;
+		// Eat the variation selector
+		else if(!isVariationSelector(next)) count++;
+	}
+    	if (count >= len) break;
   }
   return res;
 }
