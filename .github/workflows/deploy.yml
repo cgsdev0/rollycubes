@@ -25,8 +25,8 @@ jobs:
         
     # Build server + client
     - run: make release
-    - run: yarn install
-    - run: yarn build
+    - run: yarn install && yarn build
+      working-directory: client
     
     # Deploy it
     - name: ssh-scp-ssh-pipelines
