@@ -308,4 +308,4 @@ export const store = createStore(
     (window as any).__REDUX_DEVTOOLS_EXTENSION__()
 );
 
-window.REDUX_STORE = store;
+(window as any).REDUX_STORE = store;
