@@ -4,7 +4,7 @@
 
 static const unsigned int MAX_PLAYERS = 8;
 static const unsigned int MAX_CHAT_LOG = 100;
-static const unsigned int DICE_COUNT = 5;
+static const unsigned int DICE_COUNT = 2;
 static const unsigned int SESSION_BYTES = 16;
 static const unsigned int ROOM_LEN = 6;
 static const unsigned int DEFAULT_PORT = 3001;
