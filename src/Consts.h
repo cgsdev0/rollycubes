@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <string>
 #include <unordered_set>
 
 static const unsigned int MAX_PLAYERS = 8;
@@ -13,3 +14,14 @@ static const unsigned int EVICTION_LIMIT = 10;
 static const std::unordered_set<int> TARGET_SCORES = {33, 66, 67, 98, 99, 100};
 static const unsigned int MAX_PLAYER_NAME = 24;
 static const unsigned int MAX_CHAT_LEN = 402 + MAX_PLAYER_NAME;
+
+const std::string PLAYER_COLORS[] = {
+    "#e6194B",
+    "#3cb44b",
+    "#ffe119",
+    "#4363d8",
+    "#f58231",
+    "#42d4f4",
+    "#f032e6",
+    "#fabed4",
+};
