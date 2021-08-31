@@ -41,7 +41,7 @@ const PlayerComponent = (props: Props) => {
       onClick={
         self_index === n ? changeName : player.connected ? undefined : onKick
       }>
-      <div className="Name">
+      <div className={`${player.crowned ? "Crown " : ""}Name`}>
         {player.name || `User${n + 1}`}
         <div className="You">{self_index === n ? ' (You)' : null}</div>
       </div>

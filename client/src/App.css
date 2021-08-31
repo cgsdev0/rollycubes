@@ -8,6 +8,7 @@
 }
 
 body {
+  font-family: 'Roboto', sans-serif;
   background-color: white;
   height: 100vh;
   color: black;
@@ -184,13 +185,21 @@ h6 {
   min-height: 24px;
 }
 
-.Disconnected {
+.Disconnected .Name::before{
+  content: "(X) ";
+  white-space: pre;
   color: red;
 }
 
 .Player .Name {
   justify-content: flex-start;
   display: flex;
+}
+
+.Crown::before {
+    content: "C ";
+    white-space:pre;
+    color:gold;
 }
 
 .Player .Name .You {

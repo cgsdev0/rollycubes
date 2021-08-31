@@ -8,6 +8,7 @@ export interface Player {
   name: string;
   score: number;
   win_count: number;
+  crowned?: boolean;
 }
 
 export interface DieRoll {
