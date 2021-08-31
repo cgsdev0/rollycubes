@@ -327,3 +327,31 @@ td {
 a {
   color: #999;
 }
+
+.connBannerWrapper {
+    position: absolute;
+    z-index: 20;
+    height: 0px;
+    display: flex;
+    width: 100vw;
+    transition: height 500ms ease-out 500ms;
+    overflow: hidden;
+}
+.connBanner {
+    width: 100vw;
+    opacity: 100;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: #e44c4d;
+}
+
+.connBannerOpen {
+    transition: height 500ms ease-out;
+    height: 30px;
+}
+.connBannerHidden {
+    opacity: 0;
+    transition: opacity 250ms linear;
+}

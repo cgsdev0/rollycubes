@@ -13,11 +13,13 @@ class Connection extends React.Component<Props & DispatchProp> {
 
   onClose = (e: CloseEvent) => {
     console.error("Socket closed, reconnecting...");
+    this.props.dispatch({ type: "socket_close" });
     this.timer = setTimeout(this.openSocket, 5000);
   };
 
   onOpen = (e: Event) => {
     console.log("Socket opened to room", this.props.room);
+    this.props.dispatch({ type: "socket_open" });
     const name = localStorage.getItem("name");
     if(this.websocket && name) {
       this.websocket.send(JSON.stringify({ type: "update_name", name}))

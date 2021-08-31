@@ -1,6 +1,7 @@
 import React, { FormEvent } from "react";
 import { connect, DispatchProp } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
+import ConnBanner from "../ui/conn_banner";
 import "../App.css";
 import Connection from "../connection";
 import {
@@ -188,6 +189,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
               <h6 id="Victory">{winner.name || `User${turn + 1}`} Wins!</h6>
             ) : null}
             <div className="GamePage">
+              <ConnBanner />
               <Connection
                 room={this.props.route.match.params.room}
                 history={this.props.route.history}
