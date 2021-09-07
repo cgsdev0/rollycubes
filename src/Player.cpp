@@ -5,6 +5,14 @@ Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
 Player::Player(std::string session) : Player() { this->session = session; }
 
+Player::Player(json state) : Player() {
+    state.at("name").get_to(this->name);
+    state.at("score").get_to(this->score);
+    state.at("win_count").get_to(this->win_count);
+    state.at("session").get_to(this->session);
+    this->connected = false;
+}
+
 const std::string &Player::getSession() const { return session; }
 
 void Player::disconnect() { connected = false; }
@@ -33,11 +41,14 @@ const std::string &Player::getName() const { return this->name; }
 
 int Player::getScore() const { return this->score; }
 
-json Player::toJson() const {
+json Player::toJson(bool withSecrets) const {
     json result;
     result["name"] = this->name;
     result["score"] = this->score;
     result["win_count"] = this->win_count;
     result["connected"] = this->connected;
+    if (withSecrets) {
+        result["session"] = this->session;
+    }
     return result;
 }

@@ -1,4 +1,5 @@
 #include <chrono>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -7,10 +8,12 @@
 #include <queue>
 #include <random>
 #include <regex>
+#include <signal.h>
 #include <sstream>
 #include <streambuf>
 #include <string>
 #include <string_view>
+#include <unistd.h>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -40,6 +43,35 @@ std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
 
 typedef uWS::HttpResponse<false> HttpResponse;
 typedef uWS::HttpRequest HttpRequest;
+
+void signal_callback_handler(int signum) {
+    std::cout << "Caught signal, attempting graceful shutdown..." << std::endl;
+    json state;
+    for (const auto &g : games) {
+        state[g.first] = g.second->toJson(true);
+    }
+    remove("server_state.json");
+    std::ofstream state_file("server_state.json");
+    if (!state.is_null()) {
+        state_file << state;
+        state_file.close();
+    }
+    exit(0);
+}
+
+void load_persistence() {
+    std::ifstream state_file("server_state.json");
+    if (!state_file.is_open()) return;
+    json state;
+    state_file >> state;
+    state_file.close();
+    std::cout << "Successfully parsed state file! Rehydrating..." << std::endl;
+    for (auto &room : state.items()) {
+        std::cout << "Restoring room '" << room.key() << "'" << std::endl;
+        Game *g = new Game(room.value());
+        games.insert({room.key(), g});
+    }
+}
 
 unsigned int srandom_char(std::mt19937 &gen, int k = 255) {
     std::uniform_int_distribution<> dis(0, k);
@@ -151,12 +183,15 @@ std::string createRoom(bool isPrivate, std::string seed = "") {
 
 /* Very simple WebSocket echo server */
 int main(int argc, char **argv) {
+    signal(SIGINT, signal_callback_handler);
+    signal(SIGTERM, signal_callback_handler);
+
     int port = DEFAULT_PORT;
     if (argc == 2) {
         // try to read a port as arg 2
         port = atoi(argv[1]);
     }
-    /* Overly simple hello world app */
+    load_persistence();
     uWS::App()
         .get("/cookie",
              [](auto *res, auto *req) {
@@ -285,11 +320,13 @@ int main(int argc, char **argv) {
                          }
                      } catch (nlohmann::detail::parse_error &e) {
                          std::cout << "RECEIVED BAD JSON (parse_error): " << message
-                                   << std::endl << e.what() << std::endl;
+                                   << std::endl
+                                   << e.what() << std::endl;
                          response["error"] = e.what();
                      } catch (nlohmann::detail::type_error &e) {
                          std::cout << "HANDLED BAD JSON (type_error): " << message
-                                   << std::endl << e.what() << std::endl;
+                                   << std::endl
+                                   << e.what() << std::endl;
                          response["error"] = e.what();
                      }
                      if (!response.is_null())

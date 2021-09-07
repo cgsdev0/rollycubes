@@ -4,3 +4,4 @@ GameServer
 terminal/env
 *.pyc
 node_modules
+server_state.json
