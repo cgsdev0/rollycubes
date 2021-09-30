@@ -20,10 +20,52 @@ export const selectDiceRolls = createSelector(
   selectState,
   (state) => state.rolls
 );
+
+const DEBUG_PLAYERS = false;
+
 export const selectPlayers = createSelector(
   selectState,
-  (state) => state.players
+  (state) =>
+    DEBUG_PLAYERS
+      ? [
+          ...state.players,
+          { connected: true, name: "test", score: 10, win_count: 0 },
+          { connected: false, name: "test2", score: 10, win_count: 0 },
+          { connected: true, name: "test3", score: 10, win_count: 0 },
+          { connected: false, name: "test4", score: 10, win_count: 0 },
+          { connected: true, name: "test0", score: 10, win_count: 0 },
+          { connected: true, name: "test6", score: 10, win_count: 5 },
+        ]
+      : state.players
 );
+
+export const selectMaxWincount = createSelector(
+  selectPlayers,
+  (players) => Math.max(...players.map((p) => p.win_count))
+);
+
+export const selectWinnerCount = createSelector(
+  selectPlayers,
+  selectMaxWincount,
+  (players, count) =>
+    players
+      .map((p) => p.win_count)
+      .reduce((a, b) => a + (b === count ? 1 : 0), 0)
+);
+
+export const selectCrownedPlayers = createSelector(
+  selectPlayers,
+  selectMaxWincount,
+  selectWinnerCount,
+  (players, wins, winners) => {
+    console.warn({ players, wins, winners });
+    if (winners > 1) return players;
+    return players.map((p) =>
+      p.win_count === wins ? { ...p, crowned: true } : p
+    );
+  }
+);
+
 export const selectSelfIndex = createSelector(
   selectState,
   (state) => state.self_index

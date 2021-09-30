@@ -68,21 +68,29 @@ json Game::addPlayer(std::string id) {
     return result;
 }
 
-json Game::toJson() {
+json Game::toJson(bool withSecrets) const {
     json result;
+    result["players"] = json::array();
     for (const auto &player : players) {
-        result["players"].push_back(player.toJson());
+        result["players"].push_back(player.toJson(withSecrets));
     }
     for (int i = 0; i < DICE_COUNT; ++i) {
         result["rolls"].push_back(rolls[i]);
         result["used"].push_back(used[i]);
     }
+    result["chat"] = json::array();
     for (const auto &msg : chatLog) {
         result["chat"].push_back(msg);
     }
     result["turn_index"] = turn_index;
     result["victory"] = victory;
     result["rolled"] = rolled;
+
+    if (withSecrets) {
+        result["turn_token"] = turn_token;
+        // not really secret but seems fine
+        result["private"] = privateSession;
+    }
     return result;
 }
 

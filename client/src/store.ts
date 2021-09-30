@@ -8,6 +8,7 @@ export interface Player {
   name: string;
   score: number;
   win_count: number;
+  crowned?: boolean;
 }
 
 export interface DieRoll {
@@ -23,6 +24,7 @@ export interface ReduxState {
   self_index: number;
   victory: boolean;
   socket?: WebSocket;
+  connected: boolean;
   rollCount: number;
   doublesCount: number;
   chat: string[];
@@ -44,6 +46,7 @@ const initialState: ReduxState = {
   victory: false,
   rollCount: 0,
   doublesCount: 0,
+  connected: false,
   chat: [],
   reset: false,
   settings: {
@@ -159,6 +162,7 @@ const rootReducer: Reducer<ReduxState> = (
         state,
         initialState,
         game,
+        { connected: state.connected },
         { players: game.players },
         { self_index: action.id },
         { rolls },
@@ -186,6 +190,16 @@ const rootReducer: Reducer<ReduxState> = (
         }),
       };
 
+    case "socket_open":
+      return {
+        ...state,
+        connected: true,
+      };
+    case "socket_close":
+      return {
+        ...state,
+        connected: false,
+      };
     case "disconnect":
     case "reconnect":
       return {

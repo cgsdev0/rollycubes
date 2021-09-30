@@ -29,6 +29,25 @@ class Game {
         }
     }
 
+    Game(json state)
+        : dis(1, 6), updated(std::chrono::system_clock::now()) {
+        players.reserve(MAX_PLAYERS);
+        for (int i = 0; i < DICE_COUNT; ++i) {
+            this->rolls[i] = state["rolls"].at(i);
+            this->used[i] = state["used"].at(i);
+        }
+        this->chatLog = state["chat"].get<std::deque<std::string>>();
+        this->turn_index = state["turn_index"];
+        this->turn_token = state["turn_token"];
+        this->privateSession = state["private"];
+        this->rolled = state["rolled"];
+        this->victory = state["victory"];
+
+        for (auto &p : state["players"]) {
+            this->players.emplace_back(p);
+        }
+    }
+
     bool isInitialized();
     bool isPrivate() const;
     std::string hostName() const;
@@ -70,7 +89,7 @@ class Game {
 
     int connectedPlayerCount();
 
-    json toJson();
+    json toJson(bool withSecrets = false) const;
 
   private:
     std::vector<Player> players;

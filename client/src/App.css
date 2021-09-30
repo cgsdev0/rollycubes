@@ -8,6 +8,7 @@
 }
 
 body {
+  font-family: 'Roboto', sans-serif;
   background-color: white;
   height: 100vh;
   color: black;
@@ -184,13 +185,21 @@ h6 {
   min-height: 24px;
 }
 
-.Disconnected {
+.Disconnected .Name::before{
+  content: "(X) ";
+  white-space: pre;
   color: red;
 }
 
 .Player .Name {
   justify-content: flex-start;
   display: flex;
+}
+
+.Crown::before {
+    content: "C ";
+    white-space:pre;
+    color:gold;
 }
 
 .Player .Name .You {
@@ -326,4 +335,32 @@ td {
 
 a {
   color: #999;
+}
+
+.connBannerWrapper {
+    position: absolute;
+    z-index: 20;
+    height: 0px;
+    display: flex;
+    width: 100vw;
+    transition: height 500ms ease-out 500ms;
+    overflow: hidden;
+}
+.connBanner {
+    width: 100vw;
+    opacity: 100;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: #e44c4d;
+}
+
+.connBannerOpen {
+    transition: height 500ms ease-out;
+    height: 30px;
+}
+.connBannerHidden {
+    opacity: 0;
+    transition: opacity 250ms linear;
 }

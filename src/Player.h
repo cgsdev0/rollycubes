@@ -12,6 +12,8 @@ class Player {
 
     Player(std::string session);
 
+    Player(json state);
+
     const std::string &getSession() const;
 
     void disconnect();
@@ -31,7 +33,7 @@ class Player {
 
     const std::string &getName() const;
 
-    json toJson() const;
+    json toJson(bool withSecrets = false) const;
 
   private:
     std::string session;
