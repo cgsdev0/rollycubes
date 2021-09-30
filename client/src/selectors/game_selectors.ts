@@ -98,12 +98,17 @@ export const selectCheats = createSelector(
 export const selectSelf = createSelector(
   selectPlayers,
   selectSelfIndex,
-  (players, self) => players[self]
+  (players, self) => (self === undefined ? undefined : players[self])
+);
+
+export const selectIsSpectator = createSelector(
+  selectSelfIndex,
+  (self) => self === undefined
 );
 
 export const selectSelfScore = createSelector(
   selectSelf,
-  (self) => self.score
+  (self) => (self === undefined ? 0 : self.score)
 );
 
 const createDeepArraySelector = createSelectorCreator(

@@ -21,7 +21,7 @@ export interface ReduxState {
   rolled: false;
   rolled3d: false;
   turn_index: number;
-  self_index: number;
+  self_index?: number;
   victory: boolean;
   socket?: WebSocket;
   connected: boolean;
@@ -259,7 +259,9 @@ const rootReducer: Reducer<ReduxState> = (
           ...state.players.slice(action.id + 1),
         ],
         self_index:
-          action.id < state.self_index
+          state.self_index === undefined
+            ? undefined
+            : action.id < state.self_index
             ? state.self_index - 1
             : state.self_index,
       };

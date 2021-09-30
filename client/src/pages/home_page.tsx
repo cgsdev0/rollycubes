@@ -90,6 +90,7 @@ class HomePage extends React.Component<Props, State> {
               <th className="host">Host</th>
               <th>Players</th>
               <th>Join</th>
+              <th>Spectate</th>
             </tr>
             {this.state.games.map((game) => (
               <tr key={game.code}>
@@ -97,6 +98,9 @@ class HomePage extends React.Component<Props, State> {
                 <td>{game.playerCount} / 8</td>
                 <td>
                   <a href={`/room/${game.code}`}>Link</a>
+                </td>
+                <td>
+                  <a href={`/spectate/${game.code}`}>Spectate</a>
                 </td>
               </tr>
             ))}

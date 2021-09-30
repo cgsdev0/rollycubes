@@ -9,7 +9,7 @@ import {ThemeContext} from '../themes';
 interface Props {
   player: Player;
   n: number;
-  self_index: number;
+  self_index?: number;
   turn_index: number;
   socket?: WebSocket;
 }

@@ -7,6 +7,7 @@ import Connection from "../connection";
 import {
   selectDoublesCount,
   selectIsReset,
+  selectIsSpectator,
   selectTurnIndex,
   selectWinner,
 } from "../selectors/game_selectors";
@@ -18,6 +19,7 @@ import { destroyScene } from "../3d/main";
 
 interface TParams {
   room: string;
+  mode: string;
 }
 
 interface Props {
@@ -27,6 +29,7 @@ interface Props {
   doublesCount: number;
   winner?: Player;
   reset: boolean;
+  isSpectator: boolean;
   turn: number;
 }
 
@@ -192,6 +195,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
               <ConnBanner />
               <Connection
                 room={this.props.route.match.params.room}
+                mode={this.props.route.match.params.mode}
                 history={this.props.route.history}
               />
               <div id="PlayerChatWrapper">
@@ -267,8 +271,9 @@ class GamePage extends React.Component<Props & DispatchProp> {
                       ref={this.inputRef}
                       maxLength={400}
                       placeholder="Type a message..."
+                      disabled={this.props.isSpectator}
                     ></input>
-                    <button type="submit">Send</button>
+                    <button type="submit" disabled={this.props.isSpectator} >Send</button>
                   </form>
                   <div className="Messages">
                     {this.props.chat.map((msg, i) => (
@@ -294,6 +299,7 @@ const mapStateToProps = (state: ReduxState) => {
     winner: selectWinner(state),
     turn: selectTurnIndex(state),
     reset: selectIsReset(state),
+    isSpectator: selectIsSpectator(state),
   };
 };
 

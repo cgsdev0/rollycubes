@@ -4,6 +4,7 @@ import { connect, DispatchProp } from 'react-redux';
 
 interface Props {
   room: string;
+  mode: string;
   history: History;
 }
 
@@ -29,6 +30,7 @@ class Connection extends React.Component<Props & DispatchProp> {
 
   onMessage = (e: MessageEvent) => {
     const data: any = JSON.parse(e.data);
+    console.warn("hi", this.props.history.location);
     if (!data) {
       console.error("empty action from server")
     }
@@ -36,7 +38,8 @@ class Connection extends React.Component<Props & DispatchProp> {
       console.error(data || data.error);
     }
     else if (data.type === "redirect") {
-      this.props.history.replace(`/room/${data.room}`)
+      const pathParts = this.props.history.location.pathname.split('/')
+      this.props.history.replace(`/${pathParts[1]}/${data.room}`)
     }
     else {
       this.props.dispatch(data);
@@ -49,7 +52,7 @@ class Connection extends React.Component<Props & DispatchProp> {
       if(window.location.port !== '80') {
         portString = `:${window.location.port}`
       }
-      this.websocket = new WebSocket(`${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${window.location.hostname}${portString}/ws/${this.props.room}`);
+      this.websocket = new WebSocket(`${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${window.location.hostname}${portString}/ws/${this.props.mode}/${this.props.room}`);
       this.websocket.addEventListener('close', this.onClose);
       this.websocket.addEventListener('open', this.onOpen);
       this.websocket.addEventListener('message', this.onMessage);

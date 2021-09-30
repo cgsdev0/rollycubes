@@ -45,7 +45,7 @@ const AppInner = () => {
         <SettingsMenu />
         <Route path="/" exact component={CookiePage} />
         <Route path="/home" component={HomePage} />
-        <Route path="/room/:room" component={GamePage} />
+        <Route path="/:mode/:room" component={GamePage} />
       </div>
     </Router>
   );
