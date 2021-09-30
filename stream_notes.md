@@ -16,6 +16,8 @@ off-stream cleanup:
 - [ ] migrate NGINX files into the repo
   - [ ] bake the NGINX files into the deployment process
 - [ ] fix my editor (tabs and stuff)
+- [ ] update JS dependencies
+- [ ] update CRA
 
 BUGS:
 - [ ] sometimes it looks like you're dc'd but you're not??
