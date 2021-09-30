@@ -287,6 +287,7 @@ const rootReducer: Reducer<ReduxState> = (
     case "restart":
       return {
         ...initialState,
+        connected: state.connected,
         rolls: state.rolls,
         players: state.players.map((p) => ({ ...p, score: 0 })),
         turn_index: action.id,
