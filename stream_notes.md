@@ -12,6 +12,11 @@ nice to have:
 - [ ] @ mentions
 - [ ] better chat
 
+off-stream cleanup:
+- [ ] migrate NGINX files into the repo
+  - [ ] bake the NGINX files into the deployment process
+- [ ] fix my editor (tabs and stuff)
+
 BUGS:
 - [ ] sometimes it looks like you're dc'd but you're not??
     - easy repro: open the game in 2 tabs, close one, oops
