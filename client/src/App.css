@@ -197,7 +197,7 @@ h6 {
 }
 
 .Crown::before {
-    content: "C ";
+    content: "👑 ";
     white-space:pre;
     color:gold;
 }
