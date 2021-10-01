@@ -13,7 +13,7 @@ const waitFor = (delay: number) => new Promise(resolve => setTimeout(resolve, de
 
 class CookiePage extends React.Component<Props> {
     redirect = () => {
-        const state = this.props.route.history.location.state;
+        const state = this.props.route.history.location.state as any;
         if(state && state.redirect) {
             this.props.route.history.replace(state.redirect);
         }

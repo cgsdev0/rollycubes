@@ -273,7 +273,9 @@ class GamePage extends React.Component<Props & DispatchProp> {
                       placeholder="Type a message..."
                       disabled={this.props.isSpectator}
                     ></input>
-                    <button type="submit" disabled={this.props.isSpectator} >Send</button>
+                    <button type="submit" disabled={this.props.isSpectator}>
+                      Send
+                    </button>
                   </form>
                   <div className="Messages">
                     {this.props.chat.map((msg, i) => (

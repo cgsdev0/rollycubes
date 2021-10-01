@@ -1,6 +1,6 @@
-import React from 'react';
-import { History } from 'history';
-import { connect, DispatchProp } from 'react-redux';
+import React from "react";
+import { History } from "history";
+import { connect, DispatchProp } from "react-redux";
 
 interface Props {
   room: string;
@@ -12,18 +12,18 @@ class Connection extends React.Component<Props & DispatchProp> {
   websocket?: WebSocket;
   timer?: any;
 
-  onClose = (e: CloseEvent) => {
+  onClose = (_: CloseEvent) => {
     console.error("Socket closed, reconnecting...");
     this.props.dispatch({ type: "socket_close" });
     this.timer = setTimeout(this.openSocket, 5000);
   };
 
-  onOpen = (e: Event) => {
+  onOpen = (_: Event) => {
     console.log("Socket opened to room", this.props.room);
     this.props.dispatch({ type: "socket_open" });
     const name = localStorage.getItem("name");
-    if(this.websocket && name) {
-      this.websocket.send(JSON.stringify({ type: "update_name", name}))
+    if (this.websocket && name) {
+      this.websocket.send(JSON.stringify({ type: "update_name", name }));
     }
     //this.websocket!.send(JSON.stringify({ type: "roll", n: 0, msg: "Hello world!" }))
   };
@@ -32,31 +32,36 @@ class Connection extends React.Component<Props & DispatchProp> {
     const data: any = JSON.parse(e.data);
     console.warn("hi", this.props.history.location);
     if (!data) {
-      console.error("empty action from server")
-    }
-    else if("error" in data) {
+      console.error("empty action from server");
+    } else if ("error" in data) {
       console.error(data || data.error);
-    }
-    else if (data.type === "redirect") {
-      const pathParts = this.props.history.location.pathname.split('/')
-      this.props.history.replace(`/${pathParts[1]}/${data.room}`)
-    }
-    else {
+    } else if (data.type === "redirect") {
+      const pathParts = this.props.history.location.pathname.split("/");
+      this.props.history.replace(`/${pathParts[1]}/${data.room}`);
+    } else {
       this.props.dispatch(data);
     }
   };
 
   openSocket = () => {
-    if (!this.websocket || this.websocket.readyState === WebSocket.CLOSED || this.websocket.readyState === WebSocket.CLOSING) {
-      let portString = '';
-      if(window.location.port !== '80') {
-        portString = `:${window.location.port}`
+    if (
+      !this.websocket ||
+      this.websocket.readyState === WebSocket.CLOSED ||
+      this.websocket.readyState === WebSocket.CLOSING
+    ) {
+      let portString = "";
+      if (window.location.port !== "80") {
+        portString = `:${window.location.port}`;
       }
-      this.websocket = new WebSocket(`${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${window.location.hostname}${portString}/ws/${this.props.mode}/${this.props.room}`);
-      this.websocket.addEventListener('close', this.onClose);
-      this.websocket.addEventListener('open', this.onOpen);
-      this.websocket.addEventListener('message', this.onMessage);
-      this.props.dispatch({ type: "WEBSOCKET", socket: this.websocket});
+      this.websocket = new WebSocket(
+        `${window.location.protocol.endsWith("s:") ? "wss" : "ws"}://${
+          window.location.hostname
+        }${portString}/ws/${this.props.mode}/${this.props.room}`
+      );
+      this.websocket.addEventListener("close", this.onClose);
+      this.websocket.addEventListener("open", this.onOpen);
+      this.websocket.addEventListener("message", this.onMessage);
+      this.props.dispatch({ type: "WEBSOCKET", socket: this.websocket });
     }
   };
 
@@ -74,9 +79,9 @@ class Connection extends React.Component<Props & DispatchProp> {
   }
 
   componentWillUnmount() {
-    this.props.dispatch({ type: "WEBSOCKET", socket: undefined});
+    this.props.dispatch({ type: "WEBSOCKET", socket: undefined });
     if (this.websocket) {
-      if(this.timer) {
+      if (this.timer) {
         clearTimeout(this.timer);
       }
       this.websocket.removeEventListener("close", this.onClose);

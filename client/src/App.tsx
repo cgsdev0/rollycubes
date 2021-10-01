@@ -1,33 +1,29 @@
-import React from 'react';
-import {Provider} from 'react-redux';
-import {BrowserRouter as Router, Route} from 'react-router-dom';
-import './App.css';
-import GamePage from './pages/game_page';
-import {store} from './store';
-import HomePage from './pages/home_page';
-import CookiePage from './pages/cookie_page';
-import {connect} from 'react-redux';
-import {ReduxState} from './store';
-import {ThemeContext} from './themes';
-import SettingsMenu from './ui/settings';
+import React from "react";
+import { Provider } from "react-redux";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import "./App.css";
+import GamePage from "./pages/game_page";
+import { store } from "./store";
+import HomePage from "./pages/home_page";
+import CookiePage from "./pages/cookie_page";
+import { connect } from "react-redux";
+import { ReduxState } from "./store";
+import { ThemeContext } from "./themes";
+import SettingsMenu from "./ui/settings";
 
-interface Props {}
-
-interface State {}
-
-const mapStateToProps = (state: ReduxState) => {
-  return {
-    theme: state.settings.theme,
-  };
-};
-
-const AppThemer = connect(mapStateToProps)(({theme}) => {
-  return (
-    <ThemeContext.Provider value={theme}>
-      <AppInner />
-    </ThemeContext.Provider>
-  );
+const mapStateToProps = (state: ReduxState) => ({
+  theme: state.settings.theme,
 });
+
+const AppThemer = connect(mapStateToProps)(
+  ({ theme }: { theme: ReduxState["settings"]["theme"] }) => {
+    return (
+      <ThemeContext.Provider value={theme}>
+        <AppInner />
+      </ThemeContext.Provider>
+    );
+  }
+);
 
 const App = () => {
   return (

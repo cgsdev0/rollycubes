@@ -446,7 +446,7 @@ export const initScene = async (state: ReduxState) => {
         });
       });
       if (
-        dice.every((die, i) => {
+        dice.every((die, _i) => {
           if (
             die.physicsImpostor!.getLinearVelocity()!.lengthSquared() < 0.05 &&
             die.physicsImpostor!.getAngularVelocity()!.lengthSquared() < 0.05
