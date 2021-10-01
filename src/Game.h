@@ -20,8 +20,7 @@ typedef std::function<void(std::string)> SendFunc;
 class Game {
   public:
     Game(bool isPrivate)
-        : dis(1, 6), updated(std::chrono::system_clock::now()), victory(false),
-          rolled(false), privateSession(isPrivate) {
+        : privateSession(isPrivate) {
         players.reserve(MAX_PLAYERS);
         for (int i = 0; i < DICE_COUNT; ++i) {
             rolls[i] = 1;
@@ -29,8 +28,7 @@ class Game {
         }
     }
 
-    Game(json state)
-        : dis(1, 6), updated(std::chrono::system_clock::now()) {
+    Game(json state) {
         players.reserve(MAX_PLAYERS);
         for (int i = 0; i < DICE_COUNT; ++i) {
             this->rolls[i] = state["rolls"].at(i);
@@ -95,13 +93,13 @@ class Game {
     std::vector<Player> players;
     std::deque<std::string> chatLog;
     std::string turn_token;
-    std::uniform_int_distribution<int> dis;
-    std::chrono::system_clock::time_point updated;
-    int turn_index;
+    std::uniform_int_distribution<int> dis{1, 6};
+    std::chrono::system_clock::time_point updated = std::chrono::system_clock::now();
+    int turn_index = 0;
     int rolls[DICE_COUNT];
     bool used[DICE_COUNT];
-    bool rolled;
-    bool victory;
+    bool rolled = false;
+    bool victory = false;
     bool privateSession;
 };
 

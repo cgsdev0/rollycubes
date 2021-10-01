@@ -346,7 +346,12 @@ int main(int argc, char **argv) {
         // try to read a port as arg 2
         port = atoi(argv[1]);
     }
-    load_persistence();
+    try {
+        load_persistence();
+    } catch (std::exception e) {
+        std::cout << "WARNING: Failed to load server state from persistence!" << std::endl;
+        std::cout << e.what() << std::endl;
+    }
     uWS::App()
         .get("/cookie",
              [](auto *res, auto *req) {
