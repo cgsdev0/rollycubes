@@ -24,6 +24,7 @@ off-stream cleanup:
 - [x] update JS dependencies
 - [x] update CRA
 - [ ] make a discord server
+- [ ] figure out how to use an automated build system
 
 BUGS:
 - [ ] sometimes it looks like you're dc'd but you're not??
