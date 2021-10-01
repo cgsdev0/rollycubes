@@ -18,9 +18,9 @@
 #include <unordered_set>
 
 #include "App.h"
-#include "Consts.h"
-#include "Game.h"
-#include "Player.h"
+#include "Consts.hpp"
+#include "Game.hpp"
+#include "Player.hpp"
 
 // for convenience
 using json = nlohmann::json;

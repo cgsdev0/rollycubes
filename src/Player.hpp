@@ -2,7 +2,7 @@
 #include <json.hpp>
 #include <string>
 
-#include "Consts.h"
+#include "Consts.hpp"
 
 using json = nlohmann::json;
 

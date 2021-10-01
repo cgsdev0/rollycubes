@@ -1,5 +1,5 @@
-#include "Player.h"
-#include "StringUtils.h"
+#include "Player.hpp"
+#include "StringUtils.hpp"
 
 Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
