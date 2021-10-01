@@ -2,10 +2,10 @@ TODO:
 - [x] add some sort of settings menu
 - [ ] shake to roll?
 - [ ] UI 2.0
+- [ ] turn indicator
+- [x] chat links
 
 nice to have:
-- [ ] refactor all the code so it's not bad
-    - [ ] port class based components to functional where applicable
 - [ ] server command console
 - [ ] vote to skip?
 - [ ] vote to kick????
@@ -13,13 +13,19 @@ nice to have:
 - [ ] @ mentions
 - [ ] better chat
 
+icebox: (wont fix)
+- [ ] refactor all the code so it's not bad
+    - [ ] port class based components to functional where applicable
+
 off-stream cleanup:
 - [ ] migrate NGINX files into the repo
   - [ ] bake the NGINX files into the deployment process
 - [ ] fix my editor (tabs and stuff)
 - [x] update JS dependencies
 - [x] update CRA
+- [ ] make a discord server
 
 BUGS:
 - [ ] sometimes it looks like you're dc'd but you're not??
     - easy repro: open the game in 2 tabs, close one, oops
+- [ ] sometimes the reset pop text doesn't show

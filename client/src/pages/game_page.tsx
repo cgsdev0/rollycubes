@@ -1,4 +1,5 @@
 import React, { FormEvent } from "react";
+import Linkify from "react-linkify";
 import { connect, DispatchProp } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import ConnBanner from "../ui/conn_banner";
@@ -8,6 +9,7 @@ import {
   selectDoublesCount,
   selectIsReset,
   selectIsSpectator,
+  selectSomebodyIsNice,
   selectTurnIndex,
   selectWinner,
 } from "../selectors/game_selectors";
@@ -31,6 +33,7 @@ interface Props {
   reset: boolean;
   isSpectator: boolean;
   turn: number;
+  somebodyIsNice: boolean;
 }
 
 const clearSelection = () => {
@@ -167,7 +170,14 @@ class GamePage extends React.Component<Props & DispatchProp> {
   };
 
   render() {
-    const { route, doublesCount, winner, reset, turn } = this.props;
+    const {
+      route,
+      somebodyIsNice,
+      doublesCount,
+      winner,
+      reset,
+      turn,
+    } = this.props;
     const { location } = route;
     const { hash } = location;
 
@@ -187,6 +197,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
                 Doubles!
               </h6>
             ) : null}
+            {somebodyIsNice ? <h6 id="Nice">Nice (ꈍoꈍ)</h6> : null}
             {reset ? <h6 id="Reset">Reset!</h6> : null}
             {winner ? (
               <h6 id="Victory">{winner.name || `User${turn + 1}`} Wins!</h6>
@@ -279,7 +290,9 @@ class GamePage extends React.Component<Props & DispatchProp> {
                   </form>
                   <div className="Messages">
                     {this.props.chat.map((msg, i) => (
-                      <p key={i}>{msg}</p>
+                      <React.Fragment key={i}>
+                        <ChatMsg msg={msg} />
+                      </React.Fragment>
                     ))}
                   </div>
                 </div>
@@ -293,6 +306,26 @@ class GamePage extends React.Component<Props & DispatchProp> {
   }
 }
 
+const LinkDecorator = (
+  decoratedHref: string,
+  decoratedText: string,
+  key: number
+) => {
+  return (
+    <a href={decoratedHref} target="_blank" key={key} rel="noreferrer">
+      {decoratedText}
+    </a>
+  );
+};
+
+const ChatMsg = (props: { msg: string }) => {
+  return (
+    <Linkify componentDecorator={LinkDecorator}>
+      <p>{props.msg}</p>
+    </Linkify>
+  );
+};
+
 const mapStateToProps = (state: ReduxState) => {
   return {
     socket: state.socket,
@@ -302,6 +335,7 @@ const mapStateToProps = (state: ReduxState) => {
     turn: selectTurnIndex(state),
     reset: selectIsReset(state),
     isSpectator: selectIsSpectator(state),
+    somebodyIsNice: selectSomebodyIsNice(state),
   };
 };
 

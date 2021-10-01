@@ -23,25 +23,22 @@ export const selectDiceRolls = createSelector(
 
 const DEBUG_PLAYERS = false;
 
-export const selectPlayers = createSelector(
-  selectState,
-  (state) =>
-    DEBUG_PLAYERS
-      ? [
-          ...state.players,
-          { connected: true, name: "test", score: 10, win_count: 0 },
-          { connected: false, name: "test2", score: 10, win_count: 0 },
-          { connected: true, name: "test3", score: 10, win_count: 0 },
-          { connected: false, name: "test4", score: 10, win_count: 0 },
-          { connected: true, name: "test0", score: 10, win_count: 0 },
-          { connected: true, name: "test6", score: 10, win_count: 5 },
-        ]
-      : state.players
+export const selectPlayers = createSelector(selectState, (state) =>
+  DEBUG_PLAYERS
+    ? [
+        ...state.players,
+        { connected: true, name: "test", score: 10, win_count: 0 },
+        { connected: false, name: "test2", score: 10, win_count: 0 },
+        { connected: true, name: "test3", score: 10, win_count: 0 },
+        { connected: false, name: "test4", score: 10, win_count: 0 },
+        { connected: true, name: "test0", score: 10, win_count: 0 },
+        { connected: true, name: "test6", score: 10, win_count: 5 },
+      ]
+    : state.players
 );
 
-export const selectMaxWincount = createSelector(
-  selectPlayers,
-  (players) => Math.max(...players.map((p) => p.win_count))
+export const selectMaxWincount = createSelector(selectPlayers, (players) =>
+  Math.max(...players.map((p) => p.win_count))
 );
 
 export const selectWinnerCount = createSelector(
@@ -106,9 +103,12 @@ export const selectIsSpectator = createSelector(
   (self) => self === undefined
 );
 
-export const selectSelfScore = createSelector(
-  selectSelf,
-  (self) => (self === undefined ? 0 : self.score)
+export const selectSomebodyIsNice = createSelector(selectPlayers, (players) =>
+  players.some((p) => p.score === 69)
+);
+
+export const selectSelfScore = createSelector(selectSelf, (self) =>
+  self === undefined ? 0 : self.score
 );
 
 const createDeepArraySelector = createSelectorCreator(
@@ -153,22 +153,19 @@ export const selectWinner = createSelector(
   }
 );
 
-export const selectIsDoubles = createSelector(
-  selectDiceRolls,
-  (dice) => {
-    let val = 0;
-    for (const die of dice) {
-      if (!val) {
-        val = die.value;
-        continue;
-      }
-      if (die.value !== val) {
-        return false;
-      }
+export const selectIsDoubles = createSelector(selectDiceRolls, (dice) => {
+  let val = 0;
+  for (const die of dice) {
+    if (!val) {
+      val = die.value;
+      continue;
     }
-    return true;
+    if (die.value !== val) {
+      return false;
+    }
   }
-);
+  return true;
+});
 
 export const selectIsMyTurn = createSelector(
   selectSelfIndex,
@@ -187,10 +184,8 @@ export const selectShouldShowRoll = createSelector(
   (myTurn, hasRolled) => myTurn && !hasRolled
 );
 
-export const selectTotalRoll = createSelector(
-  selectDiceRolls,
-  (rolls) =>
-    rolls.map((roll) => roll.value).reduce((v: number, t: number) => v + t, 0)
+export const selectTotalRoll = createSelector(selectDiceRolls, (rolls) =>
+  rolls.map((roll) => roll.value).reduce((v: number, t: number) => v + t, 0)
 );
 
 export const selectIs3dRollHappening = createSelector(

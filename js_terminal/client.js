@@ -1,9 +1,9 @@
-var blessed = require('blessed');
+var blessed = require("blessed");
 
-const WebSocket = require('ws');
+const WebSocket = require("ws");
 
 const state = {
-  room: 'Qx8KTy',
+  room: "JSxGGv",
   self_index: 0,
   game: {
     players: [],
@@ -23,13 +23,13 @@ var form = blessed.form({
   parent: screen,
   left: 0,
   bottom: 0,
-  weight: '100%',
+  weight: "100%",
   height: 1,
   keys: true,
 });
 
 var column = blessed.box({
-  width: '30%',
+  width: "30%",
   parent: screen,
   right: 1,
   top: 2,
@@ -37,41 +37,41 @@ var column = blessed.box({
 });
 
 var chatbox = blessed.log({
-  valign: 'bottom',
-  label: 'Chat',
+  valign: "bottom",
+  label: "Chat",
   parent: screen,
   left: 0,
   top: 2,
   height: screen.height - 3,
-  width: '65%',
-  border: 'line',
+  width: "65%",
+  border: "line",
   style: {
     border: {
-      fg: 'white',
+      fg: "white",
     },
   },
 });
 
 var players = blessed.box({
   parent: column,
-  width: '100%',
+  width: "100%",
   height: column.height - 8,
   top: 0,
-  label: 'Players',
-  border: 'line',
+  label: "Players",
+  border: "line",
   tags: true,
   style: {
     border: {
-      fg: 'white',
+      fg: "white",
     },
   },
 });
 
 var dice = blessed.box({
-  align: 'center',
+  align: "center",
   parent: column,
   noCellBorders: true,
-  width: '100%',
+  width: "100%",
   height: 5,
   bottom: 2,
   tags: true,
@@ -82,78 +82,78 @@ var statusline = blessed.log({
   left: 0,
   top: 0,
   height: 1,
-  width: '65%',
+  width: "65%",
 });
 
 function printPlayers() {
   players.setContent(
     state.game.players.reduce(
       (acc, s, i) =>
-        `${acc}\n${s.connected ? '' : '{red-fg}'}${
+        `${acc}\n${s.connected ? "" : "{red-fg}"}${
           i === state.game.turn_index
             ? state.game.victory
-              ? '{green-fg}'
-              : '> '
-            : ''
+              ? "{green-fg}"
+              : "> "
+            : ""
         }${s.name || `User${i + 1}`}{|}${s.score}{/}`,
-      '',
-    ),
+      ""
+    )
   );
 }
 
 const rolls = [
   [
-    '         ',
-    ' o       ',
-    ' o       ',
-    ' o     o ',
-    ' o     o ',
-    ' o     o ',
+    "         ",
+    " o       ",
+    " o       ",
+    " o     o ",
+    " o     o ",
+    " o     o ",
   ],
   [
-    '         ',
-    '         ',
-    '         ',
-    '         ',
-    '         ',
-    '         ',
+    "         ",
+    "         ",
+    "         ",
+    "         ",
+    "         ",
+    "         ",
   ],
   [
-    '    o    ',
-    '         ',
-    '    o    ',
-    '         ',
-    '    o    ',
-    ' o     o ',
+    "    o    ",
+    "         ",
+    "    o    ",
+    "         ",
+    "    o    ",
+    " o     o ",
   ],
   [
-    '         ',
-    '         ',
-    '         ',
-    '         ',
-    '         ',
-    '         ',
+    "         ",
+    "         ",
+    "         ",
+    "         ",
+    "         ",
+    "         ",
   ],
   [
-    '         ',
-    '       o ',
-    '       o ',
-    ' o     o ',
-    ' o     o ',
-    ' o     o ',
+    "         ",
+    "       o ",
+    "       o ",
+    " o     o ",
+    " o     o ",
+    " o     o ",
   ],
 ];
-let pip = '•';
+let pip = "•";
 function printDice() {
   dice.setContent(
     rolls
-      .map(row =>
+      .map((row) =>
         state.game.rolls
-          .map(a => `{black-fg}{white-bg}${row[a - 1]}{/}`)
-          .join('  '),
+          .map((a) => `{black-fg}{white-bg}${row[a - 1]}{/}`)
+          .join("  ")
       )
-      .join('\n')
-      .replace(/o/g, pip),
+      .join("\n")
+      .replace(/o/g, pip)
   );
 }
 
@@ -164,11 +164,11 @@ async function redirect(action) {
 
 async function welcome(action) {
   state.game = action.game;
-  chatbox.setContent('');
+  chatbox.setContent("");
   if (action.game.chat) {
-    action.game.chat.reverse().forEach(msg => chatbox.log(msg));
+    action.game.chat.reverse().forEach((msg) => chatbox.log(msg));
   }
-  statusline.log(`https://rollycubes.com/room/${state.room}`);
+  statusline.log(`https://rollycubes.live/room/${state.room}`);
   printPlayers();
   printDice();
   state.self_index = action.id;
@@ -177,7 +177,7 @@ async function welcome(action) {
 async function join(action) {
   if (action.id >= state.game.players.length) {
     state.game.players.push({
-      name: '',
+      name: "",
       score: 0,
       win_count: 0,
       connected: true,
@@ -273,25 +273,25 @@ const ACTION_MAP = {
 let ws = undefined;
 
 function setupSocket() {
-  const s = new WebSocket(`wss://rollycubes.com/ws/${state.room}`, {
+  const s = new WebSocket(`wss://rollycubes.live/ws/room/${state.room}`, {
     headers: {
-      Cookie: '_session=nomnomjs',
+      Cookie: "_session=nomnomjs",
     },
   });
 
-  s.on('open', () => {
+  s.on("open", () => {
     // console.log("opened!")
   });
 
-  s.on('close', () => {
+  s.on("close", () => {
     // console.log("reconnecting!");
     setupSocket(ws);
   });
 
-  s.on('message', async data => {
+  s.on("message", async (data) => {
     action = JSON.parse(data);
     if (action) {
-      if (action.hasOwnProperty('error')) {
+      if (action.hasOwnProperty("error")) {
         chatbox.log(action);
       } else {
         await ACTION_MAP[action.type](action);
@@ -309,100 +309,100 @@ var inp = blessed.textbox({
   left: 0,
   top: 0,
   inputOnFocus: true,
-  width: '100%',
+  width: "100%",
   height: 1,
 });
 
-inp.key(['escape', 'C-c'], function() {
+inp.key(["escape", "C-c"], function() {
   screen.leave();
   process.exit(0);
 });
 
 inp.focus();
 
-form.on('submit', function(data) {
-  if (inp.value && inp.value.startsWith('/')) {
-    if (inp.value.startsWith('/rules')) {
-      chatbox.log('');
-      chatbox.log('****** Game Overview ******');
-      chatbox.log('Take turns rolling both dice. Each turn,');
-      chatbox.log('choose to add or subtract the dice from your score.');
-      chatbox.log('Your goal is to get a score of either:');
-      chatbox.log('');
-      chatbox.log('    33');
-      chatbox.log('  66  67');
-      chatbox.log(' 98 99 100');
-      chatbox.log('');
-      chatbox.log('Additional rules:');
-      chatbox.log('Doubles - you MUST roll again.');
-      chatbox.log('Sevens - SPLIT: add each die individually');
+form.on("submit", function(data) {
+  if (inp.value && inp.value.startsWith("/")) {
+    if (inp.value.startsWith("/rules")) {
+      chatbox.log("");
+      chatbox.log("****** Game Overview ******");
+      chatbox.log("Take turns rolling both dice. Each turn,");
+      chatbox.log("choose to add or subtract the dice from your score.");
+      chatbox.log("Your goal is to get a score of either:");
+      chatbox.log("");
+      chatbox.log("    33");
+      chatbox.log("  66  67");
+      chatbox.log(" 98 99 100");
+      chatbox.log("");
+      chatbox.log("Additional rules:");
+      chatbox.log("Doubles - you MUST roll again.");
+      chatbox.log("Sevens - SPLIT: add each die individually");
       chatbox.log("Reset - Match another player's score, and their");
-      chatbox.log('score will be reset to zero.');
-      chatbox.log('');
-    } else if (inp.value.startsWith('/restart')) {
-      ws.send(JSON.stringify({type: 'restart'}));
-    } else if (inp.value.startsWith('/r')) {
-      ws.send(JSON.stringify({type: 'roll'}));
-    } else if (inp.value.startsWith('/sa')) {
-      ws.send(JSON.stringify({type: 'sub_nth', n: 0}));
-      ws.send(JSON.stringify({type: 'add_nth', n: 1}));
-    } else if (inp.value.startsWith('/as')) {
-      ws.send(JSON.stringify({type: 'add_nth', n: 0}));
-      ws.send(JSON.stringify({type: 'sub_nth', n: 1}));
-    } else if (inp.value.startsWith('/a')) {
+      chatbox.log("score will be reset to zero.");
+      chatbox.log("");
+    } else if (inp.value.startsWith("/restart")) {
+      ws.send(JSON.stringify({ type: "restart" }));
+    } else if (inp.value.startsWith("/r")) {
+      ws.send(JSON.stringify({ type: "roll" }));
+    } else if (inp.value.startsWith("/sa")) {
+      ws.send(JSON.stringify({ type: "sub_nth", n: 0 }));
+      ws.send(JSON.stringify({ type: "add_nth", n: 1 }));
+    } else if (inp.value.startsWith("/as")) {
+      ws.send(JSON.stringify({ type: "add_nth", n: 0 }));
+      ws.send(JSON.stringify({ type: "sub_nth", n: 1 }));
+    } else if (inp.value.startsWith("/a")) {
       if (state.game.rolls.reduce((a, b) => a + b, 0) === 7) {
-        ws.send(JSON.stringify({type: 'add_nth', n: 0}));
-        ws.send(JSON.stringify({type: 'add_nth', n: 1}));
+        ws.send(JSON.stringify({ type: "add_nth", n: 0 }));
+        ws.send(JSON.stringify({ type: "add_nth", n: 1 }));
       } else {
-        ws.send(JSON.stringify({type: 'add'}));
+        ws.send(JSON.stringify({ type: "add" }));
       }
-    } else if (inp.value.startsWith('/s')) {
+    } else if (inp.value.startsWith("/s")) {
       if (state.game.rolls.reduce((a, b) => a + b, 0) === 7) {
-        ws.send(JSON.stringify({type: 'sub_nth', n: 0}));
-        ws.send(JSON.stringify({type: 'sub_nth', n: 1}));
+        ws.send(JSON.stringify({ type: "sub_nth", n: 0 }));
+        ws.send(JSON.stringify({ type: "sub_nth", n: 1 }));
       } else {
-        ws.send(JSON.stringify({type: 'sub'}));
+        ws.send(JSON.stringify({ type: "sub" }));
       }
-    } else if (inp.value.startsWith('/pip')) {
-      const splitten = inp.value.split(' ');
+    } else if (inp.value.startsWith("/pip")) {
+      const splitten = inp.value.split(" ");
       if (splitten.length > 1) {
         splitten.shift();
-        name = splitten.join(' ');
+        name = splitten.join(" ");
         pip = name[0];
         printDice();
       }
-    } else if (inp.value.startsWith('/n')) {
-      const splitten = inp.value.split(' ');
+    } else if (inp.value.startsWith("/n")) {
+      const splitten = inp.value.split(" ");
       if (splitten.length > 1) {
         splitten.shift();
-        name = splitten.join(' ');
-        ws.send(JSON.stringify({type: 'update_name', name: name}));
+        name = splitten.join(" ");
+        ws.send(JSON.stringify({ type: "update_name", name: name }));
       } else {
-        ws.send(JSON.stringify({type: 'update_name', name: ''}));
+        ws.send(JSON.stringify({ type: "update_name", name: "" }));
       }
-    } else if (inp.value.startsWith('/q')) {
+    } else if (inp.value.startsWith("/q")) {
       screen.leave();
       process.exit(0);
-    } else if (inp.value.startsWith('/h')) {
-      chatbox.log('');
-      chatbox.log('****** Possible commands ******');
-      chatbox.log('/[r]oll - roll the dice');
-      chatbox.log('/[a]dd - add both to your score');
-      chatbox.log('/[s]ubtract - subtract both from your score');
-      chatbox.log('/as - split: add first, subtract second');
-      chatbox.log('/sa - split: subtract first, add second');
-      chatbox.log('/[q]uit - quit the game :(');
-      chatbox.log('/[n]ame - set or clear your name');
-      chatbox.log('/[h]elp - show this page');
-      chatbox.log('/restart - start a new game');
-      chatbox.log('/rules - show an overview of the game');
-      chatbox.log('/pip [c] - set the pip to character [c]');
-      chatbox.log('');
+    } else if (inp.value.startsWith("/h")) {
+      chatbox.log("");
+      chatbox.log("****** Possible commands ******");
+      chatbox.log("/[r]oll - roll the dice");
+      chatbox.log("/[a]dd - add both to your score");
+      chatbox.log("/[s]ubtract - subtract both from your score");
+      chatbox.log("/as - split: add first, subtract second");
+      chatbox.log("/sa - split: subtract first, add second");
+      chatbox.log("/[q]uit - quit the game :(");
+      chatbox.log("/[n]ame - set or clear your name");
+      chatbox.log("/[h]elp - show this page");
+      chatbox.log("/restart - start a new game");
+      chatbox.log("/rules - show an overview of the game");
+      chatbox.log("/pip [c] - set the pip to character [c]");
+      chatbox.log("");
     } else {
-      chatbox.log('Unknown command. Try /help');
+      chatbox.log("Unknown command. Try /help");
     }
   } else if (inp.value) {
-    ws.send(JSON.stringify({type: 'chat', msg: inp.value}));
+    ws.send(JSON.stringify({ type: "chat", msg: inp.value }));
   }
 
   form.reset();
@@ -410,11 +410,11 @@ form.on('submit', function(data) {
   inp.focus();
 });
 
-inp.key(['enter'], function() {
+inp.key(["enter"], function() {
   form.submit();
 });
 
-screen.on('resize', () => {
+screen.on("resize", () => {
   chatbox.height = screen.height - 3;
   column.height = screen.height - 3;
   players.height = column.height - 8;
