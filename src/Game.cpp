@@ -2,9 +2,9 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "Consts.hpp"
-#include "Game.hpp"
-#include "StringUtils.hpp"
+#include "Consts.h"
+#include "Game.h"
+#include "StringUtils.h"
 
 bool Game::isInitialized() { return players.size() > 0; }
 bool Game::isPrivate() const { return privateSession; }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Consts.hpp"
-#include "Player.hpp"
+#include "Consts.h"
+#include "Player.h"
 
 #include <chrono>
 #include <deque>

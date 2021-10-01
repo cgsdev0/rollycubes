@@ -1,4 +1,7 @@
+gcc
 %cpp -std=c++17
-%cpp %h %hpp -Iincludes
-%cpp %hpp -IuWebSockets/src
-%cpp %hpp -IuWebSockets/uSockets/src
+%h -x
+%h c++-header
+-Iincludes
+-IuWebSockets/src
+-IuWebSockets/uSockets/src
