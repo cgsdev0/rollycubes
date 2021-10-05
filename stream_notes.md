@@ -15,12 +15,14 @@ nice to have:
 
 icebox: (wont fix)
 - [ ] refactor all the code so it's not bad
-    - [ ] port class based components to functional where applicable
+    - [x] port class based components to functional where applicable
+        - home_page.tsx could use a rewrite lol
 
 off-stream cleanup:
 - [ ] migrate NGINX files into the repo
   - [ ] bake the NGINX files into the deployment process
 - [ ] fix my editor (tabs and stuff)
+    - [ ] floating windows keep artifacting :(
 - [x] update JS dependencies
 - [x] update CRA
 - [ ] make a discord server
