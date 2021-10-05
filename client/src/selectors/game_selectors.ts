@@ -55,7 +55,6 @@ export const selectCrownedPlayers = createSelector(
   selectMaxWincount,
   selectWinnerCount,
   (players, wins, winners) => {
-    console.warn({ players, wins, winners });
     if (winners > 1) return players;
     return players.map((p) =>
       p.win_count === wins ? { ...p, crowned: true } : p

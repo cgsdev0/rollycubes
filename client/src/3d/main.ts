@@ -356,7 +356,7 @@ export const initScene = async (state: ReduxState) => {
   let lastRollWasDoubles = false;
   const roll = (serverRoll: number[], turn_index: number): void => {
     lastRollWasDoubles = serverRoll.every((v) => v === serverRoll[0]);
-    console.log(serverRoll);
+    // console.log(serverRoll);
     if (serverRoll.length === 0) {
       serverRoll = [3, 4];
     }
@@ -458,7 +458,7 @@ export const initScene = async (state: ReduxState) => {
       ) {
         if (!hasSignaledDone) {
           hasSignaledDone = true;
-          console.log("triggering thingy on iteration", i);
+          // console.log("triggering thingy on iteration", i);
           // if (i < 400) {
           //   return roll(serverRoll);
           // }
@@ -471,7 +471,7 @@ export const initScene = async (state: ReduxState) => {
     }
     if (!hasSignaledDone) {
       hasSignaledDone = true;
-      console.log("doing it live");
+      // console.log("doing it live");
       signaler = setTimeout(() => {
         signalRolled3D(lastRollWasDoubles);
         lastRollWasDoubles = false;
@@ -486,7 +486,7 @@ export const initScene = async (state: ReduxState) => {
         return;
       }
       const localRoll = quatToRoll(die.rotationQuaternion!);
-      console.log("locally rolled: ", localRoll);
+      // console.log("locally rolled: ", localRoll);
       die.updateVerticesData(
         BABYLON.VertexBuffer.UVKind,
         diceUVBuffers[(6 + serverRoll[i] - localRoll) % 6]
@@ -578,8 +578,8 @@ export const initScene = async (state: ReduxState) => {
       let dest = [firstPosition, finalPosition];
       var pos = die.position;
       let j = 0;
-      let clickFrame = -1;
-      let clickStrength = -1;
+      // let clickFrame = -1;
+      // let clickStrength = -1;
       while (dest.length) {
         const vec = dest[0].subtract(pos);
         const dist = vec.length();
@@ -588,9 +588,9 @@ export const initScene = async (state: ReduxState) => {
           if (dest.length === 1 && i === 0) {
             const potential = next!.subtract(die.position).length();
             if (potential > 0.2) {
-              clickFrame = j;
-              clickStrength = potential;
-              console.log("click!", { clickFrame, clickStrength });
+              // clickFrame = j;
+              // clickStrength = potential;
+              // console.log("click!", { clickFrame, clickStrength });
             }
           }
           frames.push({ frame: j, value: next });
@@ -641,6 +641,7 @@ export const initScene = async (state: ReduxState) => {
   snapListener = (e: any) => {
     snap(e.detail);
   };
+  (window as any).roll_func = roll;
   document.addEventListener("roll", rollListener, false);
   document.addEventListener("snapDice", snapListener, false);
   scene.onKeyboardObservable.add((kbInfo) => {

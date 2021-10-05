@@ -30,7 +30,6 @@ class Connection extends React.Component<Props & DispatchProp> {
 
   onMessage = (e: MessageEvent) => {
     const data: any = JSON.parse(e.data);
-    console.warn("hi", this.props.history.location);
     if (!data) {
       console.error("empty action from server");
     } else if ("error" in data) {

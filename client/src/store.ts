@@ -282,7 +282,7 @@ const rootReducer: Reducer<ReduxState> = (
         rollCount: state.rollCount + 1,
       };
     case "win":
-      console.log(action);
+      // console.log(action);
       const new_players = state.players.map((a) => a);
       new_players[action.id].win_count++;
       return {
