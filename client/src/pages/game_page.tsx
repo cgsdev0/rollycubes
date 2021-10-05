@@ -1,5 +1,4 @@
-import React, { FormEvent } from "react";
-import Linkify from "react-linkify";
+import React from "react";
 import { connect, DispatchProp } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import ConnBanner from "../ui/conn_banner";
@@ -18,6 +17,7 @@ import GamePanel from "../ui/game_panel";
 import Players from "../ui/players";
 import { ThemeContext } from "../themes";
 import { destroyScene } from "../3d/main";
+import ChatBox from "../ui/chat";
 
 interface TParams {
   room: string;
@@ -26,8 +26,6 @@ interface TParams {
 
 interface Props {
   route: RouteComponentProps<TParams>;
-  socket?: WebSocket;
-  chat: string[];
   doublesCount: number;
   winner?: Player;
   reset: boolean;
@@ -109,65 +107,6 @@ class GamePage extends React.Component<Props & DispatchProp> {
     );
     destroyScene();
   }
-
-  sendChat = (e: FormEvent) => {
-    if (this.props.socket) {
-      if (this.inputRef.current && this.inputRef.current.value) {
-        switch (this.inputRef.current.value.toLowerCase().split(" ")[0]) {
-          case "/help":
-            const helpString = `--------------------HELP--------------------
-/name [string] - change your username
-/hints - toggle gameplay hints
-/dark - night mode
-/light - day mode
-/3d - 3D dice! [EXPERIMENTAL]
-----------------------------------------------
-`;
-            helpString
-              .split("\n")
-              .forEach((msg) => this.props.dispatch({ type: "chat", msg }));
-            break;
-          case "/name":
-          case "/username":
-          case "/n":
-          case "/u":
-            const name = this.inputRef.current.value
-              .split(" ")
-              .slice(1)
-              .join(" ");
-            this.props.socket.send(
-              JSON.stringify({ type: "update_name", name })
-            );
-            localStorage.setItem("name", name);
-            break;
-          case "/night":
-          case "/dark":
-            this.props.dispatch({ type: "THEME_DARK" });
-            break;
-          case "/day":
-          case "/light":
-            this.props.dispatch({ type: "THEME_LIGHT" });
-            break;
-          case "/hints":
-          case "/hint":
-          case "/cheat":
-          case "/cheats":
-          case "/guide":
-            this.props.dispatch({ type: "CHEATS" });
-            break;
-          case "/3d":
-            this.props.dispatch({ type: "TOGGLE_3D" });
-            break;
-          default:
-            this.props.socket.send(
-              JSON.stringify({ type: "chat", msg: this.inputRef.current.value })
-            );
-        }
-        this.inputRef.current.value = "";
-      }
-    }
-    e.preventDefault();
-  };
 
   render() {
     const {
@@ -277,24 +216,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
                     hash !== "#chat" ? " HideMobile" : ""
                   }`}
                 >
-                  <form onSubmit={this.sendChat}>
-                    <input
-                      ref={this.inputRef}
-                      maxLength={400}
-                      placeholder="Type a message..."
-                      disabled={this.props.isSpectator}
-                    ></input>
-                    <button type="submit" disabled={this.props.isSpectator}>
-                      Send
-                    </button>
-                  </form>
-                  <div className="Messages">
-                    {this.props.chat.map((msg, i) => (
-                      <React.Fragment key={i}>
-                        <ChatMsg msg={msg} />
-                      </React.Fragment>
-                    ))}
-                  </div>
+                  <ChatBox />
                 </div>
               </div>
               <GamePanel />
@@ -306,30 +228,8 @@ class GamePage extends React.Component<Props & DispatchProp> {
   }
 }
 
-const LinkDecorator = (
-  decoratedHref: string,
-  decoratedText: string,
-  key: number
-) => {
-  return (
-    <a href={decoratedHref} target="_blank" key={key} rel="noreferrer">
-      {decoratedText}
-    </a>
-  );
-};
-
-const ChatMsg = (props: { msg: string }) => {
-  return (
-    <Linkify componentDecorator={LinkDecorator}>
-      <p>{props.msg}</p>
-    </Linkify>
-  );
-};
-
 const mapStateToProps = (state: ReduxState) => {
   return {
-    socket: state.socket,
-    chat: state.chat,
     doublesCount: selectDoublesCount(state),
     winner: selectWinner(state),
     turn: selectTurnIndex(state),

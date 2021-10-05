@@ -17,21 +17,18 @@ interface Props {
   showDiceBoxes: boolean;
 }
 
-class Dice extends React.Component<Props> {
-  render() {
-    const { dice, rolling, is3d, showDiceBoxes } = this.props;
-    if (!showDiceBoxes) {
-      return <div id="EmptyDiceBox" className="diceBox" />;
-    }
-    return (
-      <div className="diceBox">
-        {dice.map((die: DieRoll, i: number) => (
-          <Die key={i} roll={die} n={i} rolling={rolling} is3d={is3d} />
-        ))}
-      </div>
-    );
+const Dice: React.FC<Props> = ({ dice, rolling, is3d, showDiceBoxes }) => {
+  if (!showDiceBoxes) {
+    return <div id="EmptyDiceBox" className="diceBox" />;
   }
-}
+  return (
+    <div className="diceBox">
+      {dice.map((die: DieRoll, i: number) => (
+        <Die key={i} roll={die} n={i} rolling={rolling} is3d={is3d} />
+      ))}
+    </div>
+  );
+};
 
 const mapStateToProps = (state: ReduxState) => {
   return {
