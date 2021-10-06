@@ -1,5 +1,5 @@
 override CXXFLAGS += -std=c++17 -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes
-override LDFLAGS += uWebSockets/uSockets/*.o -lz
+override LDFLAGS += uWebSockets/uSockets/*.o -lz -lpthread
 
 .PHONY: src
 src: uWebSockets/uSockets/context.o uWebSockets/uSockets/epoll_kqueue.o uWebSockets/uSockets/gcd.o uWebSockets/uSockets/libuv.o uWebSockets/uSockets/loop.o uWebSockets/uSockets/socket.o uWebSockets/uSockets/ssl.o Game.o StringUtils.o Player.o GameServer.o
