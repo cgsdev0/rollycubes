@@ -182,75 +182,76 @@ std::string createRoom(bool isPrivate, std::string seed = "") {
     return id;
 }
 
-uWS::TemplatedApp<false>::WebSocketBehavior makeWebsocketBehavior() {
+uWS::TemplatedApp<false>::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::TemplatedApp<false> *app) {
     return {/* Settings */
             .compression = uWS::SHARED_COMPRESSOR,
             .maxPayloadLength = 16 * 1024,
             /* Handlers */
+            .upgrade =
+                [](auto *res, auto *req, auto *context) {
+                    std::string session = getSession(req);
+                    std::string mode = std::string(req->getParameter(0));
+                    std::string room = std::string(req->getParameter(1));
+                    std::cout << mode << " " << room << " " << session << std::endl;
+                    res->template upgrade<PerSocketData>({
+                                                             .session = session,
+                                                             .room = room,
+                                                             .spectator = (mode == "spectate"),
+                                                         },
+                                                         req->getHeader("sec-websocket-key"), req->getHeader("sec-websocket-protocol"), req->getHeader("sec-websocket-extensions"), context);
+                },
             .open =
-                [](auto *ws, auto *req) {
+                [app](auto *ws) {
+                    std::cout << "open!" << std::endl;
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
-                    new (userData) PerSocketData();
-                    std::string session = getSession(req);
-                    if (session == "") {
+                    //std::string session = getSession(req);
+                    if (userData->session == "") {
                         ws->close();
                     } else {
-                        std::string mode = std::string(req->getParameter(0));
-                        std::string room = std::string(req->getParameter(1));
-                        if (mode == "spectate") {
-                            userData->spectator = true;
-                        } else if (mode == "room") {
-                            userData->spectator = false;
-                        } else {
-                            ws->close();
-                            return;
-                        }
-                        auto it = games.find(room);
+                        /* std::string mode = std::string(req->getParameter(0)); */
+                        /* std::string room = std::string(req->getParameter(1)); */
+                        auto it = games.find(userData->room);
                         if (it != games.end()) {
                             // Connecting to a valid game
                             Game *g = it->second;
                             if (!userData->spectator) {
-                                if (!g->hasPlayer(session)) {
-                                    json resp = g->addPlayer(session);
+                                if (!g->hasPlayer(userData->session)) {
+                                    json resp = g->addPlayer(userData->session);
                                     if (resp.is_null()) {
                                         // room is full
                                         ws->close();
                                         return;
                                     } else {
-                                        ws->publish(room, resp.dump());
+                                        app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
                                     }
                                 } else {
-                                    json resp = g->reconnectPlayer(session);
-                                    ws->publish(room, resp.dump());
+                                    json resp = g->reconnectPlayer(userData->session);
+                                    app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
                                 }
                             }
-                            userData->room = std::string(room);
-                            userData->session = std::string(session);
                             json welcome;
                             welcome["type"] = "welcome";
                             welcome["game"] = g->toJson();
-                            if (!userData->spectator) welcome["id"] = g->getPlayerId(session);
-                            ws->send(welcome.dump());
-                            ws->subscribe(room);
+                            if (!userData->spectator) welcome["id"] = g->getPlayerId(userData->session);
+                            ws->send(welcome.dump(), uWS::OpCode::TEXT);
+                            ws->subscribe(userData->room);
                         } else if (userData->spectator) {
                             ws->close();
                             return;
                         } else {
                             // Connecting to a non-existant room
                             // let's migrate them to a new room
-                            room = createRoom(true, room);
+                            userData->room = createRoom(true, userData->room);
                             json route;
                             route["type"] = "redirect";
-                            route["room"] = room;
-                            userData->room = std::string(room);
-                            userData->session = std::string(session);
-                            ws->send(route.dump());
+                            route["room"] = userData->room;
+                            ws->send(route.dump(), uWS::OpCode::TEXT);
                         }
                     }
                 },
             .message =
-                [](auto *ws, std::string_view message, uWS::OpCode opCode) {
+                [app](auto *ws, std::string_view message, uWS::OpCode opCode) {
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
                     if (userData->spectator) return;
@@ -264,9 +265,10 @@ uWS::TemplatedApp<false>::WebSocketBehavior makeWebsocketBehavior() {
                             Game *g = it->second;
                             try {
                                 g->handleMessage(
-                                    [&ws](auto s) { ws->send(s); },
-                                    [&ws, &room](auto s) {
-                                        ws->publish(room, s);
+                                    [&ws](auto s) { ws->send(s, uWS::OpCode::TEXT); },
+                                    [&ws, &room, app](auto s) {
+                                        // ws->send(s, uWS::OpCode::TEXT);
+                                        app->publish(room, s, uWS::OpCode::TEXT);
                                     },
                                     data, session);
                                 /*if (data["type"].is_string()) {
@@ -292,27 +294,14 @@ uWS::TemplatedApp<false>::WebSocketBehavior makeWebsocketBehavior() {
                         response["error"] = e.what();
                     }
                     if (!response.is_null())
-                        ws->send(response.dump());
-                },
-            .drain =
-                [](auto *ws) {
-                    /* Check getBufferedAmount here */
-                },
-            .ping =
-                [](auto *ws) {
-
-                },
-            .pong =
-                [](auto *ws) {
-
+                        ws->send(response.dump(), uWS::OpCode::TEXT);
                 },
             .close =
-                [](auto *ws, int code, std::string_view message) {
+                [app](auto *ws, int code, std::string_view message) {
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
                     if (userData->spectator) {
                         // Come back to this
-                        userData->~PerSocketData();
                         return;
                     }
                     std::string room = userData->room;
@@ -322,7 +311,7 @@ uWS::TemplatedApp<false>::WebSocketBehavior makeWebsocketBehavior() {
                         Game *g = it->second;
                         json resp = g->disconnectPlayer(session);
                         if (!resp.is_null()) {
-                            ws->publish(room, resp.dump());
+                            app->publish(room, resp.dump(), uWS::OpCode::TEXT);
                         }
                         if (!g->connectedPlayerCount()) {
                             if (!eviction_set.count(room)) {
@@ -332,7 +321,6 @@ uWS::TemplatedApp<false>::WebSocketBehavior makeWebsocketBehavior() {
                             }
                         }
                     }
-                    userData->~PerSocketData();
                 }};
 }
 
@@ -352,16 +340,16 @@ int main(int argc, char **argv) {
         std::cout << "WARNING: Failed to load server state from persistence!" << std::endl;
         std::cout << e.what() << std::endl;
     }
-    uWS::App()
-        .get("/cookie",
-             [](auto *res, auto *req) {
-                 std::string session = getSession(req);
-                 if (session == "") {
-                     session = generate_hex(SESSION_BYTES);
-                     res->writeHeader("Set-Cookie", "_session=" + session);
-                 }
-                 res->end();
-             })
+    uWS::App app;
+    app.get("/cookie",
+            [](auto *res, auto *req) {
+                std::string session = getSession(req);
+                if (session == "") {
+                    session = generate_hex(SESSION_BYTES);
+                    res->writeHeader("Set-Cookie", "_session=" + session);
+                }
+                res->end();
+            })
         .get("/list",
              [](auto *res, auto *req) {
                  res->writeHeader("Content-Type", "application/json");
@@ -396,7 +384,7 @@ int main(int argc, char **argv) {
              })
         .ws<PerSocketData>(
             "/ws/:mode/:room",
-            makeWebsocketBehavior())
+            makeWebsocketBehavior(&app))
         .listen(port,
                 [port](auto *token) {
                     if (token) {
