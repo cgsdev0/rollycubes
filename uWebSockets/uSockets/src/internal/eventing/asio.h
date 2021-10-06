@@ -1,5 +1,5 @@
 /*
- * Authored by Alex Hultman, 2018-2019.
+ * Authored by Alex Hultman, 2018-2021.
  * Intellectual property of third-party.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,31 +15,31 @@
  * limitations under the License.
  */
 
-#ifndef LIBUV_H
-#define LIBUV_H
+#ifndef ASIO_H
+#define ASIO_H
 
 #include "internal/loop_data.h"
 
-#include <uv.h>
-#define LIBUS_SOCKET_READABLE UV_READABLE
-#define LIBUS_SOCKET_WRITABLE UV_WRITABLE
+#define LIBUS_SOCKET_READABLE 1
+#define LIBUS_SOCKET_WRITABLE 2
 
 struct us_loop_t {
     alignas(LIBUS_EXT_ALIGNMENT) struct us_internal_loop_data_t data;
 
-    uv_loop_t *uv_loop;
-    int is_default;
+    // a loop is an io_context
+    void *io;
 
-    uv_prepare_t *uv_pre;
-    uv_check_t *uv_check;
+    // whether or not we got an io_context as hint or not
+    int is_default;
 };
 
 // it is no longer valid to cast a pointer to us_poll_t to a pointer of uv_poll_t
 struct us_poll_t {
-    /* We need to hold a pointer to this uv_poll_t since we need to be able to resize our block */
-    uv_poll_t *uv_p;
+    void *boost_block;
+
     LIBUS_SOCKET_DESCRIPTOR fd;
     unsigned char poll_type;
+    int events;
 };
 
-#endif // LIBUV_H
+#endif // ASIO_H

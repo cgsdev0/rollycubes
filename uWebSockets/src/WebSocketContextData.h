@@ -1,5 +1,5 @@
 /*
- * Authored by Alex Hultman, 2018-2019.
+ * Authored by Alex Hultman, 2018-2020.
  * Intellectual property of third-party.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,31 +18,76 @@
 #ifndef UWS_WEBSOCKETCONTEXTDATA_H
 #define UWS_WEBSOCKETCONTEXTDATA_H
 
-#include "f2/function2.hpp"
+#include "Loop.h"
+#include "AsyncSocket.h"
+
+#include "MoveOnlyFunction.h"
 #include <string_view>
+#include <vector>
 
 #include "WebSocketProtocol.h"
 #include "TopicTree.h"
+#include "WebSocketData.h"
 
 namespace uWS {
 
-template <bool, bool> struct WebSocket;
+template <bool, bool, typename> struct WebSocket;
 
 /* todo: this looks identical to WebSocketBehavior, why not just std::move that entire thing in? */
 
-template <bool SSL>
+template <bool SSL, typename USERDATA>
 struct WebSocketContextData {
+private:
+
+public:
+
+    /* This one points to the App's shared topicTree */
+    TopicTree<TopicTreeMessage, TopicTreeBigMessage> *topicTree;
+
     /* The callbacks for this context */
-    fu2::unique_function<void(WebSocket<SSL, true> *, std::string_view, uWS::OpCode)> messageHandler = nullptr;
-    fu2::unique_function<void(WebSocket<SSL, true> *)> drainHandler = nullptr;
-    fu2::unique_function<void(WebSocket<SSL, true> *, int, std::string_view)> closeHandler = nullptr;
+    MoveOnlyFunction<void(WebSocket<SSL, true, USERDATA> *)> openHandler = nullptr;
+    MoveOnlyFunction<void(WebSocket<SSL, true, USERDATA> *, std::string_view, OpCode)> messageHandler = nullptr;
+    MoveOnlyFunction<void(WebSocket<SSL, true, USERDATA> *)> drainHandler = nullptr;
+    MoveOnlyFunction<void(WebSocket<SSL, true, USERDATA> *, int, std::string_view)> closeHandler = nullptr;
+    /* Todo: these should take message also; breaking change for v0.18 */
+    MoveOnlyFunction<void(WebSocket<SSL, true, USERDATA> *, std::string_view)> pingHandler = nullptr;
+    MoveOnlyFunction<void(WebSocket<SSL, true, USERDATA> *, std::string_view)> pongHandler = nullptr;
 
     /* Settings for this context */
     size_t maxPayloadLength = 0;
-    int idleTimeout = 0;
 
-    /* Each websocket context has a topic tree for pub/sub */
-    TopicTree topicTree;
+    /* We do need these for async upgrade */
+    CompressOptions compression;
+
+    /* There needs to be a maxBackpressure which will force close everything over that limit */
+    size_t maxBackpressure = 0;
+    bool closeOnBackpressureLimit;
+    bool resetIdleTimeoutOnSend;
+    bool sendPingsAutomatically;
+
+    /* These are calculated on creation */
+    std::pair<unsigned short, unsigned short> idleTimeoutComponents;
+
+    /* This is run once on start-up */
+    void calculateIdleTimeoutCompnents(unsigned short idleTimeout) {
+        unsigned short margin = 4;
+        /* 4, 8 or 16 seconds margin based on idleTimeout */
+        while ((int) idleTimeout - margin * 2 >= margin * 2 && margin < 16) {
+            margin = (unsigned short) (margin << 1);
+        }
+        idleTimeoutComponents = {
+            idleTimeout - (sendPingsAutomatically ? margin : 0), /* reduce normal idleTimeout if it is extended by ping-timeout */
+            margin /* ping-timeout - also used for end() timeout */
+        };
+    }
+
+    ~WebSocketContextData() {
+
+    }
+
+    WebSocketContextData(TopicTree<TopicTreeMessage, TopicTreeBigMessage> *topicTree) : topicTree(topicTree) {
+
+    }
 };
 
 }
