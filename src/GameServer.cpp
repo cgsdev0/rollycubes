@@ -44,21 +44,6 @@ std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
 typedef uWS::HttpResponse<false> HttpResponse;
 typedef uWS::HttpRequest HttpRequest;
 
-void signal_callback_handler(int signum) {
-    std::cout << "Caught signal, attempting graceful shutdown..." << std::endl;
-    json state;
-    for (const auto &g : games) {
-        state[g.first] = g.second->toJson(true);
-    }
-    remove("server_state.json");
-    std::ofstream state_file("server_state.json");
-    if (!state.is_null()) {
-        state_file << state;
-        state_file.close();
-    }
-    exit(0);
-}
-
 void load_persistence() {
     std::ifstream state_file("server_state.json");
     if (!state_file.is_open()) return;
@@ -70,6 +55,10 @@ void load_persistence() {
         std::cout << "Restoring room '" << room.key() << "'" << std::endl;
         Game *g = new Game(room.value());
         games.insert({room.key(), g});
+
+        // All rehydrated games start with 0 players, so we can schedule an eviction.
+        eviction_queue.push({std::chrono::system_clock::now(), room.key()});
+        eviction_set.insert(room.key());
     }
 }
 
@@ -109,11 +98,11 @@ std::string generate_hex(const unsigned int len) {
     return ss.str();
 }
 
-void runEviction() {
+void runEviction(bool limited = true) {
     bool popSet = true;
     int kills = 0;
     while (!eviction_queue.empty()) {
-        if (kills >= EVICTION_LIMIT)
+        if (kills >= EVICTION_LIMIT && limited)
             break;
         auto i = eviction_queue.front();
         if (i.first < std::chrono::system_clock::now() - EVICT_AFTER) {
@@ -121,7 +110,7 @@ void runEviction() {
             if (it != games.end()) {
                 Game *g = it->second;
                 if (!g->connectedPlayerCount()) {
-                    if (g->getUpdated() < i.first) {
+                    if (g->getUpdated() <= i.first) {
                         games.erase(it);
                         delete g;
                         ++kills;
@@ -140,7 +129,24 @@ void runEviction() {
             break;
         }
     }
-    std::cout << "Evicted " << kills << " games during creation of room ";
+    std::cout << "Evicted " << kills << " games" << std::endl;
+}
+
+void signal_callback_handler(int signum) {
+    std::cout << "Caught signal, attempting graceful shutdown..." << std::endl;
+    runEviction(false);
+    json state;
+    for (const auto &g : games) {
+        state[g.first] = g.second->toJson(true);
+    }
+    remove("server_state.json");
+    std::ofstream state_file("server_state.json");
+    if (!state.is_null()) {
+        state_file << state;
+        state_file.close();
+        std::cout << "Successfully persisted state to disk." << std::endl;
+    }
+    exit(0);
 }
 
 std::string getSession(HttpRequest *req) {
@@ -156,6 +162,7 @@ struct PerSocketData {
     std::string session;
     std::string room;
     bool spectator;
+    bool dedupe_conns;
 };
 
 std::string createRoom(bool isPrivate, std::string seed = "") {
@@ -167,12 +174,9 @@ std::string createRoom(bool isPrivate, std::string seed = "") {
             // Short circuit to prevent infinite loop
             // in the case of a seeded redirect already
             // existing
-            std::cout << id << " (noop)" << std::endl;
             return id;
         }
     } while (games.find(id) != games.end());
-    std::cout << id << std::endl;
-    std::cout << "New room count: " << games.size() << std::endl;
     Game *g = new Game(isPrivate);
     games.insert({id, g});
     if (!eviction_set.count(id)) {
@@ -182,7 +186,7 @@ std::string createRoom(bool isPrivate, std::string seed = "") {
     return id;
 }
 
-uWS::TemplatedApp<false>::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::TemplatedApp<false> *app) {
+uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app) {
     return {/* Settings */
             .compression = uWS::SHARED_COMPRESSOR,
             .maxPayloadLength = 16 * 1024,
@@ -192,69 +196,81 @@ uWS::TemplatedApp<false>::WebSocketBehavior<PerSocketData> makeWebsocketBehavior
                     std::string session = getSession(req);
                     std::string mode = std::string(req->getParameter(0));
                     std::string room = std::string(req->getParameter(1));
-                    std::cout << mode << " " << room << " " << session << std::endl;
-                    res->template upgrade<PerSocketData>({
-                                                             .session = session,
-                                                             .room = room,
-                                                             .spectator = (mode == "spectate"),
-                                                         },
+                    bool dedupe_conns = false;
+                    auto it = games.find(room);
+                    if (it != games.end()) {
+                        // Connecting to a valid game
+                        Game *g = it->second;
+                        if (g->isPlayerConnected(session)) {
+                            dedupe_conns = true;
+                        }
+                    }
+                    res->template upgrade<PerSocketData>({.session = session,
+                                                          .room = room,
+                                                          .spectator = (mode == "spectate"),
+                                                          .dedupe_conns = dedupe_conns},
                                                          req->getHeader("sec-websocket-key"), req->getHeader("sec-websocket-protocol"), req->getHeader("sec-websocket-extensions"), context);
                 },
             .open =
                 [app](auto *ws) {
-                    std::cout << "open!" << std::endl;
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
-                    //std::string session = getSession(req);
+
                     if (userData->session == "") {
                         ws->close();
-                    } else {
-                        /* std::string mode = std::string(req->getParameter(0)); */
-                        /* std::string room = std::string(req->getParameter(1)); */
-                        auto it = games.find(userData->room);
-                        if (it != games.end()) {
-                            // Connecting to a valid game
-                            Game *g = it->second;
-                            if (!userData->spectator) {
-                                if (!g->hasPlayer(userData->session)) {
-                                    json resp = g->addPlayer(userData->session);
-                                    if (resp.is_null()) {
-                                        // room is full
-                                        ws->close();
-                                        return;
-                                    } else {
-                                        app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
-                                    }
-                                } else {
-                                    json resp = g->reconnectPlayer(userData->session);
-                                    app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
+                        return;
+                    }
+                    if (userData->dedupe_conns) {
+                        json resp;
+                        resp["error"] = "already connected";
+                        ws->send(resp.dump(), uWS::OpCode::TEXT);
+                        return;
+                    }
+                    auto it = games.find(userData->room);
+                    if (it != games.end()) {
+                        // Connecting to a valid game
+                        Game *g = it->second;
+                        if (!userData->spectator) {
+                            if (!g->hasPlayer(userData->session)) {
+                                json resp = g->addPlayer(userData->session);
+                                if (resp.is_null()) {
+                                    // room is full
+                                    ws->close();
+                                    return;
                                 }
+                                app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
+                            } else {
+                                json resp = g->reconnectPlayer(userData->session);
+                                app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
                             }
-                            json welcome;
-                            welcome["type"] = "welcome";
-                            welcome["game"] = g->toJson();
-                            if (!userData->spectator) welcome["id"] = g->getPlayerId(userData->session);
-                            ws->send(welcome.dump(), uWS::OpCode::TEXT);
-                            ws->subscribe(userData->room);
-                        } else if (userData->spectator) {
-                            ws->close();
-                            return;
-                        } else {
-                            // Connecting to a non-existant room
-                            // let's migrate them to a new room
-                            userData->room = createRoom(true, userData->room);
-                            json route;
-                            route["type"] = "redirect";
-                            route["room"] = userData->room;
-                            ws->send(route.dump(), uWS::OpCode::TEXT);
                         }
+                        json welcome;
+                        welcome["type"] = "welcome";
+                        welcome["game"] = g->toJson();
+                        if (!userData->spectator) welcome["id"] = g->getPlayerId(userData->session);
+                        ws->send(welcome.dump(), uWS::OpCode::TEXT);
+                        ws->subscribe(userData->room);
+                    } else if (userData->spectator) {
+                        ws->close();
+                        return;
+                    } else {
+                        // Connecting to a non-existant room
+                        // let's migrate them to a new room
+                        userData->room = createRoom(true, userData->room);
+                        json route;
+                        route["type"] = "redirect";
+                        route["room"] = userData->room;
+                        ws->send(route.dump(), uWS::OpCode::TEXT);
                     }
                 },
             .message =
                 [app](auto *ws, std::string_view message, uWS::OpCode opCode) {
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
+
+                    if (userData->dedupe_conns) return;
                     if (userData->spectator) return;
+
                     std::string room = userData->room;
                     std::string session = userData->session;
                     json response;
@@ -300,10 +316,10 @@ uWS::TemplatedApp<false>::WebSocketBehavior<PerSocketData> makeWebsocketBehavior
                 [app](auto *ws, int code, std::string_view message) {
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
-                    if (userData->spectator) {
-                        // Come back to this
-                        return;
-                    }
+
+                    if (userData->spectator) return;
+                    if (userData->dedupe_conns) return;
+
                     std::string room = userData->room;
                     std::string session = userData->session;
                     auto it = games.find(room);

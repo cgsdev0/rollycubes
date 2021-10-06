@@ -41,9 +41,20 @@ const AppInner = () => {
         <SettingsMenu />
         <Route path="/" exact component={CookiePage} />
         <Route path="/home" component={HomePage} />
+        <Route path="/multiple-tabs" component={TabErrorPage} />
         <Route path="/:mode/:room" component={GamePage} />
       </div>
     </Router>
+  );
+};
+
+const TabErrorPage = () => {
+  return (
+    <div style={{ marginTop: "40vh", textAlign: "center" }}>
+      <h1>Error</h1>
+      <p>You already have a tab opened for that room.</p>
+      <a href="/home">Back to Home</a>
+    </div>
   );
 };
 

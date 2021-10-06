@@ -134,6 +134,15 @@ json Game::disconnectPlayer(std::string id) {
     return result;
 }
 
+bool Game::isPlayerConnected(std::string id) const {
+    for (int i = 0; i < players.size(); ++i) {
+        if (players[i].getSession() == id) {
+            return players[i].isConnected();
+        }
+    }
+    return false;
+}
+
 json Game::reconnectPlayer(std::string id) {
     json result;
     for (int i = 0; i < players.size(); ++i) {

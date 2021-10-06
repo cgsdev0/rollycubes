@@ -33,6 +33,10 @@ class Connection extends React.Component<Props & DispatchProp> {
     if (!data) {
       console.error("empty action from server");
     } else if ("error" in data) {
+      if (data.error === "already connected") {
+        if (this.websocket) this.websocket.close();
+        this.props.history.replace(`/multiple-tabs`);
+      }
       console.error(data || data.error);
     } else if (data.type === "redirect") {
       const pathParts = this.props.history.location.pathname.split("/");
@@ -42,6 +46,9 @@ class Connection extends React.Component<Props & DispatchProp> {
     }
   };
 
+  onError = (e: any) => {
+    console.error("oh god why", e);
+  };
   openSocket = () => {
     if (
       !this.websocket ||
@@ -60,6 +67,7 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.websocket.addEventListener("close", this.onClose);
       this.websocket.addEventListener("open", this.onOpen);
       this.websocket.addEventListener("message", this.onMessage);
+      this.websocket.addEventListener("error", this.onError);
       this.props.dispatch({ type: "WEBSOCKET", socket: this.websocket });
     }
   };

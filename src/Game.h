@@ -56,6 +56,7 @@ class Game {
 
     json disconnectPlayer(std::string id);
     json reconnectPlayer(std::string id);
+    bool isPlayerConnected(std::string id) const;
 
     void advanceTurn();
     void clearTurn();
