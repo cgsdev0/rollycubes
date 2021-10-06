@@ -295,6 +295,7 @@ const rootReducer: Reducer<ReduxState> = (
         ...initialState,
         connected: state.connected,
         rolls: state.rolls,
+        rollCount: state.rollCount,
         players: state.players.map((p) => ({ ...p, score: 0 })),
         turn_index: action.id,
         self_index: state.self_index,
