@@ -29,6 +29,7 @@ off-stream cleanup:
 - [ ] figure out how to use an automated build system
 
 BUGS:
-- [ ] sometimes it looks like you're dc'd but you're not??
+- [x] sometimes it looks like you're dc'd but you're not??
     - easy repro: open the game in 2 tabs, close one, oops
+    - solution: error out when players open multiple conns to the same game
 - [ ] sometimes the reset pop text doesn't show
