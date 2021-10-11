@@ -2,12 +2,13 @@
    "compilerOptions": {
       "lib": [
          "es5",
-         "es6"
+         "es6",
+         "es2018"
       ],
       "target": "es5",
       "module": "commonjs",
       "moduleResolution": "node",
-      "outDir": "./build",
+      "outDir": "build",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true
