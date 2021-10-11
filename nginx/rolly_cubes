@@ -1,0 +1,69 @@
+server {
+	server_name auth.rollycubes.com;
+	location / {
+		proxy_set_header Host $host;
+		proxy_pass http://localhost:3031;
+		proxy_redirect off;
+	}
+
+    listen 443 ssl; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/auth.rollycubes.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/auth.rollycubes.com/privkey.pem; # managed by Certbot
+
+
+}
+server {
+	server_name rollycubes.com www.rollycubes.com;
+	root /var/www/build;
+	location /ws {
+		proxy_set_header Host $host;
+		proxy_pass http://localhost:3001;
+		proxy_redirect off;
+	}
+        location /auth {
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP          $remote_addr;
+                proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto  $scheme;
+                proxy_pass http://localhost:8080;
+                proxy_http_version 1.1;
+        }
+	location ~ ^/(create|cookie|list)$ {
+		proxy_set_header Host $host;
+		proxy_pass http://localhost:3001;
+		proxy_redirect off;
+	}
+	location / {
+		try_files $uri $uri/ /index.html;
+	}
+
+    listen 443 ssl; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    ssl_certificate /etc/letsencrypt/live/rollycubes.com-0001/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/rollycubes.com-0001/privkey.pem; # managed by Certbot
+
+}
+server {
+    if ($host = www.rollycubes.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    if ($host = rollycubes.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    if ($host = auth.rollycubes.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+	listen [::]:80;
+	listen 80;
+	server_name rollycubes.com www.rollycubes.com auth.rollycubes.com;
+    return 404; # managed by Certbot
+
+
+}
