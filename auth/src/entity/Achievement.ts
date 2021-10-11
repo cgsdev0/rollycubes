@@ -1,11 +1,4 @@
-import {
-  BaseEntity,
-  Entity,
-  Column,
-  PrimaryColumn,
-  ManyToMany,
-  OneToMany,
-} from "typeorm";
+import { BaseEntity, Entity, Column, PrimaryColumn, OneToMany } from "typeorm";
 import { UserToAchievement } from "./UserToAchievement";
 
 @Entity()
@@ -19,10 +12,7 @@ export class Achievement extends BaseEntity {
   @Column()
   description: string;
 
-  @Column({ default: true })
-  is_boolean: boolean;
-
-  @Column({ default: 1 })
+  @Column({ default: 0 })
   max_progress: number;
 
   @Column({ nullable: true })

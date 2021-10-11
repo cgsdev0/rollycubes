@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { createConnection } from "typeorm";
+import * as cors from "cors";
 import * as bcrypt from "bcrypt";
 import * as express from "express";
 import * as bodyParser from "body-parser";
@@ -12,14 +13,19 @@ import { User } from "./entity/User";
 import { PlayerStats } from "./entity/PlayerStats";
 import { Achievement } from "./entity/Achievement";
 import { UserToAchievement } from "./entity/UserToAchievement";
+import { insertAchievementList } from "./achievements";
 
 createConnection()
   .then(async (connection) => {
-    // create express app
     const app = express();
     app.use(helmet());
     app.use(bodyParser.json());
     app.use(cookieParser());
+    app.use(
+      cors({
+        origin: "https://rollycubes.live/",
+      })
+    );
     app.use(csrf({ cookie: { httpOnly: true } }));
 
     app.get("/csrf", function (req, res) {
@@ -49,17 +55,10 @@ createConnection()
       );
     });
 
-    // setup express app here
-    // ...
-
     // start express server
     app.listen(3031);
 
-    const achievement = new Achievement();
-    achievement.id = "astronaut:1";
-    achievement.name = "Astronaut";
-    achievement.description = "Win with a score of 100";
-    await achievement.save();
+    await insertAchievementList();
 
     // insert new users for test
     const user = new User();
@@ -72,7 +71,9 @@ createConnection()
     await stats.save();
 
     const achievementAssignment = new UserToAchievement();
-    achievementAssignment.achievement = achievement;
+    achievementAssignment.achievement = await Achievement.findOneOrFail(
+      "astronaut:1"
+    );
     achievementAssignment.unlocked = new Date();
     achievementAssignment.progress = 1;
     achievementAssignment.user = user;

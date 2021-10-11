@@ -1,11 +1,4 @@
-import {
-  BaseEntity,
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinTable,
-} from "typeorm";
+import { BaseEntity, Entity, Column, ManyToOne } from "typeorm";
 import { User } from "./User";
 import { Achievement } from "./Achievement";
 
@@ -14,7 +7,7 @@ export class UserToAchievement extends BaseEntity {
   @Column()
   progress: number;
 
-  @Column()
+  @Column({ nullable: true, default: null })
   unlocked: Date;
 
   @ManyToOne(() => User, (user) => user.userToAchievements, { primary: true })

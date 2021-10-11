@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { PlayerStats } from "./PlayerStats";
 import { UserToAchievement } from "./UserToAchievement";
+import { RefreshToken } from "./RefreshToken";
 
 @Entity()
 export class User extends BaseEntity {
@@ -30,6 +31,9 @@ export class User extends BaseEntity {
 
   @OneToOne(() => PlayerStats, (stats) => stats.user)
   stats: PlayerStats;
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
 
   @OneToMany(
     () => UserToAchievement,
