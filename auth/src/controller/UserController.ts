@@ -78,6 +78,10 @@ export class UserController {
 
   async refresh(request: Request, response: Response, next: NextFunction) {
     try {
+      if (!request.cookies["refresh_token"]) {
+        response.status(401);
+        return "forbidden";
+      }
       const refresh_token = await RefreshToken.findOneOrFail(
         request.cookies["refresh_token"],
         { relations: ["user"] }

@@ -1,4 +1,5 @@
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 import { RouteComponentProps } from "react-router-dom";
 
 interface TParams {
@@ -7,9 +8,6 @@ interface TParams {
 interface Props {
   route: RouteComponentProps<TParams>;
 }
-
-const waitFor = (delay: number) =>
-  new Promise((resolve) => setTimeout(resolve, delay));
 
 const CookiePage: React.FC<Props> = ({ route }) => {
   const redirect = React.useRef(() => {
@@ -22,14 +20,10 @@ const CookiePage: React.FC<Props> = ({ route }) => {
   });
   React.useEffect(() => {
     (async () => {
-      if (document.cookie.includes("_session")) {
+      if (!document.cookie.includes("_session")) {
+        document.cookie = `_session=${uuidv4()}`;
         redirect.current();
       } else {
-        let result = await window.fetch("/cookie");
-        while (!result || !result.ok) {
-          await waitFor(1000);
-          result = await window.fetch("/cookie");
-        }
         redirect.current();
       }
     })();
