@@ -3,28 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/cannon": "^0.1.5",
-    "@types/jest": "24.0.18",
-    "@types/node": "12.7.5",
-    "@types/react": "16.9.2",
-    "@types/react-dom": "16.9.0",
-    "@types/react-linkify": "^1.0.1",
-    "@types/react-redux": "^7.1.2",
-    "@types/react-router-dom": "^4.3.5",
-    "@types/reselect": "^2.2.0",
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
     "cannon": "^0.6.2",
-    "prettier": "^1.18.2",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "react-linkify": "^1.0.0-alpha",
     "react-redux": "^7.1.1",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "^4.0.3",
     "reselect": "^4.0.0",
-    "typescript": "3.6.3"
+    "typescript": "4.4.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -51,5 +41,16 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/cannon": "^0.1.5",
+    "@types/jest": "24.0.18",
+    "@types/node": "12.7.5",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2",
+    "@types/react-linkify": "^1.0.1",
+    "@types/react-redux": "^7.1.2",
+    "@types/react-router-dom": "^4.3.5",
+    "@types/reselect": "^2.2.0",
+    "prettier": "^1.18.2"
+  }
 }

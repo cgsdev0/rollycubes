@@ -1,5 +1,5 @@
 import React from "react";
-import { RouteComponentProps } from "react-router-dom";
+import { Link, RouteComponentProps } from "react-router-dom";
 
 interface Props {
   route: RouteComponentProps;
@@ -97,10 +97,10 @@ class HomePage extends React.Component<Props, State> {
                 <td className="host">{game.hostName || "unknown"}</td>
                 <td>{game.playerCount} / 8</td>
                 <td>
-                  <a href={`/room/${game.code}`}>Link</a>
+                  <Link to={`/room/${game.code}`}>Link</Link>
                 </td>
                 <td>
-                  <a href={`/spectate/${game.code}`}>Spectate</a>
+                  <Link to={`/spectate/${game.code}`}>Spectate</Link>
                 </td>
               </tr>
             ))}

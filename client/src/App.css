@@ -32,6 +32,17 @@ body {
   z-index: 800;
 }
 
+#loginPrompt {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 800;
+}
+
+#loginPrompt img {
+    border-radius: 50%;
+}
+
 #settingsBox {
   background-color: #777;
   margin-left: 0px;

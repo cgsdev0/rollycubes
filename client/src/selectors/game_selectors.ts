@@ -11,6 +11,28 @@ export const selectIs3d = createSelector(
   (state) => state.settings.sick3dmode
 );
 
+export const selectAuthService = createSelector(
+  selectState,
+  (state) => state.settings.authServiceOrigin
+);
+
+export const selectSelfUserData = createSelector(
+  selectState,
+  (state) => state.userData
+);
+
+export const selectSelfImageUrl = createSelector(
+  selectSelfUserData,
+  (userdata) => userdata?.image_url
+);
+
+export const selectIsDev = createSelector(
+  () => {},
+  (_) =>
+    !process.env.NODE_ENV ||
+    (process.env.NODE_ENV === "development" && window.location.port === "3005")
+);
+
 export const selectIsDarkTheme = createSelector(
   selectState,
   (state) => state.settings.theme === themes.dark

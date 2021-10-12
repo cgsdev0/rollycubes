@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { createConnection } from "typeorm";
+import { verifyToken as auth } from "./middleware/auth";
 import * as cors from "cors";
 import * as bcrypt from "bcrypt";
 import * as express from "express";
@@ -34,8 +35,13 @@ createConnection()
 
     // register express routes from defined application routes
     Routes.forEach((route) => {
+      const middleware = [];
+      if (route.requires_auth) {
+        middleware.push(auth);
+      }
       (app as any)[route.method](
         route.route,
+        ...middleware,
         (req: Request, res: Response, next: Function) => {
           const result = new (route.controller as any)()[route.action](
             req,
@@ -64,6 +70,8 @@ createConnection()
     const user = new User();
     user.hashed_password = await bcrypt.hash("admin", 10);
     user.username = "admin";
+    user.image_url =
+      "https://avatars.githubusercontent.com/u/4583705?s=400&u=f59c42dd30e407689861661295c37de67a4f5032&v=4";
     await user.save();
 
     const stats = new PlayerStats();

@@ -3,6 +3,7 @@ import { User } from "../entity/User";
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import { RefreshToken } from "../entity/RefreshToken";
+import { EntityNotFoundError } from "typeorm";
 
 export class UserController {
   async all(request: Request, response: Response, next: NextFunction) {
@@ -12,6 +13,12 @@ export class UserController {
   async one(request: Request, response: Response, next: NextFunction) {
     return User.findOne(request.params.id, {
       relations: ["stats", "userToAchievements"],
+    });
+  }
+
+  async me(request: Request, response: Response, next: NextFunction) {
+    return User.findOne(response.locals.user.id, {
+      relations: ["stats"],
     });
   }
 
@@ -59,6 +66,7 @@ export class UserController {
       return "forbidden";
     } catch (e) {
       response.status(500);
+      console.error(e);
       return "error";
     }
   }
@@ -101,7 +109,11 @@ export class UserController {
       return { access_token };
     } catch (e) {
       console.error(e);
-      response.status(500);
+      if (e instanceof EntityNotFoundError) {
+        response.status(401);
+      } else {
+        response.status(500);
+      }
       return "error";
     }
   }

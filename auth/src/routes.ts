@@ -1,6 +1,14 @@
 import { UserController } from "./controller/UserController";
 
-export const Routes = [
+interface Route {
+  method: "get" | "post";
+  route: string;
+  controller: any;
+  action: string;
+  requires_auth?: boolean;
+}
+
+export const Routes: Route[] = [
   {
     method: "get",
     route: "/users",
@@ -12,6 +20,13 @@ export const Routes = [
     route: "/users/:id",
     controller: UserController,
     action: "one",
+  },
+  {
+    method: "get",
+    route: "/me",
+    controller: UserController,
+    action: "me",
+    requires_auth: true,
   },
   {
     method: "post",
@@ -26,7 +41,7 @@ export const Routes = [
     action: "login",
   },
   {
-    method: "post",
+    method: "get",
     route: "/refresh_token",
     controller: UserController,
     action: "refresh",

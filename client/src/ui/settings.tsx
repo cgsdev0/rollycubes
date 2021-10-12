@@ -7,6 +7,8 @@ import {
   selectIsDarkTheme,
   selectCheats,
   selectIs3d,
+  selectAuthService,
+  selectIsDev,
 } from "../selectors/game_selectors";
 
 interface Props {
@@ -14,6 +16,8 @@ interface Props {
   theme: boolean;
   hints: boolean;
   is3d: boolean;
+  authService: string;
+  isDev: boolean;
 }
 
 const SettingsMenu: React.FC<Props & DispatchProp> = (props) => {
@@ -84,6 +88,15 @@ const SettingsMenu: React.FC<Props & DispatchProp> = (props) => {
             >
               [{props.is3d ? "x" : " "}] 3D mode<sup>(beta)</sup>
             </li>
+            {props.isDev ? (
+              <li
+                onClick={() => {
+                  props.dispatch({ type: "DEV_AUTH_SERVICE_TOGGLE" });
+                }}
+              >
+                {props.authService}
+              </li>
+            ) : null}
           </ul>
         </div>
       ) : null}
@@ -97,6 +110,8 @@ const mapStateToProps = (state: ReduxState) => {
     theme: selectIsDarkTheme(state),
     hints: selectCheats(state),
     is3d: selectIs3d(state),
+    authService: selectAuthService(state),
+    isDev: selectIsDev(state),
   };
 };
 

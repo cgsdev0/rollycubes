@@ -11,10 +11,25 @@ export interface Player {
   crowned?: boolean;
 }
 
+export interface UserStats {
+  rolls: number;
+  doubles: number;
+  games: number;
+  wins: number;
+}
+
+export interface UserData {
+  id: string;
+  username: string;
+  image_url: string;
+  stats: UserStats;
+}
+
 export interface DieRoll {
   used: boolean;
   value: number;
 }
+
 export interface ReduxState {
   players: Player[];
   rolls: DieRoll[];
@@ -32,9 +47,15 @@ export interface ReduxState {
   settings: {
     cheats: boolean;
     sick3dmode: boolean;
+    authServiceOrigin: string;
     theme: Theme;
   };
+  authToken?: string | null;
+  userData?: UserData;
 }
+
+const PROD_AUTH_SERVICE = "https://auth.rollycubes.com/";
+const LOCAL_AUTH_SERVICE = "http://localhost:3031/";
 
 const initialState: ReduxState = {
   players: [],
@@ -52,11 +73,14 @@ const initialState: ReduxState = {
   settings: {
     cheats: (localStorage.getItem("cheats") || "false") === "true",
     sick3dmode: (localStorage.getItem("sick3dmode") || "false") === "true",
+    authServiceOrigin:
+      localStorage.getItem("authServiceOrigin") || PROD_AUTH_SERVICE,
     theme:
       themes[
         (localStorage.getItem("theme") || "light") as keyof typeof themes
       ] || themes.light,
   },
+  authToken: undefined,
 };
 
 export const TARGET_SCORES = [33, 66, 67, 98, 99, 100];
@@ -72,6 +96,11 @@ const rootReducer: Reducer<ReduxState> = (
       return {
         ...state,
         socket: action.socket,
+      };
+    case "GOT_SELF_USER_DATA":
+      return {
+        ...state,
+        userData: action.userData,
       };
     case "FINISH_3D_ROLL":
       return {
@@ -133,6 +162,28 @@ const rootReducer: Reducer<ReduxState> = (
         CHAT_BUFFER_LENGTH
       );
       return new3dState;
+    case "DEV_AUTH_SERVICE_TOGGLE":
+      const newOriginState = {
+        ...state,
+        settings: {
+          ...state.settings,
+          authServiceOrigin: state.settings.authServiceOrigin.includes(
+            "localhost"
+          )
+            ? PROD_AUTH_SERVICE
+            : LOCAL_AUTH_SERVICE,
+        },
+      };
+      localStorage.setItem(
+        "authServiceOrigin",
+        newOriginState.settings.authServiceOrigin
+      );
+      return newOriginState;
+    case "AUTHENTICATE":
+      return {
+        ...state,
+        authToken: action.access_token,
+      };
     case "CHEATS":
       localStorage.setItem("cheats", JSON.stringify(!state.settings.cheats));
       const newCheatState = {
@@ -167,7 +218,9 @@ const rootReducer: Reducer<ReduxState> = (
         { self_index: action.id },
         { rolls },
         { settings: state.settings },
-        { rolled3d: state.rolled3d }
+        { rolled3d: state.rolled3d },
+        { authToken: state.authToken },
+        { userData: state.userData }
       );
       if (state.settings.sick3dmode) {
         initScene(welcomeState);
@@ -302,6 +355,8 @@ const rootReducer: Reducer<ReduxState> = (
         chat: state.chat,
         settings: state.settings,
         socket: state.socket,
+        authToken: state.authToken,
+        userData: state.userData,
       };
     case "chat":
       const newState = {
