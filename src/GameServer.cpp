@@ -299,6 +299,8 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app) 
                         if (action_type == "authenticate") {
                             auto token = data["access_token"].get<std::string>();
                             std::cout << "RECEIVED TOKEN: " << token << std::endl;
+                            // TODO: validate token
+                            connectNewPlayer(app, ws, userData);
                         } else {
                             auto it = games.find(room);
                             if (it != games.end()) {
