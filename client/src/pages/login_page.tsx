@@ -24,19 +24,23 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
       });
     }
   }, [route, authToken]);
-  const login = async () => {
-    const csrf = await window.fetch(authService + "csrf");
+  const login = async (e: any) => {
+    e.preventDefault();
+    const csrf = await window.fetch(authService + "csrf", {
+      mode: "cors",
+      credentials: "include",
+    });
     const { csrfToken } = await csrf.json();
-    const response = await window.fetch(
-      authService + "login?_csrf=" + csrfToken,
-      {
-        method: "post",
-        body: JSON.stringify({ _csrf: csrfToken, username, password }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await window.fetch(authService + "login", {
+      method: "post",
+      mode: "cors",
+      body: JSON.stringify({ username, password }),
+      credentials: "include",
+      headers: {
+        "csrf-token": csrfToken,
+        "Content-Type": "application/json",
+      },
+    });
     const { access_token } = await response.json();
     if (access_token) {
       dispatch({ type: "AUTHENTICATE", access_token });
@@ -59,15 +63,22 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
     <div>
       <h1>Dice Game</h1>
       <p>the one where you roll some dice</p>
-      <div className="loginForm">
-        <input onChange={(e) => setUsername(e.target.value)} value={username} />
-        <input
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-          type="password"
-        />
-        <button onClick={login}>Login</button>
-      </div>
+      <form onSubmit={login}>
+        <div className="loginForm">
+          <input
+            onChange={(e) => setUsername(e.target.value)}
+            value={username}
+          />
+          <input
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            type="password"
+          />
+          <button type="submit" onClick={login}>
+            Login
+          </button>
+        </div>
+      </form>
       <p>
         Need an account? <Link to="#">Register</Link>
       </p>

@@ -26,6 +26,16 @@ export const selectSelfImageUrl = createSelector(
   (userdata) => userdata?.image_url
 );
 
+export const selectSelfUserId = createSelector(
+  selectSelfUserData,
+  (userdata) => userdata?.id
+);
+
+export const selectSelfFirstInitial = createSelector(
+  selectSelfUserData,
+  (userdata) => (userdata?.username?.charAt(0) || "").toUpperCase()
+);
+
 export const selectIsDev = createSelector(
   () => {},
   (_) =>

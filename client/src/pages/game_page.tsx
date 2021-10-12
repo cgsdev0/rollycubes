@@ -32,6 +32,7 @@ interface Props {
   isSpectator: boolean;
   turn: number;
   somebodyIsNice: boolean;
+  authToken?: string | null;
 }
 
 const clearSelection = () => {
@@ -112,6 +113,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
     const {
       route,
       somebodyIsNice,
+      authToken,
       doublesCount,
       winner,
       reset,
@@ -143,11 +145,13 @@ class GamePage extends React.Component<Props & DispatchProp> {
             ) : null}
             <div className="GamePage">
               <ConnBanner />
-              <Connection
-                room={this.props.route.match.params.room}
-                mode={this.props.route.match.params.mode}
-                history={this.props.route.history}
-              />
+              {authToken === undefined ? null : (
+                <Connection
+                  room={this.props.route.match.params.room}
+                  mode={this.props.route.match.params.mode}
+                  history={this.props.route.history}
+                />
+              )}
               <div id="PlayerChatWrapper">
                 <Players />
                 <ul className="TabHeader">
@@ -236,6 +240,7 @@ const mapStateToProps = (state: ReduxState) => {
     reset: selectIsReset(state),
     isSpectator: selectIsSpectator(state),
     somebodyIsNice: selectSomebodyIsNice(state),
+    authToken: state.authToken,
   };
 };
 

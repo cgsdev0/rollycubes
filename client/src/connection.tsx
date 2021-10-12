@@ -1,11 +1,21 @@
 import React from "react";
 import { History } from "history";
 import { connect, DispatchProp } from "react-redux";
+import { ReduxState } from "./store";
+import jwt_decode from "jwt-decode";
 
 interface Props {
   room: string;
   mode: string;
   history: History;
+  authToken?: string | null;
+}
+
+export interface DecodedUserJWT {
+  display_name: string;
+  exp: number;
+  iat: number;
+  user_id: string;
 }
 
 class Connection extends React.Component<Props & DispatchProp> {
@@ -22,7 +32,15 @@ class Connection extends React.Component<Props & DispatchProp> {
     console.log("Socket opened to room", this.props.room);
     this.props.dispatch({ type: "socket_open" });
     const name = localStorage.getItem("name");
-    if (this.websocket && name) {
+    if (this.websocket && this.props.authToken) {
+      // test
+      this.websocket.send(
+        JSON.stringify({
+          type: "authenticate",
+          access_token: this.props.authToken,
+        })
+      );
+    } else if (this.websocket && name) {
       this.websocket.send(JSON.stringify({ type: "update_name", name }));
     }
     //this.websocket!.send(JSON.stringify({ type: "roll", n: 0, msg: "Hello world!" }))
@@ -59,10 +77,15 @@ class Connection extends React.Component<Props & DispatchProp> {
       if (window.location.port !== "80") {
         portString = `:${window.location.port}`;
       }
+      let userIdStr = "";
+      if (this.props.authToken) {
+        const decoded: DecodedUserJWT = jwt_decode(this.props.authToken);
+        userIdStr = "?userId=" + decoded.user_id;
+      }
       this.websocket = new WebSocket(
         `${window.location.protocol.endsWith("s:") ? "wss" : "ws"}://${
           window.location.hostname
-        }${portString}/ws/${this.props.mode}/${this.props.room}`
+        }${portString}/ws/${this.props.mode}/${this.props.room}${userIdStr}`
       );
       this.websocket.addEventListener("close", this.onClose);
       this.websocket.addEventListener("open", this.onOpen);
@@ -103,4 +126,9 @@ class Connection extends React.Component<Props & DispatchProp> {
   }
 }
 
-export default connect()(Connection);
+const mapStateToProps = (state: ReduxState) => {
+  return {
+    authToken: state.authToken,
+  };
+};
+export default connect(mapStateToProps)(Connection);

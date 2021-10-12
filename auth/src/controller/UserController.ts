@@ -55,9 +55,14 @@ export class UserController {
             expiresIn: "2h",
           }
         );
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 30);
+
         response.cookie("refresh_token", refresh_token.id, {
           secure: true,
           httpOnly: true,
+          sameSite: "none",
+          expires,
         });
 
         return { access_token };
@@ -81,8 +86,9 @@ export class UserController {
       const { user } = refresh_token;
 
       // Check expiration
-      const expires_at = new Date(
-        refresh_token.issued_at.getTime() + 24 * 60 * 30
+      const expires_at = new Date();
+      expires_at.setTime(
+        refresh_token.issued_at.getTime() + 24 * 60 * 30 * 60 * 1000
       );
       const current_time = new Date();
       if (current_time > expires_at) {
@@ -101,9 +107,13 @@ export class UserController {
           expiresIn: "2h",
         }
       );
+      const expires = new Date();
+      expires.setDate(expires.getDate() + 30);
       response.cookie("refresh_token", new_refresh_token.id, {
         secure: true,
         httpOnly: true,
+        sameSite: "none",
+        expires,
       });
 
       return { access_token };

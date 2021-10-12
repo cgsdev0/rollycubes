@@ -154,13 +154,14 @@ std::string getSession(HttpRequest *req) {
     std::smatch cookies;
     std::string s(req->getHeader("cookie"));
     std::regex_search(s, cookies, sessionRegex);
-    return std::string(cookies[1].str());
+    return "guest:" + std::string(cookies[1].str());
 }
 
 /* ws->getUserData returns one of these */
 struct PerSocketData {
     std::string session;
     std::string room;
+    bool is_verified;
     bool spectator;
     bool dedupe_conns;
 };
@@ -194,8 +195,14 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app) 
             .upgrade =
                 [](auto *res, auto *req, auto *context) {
                     std::string session = getSession(req);
+                    bool is_verified = true;
                     std::string mode = std::string(req->getParameter(0));
                     std::string room = std::string(req->getParameter(1));
+                    std::string user_id = std::string(req->getQuery("userId"));
+                    if (user_id.length()) {
+                        session = user_id;
+                        is_verified = false;
+                    }
                     bool dedupe_conns = false;
                     auto it = games.find(room);
                     if (it != games.end()) {
@@ -207,6 +214,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app) 
                     }
                     res->template upgrade<PerSocketData>({.session = session,
                                                           .room = room,
+                                                          .is_verified = is_verified,
                                                           .spectator = (mode == "spectate"),
                                                           .dedupe_conns = dedupe_conns},
                                                          req->getHeader("sec-websocket-key"), req->getHeader("sec-websocket-protocol"), req->getHeader("sec-websocket-extensions"), context);

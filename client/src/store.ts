@@ -21,7 +21,7 @@ export interface UserStats {
 export interface UserData {
   id: string;
   username: string;
-  image_url: string;
+  image_url: string | null;
   stats: UserStats;
 }
 
@@ -180,6 +180,7 @@ const rootReducer: Reducer<ReduxState> = (
       );
       return newOriginState;
     case "AUTHENTICATE":
+      let decoded = undefined;
       return {
         ...state,
         authToken: action.access_token,

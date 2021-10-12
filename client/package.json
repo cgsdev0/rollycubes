@@ -6,6 +6,7 @@
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
     "cannon": "^0.6.2",
+    "jwt-decode": "^3.1.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-linkify": "^1.0.0-alpha",
@@ -44,6 +45,7 @@
   "devDependencies": {
     "@types/cannon": "^0.1.5",
     "@types/jest": "24.0.18",
+    "@types/jwt-decode": "^3.1.0",
     "@types/node": "12.7.5",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.2",

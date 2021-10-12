@@ -42,6 +42,16 @@ body {
 #loginPrompt img {
     border-radius: 50%;
 }
+#loginPrompt div.avatar {
+    border-radius: 50%;
+    background-color: green;
+    color: white;
+    text-align: center;
+    font-size: 14pt;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+}
 
 #settingsBox {
   background-color: #777;

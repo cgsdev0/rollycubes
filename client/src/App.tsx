@@ -44,7 +44,10 @@ const AppInner = () => {
     // Attempt to get an access_token on boot
     (async () => {
       try {
-        const response = await window.fetch(authService + "refresh_token");
+        const response = await window.fetch(authService + "refresh_token", {
+          mode: "cors",
+          credentials: "include",
+        });
         if (response.status === 200) {
           const { access_token } = await response.json();
           dispatch({ type: "AUTHENTICATE", access_token });

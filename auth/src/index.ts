@@ -24,10 +24,14 @@ createConnection()
     app.use(cookieParser());
     app.use(
       cors({
-        origin: "https://rollycubes.live/",
+        origin: "https://rollycubes.live",
+        credentials: true,
+        allowedHeaders: ["csrf-token", "content-type", "x-access-token"],
       })
     );
-    app.use(csrf({ cookie: { httpOnly: true } }));
+    app.use(
+      csrf({ cookie: { httpOnly: true, sameSite: "none", secure: true } })
+    );
 
     app.get("/csrf", function (req, res) {
       res.send({ csrfToken: req.csrfToken() });
