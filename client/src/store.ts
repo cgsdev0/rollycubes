@@ -2,6 +2,7 @@ import { AnyAction, createStore, Reducer } from "redux";
 import { Theme, themes } from "./themes";
 
 import { initScene, destroyScene } from "./3d/main";
+import decode from "jwt-decode";
 
 export interface Player {
   connected: boolean;
@@ -21,8 +22,8 @@ export interface UserStats {
 export interface UserData {
   id: string;
   username: string;
-  image_url: string | null;
-  stats: UserStats;
+  image_url?: string | null;
+  stats?: UserStats;
 }
 
 export interface DieRoll {
@@ -180,10 +181,14 @@ const rootReducer: Reducer<ReduxState> = (
       );
       return newOriginState;
     case "AUTHENTICATE":
-      let decoded = undefined;
+      let decoded: UserData | undefined = undefined;
+      if (action.access_token) {
+        decoded = decode<UserData>(action.access_token);
+      }
       return {
         ...state,
         authToken: action.access_token,
+        userData: decoded,
       };
     case "CHEATS":
       localStorage.setItem("cheats", JSON.stringify(!state.settings.cheats));
