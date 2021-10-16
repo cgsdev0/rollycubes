@@ -470,7 +470,6 @@ export const initScene = async (state: ReduxState) => {
       }
     }
     if (!hasSignaledDone) {
-      hasSignaledDone = true;
       // console.log("doing it live");
       signaler = setTimeout(() => {
         signalRolled3D(lastRollWasDoubles);

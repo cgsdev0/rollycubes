@@ -16,7 +16,7 @@ std::string nextSymbol(std::string::const_iterator start, std::string::const_ite
 const std::string zwj = u8"\u200D";
 
 bool isVariationSelector(const std::string &a) {
-    return a.length() == 3 && a[0] == (char)239 && a[1] == (char)184 && a[2] >= (char)128 && a[2] <= (char)143;
+    return a.length() == 3 && a[0] == (char)239 && a[1] == (char)184 && a[2] <= (char)143;
 }
 
 std::string toHex(std::string a) {

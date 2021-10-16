@@ -378,7 +378,7 @@ int main(int argc, char **argv) {
     }
     try {
         load_persistence();
-    } catch (std::exception e) {
+    } catch (const std::exception &e) {
         std::cout << "WARNING: Failed to load server state from persistence!" << std::endl;
         std::cout << e.what() << std::endl;
     }

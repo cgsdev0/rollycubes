@@ -5,7 +5,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToMany,
   OneToMany,
 } from "typeorm";
 import { PlayerStats } from "./PlayerStats";
