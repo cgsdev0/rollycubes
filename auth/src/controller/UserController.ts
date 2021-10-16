@@ -4,8 +4,19 @@ import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import { RefreshToken } from "../entity/RefreshToken";
 import { EntityNotFoundError } from "typeorm";
+import * as fs from "fs";
+import { publicKey } from "../middleware/auth";
+
+const jwtConfig = {
+  key: fs.readFileSync(".id"),
+  passphrase: process.env.ROLLY_CUBES_AUTH_PASSPHRASE,
+};
 
 export class UserController {
+  async pubkey(request: Request, response: Response, next: NextFunction) {
+    return { publicKey: publicKey.toString() };
+  }
+
   async all(request: Request, response: Response, next: NextFunction) {
     return User.find();
   }
@@ -50,9 +61,10 @@ export class UserController {
 
         const access_token = jwt.sign(
           { user_id: user.id, display_name: user.username },
-          "THIS_IS_A_SECRET_I_HOPE",
+          jwtConfig,
           {
             expiresIn: "2h",
+            algorithm: "RS256",
           }
         );
         const expires = new Date();
@@ -106,9 +118,10 @@ export class UserController {
 
       const access_token = jwt.sign(
         { user_id: user.id, display_name: user.username },
-        "THIS_IS_A_SECRET_I_HOPE",
+        jwtConfig,
         {
           expiresIn: "2h",
+          algorithm: "RS256",
         }
       );
       const expires = new Date();
@@ -122,10 +135,10 @@ export class UserController {
 
       return { access_token };
     } catch (e) {
-      console.error(e);
       if (e instanceof EntityNotFoundError) {
         response.status(401);
       } else {
+        console.error(e);
         response.status(500);
       }
       return "error";

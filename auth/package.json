@@ -28,8 +28,8 @@
     "typeorm": "0.2.38"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "start-dev": "ts-node-dev src/index.ts",
-    "build": "./build.sh"
+    "start": "bash -c 'source .env; ts-node src/index.ts'",
+    "start-dev": "bash -c 'source .env; ts-node-dev src/index.ts'",
+    "build": "bash -c 'source .env; ./build.sh'"
   }
 }

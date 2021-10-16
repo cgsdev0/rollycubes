@@ -17,6 +17,12 @@ export const Routes: Route[] = [
   },
   {
     method: "get",
+    route: "/public_key",
+    controller: UserController,
+    action: "pubkey",
+  },
+  {
+    method: "get",
     route: "/users/:id",
     controller: UserController,
     action: "one",
