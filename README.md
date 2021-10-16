@@ -1,5 +1,9 @@
 # dice-game
-an old classic, reimagined
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cgsdev0/rollycubes/context:cpp)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cgsdev0/rollycubes/context:javascript)
+
+Check out this project [in production here](https://rollycubes.com/) or [in beta here](https://beta.rollycubes.com/)
+And follow development [on Twitch.tv](https://twitch.tv/badcop_)!
 
 ## How to run locally
 
@@ -12,6 +16,8 @@ To run the dice game on your local machine, there are a few requirements.
 Use `./run-server.sh` (linux only)
   - This will automatically recompile/restart the server any time you modify a source file
 
+Alternatively, run `make && ./GameServer` in the root directory
+
 ### Run the client
 Use `cd client; yarn; yarn start`
   - Navigate to `localhost:3000`
@@ -20,4 +26,6 @@ Use `cd client; yarn; yarn start`
 ### Run the terminal client
 To run the terminal client locally, use `cd js_terminal; node client.js` (still a work in progress)
 
-Don't bother trying to use the python terminal client tbh, it's really bad
+### Run the auth service locally
+- `cd auth; docker-compose up -d` to set up the database
+- `yarn; yarn start` to run the service
