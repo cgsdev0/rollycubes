@@ -21,10 +21,11 @@ src/%.o: %.cpp
 
 .PHONY: clean
 clean:
-	rm -f $(UWS)
+	rm -f uWebSockets/uSockets/*.o
 	rm -f $(OBJ)
-	rm -f GameServer
+	rm -f $(TARGET)
 
+debug: clean
 debug: CXXFLAGS += -g
 debug: $(TARGET)
 
