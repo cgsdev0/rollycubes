@@ -6,3 +6,4 @@ terminal/env
 node_modules
 server_state.json
 .ccls-cache/
+*.d
