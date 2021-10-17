@@ -251,12 +251,16 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app) 
                             dedupe_conns = true;
                         }
                     }
-                    res->template upgrade<PerSocketData>({.session = session,
-                                                          .room = room,
-                                                          .is_verified = is_verified,
-                                                          .spectator = (mode == "spectate"),
-                                                          .dedupe_conns = dedupe_conns},
-                                                         req->getHeader("sec-websocket-key"), req->getHeader("sec-websocket-protocol"), req->getHeader("sec-websocket-extensions"), context);
+                    res->template upgrade<PerSocketData>(
+                        {.session = session,
+                         .room = room,
+                         .is_verified = is_verified,
+                         .spectator = (mode == "spectate"),
+                         .dedupe_conns = dedupe_conns},
+                        req->getHeader("sec-websocket-key"),
+                        req->getHeader("sec-websocket-protocol"),
+                        req->getHeader("sec-websocket-extensions"),
+                        context);
                 },
             .open =
                 [app](auto *ws) {
