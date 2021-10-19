@@ -36,6 +36,13 @@ export const Routes: Route[] = [
   },
   {
     method: "post",
+    route: "/logout",
+    controller: UserController,
+    action: "logout",
+    requires_auth: true,
+  },
+  {
+    method: "post",
     route: "/register",
     controller: UserController,
     action: "register",

@@ -190,6 +190,12 @@ const rootReducer: Reducer<ReduxState> = (
         authToken: action.access_token,
         userData: decoded,
       };
+    case "LOGOUT":
+      return {
+        ...state,
+        authToken: null,
+        userData: undefined,
+      };
     case "CHEATS":
       localStorage.setItem("cheats", JSON.stringify(!state.settings.cheats));
       const newCheatState = {

@@ -28,7 +28,7 @@ export class UserController {
   }
 
   async me(request: Request, response: Response, next: NextFunction) {
-    return User.findOne(response.locals.user.id, {
+    return User.findOne(response.locals.user.user_id, {
       relations: ["stats"],
     });
   }
@@ -42,8 +42,8 @@ export class UserController {
       await user.save();
       return "success";
     } catch (e) {
-      response.status(500);
-      return "error";
+      response.status(400);
+      return "That username is already taken.";
     }
   }
 
@@ -86,6 +86,21 @@ export class UserController {
       console.error(e);
       return "error";
     }
+  }
+
+  async logout(request: Request, response: Response, next: NextFunction) {
+    try {
+      if (request.cookies["refresh_token"]) {
+        response.clearCookie("refresh_token");
+        const refresh_token = await RefreshToken.findOneOrFail(
+          request.cookies["refresh_token"]
+        );
+        await refresh_token.remove();
+      }
+    } catch (e) {
+      // ehh
+    }
+    return "ok";
   }
 
   async refresh(request: Request, response: Response, next: NextFunction) {

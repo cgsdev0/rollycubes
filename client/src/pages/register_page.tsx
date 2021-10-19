@@ -1,7 +1,6 @@
 import React from "react";
 import { connect, DispatchProp } from "react-redux";
-import { useLocation } from "react-router";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { getCsrf } from "../auth";
 import { selectAuthService } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
@@ -13,17 +12,14 @@ interface Props {
   authToken?: string | null;
 }
 
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 const LoginPage: React.FC<DispatchProp & Props> = (props) => {
-  const query = useQuery();
-  const [username, setUsername] = React.useState<string>(
-    query.get("registered") || ""
-  );
+  const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [password2, setPassword2] = React.useState("");
+  const [isPressed, setIsPressed] = React.useState(false);
+  const [errorText, setErrorText] = React.useState("");
 
-  const { route, authToken, authService, dispatch } = props;
+  const { route, authToken, authService } = props;
 
   React.useEffect(() => {
     if (authToken) {
@@ -32,21 +28,30 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
       });
     }
   }, [route, authToken]);
-  const login = async (e: any) => {
-    e.preventDefault();
-    const response = await window.fetch(authService + "login", {
-      method: "post",
-      mode: "cors",
-      body: JSON.stringify({ username, password }),
-      credentials: "include",
-      headers: {
-        "csrf-token": await getCsrf(authService),
-        "Content-Type": "application/json",
-      },
-    });
-    const { access_token } = await response.json();
-    if (access_token) {
-      dispatch({ type: "AUTHENTICATE", access_token });
+  const register = async (e: any) => {
+    setIsPressed(true);
+    try {
+      e.preventDefault();
+      const response = await window.fetch(authService + "register", {
+        method: "post",
+        mode: "cors",
+        body: JSON.stringify({ username, password }),
+        credentials: "include",
+        headers: {
+          "csrf-token": await getCsrf(authService),
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === 200) {
+        route.history.replace("/login?registered=" + username, {
+          redirect: route.history.location.pathname,
+        });
+      } else {
+        const error = await response.text();
+        setErrorText(error);
+      }
+    } finally {
+      setIsPressed(false);
     }
   };
 
@@ -66,7 +71,7 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
     <div>
       <h1>Dice Game</h1>
       <p>the one where you roll some dice</p>
-      <form onSubmit={login}>
+      <form onSubmit={register}>
         <div className="loginForm">
           <input
             onChange={(e) => setUsername(e.target.value)}
@@ -79,14 +84,24 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
             placeholder="Password"
             type="password"
           />
-          <button type="submit" onClick={login}>
-            Login
+          <input
+            onChange={(e) => setPassword2(e.target.value)}
+            value={password2}
+            placeholder="Confirm Password"
+            type="password"
+          />
+          {errorText ? <p style={{ color: "red" }}>{errorText}</p> : null}
+          <button
+            type="submit"
+            disabled={
+              isPressed || !username || !password || password !== password2
+            }
+            onClick={register}
+          >
+            Create Account
           </button>
         </div>
       </form>
-      <p>
-        Need an account? <Link to="/register">Register</Link>
-      </p>
     </div>
   );
 };

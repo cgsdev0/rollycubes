@@ -31,6 +31,10 @@ export const selectSelfUserId = createSelector(
   (userdata) => userdata?.id
 );
 
+export const selectIsSignedIn = createSelector(selectSelfUserData, (userdata) =>
+  Boolean(userdata?.id)
+);
+
 export const selectSelfFirstInitial = createSelector(
   selectSelfUserData,
   (userdata) => (userdata?.username?.charAt(0) || "").toUpperCase()

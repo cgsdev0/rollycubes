@@ -6,6 +6,7 @@ import GamePage from "./pages/game_page";
 import { store } from "./store";
 import HomePage from "./pages/home_page";
 import LoginPage from "./pages/login_page";
+import RegisterPage from "./pages/register_page";
 import CookiePage from "./pages/cookie_page";
 import { connect } from "react-redux";
 import { ReduxState } from "./store";
@@ -45,6 +46,7 @@ const AppInner = () => {
         <Route path="/" exact component={CookiePage} />
         <Route path="/home" component={HomePage} />
         <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
         <Route path="/multiple-tabs" component={TabErrorPage} />
         <Route path="/:mode/:room" component={GamePage} />
       </div>
