@@ -8,7 +8,6 @@ import { ReduxState } from "../store";
 import "./login.css";
 
 interface Props {
-  route: RouteComponentProps;
   authService: string;
   authToken?: string | null;
 }
@@ -16,22 +15,24 @@ interface Props {
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
-const LoginPage: React.FC<DispatchProp & Props> = (props) => {
+const LoginPage: React.FC<DispatchProp &
+  Props &
+  RouteComponentProps> = props => {
   const query = useQuery();
   const [username, setUsername] = React.useState<string>(
     query.get("registered") || ""
   );
   const [password, setPassword] = React.useState("");
 
-  const { route, authToken, authService, dispatch } = props;
+  const { authToken, authService, dispatch } = props;
 
   React.useEffect(() => {
     if (authToken) {
-      route.history.replace("/home", {
-        redirect: route.history.location.pathname,
+      props.history.replace("/home", {
+        redirect: props.history.location.pathname
       });
     }
-  }, [route, authToken]);
+  }, [props.history, authToken]);
   const login = async (e: any) => {
     e.preventDefault();
     const response = await window.fetch(authService + "login", {
@@ -41,8 +42,8 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
       credentials: "include",
       headers: {
         "csrf-token": await getCsrf(authService),
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     });
     const { access_token } = await response.json();
     if (access_token) {
@@ -50,18 +51,6 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
     }
   };
 
-  React.useEffect(() => {
-    if (!document.cookie.includes("_session")) {
-      route.history.replace("/", {
-        redirect: route.history.location.pathname,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (!document.cookie.includes("_session")) {
-    return null;
-  }
   return (
     <div>
       <h1>Dice Game</h1>
@@ -69,12 +58,12 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
       <form onSubmit={login}>
         <div className="loginForm">
           <input
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             placeholder="Username"
             value={username}
           />
           <input
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             value={password}
             placeholder="Password"
             type="password"
@@ -94,9 +83,9 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
 const mapStateToProps = (state: ReduxState) => {
   return {
     authService: selectAuthService(state),
-    authToken: state.authToken,
+    authToken: state.authToken
   };
 };
 
 const ConnectedLoginPage = connect(mapStateToProps)(LoginPage);
-export default (a: RouteComponentProps) => <ConnectedLoginPage route={a} />;
+export default ConnectedLoginPage;

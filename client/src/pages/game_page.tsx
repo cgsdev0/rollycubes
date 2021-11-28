@@ -10,7 +10,7 @@ import {
   selectIsSpectator,
   selectSomebodyIsNice,
   selectTurnIndex,
-  selectWinner,
+  selectWinner
 } from "../selectors/game_selectors";
 import { Player, ReduxState } from "../store";
 import GamePanel from "../ui/game_panel";
@@ -25,7 +25,6 @@ interface TParams {
 }
 
 interface Props {
-  route: RouteComponentProps<TParams>;
   doublesCount: number;
   winner?: Player;
   reset: boolean;
@@ -52,58 +51,54 @@ const zones = [
   "GamePanel",
   "GamePage",
   "EmptyDiceBox",
-  "PlayerChatWrapper",
+  "PlayerChatWrapper"
 ];
-class GamePage extends React.Component<Props & DispatchProp> {
+class GamePage extends React.Component<
+  Props & DispatchProp & RouteComponentProps<TParams>
+> {
   inputRef: React.RefObject<HTMLInputElement>;
   listeners: any[] = [];
   doubleTap: boolean = false;
   doubleTapTimer: number | undefined;
-  constructor(props: Props & DispatchProp) {
+  constructor(props: Props & DispatchProp & RouteComponentProps<TParams>) {
     super(props);
     this.inputRef = React.createRef();
   }
   componentDidMount() {
-    if (!document.cookie.includes("_session")) {
-      this.props.route.history.replace("/", {
-        redirect: this.props.route.history.location.pathname,
-      });
-    } else {
-      // setup click handlers
-      const mouseClick = (e: any) => {
-        if (zones.includes(e.target.id || e.target.className.split(" ")[0])) {
-          if (this.doubleTap) {
-            document.dispatchEvent(
-              new CustomEvent("snapDice", {
-                detail: {
-                  x: e.x / window.innerWidth,
-                  y: e.y / window.innerHeight,
-                },
-              })
-            );
-            this.doubleTap = false;
-            if (this.doubleTapTimer) {
-              clearTimeout(this.doubleTapTimer);
-              this.doubleTapTimer = undefined;
-            }
-            clearSelection();
-            e.preventDefault();
-          } else {
-            this.doubleTap = true;
-            this.doubleTapTimer = setTimeout(() => {
-              this.doubleTap = false;
-              this.doubleTapTimer = undefined;
-            }, 300) as any;
+    // setup click handlers
+    const mouseClick = (e: any) => {
+      if (zones.includes(e.target.id || e.target.className.split(" ")[0])) {
+        if (this.doubleTap) {
+          document.dispatchEvent(
+            new CustomEvent("snapDice", {
+              detail: {
+                x: e.x / window.innerWidth,
+                y: e.y / window.innerHeight
+              }
+            })
+          );
+          this.doubleTap = false;
+          if (this.doubleTapTimer) {
+            clearTimeout(this.doubleTapTimer);
+            this.doubleTapTimer = undefined;
           }
+          clearSelection();
+          e.preventDefault();
+        } else {
+          this.doubleTap = true;
+          this.doubleTapTimer = setTimeout(() => {
+            this.doubleTap = false;
+            this.doubleTapTimer = undefined;
+          }, 300) as any;
         }
-      };
-      document.body.addEventListener("click", mouseClick, true);
-      this.listeners.push("click", mouseClick);
-    }
+      }
+    };
+    document.body.addEventListener("click", mouseClick, true);
+    this.listeners.push("click", mouseClick);
   }
 
   componentWillUnmount() {
-    this.listeners.forEach((l) =>
+    this.listeners.forEach(l =>
       document.body.removeEventListener(l.type, l.fn, true)
     );
     destroyScene();
@@ -111,27 +106,25 @@ class GamePage extends React.Component<Props & DispatchProp> {
 
   render() {
     const {
-      route,
       somebodyIsNice,
       authToken,
       doublesCount,
       winner,
       reset,
       turn,
+      location,
+      match,
+      history
     } = this.props;
-    const { location } = route;
     const { hash } = location;
 
     const rulesSel = !hash || hash === "#rules";
     const chatSel = hash === "#chat";
     const minimized = !rulesSel && !chatSel;
 
-    if (!document.cookie.includes("_session")) {
-      return null;
-    }
     return (
       <ThemeContext.Consumer>
-        {(theme) => (
+        {theme => (
           <React.Fragment>
             {doublesCount ? (
               <h6 key={doublesCount} id="Doubles">
@@ -147,9 +140,9 @@ class GamePage extends React.Component<Props & DispatchProp> {
               <ConnBanner />
               {authToken === undefined ? null : (
                 <Connection
-                  room={this.props.route.match.params.room}
-                  mode={this.props.route.match.params.mode}
-                  history={this.props.route.history}
+                  room={match.params.room}
+                  mode={match.params.mode}
+                  history={history}
                 />
               )}
               <div id="PlayerChatWrapper">
@@ -158,7 +151,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
                   <a
                     style={{
                       ...theme.tab,
-                      ...(rulesSel ? theme.tabHighlight : {}),
+                      ...(rulesSel ? theme.tabHighlight : {})
                     }}
                     href="#rules"
                   >
@@ -167,7 +160,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
                   <a
                     style={{
                       ...theme.tab,
-                      ...(chatSel ? theme.tabHighlight : {}),
+                      ...(chatSel ? theme.tabHighlight : {})
                     }}
                     href="#chat"
                   >
@@ -176,7 +169,7 @@ class GamePage extends React.Component<Props & DispatchProp> {
                   <a
                     style={{
                       ...theme.tab,
-                      ...(minimized ? theme.tabHighlight : {}),
+                      ...(minimized ? theme.tabHighlight : {})
                     }}
                     href="#minimized"
                   >
@@ -240,12 +233,10 @@ const mapStateToProps = (state: ReduxState) => {
     reset: selectIsReset(state),
     isSpectator: selectIsSpectator(state),
     somebodyIsNice: selectSomebodyIsNice(state),
-    authToken: state.authToken,
+    authToken: state.authToken
   };
 };
 
 const ConnectedGamePage = connect(mapStateToProps)(GamePage);
 
-export default (a: RouteComponentProps<TParams>) => (
-  <ConnectedGamePage route={a} />
-);
+export default ConnectedGamePage;

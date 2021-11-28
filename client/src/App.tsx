@@ -13,9 +13,10 @@ import { ReduxState } from "./store";
 import { ThemeContext } from "./themes";
 import SettingsMenu from "./ui/settings";
 import LoginPrompt from "./ui/login_prompt";
+import { RequiresSession } from "./hocs/requires_session";
 
 const mapStateToProps = (state: ReduxState) => ({
-  theme: state.settings.theme,
+  theme: state.settings.theme
 });
 
 const AppThemer = connect(mapStateToProps)(
@@ -44,11 +45,11 @@ const AppInner = () => {
         <SettingsMenu />
         <LoginPrompt />
         <Route path="/" exact component={CookiePage} />
-        <Route path="/home" component={HomePage} />
-        <Route path="/login" component={LoginPage} />
-        <Route path="/register" component={RegisterPage} />
+        <Route path="/home" component={RequiresSession(HomePage)} />
+        <Route path="/login" component={RequiresSession(LoginPage)} />
+        <Route path="/register" component={RequiresSession(RegisterPage)} />
         <Route path="/multiple-tabs" component={TabErrorPage} />
-        <Route path="/:mode/:room" component={GamePage} />
+        <Route path="/:mode/:room" component={RequiresSession(GamePage)} />
       </div>
     </Router>
   );

@@ -13,7 +13,6 @@ import { getCsrf } from "../auth";
 interface Props {
   authService: string;
   authToken?: string | null;
-  isDev: boolean;
   isSignedIn: boolean;
   isOpen: boolean;
   setIsOpen: (a: boolean) => void;
@@ -41,15 +40,6 @@ const AuthMenu: React.FC<Props & DispatchProp> = (props) => {
       {isOpen ? (
         <div id="settingsBox">
           <ul>
-            {props.isDev ? (
-              <li
-                onClick={() => {
-                  props.dispatch({ type: "DEV_AUTH_SERVICE_TOGGLE" });
-                }}
-              >
-                {props.authService}
-              </li>
-            ) : null}
             {props.isSignedIn ? (
               <li
                 onClick={async () => {

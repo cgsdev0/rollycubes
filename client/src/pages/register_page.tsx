@@ -7,27 +7,28 @@ import { ReduxState } from "../store";
 import "./login.css";
 
 interface Props {
-  route: RouteComponentProps;
   authService: string;
   authToken?: string | null;
 }
 
-const LoginPage: React.FC<DispatchProp & Props> = (props) => {
+const LoginPage: React.FC<DispatchProp &
+  Props &
+  RouteComponentProps> = props => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [password2, setPassword2] = React.useState("");
   const [isPressed, setIsPressed] = React.useState(false);
   const [errorText, setErrorText] = React.useState("");
 
-  const { route, authToken, authService } = props;
+  const { authToken, authService, history } = props;
 
   React.useEffect(() => {
     if (authToken) {
-      route.history.replace("/home", {
-        redirect: route.history.location.pathname,
+      history.replace("/home", {
+        redirect: history.location.pathname
       });
     }
-  }, [route, authToken]);
+  }, [history, authToken]);
   const register = async (e: any) => {
     setIsPressed(true);
     try {
@@ -39,12 +40,12 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
         credentials: "include",
         headers: {
           "csrf-token": await getCsrf(authService),
-          "Content-Type": "application/json",
-        },
+          "Content-Type": "application/json"
+        }
       });
       if (response.status === 200) {
-        route.history.replace("/login?registered=" + username, {
-          redirect: route.history.location.pathname,
+        history.replace("/login?registered=" + username, {
+          redirect: history.location.pathname
         });
       } else {
         const error = await response.text();
@@ -55,18 +56,6 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
     }
   };
 
-  React.useEffect(() => {
-    if (!document.cookie.includes("_session")) {
-      route.history.replace("/", {
-        redirect: route.history.location.pathname,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (!document.cookie.includes("_session")) {
-    return null;
-  }
   return (
     <div>
       <h1>Dice Game</h1>
@@ -74,18 +63,18 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
       <form onSubmit={register}>
         <div className="loginForm">
           <input
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             placeholder="Username"
             value={username}
           />
           <input
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             value={password}
             placeholder="Password"
             type="password"
           />
           <input
-            onChange={(e) => setPassword2(e.target.value)}
+            onChange={e => setPassword2(e.target.value)}
             value={password2}
             placeholder="Confirm Password"
             type="password"
@@ -109,9 +98,9 @@ const LoginPage: React.FC<DispatchProp & Props> = (props) => {
 const mapStateToProps = (state: ReduxState) => {
   return {
     authService: selectAuthService(state),
-    authToken: state.authToken,
+    authToken: state.authToken
   };
 };
 
 const ConnectedLoginPage = connect(mapStateToProps)(LoginPage);
-export default (a: RouteComponentProps) => <ConnectedLoginPage route={a} />;
+export default ConnectedLoginPage;

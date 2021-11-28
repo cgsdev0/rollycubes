@@ -1,9 +1,7 @@
 import React from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
 
-interface Props {
-  route: RouteComponentProps;
-}
+type Props = RouteComponentProps;
 
 interface Game {
   lastUpdated: number;
@@ -23,11 +21,6 @@ class HomePage extends React.Component<Props, State> {
     this.state = { pressed: false, games: [], hasData: false };
   }
   componentDidMount() {
-    if (!document.cookie.includes("_session")) {
-      this.props.route.history.replace("/", {
-        redirect: this.props.route.history.location.pathname,
-      });
-    }
     this.fetchGameList();
     this.amIMounted = true;
   }
@@ -66,13 +59,10 @@ class HomePage extends React.Component<Props, State> {
       this.setState({ pressed: false });
     } else {
       const dest = await result.text();
-      this.props.route.history.push(`/room/${dest}`);
+      this.props.history.push(`/room/${dest}`);
     }
   };
   render() {
-    if (!document.cookie.includes("_session")) {
-      return null;
-    }
     return (
       <div>
         <h1>Dice Game</h1>
@@ -92,7 +82,7 @@ class HomePage extends React.Component<Props, State> {
               <th>Join</th>
               <th>Spectate</th>
             </tr>
-            {this.state.games.map((game) => (
+            {this.state.games.map(game => (
               <tr key={game.code}>
                 <td className="host">{game.hostName || "unknown"}</td>
                 <td>{game.playerCount} / 8</td>
@@ -115,4 +105,4 @@ class HomePage extends React.Component<Props, State> {
   }
 }
 
-export default (a: RouteComponentProps) => <HomePage route={a} />;
+export default HomePage;
