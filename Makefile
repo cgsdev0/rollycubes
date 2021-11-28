@@ -1,6 +1,6 @@
 CXX=g++
 CXXFLAGS=-std=c++17 -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes
-LDFLAGS=-lz -lpthread
+LDFLAGS=-lz -lpthread -lssl -lcrypto
 TARGET=GameServer
 
 SRC=$(wildcard src/*.cpp)

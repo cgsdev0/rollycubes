@@ -22,6 +22,9 @@
 #include "Game.h"
 #include "Player.h"
 
+#define JWT_DISABLE_PICOJSON true
+#include <jwt.h>
+
 // for convenience
 using json = nlohmann::json;
 
