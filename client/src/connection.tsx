@@ -37,7 +37,7 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.websocket.send(
         JSON.stringify({
           type: "authenticate",
-          access_token: this.props.authToken,
+          access_token: this.props.authToken
         })
       );
     } else if (this.websocket && name) {
@@ -128,7 +128,7 @@ class Connection extends React.Component<Props & DispatchProp> {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    authToken: state.authToken,
+    authToken: state.authToken
   };
 };
 export default connect(mapStateToProps)(Connection);

@@ -168,7 +168,7 @@ async function welcome(action) {
   if (action.game.chat) {
     action.game.chat.reverse().forEach((msg) => chatbox.log(msg));
   }
-  statusline.log(`https://rollycubes.live/room/${state.room}`);
+  statusline.log(`https://beta.rollycubes.com/room/${state.room}`);
   printPlayers();
   printDice();
   state.self_index = action.id;
@@ -273,7 +273,7 @@ const ACTION_MAP = {
 let ws = undefined;
 
 function setupSocket() {
-  const s = new WebSocket(`wss://rollycubes.live/ws/room/${state.room}`, {
+  const s = new WebSocket(`wss://beta.rollycubes.com/ws/room/${state.room}`, {
     headers: {
       Cookie: "_session=nomnomjs",
     },

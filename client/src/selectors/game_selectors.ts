@@ -1,65 +1,66 @@
 import {
   createSelector,
   defaultMemoize,
-  createSelectorCreator,
+  createSelectorCreator
 } from "reselect";
 import { selectState, TARGET_SCORES } from "../store";
 import { themes } from "../themes";
 
 export const selectIs3d = createSelector(
   selectState,
-  (state) => state.settings.sick3dmode
+  state => state.settings.sick3dmode
 );
 
 export const selectAuthService = createSelector(
   selectState,
-  (state) => state.settings.authServiceOrigin
+  state => state.settings.authServiceOrigin
 );
 
 export const selectSelfUserData = createSelector(
   selectState,
-  (state) => state.userData
+  state => state.userData
 );
 
 export const selectSelfImageUrl = createSelector(
   selectSelfUserData,
-  (userdata) => userdata?.image_url
+  userdata => userdata?.image_url
 );
 
 export const selectSelfUserId = createSelector(
   selectSelfUserData,
-  (userdata) => userdata?.id
+  userdata => userdata?.id
 );
 
-export const selectIsSignedIn = createSelector(selectSelfUserData, (userdata) =>
+export const selectIsSignedIn = createSelector(selectSelfUserData, userdata =>
   Boolean(userdata?.id)
 );
 
 export const selectSelfFirstInitial = createSelector(
   selectSelfUserData,
-  (userdata) => (userdata?.username?.charAt(0) || "").toUpperCase()
+  userdata => (userdata?.username?.charAt(0) || "").toUpperCase()
 );
 
 export const selectIsDev = createSelector(
   () => {},
-  (_) =>
+  _ =>
     !process.env.NODE_ENV ||
-    (process.env.NODE_ENV === "development" && window.location.port === "3005")
+    (process.env.NODE_ENV === "development" &&
+      (window.location.port === "3005" || window.location.port === "3000"))
 );
 
 export const selectIsDarkTheme = createSelector(
   selectState,
-  (state) => state.settings.theme === themes.dark
+  state => state.settings.theme === themes.dark
 );
 
 export const selectDiceRolls = createSelector(
   selectState,
-  (state) => state.rolls
+  state => state.rolls
 );
 
 const DEBUG_PLAYERS = false;
 
-export const selectPlayers = createSelector(selectState, (state) =>
+export const selectPlayers = createSelector(selectState, state =>
   DEBUG_PLAYERS
     ? [
         ...state.players,
@@ -68,22 +69,20 @@ export const selectPlayers = createSelector(selectState, (state) =>
         { connected: true, name: "test3", score: 10, win_count: 0 },
         { connected: false, name: "test4", score: 10, win_count: 0 },
         { connected: true, name: "test0", score: 10, win_count: 0 },
-        { connected: true, name: "test6", score: 10, win_count: 5 },
+        { connected: true, name: "test6", score: 10, win_count: 5 }
       ]
     : state.players
 );
 
-export const selectMaxWincount = createSelector(selectPlayers, (players) =>
-  Math.max(...players.map((p) => p.win_count))
+export const selectMaxWincount = createSelector(selectPlayers, players =>
+  Math.max(...players.map(p => p.win_count))
 );
 
 export const selectWinnerCount = createSelector(
   selectPlayers,
   selectMaxWincount,
   (players, count) =>
-    players
-      .map((p) => p.win_count)
-      .reduce((a, b) => a + (b === count ? 1 : 0), 0)
+    players.map(p => p.win_count).reduce((a, b) => a + (b === count ? 1 : 0), 0)
 );
 
 export const selectCrownedPlayers = createSelector(
@@ -92,7 +91,7 @@ export const selectCrownedPlayers = createSelector(
   selectWinnerCount,
   (players, wins, winners) => {
     if (winners > 1) return players;
-    return players.map((p) =>
+    return players.map(p =>
       p.win_count === wins ? { ...p, crowned: true } : p
     );
   }
@@ -100,31 +99,28 @@ export const selectCrownedPlayers = createSelector(
 
 export const selectSelfIndex = createSelector(
   selectState,
-  (state) => state.self_index
+  state => state.self_index
 );
 export const selectTurnIndex = createSelector(
   selectState,
-  (state) => state.turn_index
+  state => state.turn_index
 );
 export const selectRollCount = createSelector(
   selectState,
-  (state) => state.rollCount
+  state => state.rollCount
 );
 export const selectIsGameOver = createSelector(
   selectState,
-  (state) => state.victory
+  state => state.victory
 );
 export const selectDoublesCount = createSelector(
   selectState,
-  (state) => state.doublesCount
+  state => state.doublesCount
 );
-export const selectIsReset = createSelector(
-  selectState,
-  (state) => state.reset
-);
+export const selectIsReset = createSelector(selectState, state => state.reset);
 export const selectCheats = createSelector(
   selectState,
-  (state) => state.settings.cheats
+  state => state.settings.cheats
 );
 
 export const selectSelf = createSelector(
@@ -135,14 +131,14 @@ export const selectSelf = createSelector(
 
 export const selectIsSpectator = createSelector(
   selectSelfIndex,
-  (self) => self === undefined
+  self => self === undefined
 );
 
-export const selectSomebodyIsNice = createSelector(selectPlayers, (players) =>
-  players.some((p) => p.score === 69)
+export const selectSomebodyIsNice = createSelector(selectPlayers, players =>
+  players.some(p => p.score === 69)
 );
 
-export const selectSelfScore = createSelector(selectSelf, (self) =>
+export const selectSelfScore = createSelector(selectSelf, self =>
   self === undefined ? 0 : self.score
 );
 
@@ -167,14 +163,12 @@ const createDeepArraySelector = createSelectorCreator(
   }
 );
 
-export const selectOtherPlayerScores = createSelector(
-  selectPlayers,
-  (players) => players.map((p) => p.score)
+export const selectOtherPlayerScores = createSelector(selectPlayers, players =>
+  players.map(p => p.score)
 );
 
-export const selectHasMultiplePlayers = createSelector(
-  selectPlayers,
-  (players) => Boolean(players.length > 1)
+export const selectHasMultiplePlayers = createSelector(selectPlayers, players =>
+  Boolean(players.length > 1)
 );
 
 export const selectWinner = createSelector(
@@ -188,7 +182,7 @@ export const selectWinner = createSelector(
   }
 );
 
-export const selectIsDoubles = createSelector(selectDiceRolls, (dice) => {
+export const selectIsDoubles = createSelector(selectDiceRolls, dice => {
   let val = 0;
   for (const die of dice) {
     if (!val) {
@@ -210,7 +204,7 @@ export const selectIsMyTurn = createSelector(
 
 export const selectHasRolled = createSelector(
   selectState,
-  (state) => state.rolled
+  state => state.rolled
 );
 
 export const selectShouldShowRoll = createSelector(
@@ -219,13 +213,13 @@ export const selectShouldShowRoll = createSelector(
   (myTurn, hasRolled) => myTurn && !hasRolled
 );
 
-export const selectTotalRoll = createSelector(selectDiceRolls, (rolls) =>
-  rolls.map((roll) => roll.value).reduce((v: number, t: number) => v + t, 0)
+export const selectTotalRoll = createSelector(selectDiceRolls, rolls =>
+  rolls.map(roll => roll.value).reduce((v: number, t: number) => v + t, 0)
 );
 
 export const selectIs3dRollHappening = createSelector(
   selectState,
-  (state) => state.settings.sick3dmode && !state.rolled3d
+  state => state.settings.sick3dmode && !state.rolled3d
 );
 
 export const selectShouldShowDiceBoxes = createSelector(
@@ -276,17 +270,17 @@ const makeCreateAddSubClassSelector = (n: number | "add" | "sub") => {
         return "";
       }
       if (typeof n !== "number") {
-        if (TARGET_SCORES.find((t) => t === self + total * dir)) {
+        if (TARGET_SCORES.find(t => t === self + total * dir)) {
           return " Victory";
         }
-        if (reset_targets.find((t) => t === self + total * dir)) {
+        if (reset_targets.find(t => t === self + total * dir)) {
           return " Reset";
         }
       } else {
         const thisRoll = dice[computedN].value;
         const others = dice
           .filter((v, i) => i !== computedN && !v.used)
-          .map((v) => v.value);
+          .map(v => v.value);
         let solutions = [];
         const combinations = Math.pow(2, others.length);
         for (let i = 0; i < combinations; ++i) {
@@ -301,10 +295,10 @@ const makeCreateAddSubClassSelector = (n: number | "add" | "sub") => {
           solutions.push(solution);
         }
         for (const solution of solutions) {
-          if (TARGET_SCORES.find((t) => t === solution + thisRoll * dir)) {
+          if (TARGET_SCORES.find(t => t === solution + thisRoll * dir)) {
             return " Victory";
           }
-          if (reset_targets.find((t) => t === solution + thisRoll * dir)) {
+          if (reset_targets.find(t => t === solution + thisRoll * dir)) {
             return " Reset";
           }
         }
@@ -318,7 +312,7 @@ let selectorMap: Record<
   ReturnType<typeof makeCreateAddSubClassSelector>
 > = {
   add: makeCreateAddSubClassSelector("add"),
-  sub: makeCreateAddSubClassSelector("sub"),
+  sub: makeCreateAddSubClassSelector("sub")
 };
 
 export const getAddSubButtonClassSelector = (n: number | "add" | "sub") => {
