@@ -60,6 +60,38 @@ class Connection extends React.Component<Props & DispatchProp> {
       const pathParts = this.props.history.location.pathname.split("/");
       this.props.history.replace(`/${pathParts[1]}/${data.room}`);
     } else {
+      // I'm sorry
+      const otherUsers = (window as any).REDUX_STORE.getState().otherUsers;
+      const {
+        authServiceOrigin
+      } = (window as any).REDUX_STORE.getState().settings;
+      const populateUser = (player: any) => {
+        if (player.hasOwnProperty("user_id")) {
+          if (!otherUsers.hasOwnProperty(player.user_id)) {
+            (async () => {
+              try {
+                const resp = await window.fetch(
+                  authServiceOrigin + "users/" + player.user_id
+                );
+                const data = await resp.json();
+                if (!data.hasOwnProperty("id")) {
+                  console.error("failed to get user info for", player.user_id);
+                  return;
+                }
+                this.props.dispatch({ type: "GOT_USER_DATA", data });
+              } catch (e) {
+                console.error("Something went wrong fetching user data", e);
+              }
+            })();
+          }
+        }
+      };
+      if (data.type === "welcome") {
+        data.game.players.forEach(populateUser);
+      }
+      if (data.type === "join") {
+        populateUser(data);
+      }
       this.props.dispatch(data);
     }
   };

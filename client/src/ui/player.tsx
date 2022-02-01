@@ -1,10 +1,9 @@
-import React from 'react';
-import {connect} from 'react-redux';
-import '../App.css';
-import {selectSelfIndex, selectTurnIndex} from '../selectors/game_selectors';
-import {Player, ReduxState} from '../store';
-import {ThemeContext} from '../themes';
-
+import React from "react";
+import { connect } from "react-redux";
+import "../App.css";
+import { selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
+import { Player, ReduxState } from "../store";
+import { ThemeContext } from "../themes";
 
 interface Props {
   player: Player;
@@ -16,34 +15,37 @@ interface Props {
 
 const PlayerComponent = (props: Props) => {
   const changeName = () => {
-    const e = window.prompt('Enter a name: ', props.player.name);
+    const e = window.prompt("Enter a name: ", props.player.name);
     if (e === null) return;
     if (props.socket) {
-      props.socket.send(JSON.stringify({type: 'update_name', name: e}));
-      localStorage.setItem('name', e);
+      props.socket.send(JSON.stringify({ type: "update_name", name: e }));
+      localStorage.setItem("name", e);
     }
   };
 
   const onKick = () => {
-    const {player, n} = props;
+    const { player, n } = props;
     const e = window.confirm(`Are you sure you want to kick ${player.name}?`);
     if (e && props.socket) {
-      props.socket.send(JSON.stringify({type: 'kick', id: n}));
+      props.socket.send(JSON.stringify({ type: "kick", id: n }));
     }
   };
 
-  const {n, player, self_index, turn_index} = props;
+  const { n, player, self_index, turn_index } = props;
   const theme = React.useContext(ThemeContext);
+  const imageUrl = player.userData?.image_url;
   return (
     <div
-      className={`Player${!player.connected ? ' Disconnected' : ''}`}
+      className={`Player${!player.connected ? " Disconnected" : ""}`}
       style={turn_index === n ? theme.turnHighlight : undefined}
       onClick={
         self_index === n ? changeName : player.connected ? undefined : onKick
-      }>
+      }
+    >
       <div className={`${player.crowned ? "Crown " : ""}Name`}>
+        {imageUrl ? <img src={imageUrl} width={24} height={24} /> : null}
         {player.name || `User${n + 1}`}
-        <div className="You">{self_index === n ? ' (You)' : null}</div>
+        <div className="You">{self_index === n ? " (You)" : null}</div>
       </div>
       <div className="Score">{JSON.stringify(player.score)}</div>
     </div>
@@ -54,7 +56,7 @@ const mapStateToProps = (state: ReduxState) => {
   return {
     self_index: selectSelfIndex(state),
     turn_index: selectTurnIndex(state),
-    socket: state.socket,
+    socket: state.socket
   };
 };
 

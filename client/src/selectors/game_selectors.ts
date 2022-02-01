@@ -6,6 +6,11 @@ import {
 import { selectState, TARGET_SCORES } from "../store";
 import { themes } from "../themes";
 
+export const selectOtherUsers = createSelector(
+  selectState,
+  state => state.otherUsers
+);
+
 export const selectIs3d = createSelector(
   selectState,
   state => state.settings.sick3dmode
@@ -74,6 +79,23 @@ export const selectPlayers = createSelector(selectState, state =>
     : state.players
 );
 
+export const selectPlayersAndUserData = createSelector(
+  selectPlayers,
+  selectOtherUsers,
+  (players, otherUsers) => {
+    const output = players.map(player => {
+      if (!player.hasOwnProperty("user_id")) {
+        return player;
+      }
+      return {
+        ...player,
+        userData: otherUsers[player.user_id!]
+      };
+    });
+    return output;
+  }
+);
+
 export const selectMaxWincount = createSelector(selectPlayers, players =>
   Math.max(...players.map(p => p.win_count))
 );
@@ -86,7 +108,7 @@ export const selectWinnerCount = createSelector(
 );
 
 export const selectCrownedPlayers = createSelector(
-  selectPlayers,
+  selectPlayersAndUserData,
   selectMaxWincount,
   selectWinnerCount,
   (players, wins, winners) => {

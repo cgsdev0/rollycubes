@@ -3,7 +3,12 @@
 
 Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
-Player::Player(std::string session) : Player() { this->session = session; }
+Player::Player(const PerSocketData &data) : Player() {
+    this->session = data.session;
+    if (this->isSignedIn()) {
+        this->name = data.display_name;
+    }
+}
 
 Player::Player(json state) : Player() {
     state.at("name").get_to(this->name);
@@ -11,6 +16,10 @@ Player::Player(json state) : Player() {
     state.at("win_count").get_to(this->win_count);
     state.at("session").get_to(this->session);
     this->connected = false;
+}
+
+bool Player::isSignedIn() const {
+    return (this->session.find("guest:") != 0);
 }
 
 const std::string &Player::getSession() const { return session; }
@@ -34,6 +43,10 @@ int Player::addWin(int n) {
 void Player::reset() { this->score = 0; }
 
 void Player::setName(std::string &name) {
+    // Signed in players cannot change their name.
+    if (this->isSignedIn()) {
+        throw GameError("signed in users can't change their name that way");
+    }
     this->name = trimString(name, MAX_PLAYER_NAME);
 }
 
@@ -47,6 +60,9 @@ json Player::toJson(bool withSecrets) const {
     result["score"] = this->score;
     result["win_count"] = this->win_count;
     result["connected"] = this->connected;
+    if (this->isSignedIn()) {
+        result["user_id"] = this->session;
+    }
     if (withSecrets) {
         result["session"] = this->session;
     }

@@ -9,7 +9,9 @@ export interface Player {
   name: string;
   score: number;
   win_count: number;
+  user_id?: string;
   crowned?: boolean;
+  userData?: UserData;
 }
 
 export interface UserStats {
@@ -53,6 +55,7 @@ export interface ReduxState {
   };
   authToken?: string | null;
   userData?: UserData;
+  otherUsers: Record<string, UserData>;
 }
 
 const PROD_AUTH_SERVICE = "https://auth.rollycubes.com/";
@@ -79,9 +82,10 @@ const initialState: ReduxState = {
     theme:
       themes[
         (localStorage.getItem("theme") || "light") as keyof typeof themes
-      ] || themes.light,
+      ] || themes.light
   },
   authToken: undefined,
+  otherUsers: {}
 };
 
 export const TARGET_SCORES = [33, 66, 67, 98, 99, 100];
@@ -96,17 +100,23 @@ const rootReducer: Reducer<ReduxState> = (
     case "WEBSOCKET":
       return {
         ...state,
-        socket: action.socket,
+        socket: action.socket
       };
     case "GOT_SELF_USER_DATA":
       return {
         ...state,
-        userData: action.userData,
+        userData: action.userData
+      };
+    case "GOT_USER_DATA":
+      const user_id = action.data.id;
+      return {
+        ...state,
+        otherUsers: Object.assign(state.otherUsers, { [user_id]: action.data })
       };
     case "FINISH_3D_ROLL":
       return {
         ...state,
-        rolled3d: true,
+        rolled3d: true
       };
     case "THEME_DARK":
       localStorage.setItem("theme", "dark");
@@ -114,8 +124,8 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         settings: {
           ...state.settings,
-          theme: themes.dark,
-        },
+          theme: themes.dark
+        }
       };
     case "TOGGLE_THEME":
       localStorage.setItem(
@@ -127,8 +137,8 @@ const rootReducer: Reducer<ReduxState> = (
         settings: {
           ...state.settings,
           theme:
-            state.settings.theme === themes.dark ? themes.light : themes.dark,
-        },
+            state.settings.theme === themes.dark ? themes.light : themes.dark
+        }
       };
     case "THEME_LIGHT":
       localStorage.setItem("theme", "light");
@@ -136,8 +146,8 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         settings: {
           ...state.settings,
-          theme: themes.light,
-        },
+          theme: themes.light
+        }
       };
     case "TOGGLE_3D":
       const new3dmode = !state.settings.sick3dmode;
@@ -151,12 +161,12 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         chat: [
           `3D mode ${state.settings.sick3dmode ? "disabled" : "enabled"}.`,
-          ...state.chat,
+          ...state.chat
         ],
         settings: {
           ...state.settings,
-          sick3dmode: new3dmode,
-        },
+          sick3dmode: new3dmode
+        }
       };
       new3dState.chat.length = Math.min(
         new3dState.chat.length,
@@ -172,8 +182,8 @@ const rootReducer: Reducer<ReduxState> = (
             "localhost"
           )
             ? PROD_AUTH_SERVICE
-            : LOCAL_AUTH_SERVICE,
-        },
+            : LOCAL_AUTH_SERVICE
+        }
       };
       localStorage.setItem(
         "authServiceOrigin",
@@ -188,13 +198,13 @@ const rootReducer: Reducer<ReduxState> = (
       return {
         ...state,
         authToken: action.access_token,
-        userData: decoded,
+        userData: decoded
       };
     case "LOGOUT":
       return {
         ...state,
         authToken: null,
-        userData: undefined,
+        userData: undefined
       };
     case "CHEATS":
       localStorage.setItem("cheats", JSON.stringify(!state.settings.cheats));
@@ -202,12 +212,12 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         chat: [
           `Hints ${state.settings.cheats ? "disabled" : "enabled"}.`,
-          ...state.chat,
+          ...state.chat
         ],
         settings: {
           ...state.settings,
-          cheats: !state.settings.cheats,
-        },
+          cheats: !state.settings.cheats
+        }
       };
       newCheatState.chat.length = Math.min(
         newCheatState.chat.length,
@@ -249,21 +259,21 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         players: state.players.concat({
           connected: true,
-          name: "",
+          name: action.name || "",
           score: 0,
-          win_count: 0,
-        }),
+          win_count: 0
+        })
       };
 
     case "socket_open":
       return {
         ...state,
-        connected: true,
+        connected: true
       };
     case "socket_close":
       return {
         ...state,
-        connected: false,
+        connected: false
       };
     case "disconnect":
     case "reconnect":
@@ -271,7 +281,7 @@ const rootReducer: Reducer<ReduxState> = (
         ...state,
         players: state.players.map((p: Player, i: number) =>
           i !== action.id ? p : { ...p, connected: action.type === "reconnect" }
-        ),
+        )
       };
     case "update":
       return {
@@ -283,30 +293,30 @@ const rootReducer: Reducer<ReduxState> = (
           "used" in action
             ? action.used.map((used: boolean, i: number) => ({
                 used,
-                value: state.rolls[i].value,
+                value: state.rolls[i].value
               }))
             : state.rolls,
-        reset: action.reset,
+        reset: action.reset
       };
     case "update_name":
       return {
         ...state,
         players: state.players.map((p: Player, i: number) =>
           i !== action.id ? p : { ...p, name: action.name }
-        ),
+        )
       };
     case "update_turn":
       return {
         ...state,
         turn_index: action.id,
         rolled: false,
-        rolled3d: false,
+        rolled3d: false
       };
     case "roll_again":
       return {
         ...state,
         rolled: false,
-        rolled3d: false,
+        rolled3d: false
       };
     case "leave":
     case "kick":
@@ -314,46 +324,46 @@ const rootReducer: Reducer<ReduxState> = (
         // We've been kicked, uh oh
         window.history.replaceState({}, "", "/home");
         return {
-          ...initialState,
+          ...initialState
         };
       }
       return {
         ...state,
         players: [
           ...state.players.slice(0, action.id),
-          ...state.players.slice(action.id + 1),
+          ...state.players.slice(action.id + 1)
         ],
         self_index:
           state.self_index === undefined
             ? undefined
             : action.id < state.self_index
             ? state.self_index - 1
-            : state.self_index,
+            : state.self_index
       };
     case "roll":
       document.dispatchEvent(
         new CustomEvent<any>("roll", {
-          detail: { rolls: action.rolls, turn_index: state.turn_index },
+          detail: { rolls: action.rolls, turn_index: state.turn_index }
         })
       );
       return {
         ...state,
         rolls: action.rolls.map((roll: number) => ({
           value: roll,
-          used: false,
+          used: false
         })),
         rolled: true,
         rolled3d: false,
-        rollCount: state.rollCount + 1,
+        rollCount: state.rollCount + 1
       };
     case "win":
       // console.log(action);
-      const new_players = state.players.map((a) => a);
+      const new_players = state.players.map(a => a);
       new_players[action.id].win_count++;
       return {
         ...state,
         players: new_players,
-        victory: true,
+        victory: true
       };
     case "restart":
       return {
@@ -361,26 +371,26 @@ const rootReducer: Reducer<ReduxState> = (
         connected: state.connected,
         rolls: state.rolls,
         rollCount: state.rollCount,
-        players: state.players.map((p) => ({ ...p, score: 0 })),
+        players: state.players.map(p => ({ ...p, score: 0 })),
         turn_index: action.id,
         self_index: state.self_index,
         chat: state.chat,
         settings: state.settings,
         socket: state.socket,
         authToken: state.authToken,
-        userData: state.userData,
+        userData: state.userData
       };
     case "chat":
       const newState = {
         ...state,
-        chat: [action.msg, ...state.chat],
+        chat: [action.msg, ...state.chat]
       };
       newState.chat.length = Math.min(newState.chat.length, CHAT_BUFFER_LENGTH);
       return newState;
     case "DOUBLES":
       return {
         ...state,
-        doublesCount: state.doublesCount + 1,
+        doublesCount: state.doublesCount + 1
       };
     default:
       if (!action.type.includes("@@"))

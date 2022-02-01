@@ -25,3 +25,25 @@ const std::string PLAYER_COLORS[] = {
     "#f032e6",
     "#fabed4",
 };
+
+class GameError {
+  public:
+    GameError(std::string err) : err(err) {}
+
+    const std::string &what() { return err; }
+
+  private:
+    std::string err;
+};
+
+/* ws->getUserData returns one of these */
+struct PerSocketData {
+    std::string session;
+    std::string room;
+    std::string display_name;
+    std::string user_id;
+    bool is_verified;
+    bool spectator;
+    bool dedupe_conns;
+};
+

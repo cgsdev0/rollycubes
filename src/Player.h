@@ -10,7 +10,7 @@ class Player {
   public:
     Player();
 
-    Player(std::string session);
+    Player(const PerSocketData &data);
 
     Player(json state);
 
@@ -19,6 +19,7 @@ class Player {
     void disconnect();
     void reconnect();
 
+    bool isSignedIn() const;
     bool isConnected() const;
 
     int addScore(int n);

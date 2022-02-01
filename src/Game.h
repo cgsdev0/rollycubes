@@ -51,7 +51,7 @@ class Game {
     std::string hostName() const;
 
     bool hasPlayer(std::string &id);
-    json addPlayer(std::string id);
+    json addPlayer(const PerSocketData &data);
     int getPlayerId(std::string &id);
 
     json disconnectPlayer(std::string id);
@@ -104,12 +104,3 @@ class Game {
     bool privateSession;
 };
 
-class GameError {
-  public:
-    GameError(std::string err) : err(err) {}
-
-    const std::string &what() { return err; }
-
-  private:
-    std::string err;
-};

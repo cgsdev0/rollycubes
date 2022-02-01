@@ -51,18 +51,23 @@ int Game::getPlayerId(std::string &id) {
     return -1;
 }
 
-json Game::addPlayer(std::string id) {
+json Game::addPlayer(const PerSocketData &data) {
     json result;
     if (players.size() >= MAX_PLAYERS) {
         return result;
     }
-    players.emplace_back(id);
+    const auto &player = players.emplace_back(data);
+    if (player.isSignedIn()) {
+        result["name"] = player.getName();
+        result["user_id"] = player.getSession();
+    }
     result["type"] = "join";
     result["id"] = players.size() - 1;
+
     // This is our first player joining
     if (players.size() == 1) {
         this->clearTurn();
-        this->turn_token = id;
+        this->turn_token = data.session;
         this->turn_index = 0;
     }
     return result;

@@ -159,15 +159,6 @@ std::string getSession(HttpRequest *req) {
     return "guest:" + std::string(cookies[1].str());
 }
 
-/* ws->getUserData returns one of these */
-struct PerSocketData {
-    std::string session;
-    std::string room;
-    bool is_verified;
-    bool spectator;
-    bool dedupe_conns;
-};
-
 std::string createRoom(bool isPrivate, std::string seed = "") {
     runEviction();
     std::string id;
@@ -196,7 +187,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
         Game *g = it->second;
         if (!userData->spectator) {
             if (!g->hasPlayer(userData->session)) {
-                json resp = g->addPlayer(userData->session);
+                json resp = g->addPlayer(*userData);
                 if (resp.is_null()) {
                     // room is full
                     ws->close();
@@ -335,6 +326,9 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                 jwt_verifier.verify(decoded);
                                 userData->is_verified = true;
                                 std::cout << "valid token!" << std::endl;
+                                auto claims = decoded.get_payload_claims();
+                                userData->user_id = claims["user_id"].to_json().get<std::string>();
+                                userData->display_name = claims["display_name"].to_json().get<std::string>();
                                 connectNewPlayer(app, ws, userData);
                             } catch (const jwt::error::signature_verification_exception &e) {
                                 std::cout << "signature verification exception" << std::endl;
