@@ -53,11 +53,13 @@ createConnection()
             next
           );
           if (result instanceof Promise) {
-            result.then((result) =>
-              result !== null && result !== undefined
-                ? res.send(result)
-                : undefined
-            );
+            result
+              .then((result) =>
+                result !== null && result !== undefined
+                  ? res.send(result)
+                  : res.send(null)
+              )
+              .catch((reason) => res.send(reason));
           } else if (result !== null && result !== undefined) {
             res.json(result);
           }
