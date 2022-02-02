@@ -17,7 +17,7 @@ std::string Game::hostName() const {
 
 int Game::totalRoll() {
     int total = 0;
-    for (int i = 0; i < DICE_COUNT; ++i)
+    for (uint i = 0; i < DICE_COUNT; ++i)
         total += rolls[i];
     return total;
 }
@@ -26,7 +26,7 @@ bool Game::isSplit() { return totalRoll() == 7; }
 
 bool Game::isDoubles() {
     int roll1 = rolls[0];
-    for (int i = 1; i < DICE_COUNT; ++i) {
+    for (uint i = 1; i < DICE_COUNT; ++i) {
         if (rolls[i] != roll1)
             return false;
     }
@@ -43,7 +43,7 @@ bool Game::hasPlayer(std::string &id) {
 }
 
 int Game::getPlayerId(std::string &id) {
-    for (int i = 0; i < players.size(); ++i) {
+    for (uint i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == id) {
             return i;
         }
@@ -79,7 +79,7 @@ json Game::toJson(bool withSecrets) const {
     for (const auto &player : players) {
         result["players"].push_back(player.toJson(withSecrets));
     }
-    for (int i = 0; i < DICE_COUNT; ++i) {
+    for (uint i = 0; i < DICE_COUNT; ++i) {
         result["rolls"].push_back(rolls[i]);
         result["used"].push_back(used[i]);
     }
@@ -101,14 +101,14 @@ json Game::toJson(bool withSecrets) const {
 
 void Game::clearTurn() {
     // Clear roll states
-    for (int i = 0; i < DICE_COUNT; ++i) {
+    for (uint i = 0; i < DICE_COUNT; ++i) {
         used[i] = false;
     }
     rolled = false;
 }
 
 bool Game::allUsed() {
-    for (int i = 0; i < DICE_COUNT; ++i) {
+    for (uint i = 0; i < DICE_COUNT; ++i) {
         if (!used[i])
             return false;
     }
@@ -128,7 +128,7 @@ void Game::advanceTurn() {
 
 json Game::disconnectPlayer(std::string id) {
     json result;
-    for (int i = 0; i < players.size(); ++i) {
+    for (uint i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == id) {
             players[i].disconnect();
             result["type"] = "disconnect";
@@ -140,7 +140,7 @@ json Game::disconnectPlayer(std::string id) {
 }
 
 bool Game::isPlayerConnected(std::string id) const {
-    for (int i = 0; i < players.size(); ++i) {
+    for (uint i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == id) {
             return players[i].isConnected();
         }
@@ -150,7 +150,7 @@ bool Game::isPlayerConnected(std::string id) const {
 
 json Game::reconnectPlayer(std::string id) {
     json result;
-    for (int i = 0; i < players.size(); ++i) {
+    for (uint i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == id) {
             players[i].reconnect();
             result["type"] = "reconnect";
@@ -202,7 +202,7 @@ void Game::chat(HANDLER_ARGS) {
     json res;
     if (!data["msg"].is_string())
         throw GameError("Message must be a string");
-    for (int i = 0; i < players.size(); ++i) {
+    for (uint i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == session) {
             res["type"] = data["type"];
             auto msg = data["msg"].get<std::string>();
@@ -228,7 +228,7 @@ void Game::chat(HANDLER_ARGS) {
 void Game::leave(HANDLER_ARGS) {
     json res;
     res["type"] = "leave";
-    for (int i = 0; i < players.size(); ++i) {
+    for (uint i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == session) {
             res["id"] = i;
             if (turn_token == players[i].getSession()) {
@@ -248,7 +248,7 @@ void Game::leave(HANDLER_ARGS) {
 void Game::kick(HANDLER_ARGS) {
     if (!data["id"].is_number())
         throw GameError("pass a number please");
-    int id = data["id"].get<int>();
+    uint id = data["id"].get<uint>();
     if (players.empty())
         throw GameError("uhhh this should never happen");
     if (id >= players.size())
@@ -293,7 +293,7 @@ void Game::update_name(HANDLER_ARGS) {
     if (!data["name"].is_string())
         throw GameError("name must be a string");
     std::string name = data["name"].get<std::string>();
-    for (int i = 0; i < players.size(); ++i) {
+    for (uint i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == session) {
             players[i].setName(name);
             json msg;
@@ -325,7 +325,7 @@ void Game::roll(HANDLER_ARGS) {
         throw GameError("invite some friends first!");
     json resp;
     resp["type"] = "roll";
-    for (int i = 0; i < DICE_COUNT; ++i) {
+    for (uint i = 0; i < DICE_COUNT; ++i) {
         std::random_device rd;
         std::mt19937 gen(rd());
         rolls[i] = dis(gen);
@@ -356,7 +356,7 @@ int Game::guardNth(const json &data) {
         throw GameError("This is not a split");
     if (!data.is_number())
         throw GameError("NaN");
-    int n = data.get<int>();
+    uint n = data.get<uint>();
     if (n >= DICE_COUNT)
         throw GameError("too high");
     if (used[n])
@@ -382,7 +382,7 @@ void Game::sub_nth(HANDLER_ARGS) {
 void Game::update(HANDLER_ARGS) {
     int change = data.get<int>();
     json res;
-    int i;
+    uint i;
     for (i = 0; i < players.size(); ++i) {
         if (players[i].getSession() == session)
             break;
@@ -404,7 +404,7 @@ void Game::update(HANDLER_ARGS) {
                 victory = true;
                 broadcast(win.dump());
             } else {
-                for (int i = 0; i < players.size(); ++i) {
+                for (uint i = 0; i < players.size(); ++i) {
                     if (session == players[i].getSession()) {
                         continue;
                     }
@@ -426,7 +426,7 @@ void Game::update(HANDLER_ARGS) {
                 broadcast(turn.dump());
             }
         } else {
-            for (int i = 0; i < players.size(); ++i) {
+            for (uint i = 0; i < players.size(); ++i) {
                 if (session == players[i].getSession()) {
                     continue;
                 }

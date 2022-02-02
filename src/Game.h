@@ -22,7 +22,7 @@ class Game {
     Game(bool isPrivate)
         : privateSession(isPrivate) {
         players.reserve(MAX_PLAYERS);
-        for (int i = 0; i < DICE_COUNT; ++i) {
+        for (uint i = 0; i < DICE_COUNT; ++i) {
             rolls[i] = 1;
             used[i] = false;
         }
@@ -30,7 +30,7 @@ class Game {
 
     Game(json state) {
         players.reserve(MAX_PLAYERS);
-        for (int i = 0; i < DICE_COUNT; ++i) {
+        for (uint i = 0; i < DICE_COUNT; ++i) {
             this->rolls[i] = state["rolls"].at(i);
             this->used[i] = state["used"].at(i);
         }
@@ -96,11 +96,10 @@ class Game {
     std::string turn_token;
     std::uniform_int_distribution<int> dis{1, 6};
     std::chrono::system_clock::time_point updated = std::chrono::system_clock::now();
-    int turn_index = 0;
+    uint turn_index = 0;
     int rolls[DICE_COUNT];
     bool used[DICE_COUNT];
     bool rolled = false;
     bool victory = false;
     bool privateSession;
 };
-

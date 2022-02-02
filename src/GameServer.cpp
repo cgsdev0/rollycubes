@@ -6,7 +6,7 @@
 #include <iostream>
 #include <json.hpp>
 #include <queue>
-#include <random>
+
 #include <regex>
 #include <signal.h>
 #include <sstream>
@@ -21,6 +21,7 @@
 #include "Consts.h"
 #include "Game.h"
 #include "Player.h"
+#include "StringUtils.h"
 
 #define JWT_DISABLE_PICOJSON true
 #include "defaults.h"
@@ -64,45 +65,9 @@ void load_persistence() {
     }
 }
 
-unsigned int srandom_char(std::mt19937 &gen, int k = 255) {
-    std::uniform_int_distribution<> dis(0, k);
-    return dis(gen);
-}
-
-unsigned int random_char(int k = 255) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, k);
-    return dis(gen);
-}
-
-std::string generate_code(const unsigned int len, std::string seed = "") {
-    std::seed_seq s(seed.begin(), seed.end());
-    std::mt19937 gen(s);
-    const std::string chars =
-        "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUV23456789";
-    const unsigned int l = chars.length() - 1;
-    std::stringstream ss;
-    for (auto i = 0; i < len; i++) {
-        ss << chars[seed == "" ? random_char(l) : srandom_char(gen, l)];
-    }
-    return ss.str();
-}
-std::string generate_hex(const unsigned int len) {
-    std::stringstream ss;
-    for (auto i = 0; i < len; i++) {
-        const auto rc = random_char();
-        std::stringstream hexstream;
-        hexstream << std::hex << rc;
-        auto hex = hexstream.str();
-        ss << (hex.length() < 2 ? '0' + hex : hex);
-    }
-    return ss.str();
-}
-
 void runEviction(bool limited = true) {
     bool popSet = true;
-    int kills = 0;
+    uint kills = 0;
     while (!eviction_queue.empty()) {
         if (kills >= EVICTION_LIMIT && limited)
             break;
@@ -163,7 +128,7 @@ std::string createRoom(bool isPrivate, std::string seed = "") {
     runEviction();
     std::string id;
     do {
-        id = generate_code(ROOM_LEN, seed);
+        id = generateCode(ROOM_LEN, seed);
         if (games.find(id) != games.end() && seed != "") {
             // Short circuit to prevent infinite loop
             // in the case of a seeded redirect already

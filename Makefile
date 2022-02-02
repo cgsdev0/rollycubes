@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes
+CXXFLAGS=-std=c++17 -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes -Wall
 LDFLAGS=-lz -lpthread -lssl -lcrypto
 TARGET=GameServer
 

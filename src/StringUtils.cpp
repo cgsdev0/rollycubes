@@ -1,6 +1,32 @@
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <string>
+
+unsigned int randomChar(int k = 255) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, k);
+    return dis(gen);
+}
+
+unsigned int srandom_char(std::mt19937 &gen, int k = 255) {
+    std::uniform_int_distribution<> dis(0, k);
+    return dis(gen);
+}
+
+std::string generateCode(const unsigned int len, std::string seed = "") {
+    std::seed_seq s(seed.begin(), seed.end());
+    std::mt19937 gen(s);
+    const std::string chars =
+        "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUV23456789";
+    const unsigned int l = chars.length() - 1;
+    std::stringstream ss;
+    for (uint i = 0; i < len; i++) {
+        ss << chars[seed == "" ? randomChar(l) : srandom_char(gen, l)];
+    }
+    return ss.str();
+}
 
 std::string nextSymbol(std::string::const_iterator start, std::string::const_iterator end) {
     std::string res;
