@@ -4,22 +4,22 @@
 Player::Player() : name(""), score(0), win_count(0), connected(true) {}
 
 Player::Player(const PerSocketData &data) : Player() {
-    this->session = data.session;
-    if (this->isSignedIn()) {
-        this->name = data.display_name;
+    session = data.session;
+    if (isSignedIn()) {
+        name = data.display_name;
     }
 }
 
 Player::Player(json state) : Player() {
-    state.at("name").get_to(this->name);
-    state.at("score").get_to(this->score);
-    state.at("win_count").get_to(this->win_count);
-    state.at("session").get_to(this->session);
-    this->connected = false;
+    state.at("name").get_to(name);
+    state.at("score").get_to(score);
+    state.at("win_count").get_to(win_count);
+    state.at("session").get_to(session);
+    connected = false;
 }
 
 bool Player::isSignedIn() const {
-    return (this->session.find("guest:") != 0);
+    return (session.find("guest:") != 0);
 }
 
 const std::string &Player::getSession() const { return session; }
@@ -40,31 +40,31 @@ int Player::addWin(int n) {
     return win_count;
 }
 
-void Player::reset() { this->score = 0; }
+void Player::reset() { score = 0; }
 
 void Player::setName(std::string &name) {
     // Signed in players cannot change their name.
-    if (this->isSignedIn()) {
+    if (isSignedIn()) {
         throw GameError("signed in users can't change their name that way");
     }
-    this->name = trimString(name, MAX_PLAYER_NAME);
+    name = trimString(name, MAX_PLAYER_NAME);
 }
 
-const std::string &Player::getName() const { return this->name; }
+const std::string &Player::getName() const { return name; }
 
-int Player::getScore() const { return this->score; }
+int Player::getScore() const { return score; }
 
 json Player::toJson(bool withSecrets) const {
     json result;
-    result["name"] = this->name;
-    result["score"] = this->score;
-    result["win_count"] = this->win_count;
-    result["connected"] = this->connected;
-    if (this->isSignedIn()) {
-        result["user_id"] = this->session;
+    result["name"] = name;
+    result["score"] = score;
+    result["win_count"] = win_count;
+    result["connected"] = connected;
+    if (isSignedIn()) {
+        result["user_id"] = session;
     }
     if (withSecrets) {
-        result["session"] = this->session;
+        result["session"] = session;
     }
     return result;
 }

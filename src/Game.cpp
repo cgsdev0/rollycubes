@@ -22,7 +22,7 @@ int Game::totalRoll() {
     return total;
 }
 
-bool Game::isSplit() { return this->totalRoll() == 7; }
+bool Game::isSplit() { return totalRoll() == 7; }
 
 bool Game::isDoubles() {
     int roll1 = rolls[0];
@@ -66,9 +66,9 @@ json Game::addPlayer(const PerSocketData &data) {
 
     // This is our first player joining
     if (players.size() == 1) {
-        this->clearTurn();
-        this->turn_token = data.session;
-        this->turn_index = 0;
+        clearTurn();
+        turn_token = data.session;
+        turn_index = 0;
     }
     return result;
 }
@@ -116,7 +116,7 @@ bool Game::allUsed() {
 }
 
 void Game::advanceTurn() {
-    this->clearTurn();
+    clearTurn();
     if (players.size() == 1) {
         turn_token = players[0].getSession();
         turn_index = 0;
@@ -232,7 +232,7 @@ void Game::leave(HANDLER_ARGS) {
         if (players[i].getSession() == session) {
             res["id"] = i;
             if (turn_token == players[i].getSession()) {
-                this->advanceTurn();
+                advanceTurn();
                 json turn;
                 turn["type"] = "update_turn";
                 turn["id"] = turn_index;
@@ -258,7 +258,7 @@ void Game::kick(HANDLER_ARGS) {
     res["type"] = "kick";
     res["id"] = id;
     if (turn_token == players[id].getSession()) {
-        this->advanceTurn();
+        advanceTurn();
         if (turn_index > id) {
             turn_index--;
         }
@@ -285,7 +285,7 @@ void Game::restart(HANDLER_ARGS) {
     victory = false;
     advanceTurn();
     res["type"] = "restart";
-    res["id"] = this->turn_index;
+    res["id"] = turn_index;
     broadcast(res.dump());
 }
 
@@ -308,7 +308,7 @@ void Game::update_name(HANDLER_ARGS) {
 void Game::guardUpdate(const std::string &session) {
     if (victory)
         throw GameError("game is over");
-    if (session != this->turn_token)
+    if (session != turn_token)
         throw GameError("not your turn");
     if (!rolled)
         throw GameError("you need to roll first");
@@ -317,7 +317,7 @@ void Game::guardUpdate(const std::string &session) {
 void Game::roll(HANDLER_ARGS) {
     if (victory)
         throw GameError("game is over");
-    if (session != this->turn_token)
+    if (session != turn_token)
         throw GameError("not your turn");
     if (rolled)
         throw GameError("now's not the time for that");
@@ -336,23 +336,23 @@ void Game::roll(HANDLER_ARGS) {
 }
 
 void Game::add(HANDLER_ARGS) {
-    this->guardUpdate(session);
-    if (this->isSplit())
+    guardUpdate(session);
+    if (isSplit())
         throw GameError("you must add invdividually");
-    data = json(this->totalRoll());
-    this->update(send, broadcast, data, session);
+    data = json(totalRoll());
+    update(send, broadcast, data, session);
 }
 
 void Game::sub(HANDLER_ARGS) {
-    this->guardUpdate(session);
-    if (this->isSplit())
+    guardUpdate(session);
+    if (isSplit())
         throw GameError("you must add invdividually");
-    data = json(-this->totalRoll());
-    this->update(send, broadcast, data, session);
+    data = json(-totalRoll());
+    update(send, broadcast, data, session);
 }
 
 int Game::guardNth(const json &data) {
-    if (!this->isSplit())
+    if (!isSplit())
         throw GameError("This is not a split");
     if (!data.is_number())
         throw GameError("NaN");
@@ -366,17 +366,17 @@ int Game::guardNth(const json &data) {
 }
 
 void Game::add_nth(HANDLER_ARGS) {
-    this->guardUpdate(session);
-    int n = this->guardNth(data["n"]);
+    guardUpdate(session);
+    int n = guardNth(data["n"]);
     data = json(rolls[n]);
-    this->update(send, broadcast, data, session);
+    update(send, broadcast, data, session);
 }
 
 void Game::sub_nth(HANDLER_ARGS) {
-    this->guardUpdate(session);
-    int n = this->guardNth(data["n"]);
+    guardUpdate(session);
+    int n = guardNth(data["n"]);
     data = json(-rolls[n]);
-    this->update(send, broadcast, data, session);
+    update(send, broadcast, data, session);
 }
 
 void Game::update(HANDLER_ARGS) {
@@ -393,8 +393,8 @@ void Game::update(HANDLER_ARGS) {
     res["used"] = used;
     res["id"] = i;
     broadcast(res.dump());
-    if (!this->isSplit() || this->allUsed()) {
-        if (!this->isDoubles()) {
+    if (!isSplit() || allUsed()) {
+        if (!isDoubles()) {
             if (TARGET_SCORES.count(score)) {
                 // WIN CONDITION
                 json win;
@@ -419,7 +419,7 @@ void Game::update(HANDLER_ARGS) {
                         break;
                     }
                 }
-                this->advanceTurn();
+                advanceTurn();
                 json turn;
                 turn["type"] = "update_turn";
                 turn["id"] = turn_index;
