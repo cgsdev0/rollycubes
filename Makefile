@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++17 -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes -Wall
+CXXFLAGS=-std=c++20 -Wall -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes
 LDFLAGS=-lz -lpthread -lssl -lcrypto
 TARGET=GameServer
 
@@ -21,9 +21,9 @@ src/%.o: %.cpp
 
 .PHONY: clean
 clean:
-	rm -f uWebSockets/uSockets/*.o
 	rm -f $(OBJ)
 	rm -f $(TARGET)
+	cd uWebSockets/uSockets && make clean
 
 debug: clean
 debug: CXXFLAGS += -g

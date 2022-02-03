@@ -1,3 +1,4 @@
+
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
@@ -25,6 +26,9 @@
 
 #define JWT_DISABLE_PICOJSON true
 #include "defaults.h"
+
+#include "API.h"
+
 // for convenience
 using json = nlohmann::json;
 
@@ -375,6 +379,18 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
 }
 
 int main(int argc, char **argv) {
+    Fuck fuck;
+    fuck.fuck = 1;
+    Fucks fucks;
+    fucks.fucks.push_back(fuck);
+    fuck.fuck = 2;
+    fucks.fucks.push_back(fuck);
+    auto str = jsonStringify(fucks);
+    std::cout << str << std::endl;
+    jsonParse(fucks, str);
+    for (auto fuq : fucks.fucks)
+        std::cout << fuq.fuck << std::endl;
+    return 0;
     signal(SIGINT, signal_callback_handler);
     signal(SIGTERM, signal_callback_handler);
 

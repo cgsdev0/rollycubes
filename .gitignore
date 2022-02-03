@@ -6,4 +6,5 @@ terminal/env
 node_modules
 server_state.json
 .ccls-cache/
+gcm.cache/
 *.d
