@@ -1,4 +1,6 @@
-#pragma once
+#ifndef INCLUDE_CONSTS_H
+#define INCLUDE_CONSTS_H
+
 #include <chrono>
 #include <string>
 #include <unordered_set>
@@ -28,16 +30,6 @@ const string PLAYER_COLORS[] = {
     "#fabed4",
 };
 
-class GameError {
-  public:
-    GameError(string err) : err(err) {}
-
-    const string &what() { return err; }
-
-  private:
-    string err;
-};
-
 /* ws->getUserData returns one of these */
 struct PerSocketData {
     string session;
@@ -48,3 +40,5 @@ struct PerSocketData {
     bool spectator;
     bool dedupe_conns;
 };
+
+#endif

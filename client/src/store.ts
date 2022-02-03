@@ -109,9 +109,10 @@ const rootReducer: Reducer<ReduxState> = (
       };
     case "GOT_USER_DATA":
       const user_id = action.data.id;
+      console.warn("GOT_USER_DATA", action);
       return {
         ...state,
-        otherUsers: Object.assign(state.otherUsers, { [user_id]: action.data })
+        otherUsers: Object.assign({}, state.otherUsers, { [user_id]: action.data })
       };
     case "FINISH_3D_ROLL":
       return {
@@ -225,7 +226,7 @@ const rootReducer: Reducer<ReduxState> = (
       );
       return newCheatState;
     case "welcome":
-      const { game } = action;
+      const {type, ...game} = action;
       const rolls = [];
       for (let i = 0; i < game.rolls.length; ++i) {
         rolls.push({ used: game.used[i], value: game.rolls[i] });

@@ -21,7 +21,6 @@
 #include "App.h"
 #include "Consts.h"
 #include "Game.h"
-#include "Player.h"
 #include "StringUtils.h"
 
 #include "API.h"
@@ -58,12 +57,13 @@ void load_persistence() {
     std::cout << "Successfully parsed state file! Rehydrating..." << std::endl;
     for (auto &room : state.items()) {
         std::cout << "Restoring room '" << room.key() << "'" << std::endl;
-        Game *g = new Game(room.value());
-        games.insert({room.key(), g});
+        // TODO
+        // Game *g = new Game(room.value());
+        // games.insert({room.key(), g});
 
-        // All rehydrated games start with 0 players, so we can schedule an eviction.
-        eviction_queue.push({std::chrono::system_clock::now(), room.key()});
-        eviction_set.insert(room.key());
+        // // All rehydrated games start with 0 players, so we can schedule an eviction.
+        // eviction_queue.push({std::chrono::system_clock::now(), room.key()});
+        // eviction_set.insert(room.key());
     }
 }
 
@@ -106,7 +106,7 @@ void signal_callback_handler(int signum) {
     runEviction(false);
     json state;
     for (const auto &g : games) {
-        state[g.first] = g.second->toJson(true);
+        state[g.first] = "TODO";
     }
     remove("server_state.json");
     std::ofstream state_file("server_state.json");
@@ -166,11 +166,10 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
                 app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
             }
         }
-        json welcome;
-        welcome["type"] = "welcome";
-        welcome["game"] = g->toJson();
-        if (!userData->spectator) welcome["id"] = g->getPlayerId(userData->session);
-        ws->send(welcome.dump(), uWS::OpCode::TEXT);
+
+        auto welcome = g->toWelcomeMsg();
+        welcome.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
+        ws->send(welcome.toString(), uWS::OpCode::TEXT);
         ws->subscribe(userData->room);
     } else if (userData->spectator) {
         ws->close();
@@ -253,7 +252,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
 
                     std::string room = userData->room;
                     std::string session = userData->session;
-                    json response;
+                    std::string response;
                     try {
                         auto data = json::parse(message);
                         if (!data["type"].is_string())
@@ -264,7 +263,6 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                             try {
                                 auto claim = jwt_verifier.decode_and_verify(token);
                                 userData->is_verified = true;
-                                std::cout << "valid token!" << std::endl;
                                 userData->user_id = claim.user_id;
                                 userData->display_name = claim.display_name;
                                 connectNewPlayer(app, ws, userData);
@@ -294,25 +292,25 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                   }
                                   }*/
                                 } catch (GameError &e) {
-                                    response["error"] = e.what();
+                                    response = GameError(e.what()).toString();
                                 }
                             } else {
-                                response["error"] = "Room not found: " + room;
+                                response = GameError("Room not found: " + room).toString();
                             }
                         }
                     } catch (nlohmann::detail::parse_error &e) {
                         std::cout << "RECEIVED BAD JSON (parse_error): " << message
                                   << std::endl
                                   << e.what() << std::endl;
-                        response["error"] = e.what();
+                        response = GameError(e.what()).toString();
                     } catch (nlohmann::detail::type_error &e) {
                         std::cout << "HANDLED BAD JSON (type_error): " << message
                                   << std::endl
                                   << e.what() << std::endl;
-                        response["error"] = e.what();
+                        response = GameError(e.what()).toString();
                     }
-                    if (!response.is_null())
-                        ws->send(response.dump(), uWS::OpCode::TEXT);
+                    if (response.length())
+                        ws->send(response, uWS::OpCode::TEXT);
                 },
             .close =
                 [app](auto *ws, int code, std::string_view message) {

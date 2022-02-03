@@ -56,6 +56,13 @@ constexpr const_str<N> toLower(const char (&str)[N]) {
         from_json(j, *this);                           \
     }
 
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GameError, error)
+std::string GameError::toString() const {
+    json j;
+    to_json(j, *this);
+    return j.dump();
+}
+
 /*************************************************\
 |                                                 |
 |   DEFINE NEW SERIALIZABLE MESSAGE STRUCTS HERE  |
@@ -63,7 +70,12 @@ constexpr const_str<N> toLower(const char (&str)[N]) {
 \*************************************************/
 
 namespace API {
+    JSON_SERIALIZATION(PlayerState, session, name, score, win_count, connected)
+    JSON_SERIALIZATION(GameState, players, chatLog, turn_index, rolls, used, rolled, victory, privateSession)
+    JSON_SERIALIZATION(PlayerStateSanitized, name, score, user_id, win_count, connected)
+    JSON_SERIALIZATION(Welcome, players, chatLog, turn_index, rolls, used, rolled, victory, privateSession, id)
     JSON_SERIALIZATION(Redirect, room)
+    JSON_SERIALIZATION(Reconnect, id)
     JSON_SERIALIZATION(Room, code, host_name, last_updated, player_count)
     JSON_SERIALIZATION(Room_List, rooms)
 } // namespace API

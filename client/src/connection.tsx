@@ -66,7 +66,7 @@ class Connection extends React.Component<Props & DispatchProp> {
         authServiceOrigin
       } = (window as any).REDUX_STORE.getState().settings;
       const populateUser = (player: any) => {
-        if (player.hasOwnProperty("user_id")) {
+        if (player.hasOwnProperty("user_id") && player.user_id) {
           if (!otherUsers.hasOwnProperty(player.user_id)) {
             (async () => {
               try {
@@ -87,7 +87,7 @@ class Connection extends React.Component<Props & DispatchProp> {
         }
       };
       if (data.type === "welcome") {
-        data.game.players.forEach(populateUser);
+        data.players.forEach(populateUser);
       }
       if (data.type === "join") {
         populateUser(data);

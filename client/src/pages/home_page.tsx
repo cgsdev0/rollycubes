@@ -31,7 +31,7 @@ class HomePage extends React.Component<Props, State> {
     try {
       const data = await window.fetch("/list");
       const allGames = await data.json();
-      const games = allGames
+      const games = allGames.rooms
         .filter((game: Game) => game.playerCount)
         .sort((a: Game, b: Game) => {
           if (a.playerCount === b.playerCount) {

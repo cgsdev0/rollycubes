@@ -21,8 +21,9 @@ src/%.o: %.cpp
 
 .PHONY: clean
 clean:
-	rm -f $(OBJ)
-	rm -f $(TARGET)
+	rm -f **/*.o
+	rm -f GameServer
+	rm -f **/*.d
 	cd uWebSockets/uSockets && make clean
 
 debug: clean

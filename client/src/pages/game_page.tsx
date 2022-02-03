@@ -123,104 +123,109 @@ class GamePage extends React.Component<
     const minimized = !rulesSel && !chatSel;
 
     return (
-      <ThemeContext.Consumer>
-        {theme => (
-          <React.Fragment>
-            {doublesCount ? (
-              <h6 key={doublesCount} id="Doubles">
-                Doubles!
-              </h6>
-            ) : null}
-            {somebodyIsNice ? <h6 id="Nice">Nice (ꈍoꈍ)</h6> : null}
-            {reset ? <h6 id="Reset">Reset!</h6> : null}
-            {winner ? (
-              <h6 id="Victory">{winner.name || `User${turn + 1}`} Wins!</h6>
-            ) : null}
-            <div className="GamePage">
-              <ConnBanner />
-              {authToken === undefined ? null : (
-                <Connection
-                  room={match.params.room}
-                  mode={match.params.mode}
-                  history={history}
-                />
-              )}
-              <div id="PlayerChatWrapper">
-                <Players />
-                <ul className="TabHeader">
-                  <a
-                    style={{
-                      ...theme.tab,
-                      ...(rulesSel ? theme.tabHighlight : {})
-                    }}
-                    href="#rules"
-                  >
-                    <li>Rules</li>
-                  </a>
-                  <a
-                    style={{
-                      ...theme.tab,
-                      ...(chatSel ? theme.tabHighlight : {})
-                    }}
-                    href="#chat"
-                  >
-                    <li>Chat</li>
-                  </a>
-                  <a
-                    style={{
-                      ...theme.tab,
-                      ...(minimized ? theme.tabHighlight : {})
-                    }}
-                    href="#minimized"
-                  >
-                    <li>Minimize</li>
-                  </a>
-                </ul>
-                <div
-                  id="RuleBox"
-                  className={`TabContainer Rules ${
-                    hash && hash !== "#rules" ? " HideMobile" : ""
-                  }`}
-                >
-                  <h2 className="HideMobile">Rules</h2>
-                  <p>
-                    Each roll, you may add or subtract the total value shown on
-                    the dice from your score.
-                  </p>
-                  <p>Winning Scores:</p>
-                  <ul>
-                    <li>33</li>
-                    <li>66, 67</li>
-                    <li>98, 99, 100</li>
-                  </ul>
-                  <p>Additional Rules:</p>
-                  <ul>
-                    <li>
-                      If you roll doubles, you <strong>must</strong> roll again.
-                    </li>
-                    <li>
-                      If you match a player's score, they are{" "}
-                      <strong>reset</strong> to 0.
-                    </li>
-                    <li>
-                      If you roll a seven, you may <strong>split</strong> the
-                      dice into 2 rolls.
-                    </li>
-                  </ul>
-                </div>
-                <div
-                  className={`TabContainer Chat ${
-                    hash !== "#chat" ? " HideMobile" : ""
-                  }`}
-                >
-                  <ChatBox />
-                </div>
-              </div>
-              <GamePanel />
-            </div>
-          </React.Fragment>
+      <React.Fragment>
+        {authToken === undefined ? null : (
+          <Connection
+            room={match.params.room}
+            mode={match.params.mode}
+            history={history}
+          />
         )}
-      </ThemeContext.Consumer>
+
+        <ThemeContext.Consumer>
+          {theme => (
+            <React.Fragment>
+              {doublesCount ? (
+                <h6 key={doublesCount} id="Doubles">
+                  Doubles!
+                </h6>
+              ) : null}
+              {somebodyIsNice ? <h6 id="Nice">Nice (ꈍoꈍ)</h6> : null}
+              {reset ? <h6 id="Reset">Reset!</h6> : null}
+              {winner ? (
+                <h6 id="Victory">{winner.name || `User${turn + 1}`} Wins!</h6>
+              ) : null}
+              <div className="GamePage">
+                <ConnBanner />
+
+                <div id="PlayerChatWrapper">
+                  <Players />
+                  <ul className="TabHeader">
+                    <a
+                      style={{
+                        ...theme.tab,
+                        ...(rulesSel ? theme.tabHighlight : {})
+                      }}
+                      href="#rules"
+                    >
+                      <li>Rules</li>
+                    </a>
+                    <a
+                      style={{
+                        ...theme.tab,
+                        ...(chatSel ? theme.tabHighlight : {})
+                      }}
+                      href="#chat"
+                    >
+                      <li>Chat</li>
+                    </a>
+                    <a
+                      style={{
+                        ...theme.tab,
+                        ...(minimized ? theme.tabHighlight : {})
+                      }}
+                      href="#minimized"
+                    >
+                      <li>Minimize</li>
+                    </a>
+                  </ul>
+                  <div
+                    id="RuleBox"
+                    className={`TabContainer Rules ${
+                      hash && hash !== "#rules" ? " HideMobile" : ""
+                    }`}
+                  >
+                    <h2 className="HideMobile">Rules</h2>
+                    <p>
+                      Each roll, you may add or subtract the total value shown
+                      on the dice from your score.
+                    </p>
+                    <p>Winning Scores:</p>
+                    <ul>
+                      <li>33</li>
+                      <li>66, 67</li>
+                      <li>98, 99, 100</li>
+                    </ul>
+                    <p>Additional Rules:</p>
+                    <ul>
+                      <li>
+                        If you roll doubles, you <strong>must</strong> roll
+                        again.
+                      </li>
+                      <li>
+                        If you match a player's score, they are{" "}
+                        <strong>reset</strong> to 0.
+                      </li>
+                      <li>
+                        If you roll a seven, you may <strong>split</strong> the
+                        dice into 2 rolls.
+                      </li>
+                    </ul>
+                  </div>
+                  <div
+                    className={`TabContainer Chat ${
+                      hash !== "#chat" ? " HideMobile" : ""
+                    }`}
+                  >
+                    <ChatBox />
+                  </div>
+                </div>
+                <GamePanel />
+              </div>
+            </React.Fragment>
+          )}
+        </ThemeContext.Consumer>
+      </React.Fragment>
     );
   }
 }
