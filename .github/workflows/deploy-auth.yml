@@ -23,21 +23,26 @@ jobs:
         node-version: '15.x'
         
     # Build server
-    - run: npm install; ./build.sh
+    - run: npm install; ./build.sh; mv build auth-server
       working-directory: auth
     
-    # Deploy it
+    - name: Deploy to server
+      id: deploy
+      uses: Pendect/action-rsyncer@v1.1.0
+      env:
+        DEPLOY_KEY: ${{secrets.PROD_DEPLOY_KEY}}
+      with:
+        flags: '-avzr --delete'
+        options: ''
+        ssh_options: ''
+        src: 'auth/auth-server'
+        dest: 'root@rollycubes.com:/home/shane/auth-server'
+        
+    # Restart the service
     - name: ssh-scp-ssh-pipelines
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
       with:
         host: rollycubes.com
         user: root
         key: ${{ secrets.PROD_DEPLOY_KEY }}
-        first_ssh: |
-          sudo rm -rf /home/shane/auth-server
-          systemctl stop dice_auth
-        # scp from local to remote
-        scp: |
-          auth/build => '/home/shane/.'
-        # execute post-commands after scp
-        last_ssh: systemctl start dice_auth
+        first_ssh: systemctl start dice_auth
