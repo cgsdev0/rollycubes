@@ -23,7 +23,7 @@ jobs:
         node-version: '15.x'
         
     # Build server
-    - run: ./build.sh
+    - run: npm install; ./build.sh
       working-directory: auth
     
     # Deploy it
