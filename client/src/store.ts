@@ -243,7 +243,8 @@ const rootReducer: Reducer<ReduxState> = (
         { settings: state.settings },
         { rolled3d: state.rolled3d },
         { authToken: state.authToken },
-        { userData: state.userData }
+        { userData: state.userData },
+        { otherUsers: state.otherUsers }
       );
       if (state.settings.sick3dmode) {
         initScene(welcomeState);

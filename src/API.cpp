@@ -45,7 +45,7 @@ constexpr const_str<N> toLower(const char (&str)[N]) {
     constexpr auto structName(const x &i) {            \
         return toLower(#x);                            \
     }                                                  \
-    std::string x::toString() {                        \
+    std::string x::toString() const {                  \
         json j;                                        \
         to_json(j, *this);                             \
         j["type"] = structName(*this);                 \

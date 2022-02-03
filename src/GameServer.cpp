@@ -57,13 +57,14 @@ void load_persistence() {
     std::cout << "Successfully parsed state file! Rehydrating..." << std::endl;
     for (auto &room : state.items()) {
         std::cout << "Restoring room '" << room.key() << "'" << std::endl;
-        // TODO
-        // Game *g = new Game(room.value());
-        // games.insert({room.key(), g});
+        API::GameState state;
+        state.fromString(room.value().dump());
+        Game *g = new Game(state);
+        games.insert({room.key(), g});
 
         // // All rehydrated games start with 0 players, so we can schedule an eviction.
-        // eviction_queue.push({std::chrono::system_clock::now(), room.key()});
-        // eviction_set.insert(room.key());
+        eviction_queue.push({std::chrono::system_clock::now(), room.key()});
+        eviction_set.insert(room.key());
     }
 }
 
@@ -106,7 +107,7 @@ void signal_callback_handler(int signum) {
     runEviction(false);
     json state;
     for (const auto &g : games) {
-        state[g.first] = "TODO";
+        state[g.first] = json::parse(g.second->toString());
     }
     remove("server_state.json");
     std::ofstream state_file("server_state.json");

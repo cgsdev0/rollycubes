@@ -9,7 +9,7 @@
 #include <vector>
 
 #define FWD_DECLARE_JSON_SERIALIZABLE() \
-    std::string toString();             \
+    std::string toString() const;       \
     void fromString(const std::string &str);
 
 // Generic game error type; represents an error that is surfacable

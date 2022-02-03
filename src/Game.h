@@ -29,6 +29,15 @@ class Game {
         }
     }
 
+    // Rehydrate game from disk
+    Game(const API::GameState &g) {
+        this->state = g;
+        for (auto &player : this->state.players) {
+            player.connected = false;
+        }
+        turn_token = g.players[g.turn_index].session;
+    }
+
     bool isInitialized();
     bool isPrivate() const;
     std::string hostName() const;
@@ -73,6 +82,10 @@ class Game {
 
     API::Welcome toWelcomeMsg() {
         return API::Welcome(this->state);
+    }
+
+    std::string toString() const {
+        return this->state.toString();
     }
 
   private:
