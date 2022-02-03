@@ -1,8 +1,7 @@
 name: Deploy Auth Service to Digital Ocean
 
 on:
-  release:
-    types: [ created ]
+  workflow_dispatch
 
 defaults:
   run:
