@@ -5,20 +5,6 @@
 
 using json = nlohmann::json;
 
-template <typename T>
-std::string jsonStringify(const T &t) {
-    json j;
-    to_json(j, t);
-    j["type"] = structName(t);
-    return j.dump();
-}
-
-template <typename T>
-void jsonParse(T &out, std::string s) {
-    json j = json::parse(s);
-    from_json(j, out);
-}
-
 // Helper function that converts a character to lowercase on compile time
 constexpr char charToLower(const char c) {
     return (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c;
@@ -59,8 +45,16 @@ constexpr const_str<N> toLower(const char (&str)[N]) {
     constexpr auto structName(const x &i) {            \
         return toLower(#x);                            \
     }                                                  \
-    template std::string jsonStringify<x>(const x &t); \
-    template void jsonParse<x>(x & t, std::string s);
+    std::string x::toString() {                        \
+        json j;                                        \
+        to_json(j, *this);                             \
+        j["type"] = structName(*this);                 \
+        return j.dump();                               \
+    }                                                  \
+    void x::fromString(const std::string &s) {         \
+        auto j = json::parse(s);                       \
+        from_json(j, *this);                           \
+    }
 
 /*************************************************\
 |                                                 |

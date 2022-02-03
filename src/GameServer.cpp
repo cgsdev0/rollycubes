@@ -385,9 +385,9 @@ int main(int argc, char **argv) {
     fucks.fucks.push_back(fuck);
     fuck.fuck = 2;
     fucks.fucks.push_back(fuck);
-    auto str = jsonStringify(fucks);
+    auto str = fucks.toString();
     std::cout << str << std::endl;
-    jsonParse(fucks, str);
+    fucks.fromString(str);
     for (auto fuq : fucks.fucks)
         std::cout << fuq.fuck << std::endl;
     return 0;
