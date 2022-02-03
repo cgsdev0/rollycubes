@@ -32,7 +32,7 @@ jobs:
       env:
         DEPLOY_KEY: ${{secrets.PROD_DEPLOY_KEY}}
       with:
-        flags: '-avzr --delete'
+        flags: '-avzr'
         options: ''
         ssh_options: ''
         src: 'auth/auth-server'
