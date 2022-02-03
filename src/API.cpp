@@ -61,5 +61,9 @@ constexpr const_str<N> toLower(const char (&str)[N]) {
 |   DEFINE NEW SERIALIZABLE MESSAGE STRUCTS HERE  |
 |                                                 |
 \*************************************************/
-JSON_SERIALIZATION(Fuck, fuck, yeet)
-JSON_SERIALIZATION(Fucks, fucks)
+
+namespace API {
+    JSON_SERIALIZATION(Redirect, room)
+    JSON_SERIALIZATION(Room, code, host_name, last_updated, player_count)
+    JSON_SERIALIZATION(Room_List, rooms)
+} // namespace API

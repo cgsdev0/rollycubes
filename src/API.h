@@ -5,15 +5,25 @@
     std::string toString(); \
     void fromString(const std::string &str);
 
-struct Fuck {
-    std::string yeet;
-    int fuck;
+namespace API {
 
-    JSON_SERIALIZABLE()
-};
+    struct Redirect {
+        std::string room;
 
-struct Fucks {
-    std::vector<Fuck> fucks;
+        JSON_SERIALIZABLE()
+    };
 
-    JSON_SERIALIZABLE()
-};
+    struct Room {
+        std::string code;
+        std::string host_name;
+        std::string last_updated;
+        int player_count;
+
+        JSON_SERIALIZABLE()
+    };
+
+    struct Room_List {
+        std::vector<Room> rooms;
+        JSON_SERIALIZABLE()
+    };
+} // namespace API

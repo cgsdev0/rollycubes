@@ -181,10 +181,9 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
         // Connecting to a non-existant room
         // let's migrate them to a new room
         userData->room = createRoom(true, userData->room);
-        json route;
-        route["type"] = "redirect";
-        route["room"] = userData->room;
-        ws->send(route.dump(), uWS::OpCode::TEXT);
+        API::Redirect msg;
+        msg.room = userData->room;
+        ws->send(msg.toString(), uWS::OpCode::TEXT);
     }
 }
 
@@ -379,18 +378,6 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
 }
 
 int main(int argc, char **argv) {
-    Fuck fuck;
-    fuck.fuck = 1;
-    Fucks fucks;
-    fucks.fucks.push_back(fuck);
-    fuck.fuck = 2;
-    fucks.fucks.push_back(fuck);
-    auto str = fucks.toString();
-    std::cout << str << std::endl;
-    fucks.fromString(str);
-    for (auto fuq : fucks.fucks)
-        std::cout << fuq.fuck << std::endl;
-    return 0;
     signal(SIGINT, signal_callback_handler);
     signal(SIGTERM, signal_callback_handler);
 
@@ -412,20 +399,20 @@ int main(int argc, char **argv) {
     app.get("/list",
             [](auto *res, auto *req) {
                 res->writeHeader("Content-Type", "application/json");
-                json respList = json::array();
+                API::Room_List respList;
                 for (auto const &[code, game] : games) {
                     if (game->isPrivate()) {
                         continue;
                     }
                     std::string updated = serializeTimePoint(
                         game->getUpdated(), "UTC: %Y-%m-%d %H:%M:%S");
-                    respList.push_back(
-                        {{"code", code},
-                         {"playerCount", game->connectedPlayerCount()},
-                         {"lastUpdated", updated},
-                         {"hostName", game->hostName()}});
+                    respList.rooms.push_back(
+                        {.code = code,
+                         .host_name = game->hostName(),
+                         .last_updated = updated,
+                         .player_count = game->connectedPlayerCount()});
                 }
-                res->write(respList.dump());
+                res->write(respList.toString());
                 res->end();
             })
         .get("/create",
