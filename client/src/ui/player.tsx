@@ -4,6 +4,7 @@ import "../App.css";
 import { selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
 import { Player, ReduxState } from "../store";
 import { ThemeContext } from "../themes";
+import Avatar from "./avatar";
 
 interface Props {
   player: Player;
@@ -34,6 +35,8 @@ const PlayerComponent = (props: Props) => {
   const { n, player, self_index, turn_index } = props;
   const theme = React.useContext(ThemeContext);
   const imageUrl = player.userData?.image_url;
+  const firstInitial = player.name ? player.name[0] : "U";
+  const showAvatar = Boolean(player.user_id);
   return (
     <div
       className={`Player${!player.connected ? " Disconnected" : ""}`}
@@ -43,7 +46,9 @@ const PlayerComponent = (props: Props) => {
       }
     >
       <div className={`${player.crowned ? "Crown " : ""}Name`}>
-        {imageUrl ? <img src={imageUrl} width={24} height={24} /> : null}
+        {showAvatar ? (
+          <Avatar imageUrl={imageUrl} firstInitial={firstInitial} />
+        ) : null}
         {player.name || `User${n + 1}`}
         <div className="You">{self_index === n ? " (You)" : null}</div>
       </div>

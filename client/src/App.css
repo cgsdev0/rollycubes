@@ -49,7 +49,7 @@ body {
 #loginPrompt img {
     border-radius: 50%;
 }
-#loginPrompt div.avatar {
+div.avatar {
     border-radius: 50%;
     background-color: green;
     color: white;
@@ -58,6 +58,7 @@ body {
     font-weight: bold;
     width: 24px;
     height: 24px;
+    margin-right: 12px;
 }
 
 #settingsBox {

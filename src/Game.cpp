@@ -275,6 +275,9 @@ void Game::update_name(HANDLER_ARGS) {
     std::string name = data["name"].get<std::string>();
     for (uint i = 0; i < state.players.size(); ++i) {
         if (state.players[i].session == session) {
+            if (isSignedIn(state.players[i])) {
+                throw GameError("signed in players can't change names that way");
+            }
             state.players[i].name = name;
             json msg;
             msg["type"] = "update_name";
