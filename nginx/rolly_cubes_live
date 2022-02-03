@@ -2,6 +2,7 @@ server {
 	server_name rollycubes.live;
 
         error_page   504  @error_page;
+        error_page   502  @error_page;
 
         location     @error_page {
             root /var/www/stream;
