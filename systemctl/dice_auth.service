@@ -3,9 +3,7 @@ Description=Dice Game Auth
 After=network.target
 
 [Service]
-WorkingDirectory=/home/shane/auth-server
-ExecStart=/usr/bin/node index.js
-Restart=on-failure
+ExecStart=/home/shane/auth-server/start.sh
 RestartPreventExitStatus=255
 Type=simple
 User=dice
