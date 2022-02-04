@@ -33,7 +33,8 @@ wD5UbFt1UoZuMHSzEUzcKaLpoCCjNg6Jxc5VTBHuTuzNiHJ8AULw6CfrUjO3yJ9I
 /sDRNfe0wnJbvGLYNzeXi5AxBacfqkiUD4cAZExkPKi2gGyNzyH7Jem+Yd/a7pAQ
 p0UHBGyVNjRYF86YetoiFisCAwEAAQ==
 -----END PUBLIC KEY-----)";
-    impl->verifier.allow_algorithm(jwt::algorithm::rs256(public_key, "", "", ""));
+    impl->verifier.allow_algorithm(jwt::algorithm::rs256(public_key, "", "", ""))
+        .leeway(60);
     impl->initialized = true;
 }
 
