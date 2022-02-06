@@ -26,6 +26,7 @@
 #include "API.h"
 #include "AuthServerRequestQueue.h"
 #include "JWTVerifier.h"
+#include "MoveOnlyFunction.h"
 
 // for convenience
 using json = nlohmann::json;
@@ -187,7 +188,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
     }
 }
 
-uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier) {
+uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer) {
     return {/* Settings */
             .compression = uWS::SHARED_COMPRESSOR,
             .maxPayloadLength = 16 * 1024,
@@ -246,7 +247,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     connectNewPlayer(app, ws, userData);
                 },
             .message =
-                [app, &jwt_verifier](auto *ws, std::string_view message, uWS::OpCode opCode) {
+                [app, &jwt_verifier, &authServer](auto *ws, std::string_view message, uWS::OpCode opCode) {
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
 
@@ -284,10 +285,12 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                 try {
                                     g->handleMessage(
                                         [&ws](auto s) { ws->send(s, uWS::OpCode::TEXT); },
-                                        [&ws, &room, app](auto s) {
+                                        [ws, room, app](auto s) {
                                             // ws->send(s, uWS::OpCode::TEXT);
                                             app->publish(room, s, uWS::OpCode::TEXT);
                                         },
+                                        {.reportStats = [&authServer](auto url, auto json) { authServer.send(url, json); },
+                                         .reportStats2 = [&authServer](auto url, auto json, auto cb) { authServer.send(url, json, cb); }},
                                         data, session);
                                     /*if (data["type"].is_string()) {
                                   if (data["type"] == "leave") {
@@ -362,7 +365,7 @@ int main(int argc, char **argv) {
     JWTVerifier jwt_verifier;
     jwt_verifier.init();
 
-    AuthServerRequestQueue authServer("http://localhost:3031/");
+    AuthServerRequestQueue authServer("http://localhost:3031/", uWS::Loop::get());
     authServer.send("test", "{}");
 
     uWS::App app;
@@ -400,7 +403,7 @@ int main(int argc, char **argv) {
              })
         .ws<PerSocketData>(
             "/ws/:mode/:room",
-            makeWebsocketBehavior(&app, jwt_verifier))
+            makeWebsocketBehavior(&app, jwt_verifier, authServer))
         .listen(port,
                 [port](auto *token) {
                     if (token) {

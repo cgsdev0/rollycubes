@@ -12,6 +12,8 @@ export class Achievement extends BaseEntity {
   @Column()
   description: string;
 
+  // If max_progress is greater than 0, the achievement is
+  // numeric rather than boolean.
   @Column({ default: 0 })
   max_progress: number;
 

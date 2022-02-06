@@ -4,6 +4,7 @@
 
 #include "Consts.h"
 #include "Game.h"
+#include "Loop.h"
 #include "StringUtils.h"
 
 bool Game::isInitialized() { return state.players.size() > 0; }
@@ -156,7 +157,7 @@ int Game::connectedPlayerCount() {
     }
 
 static const std::unordered_map<
-    std::string, std::function<void(Game *, SendFunc, SendFunc, json &,
+    std::string, std::function<void(Game *, SendFunc, SendFunc, HandlerArgs, json &,
                                     const std::string &)>>
     action_map = {ACTION(chat), ACTION(leave), ACTION(kick),
                   ACTION(restart), ACTION(update_name), ACTION(roll),
@@ -171,7 +172,7 @@ void Game::handleMessage(HANDLER_ARGS) {
     auto action_type = data["type"].get<std::string>();
     auto it = action_map.find(action_type);
     if (it != action_map.end()) {
-        it->second(this, send, broadcast, data, session);
+        it->second(this, send, broadcast, server, data, session);
     } else {
         throw GameError("Unknown action type");
     }
@@ -260,8 +261,11 @@ void Game::restart(HANDLER_ARGS) {
         throw GameError("game still in progress");
 
     json res;
-    for (auto &player : state.players)
+    for (auto &player : state.players) {
         player.score = 0;
+        player.doubles_count = 0;
+        player.roll_count = 0;
+    }
     state.victory = false;
     advanceTurn();
     res["type"] = "restart";
@@ -298,6 +302,11 @@ void Game::guardUpdate(const std::string &session) {
 }
 
 void Game::roll(HANDLER_ARGS) {
+    /* server.reportStats2("add_stats", "{}", [broadcast](auto s) { */
+    /*     API::AchievementUnlock a{ */
+    /*         .name = "you did it congrats"}; */
+    /*     broadcast(a.toString()); */
+    /* }); */
     if (state.victory)
         throw GameError("game is over");
     if (session != turn_token)
@@ -315,6 +324,16 @@ void Game::roll(HANDLER_ARGS) {
         resp["rolls"].push_back(state.rolls[i]);
     }
     state.rolled = true;
+
+    // Update statistics
+    for (uint i = 0; i < state.players.size(); ++i) {
+        if (state.players[i].session == turn_token) {
+            state.players[i].roll_count++;
+            if (isDoubles()) {
+                state.players[i].doubles_count++;
+            }
+        }
+    }
     broadcast(resp.dump());
 }
 
@@ -323,7 +342,7 @@ void Game::add(HANDLER_ARGS) {
     if (isSplit())
         throw GameError("you must add invdividually");
     data = json(totalRoll());
-    update(send, broadcast, data, session);
+    update(send, broadcast, server, data, session);
 }
 
 void Game::sub(HANDLER_ARGS) {
@@ -331,7 +350,7 @@ void Game::sub(HANDLER_ARGS) {
     if (isSplit())
         throw GameError("you must add invdividually");
     data = json(-totalRoll());
-    update(send, broadcast, data, session);
+    update(send, broadcast, server, data, session);
 }
 
 int Game::guardNth(const json &data) {
@@ -352,38 +371,53 @@ void Game::add_nth(HANDLER_ARGS) {
     guardUpdate(session);
     int n = guardNth(data["n"]);
     data = json(state.rolls[n]);
-    update(send, broadcast, data, session);
+    update(send, broadcast, server, data, session);
 }
 
 void Game::sub_nth(HANDLER_ARGS) {
     guardUpdate(session);
     int n = guardNth(data["n"]);
     data = json(-state.rolls[n]);
-    update(send, broadcast, data, session);
+    update(send, broadcast, server, data, session);
 }
 
 void Game::update(HANDLER_ARGS) {
     int change = data.get<int>();
     json res;
-    uint i;
-    for (i = 0; i < state.players.size(); ++i) {
-        if (state.players[i].session == session)
+    uint winnerId;
+    for (winnerId = 0; winnerId < state.players.size(); ++winnerId) {
+        if (state.players[winnerId].session == session)
             break;
     }
-    int score = state.players[i].score += change;
+    int score = state.players[winnerId].score += change;
     res["type"] = "update";
     res["score"] = score;
     res["used"] = state.used;
-    res["id"] = i;
+    res["id"] = winnerId;
     broadcast(res.dump());
     if (!isSplit() || allUsed()) {
         if (!isDoubles()) {
             if (TARGET_SCORES.count(score)) {
                 // WIN CONDITION
                 json win;
-                state.players[i].win_count++;
+                state.players[winnerId].win_count++;
+                for (uint i = 0; i < state.players.size(); ++i) {
+                    if (!isSignedIn(state.players[i])) continue;
+                    API::ReportStats stats{
+                        .id = state.players[i].session,
+                        .rolls = state.players[i].roll_count,
+                        .wins = (winnerId == i ? 1 : 0),
+                        .games = 1,
+                        .doubles = state.players[i].doubles_count};
+                    server.reportStats2("add_stats", stats.toString(), [broadcast](auto s) {
+                        API::AchievementUnlock a{
+                            .name = "you did it congrats"};
+                        broadcast(a.toString());
+                    });
+                }
+
                 win["type"] = "win";
-                win["id"] = i;
+                win["id"] = winnerId;
                 state.victory = true;
                 broadcast(win.dump());
             } else {

@@ -382,7 +382,8 @@ const rootReducer: Reducer<ReduxState> = (
         settings: state.settings,
         socket: state.socket,
         authToken: state.authToken,
-        userData: state.userData
+        userData: state.userData,
+        otherUsers: state.otherUsers
       };
     case "chat":
       const newState = {

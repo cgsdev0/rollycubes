@@ -11,6 +11,7 @@ import * as csrf from "csurf";
 import * as helmet from "helmet";
 import { Request, Response } from "express";
 import { Routes } from "./routes";
+import { ServerRoutes } from "./server_routes";
 import { User } from "./entity/User";
 import { PlayerStats } from "./entity/PlayerStats";
 import { Achievement } from "./entity/Achievement";
@@ -34,17 +35,16 @@ createConnection()
       console.log("GREAT SUCCESS");
       res.send("you did it!");
     });
-    app.use(
-      csrf({ cookie: { httpOnly: true, sameSite: "none", secure: true } })
-    );
-
-    app.get("/csrf", function (req, res) {
+    const csurf = csrf({
+      cookie: { httpOnly: true, sameSite: "none", secure: true },
+    });
+    app.get("/csrf", csurf, function (req, res) {
       res.send({ csrfToken: req.csrfToken() });
     });
 
     // register express routes from defined application routes
-    Routes.forEach((route) => {
-      const middleware = [];
+    const registerRoute = (middlewares) => (route) => {
+      const middleware = [...middlewares];
       if (route.requires_auth) {
         middleware.push(userAuth);
       }
@@ -64,39 +64,43 @@ createConnection()
                   ? res.send(result)
                   : res.send(null)
               )
-              .catch((reason) => res.send(reason));
+              .catch((reason) =>
+                res.send(reason.message || "something went wrong")
+              );
           } else if (result !== null && result !== undefined) {
             res.json(result);
           }
         }
       );
-    });
+    };
 
+    Routes.forEach(registerRoute([csurf]));
+    ServerRoutes.forEach(registerRoute([serverAuth]));
     // start express server
     app.listen(3031);
 
     await insertAchievementList();
 
-    // insert new users for test
-    const user = new User();
-    user.hashed_password = await bcrypt.hash("admin", 10);
-    user.username = "admin";
-    user.image_url =
-      "https://avatars.githubusercontent.com/u/4583705?s=400&u=f59c42dd30e407689861661295c37de67a4f5032&v=4";
-    await user.save();
+    // // insert new users for test
+    // const user = new User();
+    // user.hashed_password = await bcrypt.hash("admin", 10);
+    // user.username = "admin";
+    // user.image_url =
+    //   "https://avatars.githubusercontent.com/u/4583705?s=400&u=f59c42dd30e407689861661295c37de67a4f5032&v=4";
+    // await user.save();
 
-    const stats = new PlayerStats();
-    stats.user = user;
-    await stats.save();
+    // const stats = new PlayerStats();
+    // stats.user = user;
+    // await stats.save();
 
-    const achievementAssignment = new UserToAchievement();
-    achievementAssignment.achievement = await Achievement.findOneOrFail(
-      "astronaut:1"
-    );
-    achievementAssignment.unlocked = new Date();
-    achievementAssignment.progress = 1;
-    achievementAssignment.user = user;
-    await achievementAssignment.save();
+    // const achievementAssignment = new UserToAchievement();
+    // achievementAssignment.achievement = await Achievement.findOneOrFail(
+    //   "astronaut:1"
+    // );
+    // achievementAssignment.unlocked = new Date();
+    // achievementAssignment.progress = 1;
+    // achievementAssignment.user = user;
+    // await achievementAssignment.save();
 
     console.log(
       "Express server has started on port 3031. Open http://localhost:3031/users to see results"

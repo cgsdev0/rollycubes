@@ -24,11 +24,20 @@ struct GameError {
 namespace API {
     // Represents the state of a player in a particular session
     struct PlayerState {
-        PlayerState() : session(""), name(""), score(0), win_count(0), connected(true) {}
+        PlayerState()
+            : session(""),
+              name(""),
+              score(0),
+              win_count(0),
+              doubles_count(0),
+              roll_count(0),
+              connected(true) {}
         std::string session;
         std::string name;
         int score;
         int win_count;
+        int doubles_count;
+        int roll_count;
         bool connected;
 
         FWD_DECLARE_JSON_SERIALIZABLE()
@@ -44,6 +53,16 @@ namespace API {
         bool rolled = false;
         bool victory = false;
         bool privateSession;
+
+        FWD_DECLARE_JSON_SERIALIZABLE()
+    };
+
+    // Represents unlocking an achievement
+    struct AchievementUnlock {
+        std::string achievement_id;
+        std::string image_url;
+        std::string name;
+        std::string description;
 
         FWD_DECLARE_JSON_SERIALIZABLE()
     };
@@ -79,6 +98,16 @@ namespace API {
     // Another player reconnected
     struct Reconnect {
         int id;
+
+        FWD_DECLARE_JSON_SERIALIZABLE()
+    };
+
+    struct ReportStats {
+        std::string id;
+        int rolls;
+        int wins;
+        int games;
+        int doubles;
 
         FWD_DECLARE_JSON_SERIALIZABLE()
     };

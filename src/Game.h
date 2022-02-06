@@ -14,9 +14,16 @@
 using json = nlohmann::json;
 
 typedef std::function<void(std::string)> SendFunc;
+typedef std::function<void(std::string, std::string)> AuthSendFunc;
+typedef std::function<void(std::string, std::string, SendFunc)> AuthSendFunc2;
+
+struct HandlerArgs {
+    AuthSendFunc reportStats;
+    AuthSendFunc2 reportStats2;
+};
 
 #define HANDLER_ARGS \
-    SendFunc send, SendFunc broadcast, json &data, const ::std::string &session
+    SendFunc send, SendFunc broadcast, HandlerArgs server, json &data, const ::std::string &session
 
 class Game {
   public:

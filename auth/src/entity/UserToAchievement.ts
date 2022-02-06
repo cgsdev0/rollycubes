@@ -4,7 +4,7 @@ import { Achievement } from "./Achievement";
 
 @Entity()
 export class UserToAchievement extends BaseEntity {
-  @Column()
+  @Column({ default: 0 })
   progress: number;
 
   @Column({ nullable: true, default: null })

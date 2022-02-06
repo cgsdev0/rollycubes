@@ -1,11 +1,15 @@
 import { NextFunction, Request, Response } from "express";
+import { getConnection } from "typeorm";
 import { User } from "../entity/User";
+import { PlayerStats } from "../entity/PlayerStats";
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import { RefreshToken } from "../entity/RefreshToken";
 import { EntityNotFoundError } from "typeorm";
 import * as fs from "fs";
 import { publicKey } from "../middleware/auth";
+import { UserToAchievement } from "../entity/UserToAchievement";
+import { Achievement } from "../entity/Achievement";
 
 const jwtConfig = {
   key: fs.readFileSync(".id"),
@@ -25,6 +29,69 @@ export class UserController {
     return User.findOne(request.params.id, {
       relations: ["stats", "userToAchievements"],
     });
+  }
+
+  async achievementProgress(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    if (
+      !request.body.userId ||
+      !request.body.achievementId ||
+      !request.body.progress
+    ) {
+      throw new Error("no id specified");
+    }
+
+    const { userId, achievementId, progress } = request.body;
+    if (progress <= 0) return "nothing todo";
+
+    let a = await UserToAchievement.findOne({
+      where: { user: { id: userId }, achievement: { id: achievementId } },
+      relations: ["achievement", "user"],
+    });
+    if (!a) {
+      a = new UserToAchievement();
+      a.achievement = await Achievement.findOneOrFail(achievementId);
+      a.user = await User.findOneOrFail(userId);
+      a.progress = 0;
+    }
+    if (a.unlocked) return "already unlocked!";
+
+    a.progress += progress;
+    console.log(a);
+    // Check if they completed the achievement
+    if (a.achievement.max_progress <= a.progress) {
+      a.unlocked = new Date();
+    }
+    await a.save();
+    if (a.unlocked) return "UNLOCK";
+    return "ok";
+  }
+
+  async addStats(request: Request, response: Response, next: NextFunction) {
+    if (!request.body.id) {
+      throw new Error("no id specified");
+    }
+
+    const setStatement = {};
+    const cols = ["rolls", "wins", "games", "doubles"];
+    cols.forEach((col) => {
+      if (!request.body.hasOwnProperty(col)) return;
+      setStatement[col] = () => `${col} + ${request.body[col]}`;
+    });
+    if (Object.keys(setStatement).length === 0) {
+      throw new Error("no stats need to be updated");
+    }
+
+    await getConnection()
+      .createQueryBuilder()
+      .update(PlayerStats)
+      .set(setStatement)
+      .where("userId = :id", { id: request.body.id })
+      .execute();
+    return "done";
   }
 
   async me(request: Request, response: Response, next: NextFunction) {

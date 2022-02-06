@@ -12,6 +12,12 @@ export const insertAchievementList = async () => {
         name: "Astronaut",
         description: "Win with a score of 100",
       },
+      {
+        id: "getting_started",
+        name: "Getting Started",
+        description: "You rolled your first dice!",
+        max_progress: 1,
+      },
     ])
     .execute();
 };

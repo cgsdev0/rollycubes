@@ -7,7 +7,7 @@
   "database": "test",
   "synchronize": true,
   "logging": false,
-  "dropSchema": true,
+  "dropSchema": false,
   "entities": ["src/entity/**/*.ts"],
   "migrations": ["src/migration/**/*.ts"],
   "subscribers": ["src/subscriber/**/*.ts"],
