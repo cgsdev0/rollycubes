@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-import { verifyToken as auth } from "./middleware/auth";
+import { verifyToken as userAuth } from "./middleware/auth";
+import { verifyPreSharedKey as serverAuth } from "./middleware/server_auth";
 import * as cors from "cors";
 import * as bcrypt from "bcrypt";
 import * as express from "express";
@@ -29,6 +30,10 @@ createConnection()
         allowedHeaders: ["csrf-token", "content-type", "x-access-token"],
       })
     );
+    app.post("/test", serverAuth, function (req, res) {
+      console.log("GREAT SUCCESS");
+      res.send("you did it!");
+    });
     app.use(
       csrf({ cookie: { httpOnly: true, sameSite: "none", secure: true } })
     );
@@ -41,7 +46,7 @@ createConnection()
     Routes.forEach((route) => {
       const middleware = [];
       if (route.requires_auth) {
-        middleware.push(auth);
+        middleware.push(userAuth);
       }
       (app as any)[route.method](
         route.route,

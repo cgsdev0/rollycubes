@@ -24,6 +24,7 @@
 #include "StringUtils.h"
 
 #include "API.h"
+#include "AuthServerRequestQueue.h"
 #include "JWTVerifier.h"
 
 // for convenience
@@ -41,7 +42,8 @@ std::string serializeTimePoint(const time_point &time,
 
 std::unordered_map<std::string, Game *> games;
 
-std::unordered_set<std::string> eviction_set;
+std::unordered_set<std::string>
+    eviction_set;
 std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
     eviction_queue;
 
@@ -359,6 +361,9 @@ int main(int argc, char **argv) {
 
     JWTVerifier jwt_verifier;
     jwt_verifier.init();
+
+    AuthServerRequestQueue authServer("http://localhost:3031/");
+    authServer.send("test", "{}");
 
     uWS::App app;
     app.get("/list",

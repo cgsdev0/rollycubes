@@ -8,3 +8,4 @@ server_state.json
 .ccls-cache/
 gcm.cache/
 *.d
+**/.pre-shared-key
