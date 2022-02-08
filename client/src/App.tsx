@@ -1,19 +1,19 @@
 import React from "react";
-import { Provider } from "react-redux";
+import { connect, Provider } from "react-redux";
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+import { RequiresSession } from "./hocs/requires_session";
+import CookiePage from "./pages/cookie_page";
 import GamePage from "./pages/game_page";
-import { store } from "./store";
 import HomePage from "./pages/home_page";
 import LoginPage from "./pages/login_page";
 import RegisterPage from "./pages/register_page";
-import CookiePage from "./pages/cookie_page";
-import { connect } from "react-redux";
-import { ReduxState } from "./store";
+import { ReduxState, store } from "./store";
 import { ThemeContext } from "./themes";
-import SettingsMenu from "./ui/settings";
 import LoginPrompt from "./ui/login_prompt";
-import { RequiresSession } from "./hocs/requires_session";
+import SettingsMenu from "./ui/settings";
 
 const mapStateToProps = (state: ReduxState) => ({
   theme: state.settings.theme
@@ -31,9 +31,16 @@ const AppThemer = connect(mapStateToProps)(
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <AppThemer />
-    </Provider>
+    <>
+      <ToastContainer
+        theme={"dark"}
+        closeButton={false}
+        position={"bottom-center"}
+      />
+      <Provider store={store}>
+        <AppThemer />
+      </Provider>
+    </>
   );
 };
 

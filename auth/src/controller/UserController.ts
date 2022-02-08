@@ -37,24 +37,24 @@ export class UserController {
     next: NextFunction
   ) {
     if (
-      !request.body.userId ||
-      !request.body.achievementId ||
+      !request.body.user_id ||
+      !request.body.achievement_id ||
       !request.body.progress
     ) {
       throw new Error("no id specified");
     }
 
-    const { userId, achievementId, progress } = request.body;
+    const { user_id, achievement_id, progress } = request.body;
     if (progress <= 0) return "nothing todo";
 
     let a = await UserToAchievement.findOne({
-      where: { user: { id: userId }, achievement: { id: achievementId } },
+      where: { user: { id: user_id }, achievement: { id: achievement_id } },
       relations: ["achievement", "user"],
     });
     if (!a) {
       a = new UserToAchievement();
-      a.achievement = await Achievement.findOneOrFail(achievementId);
-      a.user = await User.findOneOrFail(userId);
+      a.achievement = await Achievement.findOneOrFail(achievement_id);
+      a.user = await User.findOneOrFail(user_id);
       a.progress = 0;
     }
     if (a.unlocked) return "already unlocked!";
@@ -66,7 +66,8 @@ export class UserController {
       a.unlocked = new Date();
     }
     await a.save();
-    if (a.unlocked) return "UNLOCK";
+    if (a.unlocked)
+      return Object.assign({ type: "achievement_unlock" }, a.achievement);
     return "ok";
   }
 
@@ -89,7 +90,7 @@ export class UserController {
       .createQueryBuilder()
       .update(PlayerStats)
       .set(setStatement)
-      .where("userId = :id", { id: request.body.id })
+      .where("user_id = :id", { id: request.body.id })
       .execute();
     return "done";
   }

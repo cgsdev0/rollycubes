@@ -1,8 +1,10 @@
-import React from "react";
 import { History } from "history";
-import { connect, DispatchProp } from "react-redux";
-import { ReduxState } from "./store";
 import jwt_decode from "jwt-decode";
+import React from "react";
+import { connect, DispatchProp } from "react-redux";
+import { toast } from "react-toastify";
+import { ReduxState } from "./store";
+import { Achievement } from "./ui/achievement";
 
 interface Props {
   room: string;
@@ -29,6 +31,14 @@ class Connection extends React.Component<Props & DispatchProp> {
   };
 
   onOpen = (_: Event) => {
+    toast(
+      Achievement({
+        description: "hey there's some text about the achievement",
+        name: "Getting Started",
+        image_url: "https://via.placeholder.com/64/0000FF/808080",
+        achievement_id: "fake_test"
+      })
+    );
     console.log("Socket opened to room", this.props.room);
     this.props.dispatch({ type: "socket_open" });
     const name = localStorage.getItem("name");
@@ -86,6 +96,9 @@ class Connection extends React.Component<Props & DispatchProp> {
           }
         }
       };
+      if (data.type === "achievement_unlock") {
+        toast(Achievement(data), { autoClose: 0 });
+      }
       if (data.type === "welcome") {
         data.players.forEach(populateUser);
       }

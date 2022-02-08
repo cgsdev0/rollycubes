@@ -54,15 +54,32 @@ namespace API {
         bool victory = false;
         bool privateSession;
 
+        const API::PlayerState &getPlayer(const std::string &session) const {
+            for (uint i = 0; i < players.size(); ++i) {
+                if (players[i].session == session) {
+                    return players[i];
+                }
+            }
+            throw new GameError("unknown player");
+        }
         FWD_DECLARE_JSON_SERIALIZABLE()
     };
 
     // Represents unlocking an achievement
-    struct AchievementUnlock {
-        std::string achievement_id;
+    struct Achievement_Unlock {
+        std::string id;
         std::string image_url;
         std::string name;
         std::string description;
+        int max_progress;
+
+        FWD_DECLARE_JSON_SERIALIZABLE()
+    };
+
+    struct AchievementProgress {
+        std::string achievement_id;
+        std::string user_id;
+        int progress;
 
         FWD_DECLARE_JSON_SERIALIZABLE()
     };

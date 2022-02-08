@@ -7,11 +7,11 @@ export const insertAchievementList = async () => {
     .insert()
     .into(Achievement)
     .values([
-      {
-        id: "astronaut:1",
-        name: "Astronaut",
-        description: "Win with a score of 100",
-      },
+      // {
+      //   id: "astronaut:1",
+      //   name: "Astronaut",
+      //   description: "Win with a score of 100",
+      // },
       {
         id: "getting_started",
         name: "Getting Started",

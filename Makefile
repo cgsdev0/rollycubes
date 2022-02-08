@@ -3,7 +3,7 @@ CXXFLAGS=-std=c++20 -Wall -IuWebSockets/src -IuWebSockets/uSockets/src -Iinclude
 LDFLAGS=-lz -lpthread -lssl -lcrypto
 TARGET=GameServer
 
-SRC=$(wildcard src/*.cpp)
+SRC=$(shell find src/ -type f -name '*.cpp')
 OBJ=$(SRC:.cpp=.o)
 DEP=$(OBJ:.o=.d)
 

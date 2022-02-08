@@ -4,10 +4,10 @@ import { Link, RouteComponentProps } from "react-router-dom";
 type Props = RouteComponentProps;
 
 interface Game {
-  lastUpdated: number;
-  hostName: string;
+  last_updated: number;
+  host_name: string;
   code: string;
-  playerCount: number;
+  player_count: number;
 }
 interface State {
   pressed: boolean;
@@ -32,18 +32,18 @@ class HomePage extends React.Component<Props, State> {
       const data = await window.fetch("/list");
       const allGames = await data.json();
       const games = allGames.rooms
-        .filter((game: Game) => game.playerCount)
+        .filter((game: Game) => game.player_count)
         .sort((a: Game, b: Game) => {
-          if (a.playerCount === b.playerCount) {
+          if (a.player_count === b.player_count) {
             // how should we break ties
-            return b.lastUpdated > a.lastUpdated;
+            return b.last_updated > a.last_updated;
           }
           // move full lobbies to the bottom
-          if (b.playerCount === 8 && a.playerCount !== 8) {
+          if (b.player_count === 8 && a.player_count !== 8) {
             return -1;
           }
           // default: sort by player count
-          return b.playerCount - a.playerCount;
+          return b.player_count - a.player_count;
         });
       this.setState({ games, hasData: true });
     } finally {
@@ -84,8 +84,8 @@ class HomePage extends React.Component<Props, State> {
             </tr>
             {this.state.games.map(game => (
               <tr key={game.code}>
-                <td className="host">{game.hostName || "unknown"}</td>
-                <td>{game.playerCount} / 8</td>
+                <td className="host">{game.host_name || "unknown"}</td>
+                <td>{game.player_count} / 8</td>
                 <td>
                   <Link to={`/room/${game.code}`}>Link</Link>
                 </td>

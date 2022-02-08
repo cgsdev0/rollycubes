@@ -6,6 +6,17 @@
 #include "Game.h"
 #include "Loop.h"
 #include "StringUtils.h"
+#include "achievements/All.h"
+
+Game::Game() {
+    // Initialize all achievements
+    this->achievements = initAchievements();
+}
+Game::~Game() {
+    for (auto &achievement : this->achievements) {
+        delete achievement;
+    }
+}
 
 bool Game::isInitialized() { return state.players.size() > 0; }
 bool Game::isPrivate() const { return state.privateSession; }
@@ -157,7 +168,7 @@ int Game::connectedPlayerCount() {
     }
 
 static const std::unordered_map<
-    std::string, std::function<void(Game *, SendFunc, SendFunc, HandlerArgs, json &,
+    std::string, std::function<void(Game *, SendFunc, HandlerArgs, json &,
                                     const std::string &)>>
     action_map = {ACTION(chat), ACTION(leave), ACTION(kick),
                   ACTION(restart), ACTION(update_name), ACTION(roll),
@@ -166,16 +177,45 @@ static const std::unordered_map<
 
 #undef ACTION
 
+void Game::processEvent(const API::PlayerState *player, HandlerArgs *server, const json &data, const API::GameState &prev) {
+    if (!isSignedIn(*player)) return;
+
+    for (auto achievement : this->achievements) {
+        auto progress = achievement->processEvent(data, prev, state, player->session);
+        if (progress <= 0) continue;
+        API::AchievementProgress ap{
+            .achievement_id = achievement->getAchievementID(),
+            .user_id = player->session,
+            .progress = progress};
+        auto send = server->send;
+        server->reportStats2("achievement_progress", ap.toString(), [send](auto s) {
+            API::Achievement_Unlock a;
+            try {
+                a.fromString(s);
+                send(a.toString());
+            } catch (nlohmann::detail::parse_error &e) {
+                // expected
+            }
+        });
+    }
+}
 void Game::handleMessage(HANDLER_ARGS) {
     if (!data["type"].is_string())
         throw GameError("Type is not specified correctly");
+    // Copy a snapshot of the current game state
+    API::GameState prev(state);
+    const API::PlayerState *player = nullptr;
+    player = &state.getPlayer(session);
+    if (player == nullptr)
+        throw GameError("unknown player");
     auto action_type = data["type"].get<std::string>();
     auto it = action_map.find(action_type);
     if (it != action_map.end()) {
-        it->second(this, send, broadcast, server, data, session);
+        it->second(this, broadcast, server, data, session);
     } else {
         throw GameError("Unknown action type");
     }
+    processEvent(player, &server, data, prev);
     updated = std::chrono::system_clock::now();
 }
 
@@ -341,16 +381,16 @@ void Game::add(HANDLER_ARGS) {
     guardUpdate(session);
     if (isSplit())
         throw GameError("you must add invdividually");
-    data = json(totalRoll());
-    update(send, broadcast, server, data, session);
+    json j = json(totalRoll());
+    update(broadcast, server, j, session);
 }
 
 void Game::sub(HANDLER_ARGS) {
     guardUpdate(session);
     if (isSplit())
         throw GameError("you must add invdividually");
-    data = json(-totalRoll());
-    update(send, broadcast, server, data, session);
+    json j = json(-totalRoll());
+    update(broadcast, server, j, session);
 }
 
 int Game::guardNth(const json &data) {
@@ -370,15 +410,15 @@ int Game::guardNth(const json &data) {
 void Game::add_nth(HANDLER_ARGS) {
     guardUpdate(session);
     int n = guardNth(data["n"]);
-    data = json(state.rolls[n]);
-    update(send, broadcast, server, data, session);
+    json j = json(state.rolls[n]);
+    update(broadcast, server, j, session);
 }
 
 void Game::sub_nth(HANDLER_ARGS) {
     guardUpdate(session);
     int n = guardNth(data["n"]);
-    data = json(-state.rolls[n]);
-    update(send, broadcast, server, data, session);
+    json j = json(-state.rolls[n]);
+    update(broadcast, server, j, session);
 }
 
 void Game::update(HANDLER_ARGS) {
@@ -410,9 +450,9 @@ void Game::update(HANDLER_ARGS) {
                         .games = 1,
                         .doubles = state.players[i].doubles_count};
                     server.reportStats2("add_stats", stats.toString(), [broadcast](auto s) {
-                        API::AchievementUnlock a{
-                            .name = "you did it congrats"};
-                        broadcast(a.toString());
+                        /* API::Achievement_Unlock a{ */
+                        /*     .name = "you did it congrats"}; */
+                        /* broadcast(a.toString()); */
                     });
                 }
 
@@ -460,7 +500,7 @@ void Game::update(HANDLER_ARGS) {
             clearTurn();
             json rollAgain;
             rollAgain["type"] = "roll_again";
-            send(rollAgain.dump());
+            server.send(rollAgain.dump());
         }
     }
 }

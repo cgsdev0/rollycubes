@@ -2,6 +2,7 @@
 #define INCLUDE_GAME_H
 
 #include "Consts.h"
+#include "achievements/BaseAchievement.h"
 
 #include "API.h"
 #include <chrono>
@@ -18,17 +19,20 @@ typedef std::function<void(std::string, std::string)> AuthSendFunc;
 typedef std::function<void(std::string, std::string, SendFunc)> AuthSendFunc2;
 
 struct HandlerArgs {
+    SendFunc send;
     AuthSendFunc reportStats;
     AuthSendFunc2 reportStats2;
 };
 
 #define HANDLER_ARGS \
-    SendFunc send, SendFunc broadcast, HandlerArgs server, json &data, const ::std::string &session
+    SendFunc broadcast, HandlerArgs server, json &data, const ::std::string &session
 
 class Game {
   public:
-    Game(bool isPrivate) {
-        this->state.privateSession = true;
+    Game();
+    ~Game();
+    Game(bool isPrivate) : Game() {
+        this->state.privateSession = isPrivate;
         this->state.players.reserve(MAX_PLAYERS);
         for (uint i = 0; i < DICE_COUNT; ++i) {
             this->state.rolls[i] = 1;
@@ -37,7 +41,7 @@ class Game {
     }
 
     // Rehydrate game from disk
-    Game(const API::GameState &g) {
+    Game(const API::GameState &g) : Game() {
         this->state = g;
         for (auto &player : this->state.players) {
             player.connected = false;
@@ -94,11 +98,13 @@ class Game {
     std::string toString() const {
         return this->state.toString();
     }
+    void processEvent(const API::PlayerState *player, HandlerArgs *server, const json &data, const API::GameState &prev);
 
   private:
     std::uniform_int_distribution<int> dis{1, 6};
     std::chrono::system_clock::time_point updated = std::chrono::system_clock::now();
     std::string turn_token;
+    std::vector<BaseAchievement *> achievements;
     API::GameState state;
 };
 

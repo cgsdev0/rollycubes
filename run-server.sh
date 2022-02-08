@@ -5,7 +5,7 @@ do
     pkill GameServer
     clear
     echo "====================================================="
-    make -j$(( $(nproc) / 2 )) || echo -e '\a'
+    make -j$(( $(nproc) / 2 ))
     ./GameServer &
     inotifywait src -e MODIFY
 done
