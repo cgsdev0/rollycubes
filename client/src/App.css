@@ -7,6 +7,9 @@
   overflow-x: hidden;
 }
 
+:root {
+  --toastify-toast-width: 360px;
+}
 body {
   font-family: 'Roboto', sans-serif;
   background-color: white;

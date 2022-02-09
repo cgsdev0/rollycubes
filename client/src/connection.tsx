@@ -31,14 +31,30 @@ class Connection extends React.Component<Props & DispatchProp> {
   };
 
   onOpen = (_: Event) => {
-    toast(
-      Achievement({
-        description: "hey there's some text about the achievement",
-        name: "Getting Started",
-        image_url: "https://via.placeholder.com/64/0000FF/808080",
-        achievement_id: "fake_test"
-      })
-    );
+    {
+      /* toast( */
+    }
+    {
+      /*   Achievement({ */
+    }
+    {
+      /*     description: "hey there's some text about the achievement", */
+    }
+    {
+      /*     name: "Getting Started", */
+    }
+    {
+      /*     image_url: "https://via.placeholder.com/64/0000FF/808080", */
+    }
+    {
+      /*     achievement_id: "fake_test" */
+    }
+    {
+      /*   }) */
+    }
+    {
+      /* ); */
+    }
     console.log("Socket opened to room", this.props.room);
     this.props.dispatch({ type: "socket_open" });
     const name = localStorage.getItem("name");

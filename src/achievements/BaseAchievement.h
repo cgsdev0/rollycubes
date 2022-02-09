@@ -9,6 +9,7 @@ using json = nlohmann::json;
 
 class BaseAchievement {
   public:
+    virtual void removePlayer(const std::string &session) {}
     // Return the progress on this achievement
     virtual int processEvent(const json &event, const API::GameState &before, const API::GameState &after, const std::string &session) = 0;
     // Get the achievement ID

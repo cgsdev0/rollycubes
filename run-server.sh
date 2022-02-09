@@ -7,5 +7,5 @@ do
     echo "==============================================="
     make -j$(( $(nproc) / 2 ))
     ./GameServer &
-    inotifywait src -e MODIFY
+    inotifywait -r src -e MODIFY
 done

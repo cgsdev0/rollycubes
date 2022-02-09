@@ -290,6 +290,9 @@ void Game::kick(HANDLER_ARGS) {
     } else if (state.turn_index > id) {
         state.turn_index--;
     }
+    for (auto &achievement : achievements) {
+        achievement->removePlayer(state.players[id].session);
+    }
     state.players.erase(state.players.begin() + id);
     broadcast(res.dump());
 }

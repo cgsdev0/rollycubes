@@ -1,21 +1,28 @@
-#ifndef INCLUDE_ACHIEVEMENTS_GETTING_STARTED_H
-#define INCLUDE_ACHIEVEMENTS_GETTING_STARTED_H
+
+#ifndef INCLUDE_ACHIEVEMENTS_WIN_GAMES_H
+#define INCLUDE_ACHIEVEMENTS_WIN_GAMES_H
 
 #include "BaseAchievement.h"
 
-class GettingStarted : public BaseAchievement {
+class WinGames : public BaseAchievement {
+  public:
+    WinGames(std::string id) {
+        this->id = id;
+    }
 
     virtual int processEvent(const json &event, const API::GameState &before, const API::GameState &after, const std::string &session) {
-        if (event["type"] == "roll" &&
-            before.getPlayer(session).roll_count == 0) {
+        if (!before.victory && after.victory) {
             return 1;
         }
         return 0;
     }
     // Get the achievement ID
     virtual std::string getAchievementID() {
-        return "getting_started";
+        return "win_games:" + id;
     }
+
+  private:
+    std::string id;
 };
 
 #endif

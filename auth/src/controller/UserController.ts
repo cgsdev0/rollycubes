@@ -60,12 +60,14 @@ export class UserController {
     if (a.unlocked) return "already unlocked!";
 
     a.progress += progress;
-    console.log(a);
     // Check if they completed the achievement
     if (a.achievement.max_progress <= a.progress) {
       a.unlocked = new Date();
     }
     await a.save();
+    if (!a.achievement.image_url) {
+      a.achievement.image_url = "//via.placeholder.com/48";
+    }
     if (a.unlocked)
       return Object.assign({ type: "achievement_unlock" }, a.achievement);
     return "ok";
