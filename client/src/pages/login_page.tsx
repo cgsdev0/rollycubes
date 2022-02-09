@@ -5,6 +5,7 @@ import { Link, RouteComponentProps } from "react-router-dom";
 import { getCsrf } from "../auth";
 import { selectAuthService } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
+import { TwitchButton } from "../twitch";
 import "./login.css";
 
 interface Props {
@@ -51,14 +52,8 @@ const LoginPage: React.FC<DispatchProp &
     }
   };
 
-  const twitchLogin = () => {
-    document.location =
-      "http://localhost:3031/twitch" +
-      `?redirect=${document.location.origin}/twitch_oauth`;
-  };
-
   return (
-    <div>
+    <div className="loginContainer">
       <h1>Dice Game</h1>
       <p>the one where you roll some dice</p>
       <form onSubmit={login}>
@@ -79,7 +74,7 @@ const LoginPage: React.FC<DispatchProp &
           </button>
         </div>
       </form>
-      <button onClick={twitchLogin}>Login With Twitch</button>
+      <TwitchButton />
       <p>
         Need an account? <Link to="/register">Register</Link>
       </p>

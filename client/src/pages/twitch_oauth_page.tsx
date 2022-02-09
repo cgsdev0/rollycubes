@@ -46,6 +46,7 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props & RouteComponentProps> = ({
         dispatch({ type: "AUTHENTICATE", access_token });
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;

@@ -8,3 +8,18 @@ div.loginForm {
     height: 24px;
     font-size: 16pt;
 }
+.loginContainer button {
+    width: 100%;
+    margin: 0px;
+    margin-bottom: 12px;
+    padding: 6px 6px;
+}
+
+.twitchButton {
+    background-color: #9146FF;
+    color: #FFFFFF;
+}
+
+.twitchButton:active {
+    background-color: #6903ff;
+}

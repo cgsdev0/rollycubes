@@ -1,17 +1,15 @@
 import React from "react";
 import { connect, DispatchProp } from "react-redux";
 import "../App.css";
-import { ReduxState } from "../store";
-import "../ui/buttons/buttons.css";
 import {
-  selectIsDarkTheme,
+  selectAuthService,
   selectCheats,
   selectIs3d,
-  selectAuthService,
-  selectIsDev,
-  selectIsSignedIn,
+  selectIsDarkTheme,
+  selectIsDev
 } from "../selectors/game_selectors";
-import { getCsrf } from "../auth";
+import { ReduxState } from "../store";
+import "../ui/buttons/buttons.css";
 
 interface Props {
   socket?: WebSocket;
@@ -22,7 +20,7 @@ interface Props {
   authService: string;
 }
 
-const SettingsMenu: React.FC<Props & DispatchProp> = (props) => {
+const SettingsMenu: React.FC<Props & DispatchProp> = props => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const changeName = () => {
@@ -113,7 +111,7 @@ const mapStateToProps = (state: ReduxState) => {
     hints: selectCheats(state),
     is3d: selectIs3d(state),
     authService: selectAuthService(state),
-    isDev: selectIsDev(state),
+    isDev: selectIsDev(state)
   };
 };
 

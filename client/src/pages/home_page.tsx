@@ -76,24 +76,26 @@ class HomePage extends React.Component<Props, State> {
         <h2>Public Lobbies</h2>
         {this.state.games.length ? (
           <table className="lobby-table">
-            <tr>
-              <th className="host">Host</th>
-              <th>Players</th>
-              <th>Join</th>
-              <th>Spectate</th>
-            </tr>
-            {this.state.games.map(game => (
-              <tr key={game.code}>
-                <td className="host">{game.host_name || "unknown"}</td>
-                <td>{game.player_count} / 8</td>
-                <td>
-                  <Link to={`/room/${game.code}`}>Link</Link>
-                </td>
-                <td>
-                  <Link to={`/spectate/${game.code}`}>Spectate</Link>
-                </td>
+            <tbody>
+              <tr>
+                <th className="host">Host</th>
+                <th>Players</th>
+                <th>Join</th>
+                <th>Spectate</th>
               </tr>
-            ))}
+              {this.state.games.map(game => (
+                <tr key={game.code}>
+                  <td className="host">{game.host_name || "unknown"}</td>
+                  <td>{game.player_count} / 8</td>
+                  <td>
+                    <Link to={`/room/${game.code}`}>Link</Link>
+                  </td>
+                  <td>
+                    <Link to={`/spectate/${game.code}`}>Spectate</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         ) : (
           <p>

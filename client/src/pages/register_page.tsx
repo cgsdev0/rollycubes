@@ -4,6 +4,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { getCsrf } from "../auth";
 import { selectAuthService } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
+import { TwitchButton } from "../twitch";
 import "./login.css";
 
 interface Props {
@@ -57,7 +58,7 @@ const LoginPage: React.FC<DispatchProp &
   };
 
   return (
-    <div>
+    <div className="loginContainer">
       <h1>Dice Game</h1>
       <p>the one where you roll some dice</p>
       <form onSubmit={register}>
@@ -91,6 +92,7 @@ const LoginPage: React.FC<DispatchProp &
           </button>
         </div>
       </form>
+      <TwitchButton />
     </div>
   );
 };

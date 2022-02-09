@@ -109,7 +109,6 @@ const rootReducer: Reducer<ReduxState> = (
       };
     case "GOT_USER_DATA":
       const user_id = action.data.id;
-      console.warn("GOT_USER_DATA", action);
       return {
         ...state,
         otherUsers: Object.assign({}, state.otherUsers, {
