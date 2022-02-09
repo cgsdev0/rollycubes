@@ -29,4 +29,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: beta
+        tags: ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:beta
