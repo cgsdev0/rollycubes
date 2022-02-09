@@ -29,5 +29,5 @@ jobs:
           nginx => '/root'
         # execute post-commands after scp
         last_ssh: |
-          cd /root/auth
+          cd /root/nginx
           docker-compose up -d
