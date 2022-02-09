@@ -45,4 +45,4 @@ jobs:
         host: rollycubes.com
         user: root
         key: ${{ secrets.PROD_DEPLOY_KEY }}
-        first_ssh: systemctl start dice_auth
+        first_ssh: systemctl restart dice_auth
