@@ -5,6 +5,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  CHANNEL: beta
   IMAGE_NAME: ${{ github.repository }}
   
 jobs:
@@ -29,4 +30,15 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:beta
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.CHANNEL }}
+
+    - name: Pull docker image
+      uses: appleboy/ssh-action@master
+      with:
+        host: rollycubes.com
+        username: root
+        key: ${{ secrets.DO_SSH_KEY }}
+        script: |
+          whoami
+          ls -al
+          docker pull ghcr.io/cgsdev0/rollycubes:${{ env.CHANNEL }}
