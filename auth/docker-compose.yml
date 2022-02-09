@@ -19,3 +19,8 @@ services:
 
     volumes:
       - /home/sarah/postgres-data-auth:/var/lib/postgresql/data
+
+networks:
+  default:
+    name: rollycubes
+    external: true

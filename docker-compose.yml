@@ -6,11 +6,11 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./:/build
+      - ../secrets:/secrets
     external_links:
       - "auth:auth"
 networks:
   default:
+    name: rollycubes
     external: true
-    name: auth_default
 
