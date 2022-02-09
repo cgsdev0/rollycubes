@@ -17,7 +17,7 @@ COPY . .
 FROM base as production
 
 ENV NODE_PATH=/build
-COPY .env ./build/
+COPY --from=base .env ./build/
 RUN npm run build
 
 FROM gcr.io/distroless/nodejs
