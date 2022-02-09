@@ -2,7 +2,7 @@ name: Deploy Nginx
 
 on:
   workflow_dispatch
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
+
     # Deploy it
     - name: ssh-scp-ssh-pipelines
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
@@ -24,6 +24,8 @@ jobs:
           mkdir -p /root/nginx
           cd /root/nginx
           docker-compose down || true
+          rm -rf config
+          mkdir -p config
         # scp from local to remote
         scp: |
           nginx => '/root'

@@ -1,22 +1,24 @@
 version: '3.9'
+
 services:
   nginx:
-    image: nginx:1.15-alpine
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
+    env_file:
+      - ./nginx-certbot.env
+    environment:
+      CERTBOT_EMAIL: rollycubes@cgs.dev
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./config/:/etc/nginx/conf.d
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - 80:80
+      - 443:443
     external_links:
       - "auth:auth"
-  certbot:
-    image: certbot/certbot
     volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - nginx_secrets:/etc/letsencrypt
+      - ./config:/etc/nginx/user_conf.d
 
+volumes:
+  nginx_secrets:
 networks:
   default:
     name: rollycubes
