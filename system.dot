@@ -1,0 +1,6 @@
+digraph {
+  GameServer -> AuthServer
+  Client -> AuthServer
+  AuthServer -> Client
+  Client -> GameServer [dir="both",label="WS"]
+}
