@@ -1,0 +1,33 @@
+name: Deploy Nginx
+
+on:
+  workflow_dispatch
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    # Deploy it
+    - name: ssh-scp-ssh-pipelines
+      uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
+      with:
+        host: rollycubes.com
+        user: root
+        key: ${{ secrets.DO_SSH_KEY }}
+        first_ssh: |
+          mkdir -p /root/nginx
+          cd /root/nginx
+          docker-compose down || true
+        # scp from local to remote
+        scp: |
+          nginx => '/root'
+        # execute post-commands after scp
+        last_ssh: |
+          cd /root/auth
+          docker-compose up -d
