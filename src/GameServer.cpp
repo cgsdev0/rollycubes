@@ -366,7 +366,7 @@ int main(int argc, char **argv) {
     JWTVerifier jwt_verifier;
     jwt_verifier.init();
 
-    AuthServerRequestQueue authServer("http://localhost:3031/", uWS::Loop::get());
+    AuthServerRequestQueue authServer("http://auth:3031/", uWS::Loop::get());
     authServer.send("test", "{}");
 
     uWS::App app;

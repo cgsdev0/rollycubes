@@ -22,7 +22,7 @@ JWTVerifier::~JWTVerifier() {
 
 void JWTVerifier::init() {
     // TODO: maybe don't hardcode localhost url
-    auto public_key_resp = http::get("http://localhost:3031/public_key");
+    auto public_key_resp = http::get("http://auth:3031/public_key");
     auto j = nlohmann::json::parse(public_key_resp);
     auto public_key = j["publicKey"].get<std::string>();
 

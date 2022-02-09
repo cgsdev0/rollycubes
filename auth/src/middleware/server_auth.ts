@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import * as fs from "fs";
 
-const preSharedKey = fs.readFileSync(".pre-shared-key").toString().trim();
+const preSharedKey = fs
+  .readFileSync("./secrets/.pre-shared-key")
+  .toString()
+  .trim();
 
 export const verifyPreSharedKey = (
   req: Request,

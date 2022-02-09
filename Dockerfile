@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM alpine:edge as build
 RUN apk add g++ libc-dev zlib-dev make openssl-dev
 RUN mkdir build
 
@@ -9,4 +9,8 @@ COPY Makefile /build/Makefile
 
 RUN cd /build; ls -la .; make release
 
-ENTRYPOINT ["/build/GameServer"]
+FROM alpine:edge as prod
+RUN apk add libstdc++ libgcc
+COPY --from=build /build/GameServer .
+
+ENTRYPOINT ["./GameServer"]

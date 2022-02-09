@@ -1,11 +1,12 @@
 {
   "type": "postgres",
-  "host": "localhost",
+  "host": "db",
   "port": 5432,
   "username": "test",
   "password": "test",
   "database": "test",
   "logging": false,
+  "synchronize": true,
   "entities": ["entity/**/*.js"],
   "migrations": ["migration/**/*.js"],
   "subscribers": ["subscriber/**/*.js"],

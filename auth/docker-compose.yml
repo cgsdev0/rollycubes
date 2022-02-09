@@ -1,14 +1,21 @@
 version: '3'
 services:
-
+  auth:
+    image: test
+    ports:
+      - "3031:3031"
+    depends_on:
+      - "postgres"
+    links:
+      - "postgres:db"
+    volumes:
+      - ./:/secrets
   postgres:
     image: "postgres:9.6.1"
-    ports:
-      - "127:0.0.1:5432:5432"
     environment:
       POSTGRES_USER: "test"
       POSTGRES_PASSWORD: "test"
       POSTGRES_DB: "test"
 
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - /home/sarah/postgres-data-auth:/var/lib/postgresql/data
