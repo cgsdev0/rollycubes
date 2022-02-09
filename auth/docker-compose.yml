@@ -1,7 +1,7 @@
 version: '3'
 services:
   auth:
-    image: test
+    image: ghcr.io/cgsdev0/rollycubes-auth
     ports:
       - "3031:3031"
     depends_on:

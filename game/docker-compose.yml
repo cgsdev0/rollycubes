@@ -1,8 +1,7 @@
 version: "3.9"  # optional since v1.27.0
 services:
   game-server:
-    # image: ghcr.io/cgsdev0/rollycubes:beta
-    image: gameserv
+    image: ghcr.io/cgsdev0/rollycubes:beta
     ports:
       - "3001:3001"
     volumes:
