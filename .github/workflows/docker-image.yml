@@ -42,6 +42,7 @@ jobs:
         first_ssh: |
           cd /root/game
           docker-compose down || true
+          docker pull ghcr.io/cgsdev0/rollycubes:beta
         # scp from local to remote
         scp: |
           game/docker-compose.yml => '/root/game'
