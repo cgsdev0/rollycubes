@@ -1,3 +1,4 @@
+#include "StringUtils.h"
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -15,7 +16,7 @@ unsigned int srandom_char(std::mt19937 &gen, int k = 255) {
     return dis(gen);
 }
 
-std::string generateCode(const unsigned int len, std::string seed = "") {
+std::string generateCode(const unsigned int len, std::string seed) {
     std::seed_seq s(seed.begin(), seed.end());
     std::mt19937 gen(s);
     const std::string chars =
@@ -58,7 +59,7 @@ std::string toHex(std::string a) {
     return res.str();
 }
 
-std::string trimString(const std::string &a, int len, bool strict = false) {
+std::string trimString(const std::string &a, int len, bool strict) {
     std::string res;
     if (!len) return res;
     res.reserve(len);

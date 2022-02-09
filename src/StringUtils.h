@@ -3,6 +3,8 @@
 
 #include <string>
 
+typedef unsigned int uint;
+
 // Trims a string to a certain amount of characters (unicode aware).
 std::string trimString(const std::string &a, int len, bool strict = false);
 

@@ -6,6 +6,7 @@
 #include <unordered_set>
 
 using string = std::string;
+typedef unsigned int uint;
 
 static const uint MAX_PLAYERS = 8;
 static const uint MAX_CHAT_LOG = 100;
