@@ -44,7 +44,7 @@ jobs:
           docker-compose down || true
         # scp from local to remote
         scp: |
-          auth/docker-compose.yml => '/root/auth/docker-compose.yml'
+          auth/docker-compose.yml => '/root/auth'
         # execute post-commands after scp
         last_ssh: |
           cd /root/auth
