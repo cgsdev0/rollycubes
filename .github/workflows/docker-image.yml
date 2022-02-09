@@ -3,10 +3,12 @@ name: Docker Image CI
 on:
   workflow_dispatch
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
