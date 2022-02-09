@@ -18,8 +18,8 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "start": "BROWSER=none react-scripts start 2>&1 | cat -v | (react-scripts-wrapper || cat)",
-    "start-off-stream": "PORT=3005 react-scripts start 2>&1 | cat -v | (react-scripts-wrapper2 || cat)",
+    "start": "BROWSER=none react-scripts start",
+    "start-off-stream": "PORT=3005 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

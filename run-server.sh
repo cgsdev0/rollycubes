@@ -4,7 +4,7 @@ while true;
 do
     pkill GameServer
     clear
-    echo "====================================================="
+    echo "==============================================="
     make -j$(( $(nproc) / 2 ))
     ./GameServer &
     inotifywait src -e MODIFY
