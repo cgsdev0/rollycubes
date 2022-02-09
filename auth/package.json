@@ -32,6 +32,6 @@
   "scripts": {
     "start": "bash -c 'source .env; ts-node src/index.ts'",
     "start-dev": "bash -c 'source .env; NODE_ENV=development ts-node-dev src/index.ts'",
-    "build": "bash -c 'source .env; ./build.sh'"
+    "build": "bash -c './build.sh'"
   }
 }
