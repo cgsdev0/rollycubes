@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 COPY package*.json ./
+COPY .env ./
 
 RUN npm i
 
@@ -16,7 +17,7 @@ COPY . .
 FROM base as production
 
 ENV NODE_PATH=/build
-
+COPY .env ./build/
 RUN npm run build
 
 FROM gcr.io/distroless/nodejs
