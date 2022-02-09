@@ -48,4 +48,4 @@ jobs:
         # execute post-commands after scp
         last_ssh: |
           cd /root/game
-          docker-compose --env-file up -d
+          docker-compose up -d
