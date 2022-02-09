@@ -42,6 +42,7 @@ jobs:
         first_ssh: |
           cd /root/auth
           docker-compose down || true
+          docker pull ghcr.io/cgsdev0/rollycubes-=auth:latest
         # scp from local to remote
         scp: |
           auth/docker-compose.yml => '/root/auth'
