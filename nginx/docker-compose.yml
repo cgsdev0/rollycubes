@@ -13,6 +13,7 @@ services:
       - 443:443
     external_links:
       - "auth:auth"
+      - "game-server:game-server"
     volumes:
       - nginx_secrets:/etc/letsencrypt
       - ./config:/etc/nginx/user_conf.d
