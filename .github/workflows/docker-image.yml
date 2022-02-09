@@ -7,7 +7,7 @@ env:
   REGISTRY: ghcr.io
   CHANNEL: beta
   IMAGE_NAME: ${{ github.repository }}
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-        
+
     - name: Build and push Docker image
       uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
       with:
@@ -42,11 +42,11 @@ jobs:
         first_ssh: |
           cd /root/game
           docker-compose down || true
-          docker pull ghcr.io/cgsdev0/rollycubes:beta
         # scp from local to remote
         scp: |
           game/docker-compose.yml => '/root/game'
         # execute post-commands after scp
         last_ssh: |
           cd /root/game
+          docker-compose pull
           docker-compose up -d
