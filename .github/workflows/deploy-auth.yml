@@ -36,7 +36,7 @@ jobs:
         options: ''
         ssh_options: ''
         src: 'auth/auth-server'
-        dest: 'root@rollycubes.com:/home/shane/auth-server'
+        dest: 'root@rollycubes.com:/home/shane/.'
         
     # Restart the service
     - name: ssh-scp-ssh-pipelines
