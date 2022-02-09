@@ -4,14 +4,12 @@ services:
     image: ghcr.io/cgsdev0/rollycubes-auth
     environment:
       - "ROLLY_CUBES_AUTH_PASSPHRASE"
-    ports:
-      - "3031:3031"
     depends_on:
       - "postgres"
     links:
       - "postgres:db"
     volumes:
-      - ./:/secrets
+      - ../secrets/:/secrets
   postgres:
     image: "postgres:9.6.1"
     environment:
