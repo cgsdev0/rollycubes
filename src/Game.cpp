@@ -453,6 +453,7 @@ void Game::update(HANDLER_ARGS) {
                         .games = 1,
                         .doubles = state.players[i].doubles_count};
                     server.reportStats2("add_stats", stats.toString(), [broadcast](auto s) {
+                        std::cout << "AUTH SAYS: " << s << std::endl;
                         /* API::Achievement_Unlock a{ */
                         /*     .name = "you did it congrats"}; */
                         /* broadcast(a.toString()); */

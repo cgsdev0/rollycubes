@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { RequiresSession } from "./hocs/requires_session";
 import CookiePage from "./pages/cookie_page";
+import TwitchOAuthPage from "./pages/twitch_oauth_page";
 import GamePage from "./pages/game_page";
 import HomePage from "./pages/home_page";
 import LoginPage from "./pages/login_page";
@@ -52,6 +53,7 @@ const AppInner = () => {
         <SettingsMenu />
         <LoginPrompt />
         <Route path="/" exact component={CookiePage} />
+        <Route path="/twitch_oauth" component={TwitchOAuthPage} />
         <Route path="/home" component={RequiresSession(HomePage)} />
         <Route path="/login" component={RequiresSession(LoginPage)} />
         <Route path="/register" component={RequiresSession(RegisterPage)} />

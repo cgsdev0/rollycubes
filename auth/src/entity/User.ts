@@ -10,6 +10,7 @@ import {
 import { PlayerStats } from "./PlayerStats";
 import { UserToAchievement } from "./UserToAchievement";
 import { RefreshToken } from "./RefreshToken";
+import { TwitchIdentity } from "./TwitchIdentity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -30,6 +31,9 @@ export class User extends BaseEntity {
 
   @OneToOne(() => PlayerStats, (stats) => stats.user)
   stats: PlayerStats;
+
+  @OneToOne(() => TwitchIdentity, (twitch) => twitch.user)
+  twitch: TwitchIdentity;
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens: RefreshToken[];

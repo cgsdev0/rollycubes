@@ -60,7 +60,7 @@ namespace API {
                     return players[i];
                 }
             }
-            throw new GameError("unknown player");
+            throw GameError("unknown player");
         }
         FWD_DECLARE_JSON_SERIALIZABLE()
     };

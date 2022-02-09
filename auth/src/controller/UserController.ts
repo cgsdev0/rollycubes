@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import fetch from "node-fetch";
 import { getConnection } from "typeorm";
 import { User } from "../entity/User";
 import { PlayerStats } from "../entity/PlayerStats";
@@ -10,6 +11,7 @@ import * as fs from "fs";
 import { publicKey } from "../middleware/auth";
 import { UserToAchievement } from "../entity/UserToAchievement";
 import { Achievement } from "../entity/Achievement";
+import { TwitchIdentity } from "../entity/TwitchIdentity";
 
 const jwtConfig = {
   key: fs.readFileSync(".id"),
@@ -78,22 +80,22 @@ export class UserController {
       throw new Error("no id specified");
     }
 
-    const setStatement = {};
-    const cols = ["rolls", "wins", "games", "doubles"];
-    cols.forEach((col) => {
-      if (!request.body.hasOwnProperty(col)) return;
-      setStatement[col] = () => `${col} + ${request.body[col]}`;
-    });
-    if (Object.keys(setStatement).length === 0) {
-      throw new Error("no stats need to be updated");
+    let stats = await PlayerStats.findOne(request.body.id);
+    if (!stats) {
+      stats = new PlayerStats();
+      stats.rolls = 0;
+      stats.wins = 0;
+      stats.games = 0;
+      stats.doubles = 0;
     }
-
-    await getConnection()
-      .createQueryBuilder()
-      .update(PlayerStats)
-      .set(setStatement)
-      .where("user_id = :id", { id: request.body.id })
-      .execute();
+    stats.user = new User();
+    stats.user.id = request.body.id;
+    const { rolls, wins, games, doubles } = request.body;
+    stats.rolls += rolls || 0;
+    stats.wins += wins || 0;
+    stats.games += games || 0;
+    stats.doubles += doubles || 0;
+    await stats.save();
     return "done";
   }
 
@@ -117,6 +119,79 @@ export class UserController {
     }
   }
 
+  async login_helper(user: User, response: Response) {
+    const refresh_token = new RefreshToken();
+    refresh_token.user = user;
+    await refresh_token.save();
+
+    const access_token = jwt.sign(
+      { user_id: user.id, display_name: user.username },
+      jwtConfig,
+      {
+        expiresIn: "2h",
+        algorithm: "RS256",
+      }
+    );
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 30);
+
+    response.cookie("refresh_token", refresh_token.id, {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+      expires,
+    });
+
+    return { access_token };
+  }
+
+  async twitch_oauth(request: Request, response: Response, next: NextFunction) {
+    const { twitch_access_token } = request.body;
+    // Validate access token against twitch
+    const resp = await fetch("https://id.twitch.tv/oauth2/validate", {
+      headers: { Authorization: "Bearer " + twitch_access_token },
+    });
+    const twitchTokenData = await resp.json();
+    const { client_id, login, user_id } = twitchTokenData;
+    if (client_id !== process.env.TWITCH_CLIENT_ID) {
+      response.status(400);
+      console.error(twitchTokenData);
+      return "client id mismatch";
+    }
+    let twitchId = await TwitchIdentity.findOne(user_id, {
+      relations: ["user"],
+    });
+    if (!twitchId) {
+      // registration flow
+
+      // Ask twitch for user details
+      const userDataResp = await fetch(
+        "https://api.twitch.tv/helix/users?id=" + user_id,
+        {
+          headers: {
+            Authorization: "Bearer " + twitch_access_token,
+            "Client-Id": client_id,
+          },
+        }
+      );
+      const { data } = await userDataResp.json();
+      const [twitchUserData] = data;
+      const user = new User();
+      user.username = twitchUserData.display_name;
+      user.image_url = twitchUserData.profile_image_url;
+      user.hashed_password = "";
+      twitchId = new TwitchIdentity();
+      twitchId.twitch_id = user_id;
+      twitchId.twitch_login = login;
+      await twitchId.save();
+      user.twitch = twitchId;
+      await user.save();
+      twitchId.user = user;
+    }
+    // login flow
+    return await this.login_helper(twitchId.user, response);
+  }
+
   async login(request: Request, response: Response, next: NextFunction) {
     try {
       const user = await User.findOneOrFail({
@@ -125,29 +200,7 @@ export class UserController {
       });
 
       if (await bcrypt.compare(request.body.password, user.hashed_password)) {
-        const refresh_token = new RefreshToken();
-        refresh_token.user = user;
-        await refresh_token.save();
-
-        const access_token = jwt.sign(
-          { user_id: user.id, display_name: user.username },
-          jwtConfig,
-          {
-            expiresIn: "2h",
-            algorithm: "RS256",
-          }
-        );
-        const expires = new Date();
-        expires.setDate(expires.getDate() + 30);
-
-        response.cookie("refresh_token", refresh_token.id, {
-          secure: true,
-          httpOnly: true,
-          sameSite: "none",
-          expires,
-        });
-
-        return { access_token };
+        return await this.login_helper(user, response);
       }
       response.status(401);
       return "forbidden";

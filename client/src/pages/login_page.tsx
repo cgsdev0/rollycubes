@@ -51,6 +51,12 @@ const LoginPage: React.FC<DispatchProp &
     }
   };
 
+  const twitchLogin = () => {
+    document.location =
+      "http://localhost:3031/twitch" +
+      `?redirect=${document.location.origin}/twitch_oauth`;
+  };
+
   return (
     <div>
       <h1>Dice Game</h1>
@@ -73,6 +79,7 @@ const LoginPage: React.FC<DispatchProp &
           </button>
         </div>
       </form>
+      <button onClick={twitchLogin}>Login With Twitch</button>
       <p>
         Need an account? <Link to="/register">Register</Link>
       </p>

@@ -31,9 +31,16 @@ createConnection()
         allowedHeaders: ["csrf-token", "content-type", "x-access-token"],
       })
     );
-    app.post("/test", serverAuth, function (req, res) {
-      console.log("GREAT SUCCESS");
-      res.send("you did it!");
+    app.get("/twitch", function (req, res) {
+      const redirect = req.param("redirect", "");
+      if (!redirect)
+        return res.status(400).send("please include a redirect url");
+      const dest =
+        `https://id.twitch.tv/oauth2/authorize` +
+        `?client_id=${process.env.TWITCH_CLIENT_ID}` +
+        `&redirect_uri=${redirect}` +
+        `&response_type=token`;
+      res.redirect(302, dest);
     });
     const csurf = csrf({
       cookie: { httpOnly: true, sameSite: "none", secure: true },

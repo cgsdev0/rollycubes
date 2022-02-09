@@ -16,6 +16,12 @@ export const Routes: Route[] = [
     action: "all",
   },
   {
+    method: "post",
+    route: "/twitch_login_or_register",
+    controller: UserController,
+    action: "twitch_oauth",
+  },
+  {
     method: "get",
     route: "/public_key",
     controller: UserController,

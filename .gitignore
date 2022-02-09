@@ -9,3 +9,4 @@ server_state.json
 gcm.cache/
 *.d
 **/.pre-shared-key
+auth/.twitch_secrets
