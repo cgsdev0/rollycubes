@@ -24,7 +24,7 @@ Use `cd client; yarn; yarn start`
   - This will also hot reload any time you modify a file in the client folder
 
 ### Run the terminal client
-To run the terminal client locally, use `cd js_terminal; node client.js` (still a work in progress)
+To run the terminal client locally, use `cd terminal_client; node client.js` (still a work in progress)
 
 ### Run the auth service locally
 - `cd auth; docker-compose up -d` to set up the database
