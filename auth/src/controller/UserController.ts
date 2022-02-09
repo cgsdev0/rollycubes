@@ -12,6 +12,7 @@ import { publicKey } from "../middleware/auth";
 import { UserToAchievement } from "../entity/UserToAchievement";
 import { Achievement } from "../entity/Achievement";
 import { TwitchIdentity } from "../entity/TwitchIdentity";
+import { TWITCH_CLIENT_ID } from "../twitch";
 
 const jwtConfig = {
   key: fs.readFileSync(".id"),
@@ -153,7 +154,7 @@ export class UserController {
     });
     const twitchTokenData = await resp.json();
     const { client_id, login, user_id } = twitchTokenData;
-    if (client_id !== process.env.TWITCH_CLIENT_ID) {
+    if (client_id !== TWITCH_CLIENT_ID) {
       response.status(400);
       console.error(twitchTokenData);
       return "client id mismatch";

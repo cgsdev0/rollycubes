@@ -1,22 +1,18 @@
-import "reflect-metadata";
-import { createConnection } from "typeorm";
-import { verifyToken as userAuth } from "./middleware/auth";
-import { verifyPreSharedKey as serverAuth } from "./middleware/server_auth";
-import * as cors from "cors";
-import * as bcrypt from "bcrypt";
-import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
+import * as cors from "cors";
 import * as csrf from "csurf";
-import * as helmet from "helmet";
+import * as express from "express";
 import { Request, Response } from "express";
+import * as helmet from "helmet";
+import "reflect-metadata";
+import { createConnection } from "typeorm";
+import { insertAchievementList } from "./achievements";
+import { verifyToken as userAuth } from "./middleware/auth";
+import { verifyPreSharedKey as serverAuth } from "./middleware/server_auth";
 import { Routes } from "./routes";
 import { ServerRoutes } from "./server_routes";
-import { User } from "./entity/User";
-import { PlayerStats } from "./entity/PlayerStats";
-import { Achievement } from "./entity/Achievement";
-import { UserToAchievement } from "./entity/UserToAchievement";
-import { insertAchievementList } from "./achievements";
+import { TWITCH_CLIENT_ID } from "./twitch";
 
 createConnection()
   .then(async (connection) => {
@@ -37,7 +33,7 @@ createConnection()
         return res.status(400).send("please include a redirect url");
       const dest =
         `https://id.twitch.tv/oauth2/authorize` +
-        `?client_id=${process.env.TWITCH_CLIENT_ID}` +
+        `?client_id=${TWITCH_CLIENT_ID}` +
         `&redirect_uri=${redirect}` +
         `&response_type=token`;
       res.redirect(302, dest);
