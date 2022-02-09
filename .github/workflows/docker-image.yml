@@ -3,6 +3,10 @@ name: Docker Image CI
 on:
   workflow_dispatch
 
+defaults:
+  run:
+    shell: bash
+    
 env:
   REGISTRY: ghcr.io
   CHANNEL: beta
@@ -17,6 +21,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15.x'
 
     - name: Log in to the Container registry
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
@@ -31,7 +38,11 @@ jobs:
         context: game
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.CHANNEL }}
-
+        
+    - name: Build client
+      run: yarn install && ( yarn build || echo "errors are delicious nom nom nom" )
+      working-directory: client
+      
     # Deploy it
     - name: ssh-scp-ssh-pipelines
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
@@ -42,9 +53,11 @@ jobs:
         first_ssh: |
           cd /root/game
           docker-compose down || true
+          rm -rf /root/client
         # scp from local to remote
         scp: |
           game/docker-compose.yml => '/root/game'
+          client/build => '/root/.'
         # execute post-commands after scp
         last_ssh: |
           cd /root/game
