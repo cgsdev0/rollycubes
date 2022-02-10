@@ -1,7 +1,16 @@
 name: Docker Image CI
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Channel'
+        required: true
+        default: 'beta' 
+        type: choice
+        options:
+        - prod
+        - beta
 
 defaults:
   run:
@@ -9,7 +18,6 @@ defaults:
     
 env:
   REGISTRY: ghcr.io
-  CHANNEL: beta
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -37,7 +45,7 @@ jobs:
       with:
         context: game
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.CHANNEL }}
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.channel }}
         
     - name: Build client
       run: yarn install && ( yarn build || echo "errors are delicious nom nom nom" )
@@ -51,15 +59,15 @@ jobs:
         user: root
         key: ${{ secrets.DO_SSH_KEY }}
         first_ssh: |
-          cd /root/game
-          docker-compose down || true
-          rm -rf /root/client/*
+          cd /root/game/${{ github.event.inputs.channel }}
+          CHANNEL=${{ github.event.inputs.channel }} docker-compose down || true
+          rm -rf /root/client/${{ github.event.inputs.channel }}/*
         # scp from local to remote
         scp: |
-          game/docker-compose.yml => '/root/game'
-          'client/build/*' => '/root/client/'
+          game/docker-compose.yml => '/root/game/${{ github.event.inputs.channel }}'
+          'client/build/*' => '/root/client/${{ github.event.inputs.channel }}/'
         # execute post-commands after scp
         last_ssh: |
-          cd /root/game
-          docker-compose pull
-          docker-compose up -d
+          cd /root/game/${{ github.event.inputs.channel }}
+          CHANNEL=${{ github.event.inputs.channel }} docker-compose pull
+          CHANNEL=${{ github.event.inputs.channel }} docker-compose up -d
