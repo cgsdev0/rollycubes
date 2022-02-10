@@ -1,16 +1,28 @@
 import React from "react";
+import { connect } from "react-redux";
 import "./pages/login.css";
+import { selectAuthService } from "./selectors/game_selectors";
+import { ReduxState } from "./store";
 
-const twitchLogin = () => {
+const twitchLogin = (authService: string) => () => {
   document.location =
-    "http://localhost:3031/twitch" +
+    `${authService}twitch` +
     `?redirect=${document.location.origin}/twitch_oauth`;
 };
 
-export const TwitchButton: React.FC<{}> = () => {
+const UnconnectedTwitchButton: React.FC<{ authService: string }> = ({
+  authService
+}) => {
   return (
-    <button onClick={twitchLogin} className="twitchButton">
+    <button onClick={twitchLogin(authService)} className="twitchButton">
       Login With Twitch
     </button>
   );
 };
+
+const mapStateToProps = (state: ReduxState) => {
+  return {
+    authService: selectAuthService(state)
+  };
+};
+export const TwitchButton = connect(mapStateToProps)(UnconnectedTwitchButton);
