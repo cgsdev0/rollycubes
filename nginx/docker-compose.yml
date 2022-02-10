@@ -17,6 +17,7 @@ services:
     volumes:
       - nginx_secrets:/etc/letsencrypt
       - ./config:/etc/nginx/user_conf.d
+      - ../client:/var/www/client
 
 volumes:
   nginx_secrets:
