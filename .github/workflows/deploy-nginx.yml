@@ -13,8 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # Deploy it
-    - name: ssh-scp-ssh-pipelines
+    - name: Deploy
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
       with:
         host: rollycubes.com
@@ -26,10 +25,8 @@ jobs:
           docker-compose down || true
           rm -rf config
           mkdir -p config
-        # scp from local to remote
         scp: |
           nginx => '/root'
-        # execute post-commands after scp
         last_ssh: |
           cd /root/nginx
           docker-compose up -d
