@@ -4,13 +4,14 @@ RUN mkdir build
 
 ADD uWebSockets /build/uWebSockets
 ADD includes /build/includes
-ADD src /build/src
 COPY Makefile /build/Makefile
+ADD src /build/src
 
 RUN cd /build; ls -la .; make release
 
 FROM alpine:edge as prod
 RUN apk add libstdc++ libgcc
 COPY --from=build /build/GameServer .
+COPY entry.sh .
 
-ENTRYPOINT ["./GameServer"]
+ENTRYPOINT ["./entry.sh"]

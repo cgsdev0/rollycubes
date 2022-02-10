@@ -13,11 +13,13 @@ services:
       - 443:443
     external_links:
       - "auth:auth"
-      - "game-server:game-server"
+      - "game-server-prod:game-server-prod"
+      - "game-server-beta:game-server-beta"
     volumes:
       - nginx_secrets:/etc/letsencrypt
       - ./config:/etc/nginx/user_conf.d
-      - ../client:/var/www/client
+      - ../client/beta:/var/www/client/beta
+      - ../client/prod:/var/www/client/prod
 
 volumes:
   nginx_secrets:
