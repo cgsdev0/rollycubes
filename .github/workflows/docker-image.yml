@@ -53,7 +53,7 @@ jobs:
         first_ssh: |
           cd /root/game
           docker-compose down || true
-          rm -rf /root/client
+          rm -rf /root/client/*
         # scp from local to remote
         scp: |
           game/docker-compose.yml => '/root/game'
