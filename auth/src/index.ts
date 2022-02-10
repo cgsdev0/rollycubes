@@ -20,9 +20,21 @@ createConnection()
     app.use(helmet());
     app.use(bodyParser.json());
     app.use(cookieParser());
+    const whitelist = [
+      "https://rollycubes.com",
+      "https://www.rollycubes.com",
+      "https://rollycubes.live",
+    ];
+    const origin = function (orig: string, callback: any) {
+      if (whitelist.indexOf(orig) !== -1 || !orig) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    };
     app.use(
       cors({
-        origin: "https://rollycubes.live",
+        origin,
         credentials: true,
         allowedHeaders: ["csrf-token", "content-type", "x-access-token"],
       })
