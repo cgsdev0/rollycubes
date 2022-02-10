@@ -22,6 +22,7 @@ createConnection()
     app.use(cookieParser());
     const whitelist = [
       "https://rollycubes.com",
+      "https://beta.rollycubes.com",
       "https://www.rollycubes.com",
       "https://rollycubes.live",
     ];
