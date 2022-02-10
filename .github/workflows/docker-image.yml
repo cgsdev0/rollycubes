@@ -57,7 +57,7 @@ jobs:
         # scp from local to remote
         scp: |
           game/docker-compose.yml => '/root/game'
-          client/build => '/root/.'
+          'client/build/*' => '/root/client/'
         # execute post-commands after scp
         last_ssh: |
           cd /root/game
