@@ -229,8 +229,9 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
 
-                    if (userData->session == "") {
-                        ws->close();
+                    if (userData->session == "guest:") {
+                        ws->send("cookie", uWS::OpCode::TEXT);
+                        userData->is_verified = false;
                         return;
                     }
                     if (userData->dedupe_conns) {

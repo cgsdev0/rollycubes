@@ -25,6 +25,8 @@ createConnection()
       "https://beta.rollycubes.com",
       "https://www.rollycubes.com",
       "https://rollycubes.live",
+      "http://localhost:3000",
+      "http://localhost:3005",
     ];
     const origin = function (orig: string, callback: any) {
       if (whitelist.indexOf(orig) !== -1 || !orig) {

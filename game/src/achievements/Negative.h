@@ -4,8 +4,6 @@
 #define INCLUDE_ACHIEVEMENTS_NEGATIVE_H
 
 #include "BaseAchievement.h"
-#include <iostream>
-#include <map>
 
 class Negative : public BaseAchievement {
   public:

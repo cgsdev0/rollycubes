@@ -308,6 +308,7 @@ void Game::restart(HANDLER_ARGS) {
         player.score = 0;
         player.doubles_count = 0;
         player.roll_count = 0;
+        player.turn_count = 0;
     }
     state.victory = false;
     advanceTurn();
@@ -373,7 +374,10 @@ void Game::roll(HANDLER_ARGS) {
         if (state.players[i].session == turn_token) {
             state.players[i].roll_count++;
             if (isDoubles()) {
+
                 state.players[i].doubles_count++;
+            } else {
+                state.players[i].turn_count++;
             }
         }
     }

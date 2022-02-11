@@ -70,7 +70,7 @@ std::string GameError::toString() const {
 \*************************************************/
 
 namespace API {
-    JSON_SERIALIZATION(PlayerState, session, name, score, win_count, connected)
+    JSON_SERIALIZATION(PlayerState, session, name, score, win_count, connected, turn_count)
     JSON_SERIALIZATION(GameState, players, chatLog, turn_index, rolls, used, rolled, victory, privateSession)
     JSON_SERIALIZATION(Achievement_Unlock, id, image_url, name, description, max_progress)
     JSON_SERIALIZATION(AchievementProgress, achievement_id, user_id, progress)

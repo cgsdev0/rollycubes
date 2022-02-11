@@ -57,6 +57,11 @@ class Connection extends React.Component<Props & DispatchProp> {
   };
 
   onMessage = (e: MessageEvent) => {
+    if (e.data === "cookie") {
+      this.props.history.replace("/");
+      if (this.websocket) this.websocket.close();
+      return;
+    }
     const data: any = JSON.parse(e.data);
     if (!data) {
       console.error("empty action from server");

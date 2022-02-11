@@ -74,6 +74,18 @@ export const insertAchievementList = async () => {
       description: "Get the roll the player after you needed to win.",
       max_progress: 1,
     },
+    {
+      id: "oops",
+      name: "Oops...",
+      description: "Miss an opportunity to win the game.",
+      max_progress: 1,
+    },
+    {
+      id: "perfect",
+      name: "Perfect Game",
+      description: "Win a game in a single turn.",
+      max_progress: 1,
+    },
   ];
   await Promise.all(
     achievementList.map((ach) =>
@@ -82,6 +94,7 @@ export const insertAchievementList = async () => {
         .insert()
         .into(Achievement)
         .values([ach])
+        .orUpdate(["name", "description", "image_url", "max_progress"], ["id"])
         .execute()
     )
   );

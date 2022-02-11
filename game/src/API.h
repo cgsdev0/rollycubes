@@ -31,7 +31,8 @@ namespace API {
               win_count(0),
               doubles_count(0),
               roll_count(0),
-              connected(true) {}
+              connected(true),
+              turn_count(0) {}
         std::string session;
         std::string name;
         int score;
@@ -39,6 +40,7 @@ namespace API {
         int doubles_count;
         int roll_count;
         bool connected;
+        int turn_count;
 
         FWD_DECLARE_JSON_SERIALIZABLE()
     };

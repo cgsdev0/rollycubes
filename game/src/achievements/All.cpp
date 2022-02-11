@@ -2,6 +2,9 @@
 #include "Doubles.h"
 #include "GettingStarted.h"
 #include "Negative.h"
+#include "Oops.h"
+#include "Perfect.h"
+#include "Rude.h"
 #include "WinGames.h"
 
 std::vector<BaseAchievement *> initAchievements() {
@@ -14,6 +17,9 @@ std::vector<BaseAchievement *> initAchievements() {
         new Doubles(2),
         new Doubles(3),
         new Negative(),
+        new Rude(),
+        new Oops(),
+        new Perfect(),
     };
     return achievements;
 }
