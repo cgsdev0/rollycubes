@@ -6,6 +6,5 @@ tmp/
 temp/
 
 # keys n stuff
-.id
-.id.pub
+secrets/
 .env

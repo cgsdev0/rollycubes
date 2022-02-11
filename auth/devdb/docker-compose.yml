@@ -1,17 +1,9 @@
 version: '3'
 services:
-  auth:
-    image: ghcr.io/cgsdev0/rollycubes-auth
-    environment:
-      - "ROLLY_CUBES_AUTH_PASSPHRASE"
-    depends_on:
-      - "postgres"
-    links:
-      - "postgres:db"
-    volumes:
-      - ../secrets/:/secrets
   postgres:
     image: "postgres:9.6.1"
+    ports:
+      - '5432:5432'
     environment:
       POSTGRES_USER: "test"
       POSTGRES_PASSWORD: "test"

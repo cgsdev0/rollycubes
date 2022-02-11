@@ -363,11 +363,21 @@ int main(int argc, char **argv) {
         std::cout << e.what() << std::endl;
     }
 
-    JWTVerifier jwt_verifier;
-    jwt_verifier.init();
+    std::string devEnv(std::getenv("DEV"));
+    std::string authServerUrl("http://auth:3031/");
+    std::string devAuthServerUrl("http://localhost:3031/");
 
-    AuthServerRequestQueue authServer("http://auth:3031/", uWS::Loop::get());
-    authServer.send("test", "{}");
+    std::string baseAuthUrl;
+    if (!devEnv.size()) {
+        baseAuthUrl = authServerUrl;
+    } else {
+        baseAuthUrl = devAuthServerUrl;
+    }
+
+    JWTVerifier jwt_verifier;
+    jwt_verifier.init(baseAuthUrl);
+
+    AuthServerRequestQueue authServer(baseAuthUrl, uWS::Loop::get());
 
     uWS::App app;
     app.get("/list",

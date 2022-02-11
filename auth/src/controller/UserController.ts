@@ -15,7 +15,7 @@ import { TwitchIdentity } from "../entity/TwitchIdentity";
 import { TWITCH_CLIENT_ID } from "../twitch";
 
 const jwtConfig = {
-  key: fs.readFileSync("/secrets/.id"),
+  key: fs.readFileSync("./secrets/.id"),
   passphrase: process.env.ROLLY_CUBES_AUTH_PASSPHRASE,
 };
 

@@ -13,7 +13,7 @@ struct JWTVerifier {
     ~JWTVerifier();
 
     // Must be called in order to fetch public key.
-    void init();
+    void init(const std::string &baseUrl);
 
     ValidClaim decode_and_verify(const std::string &token) const;
 

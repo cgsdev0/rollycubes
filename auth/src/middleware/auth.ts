@@ -3,7 +3,7 @@ import * as fs from "fs";
 
 import jwt = require("jsonwebtoken");
 
-export const publicKey = fs.readFileSync("/secrets/.id.pub");
+export const publicKey = fs.readFileSync("./secrets/.id.pub");
 
 export const verifyToken = (
   req: Request,

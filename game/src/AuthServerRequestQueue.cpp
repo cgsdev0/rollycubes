@@ -55,7 +55,7 @@ void AuthServerRequestQueue::send(std::string url, std::string json, Callback cb
 AuthServerRequestQueue::AuthServerRequestQueue(std::string baseUrl, uWS::Loop *loop)
     : baseUrl(baseUrl) {
 
-    std::ifstream preSharedKeyFile("/secrets/.pre-shared-key");
+    std::ifstream preSharedKeyFile("./secrets/.pre-shared-key");
     if (!preSharedKeyFile.is_open())
         throw std::runtime_error("no .pre-shared-key file found!");
     std::string key;

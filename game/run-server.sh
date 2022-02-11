@@ -6,6 +6,6 @@ do
     clear
     echo "==============================================="
     make -j$(( $(nproc) / 2 ))
-    ./GameServer &
+    DEV=true ./GameServer &
     inotifywait -r src -e MODIFY
 done
