@@ -61,7 +61,49 @@ div.avatar {
     font-weight: bold;
     width: 24px;
     height: 24px;
-    margin-right: 12px;
+}
+
+.avatar-container {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.achievements {
+  display: flex;
+  gap: 6px;
+  pointer-events: auto !important;
+}
+
+.achievements-scroll {
+  width: 360px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.player-tooltip {
+  opacity: 1 !important;
+  font-size: 20px !important;
+  pointer-events: auto !important;
+}
+
+.player-tooltip:hover {
+  visibility: visible !important;
+}
+
+.player-tooltip h1 {
+  font-size: 24px;
+  margin: 4px 0px;
+}
+
+.player-tooltip h2 {
+  font-size: 20px;
+  margin: 4px 0px;
+}
+
+.player-tooltip p {
+  font-size: 16px;
+  margin: 0px;
 }
 
 #settingsBox {
@@ -229,12 +271,14 @@ h6 {
 .Player .Name {
   justify-content: flex-start;
   display: flex;
+  align-items: center;
 }
 
 .Crown::before {
     content: "👑 ";
     white-space:pre;
     color:gold;
+    height: 100%;
 }
 
 .Player .Name .You {
@@ -243,6 +287,8 @@ h6 {
 
 .Player .Score {
   align-content: flex-end;
+  display: flex;
+  align-items: center;
 }
 
 .ButtonPanel {
