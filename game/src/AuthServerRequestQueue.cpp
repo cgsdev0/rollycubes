@@ -2,6 +2,7 @@
 #include "HTTPClient.h"
 #include "RequestQueue.h"
 #include <fstream>
+#include <iostream>
 #include <optional>
 #include <thread>
 
@@ -14,6 +15,7 @@ struct AuthServerRequest {
 class AuthServerRequestQueue::AuthServerRequestQueueImpl {
   public:
     AuthServerRequestQueueImpl(const std::string &key, uWS::Loop *loop) : loop(loop), preSharedKey(key), t(&AuthServerRequestQueueImpl::runRequestLoop, this) {
+        std::cout << "Pre-shared-key length: " << key.length() << std::endl;
     }
 
     void runRequestLoop() {
