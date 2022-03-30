@@ -62,8 +62,8 @@ const PlayerComponent = (props: Props) => {
 
   const losses = games - wins;
 
-  const win_rate = Math.floor((wins / games) * 1000) / 10;
-  const doubles_rate = Math.floor((doubles / rolls) * 1000) / 10;
+  const win_rate = Math.floor((wins / (games || 1)) * 1000) / 10;
+  const doubles_rate = Math.floor((doubles / (rolls || 1)) * 1000) / 10;
 
   const join_date = new Date(props.player.userData?.createdDate || 0)
     .toDateString()
@@ -73,16 +73,22 @@ const PlayerComponent = (props: Props) => {
   return (
     <>
       <ReactTooltip
-        delayHide={400}
         className="player-tooltip"
         id={`player-${n}`}
         effect="solid"
         place="bottom"
         overridePosition={overridePosition}
         backgroundColor="#777"
-        clickable
+        globalEventOff="click"
+        isCapture={true}
+        afterShow={e => {
+          e.stopPropagation();
+        }}
       >
-        <h1>{player.name || `User${n + 1}`}</h1>
+        <h1>
+          <Avatar imageUrl={imageUrl} firstInitial={firstInitial} size={32} />
+          <span>{player.name || `User${n + 1}`}</span>
+        </h1>
         <p>Player since {join_date.join(" ")}</p>
         <h2>Stats</h2>
         <p>
@@ -105,15 +111,17 @@ const PlayerComponent = (props: Props) => {
         </div>
         <HorizontalScroll className="achievements-scroll">
           <div className="achievements">
-            {props.player.userData?.userToAchievements.map(ach => (
-              <img
-                data-tip
-                data-for={`achievement-${n}-${ach.achievement.id}`}
-                key={ach.achievement.id}
-                alt={ach.achievement.description}
-                src={ach.achievement.image_url || "//via.placeholder.com/48"}
-              />
-            ))}
+            {props.player.userData?.userToAchievements
+              .filter(ach => ach.unlocked)
+              .map(ach => (
+                <img
+                  data-tip
+                  data-for={`achievement-${n}-${ach.achievement.id}`}
+                  key={ach.achievement.id}
+                  alt={ach.achievement.description}
+                  src={ach.achievement.image_url || "//via.placeholder.com/48"}
+                />
+              ))}
           </div>
         </HorizontalScroll>
       </ReactTooltip>

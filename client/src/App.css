@@ -59,14 +59,16 @@ div.avatar {
     text-align: center;
     font-size: 14pt;
     font-weight: bold;
-    width: 24px;
-    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .avatar-container {
     display: flex;
     align-items: center;
     margin-right: 8px;
+    cursor: pointer;
 }
 
 .achievements {
@@ -94,6 +96,7 @@ div.avatar {
 .player-tooltip h1 {
   font-size: 24px;
   margin: 4px 0px;
+  display: flex;
 }
 
 .player-tooltip h2 {
