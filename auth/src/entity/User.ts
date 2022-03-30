@@ -1,16 +1,17 @@
 import {
-  OneToOne,
-  CreateDateColumn,
   BaseEntity,
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn,
+  Entity,
+  Index,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { PlayerStats } from "./PlayerStats";
-import { UserToAchievement } from "./UserToAchievement";
 import { RefreshToken } from "./RefreshToken";
 import { TwitchIdentity } from "./TwitchIdentity";
+import { UserToAchievement } from "./UserToAchievement";
 
 @Entity()
 export class User extends BaseEntity {
@@ -18,6 +19,7 @@ export class User extends BaseEntity {
   id: string;
 
   @Column()
+  @Index()
   username: string;
 
   @Column({ select: false })

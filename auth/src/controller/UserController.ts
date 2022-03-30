@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import fetch from "node-fetch";
-import { getConnection } from "typeorm";
+import { Not, getConnection } from "typeorm";
 import { User } from "../entity/User";
 import { PlayerStats } from "../entity/PlayerStats";
 import * as jwt from "jsonwebtoken";
@@ -106,17 +106,35 @@ export class UserController {
     });
   }
 
+  validate_username(username: string): boolean {
+    if (username.length > 24) return false;
+    if (!username.match(/^[0-9a-zA-Z_]+$/)) return false;
+    return true;
+  }
+
   async register(request: Request, response: Response, next: NextFunction) {
     try {
-      const user = new User();
-      user.username = request.body.username;
+      const user = await User.findOne({
+        select: ["username", "id"],
+        where: { username: request.body.username, hashed_password: Not("") },
+      });
+      if (user) {
+        throw new Error("That username is already taken.");
+      }
+      if (!this.validate_username(request.body.username)) {
+        throw new Error(
+          "username max length: 24, letters/numbers/underscores only"
+        );
+      }
+      const newUser = new User();
+      newUser.username = request.body.username;
       const hashed_password = await bcrypt.hash(request.body.password, 10);
-      user.hashed_password = hashed_password;
-      await user.save();
+      newUser.hashed_password = hashed_password;
+      await newUser.save();
       return "success";
     } catch (e) {
       response.status(400);
-      return "That username is already taken.";
+      return e.message;
     }
   }
 
@@ -197,7 +215,7 @@ export class UserController {
     try {
       const user = await User.findOneOrFail({
         select: ["hashed_password", "username", "id"],
-        where: { username: request.body.username },
+        where: { username: request.body.username, hashed_password: Not("") },
       });
 
       if (await bcrypt.compare(request.body.password, user.hashed_password)) {
