@@ -54,7 +54,7 @@ const LoginPage: React.FC<DispatchProp &
 
   return (
     <div className="loginContainer">
-      <h1>Dice Game</h1>
+      <h1>Rolly Cubes</h1>
       <p>the one where you roll some dice</p>
       <form onSubmit={login}>
         <div className="loginForm">

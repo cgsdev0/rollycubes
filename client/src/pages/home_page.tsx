@@ -65,7 +65,7 @@ class HomePage extends React.Component<Props, State> {
   render() {
     return (
       <div>
-        <h1>Dice Game</h1>
+        <h1>Rolly Cubes</h1>
         <p>the one where you roll some dice</p>
         <button onClick={this.onStart(false)} disabled={this.state.pressed}>
           New Public Game
