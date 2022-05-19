@@ -1,11 +1,11 @@
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 import { connect, Provider } from "react-redux";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { RequiresSession } from "./hocs/requires_session";
-import CookiePage from "./pages/cookie_page";
 import TwitchOAuthPage from "./pages/twitch_oauth_page";
 import GamePage from "./pages/game_page";
 import HomePage from "./pages/home_page";
@@ -17,7 +17,7 @@ import LoginPrompt from "./ui/login_prompt";
 import SettingsMenu from "./ui/settings";
 
 const mapStateToProps = (state: ReduxState) => ({
-  theme: state.settings.theme
+  theme: state.settings.theme,
 });
 
 const AppThemer = connect(mapStateToProps)(
@@ -31,6 +31,11 @@ const AppThemer = connect(mapStateToProps)(
 );
 
 const App = () => {
+  // make a cookie DONT FORGET TO SET THE PATH AHHHHHHHHHHHHHHHHHHHH
+  if (!document.cookie.includes("_session")) {
+    document.cookie = `_session=${uuidv4()}; Path=/; Secure`;
+  }
+
   return (
     <>
       <ToastContainer
@@ -52,9 +57,8 @@ const AppInner = () => {
       <div className="App" style={theme.app}>
         <SettingsMenu />
         <LoginPrompt />
-        <Route path="/" exact component={CookiePage} />
+        <Route path="/" component={RequiresSession(HomePage)} exact />
         <Route path="/twitch_oauth" component={TwitchOAuthPage} />
-        <Route path="/home" component={RequiresSession(HomePage)} />
         <Route path="/login" component={RequiresSession(LoginPage)} />
         <Route path="/register" component={RequiresSession(RegisterPage)} />
         <Route path="/multiple-tabs" component={TabErrorPage} />
@@ -69,7 +73,7 @@ const TabErrorPage = () => {
     <div style={{ marginTop: "40vh", textAlign: "center" }}>
       <h1>Error</h1>
       <p>You already have a tab opened for that room.</p>
-      <a href="/home">Back to Home</a>
+      <a href="/">Back to Home</a>
     </div>
   );
 };

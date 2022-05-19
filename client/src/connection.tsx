@@ -47,7 +47,7 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.websocket.send(
         JSON.stringify({
           type: "authenticate",
-          access_token: this.props.authToken
+          access_token: this.props.authToken,
         })
       );
     } else if (this.websocket && name) {
@@ -77,9 +77,8 @@ class Connection extends React.Component<Props & DispatchProp> {
     } else {
       // I'm sorry
       const otherUsers = (window as any).REDUX_STORE.getState().otherUsers;
-      const {
-        authServiceOrigin
-      } = (window as any).REDUX_STORE.getState().settings;
+      const { authServiceOrigin } = (window as any).REDUX_STORE.getState()
+        .settings;
       const populateUser = (player: any) => {
         if (player.hasOwnProperty("user_id") && player.user_id) {
           if (!otherUsers.hasOwnProperty(player.user_id)) {
@@ -132,6 +131,7 @@ class Connection extends React.Component<Props & DispatchProp> {
         const decoded: DecodedUserJWT = jwt_decode(this.props.authToken);
         userIdStr = "?userId=" + decoded.user_id;
       }
+      console.warn("I AM MAKING A NEW WEBSOCKET NOW :)", document.cookie);
       this.websocket = new WebSocket(
         `${window.location.protocol.endsWith("s:") ? "wss" : "ws"}://${
           window.location.hostname
@@ -178,7 +178,7 @@ class Connection extends React.Component<Props & DispatchProp> {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    authToken: state.authToken
+    authToken: state.authToken,
   };
 };
 export default connect(mapStateToProps)(Connection);
