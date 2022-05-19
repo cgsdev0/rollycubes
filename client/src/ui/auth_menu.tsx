@@ -28,7 +28,9 @@ const AuthMenu: React.FC<Props & DispatchProp> = (props) => {
       }
     };
     if (isOpen) {
-      document.addEventListener("click", closeAuth);
+      setTimeout(() => {
+        document.addEventListener("click", closeAuth);
+      }, 0);
       return () => {
         document.removeEventListener("click", closeAuth);
       };

@@ -6,7 +6,7 @@ import {
   selectCheats,
   selectIs3d,
   selectIsDarkTheme,
-  selectIsDev
+  selectIsDev,
 } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import "../ui/buttons/buttons.css";
@@ -20,7 +20,7 @@ interface Props {
   authService: string;
 }
 
-const SettingsMenu: React.FC<Props & DispatchProp> = props => {
+const SettingsMenu: React.FC<Props & DispatchProp> = (props) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const changeName = () => {
@@ -40,7 +40,9 @@ const SettingsMenu: React.FC<Props & DispatchProp> = props => {
       }
     };
     if (isOpen) {
-      document.addEventListener("click", closeSettings);
+      setTimeout(() => {
+        document.addEventListener("click", closeSettings);
+      }, 0);
       return () => {
         document.removeEventListener("click", closeSettings);
       };
@@ -111,7 +113,7 @@ const mapStateToProps = (state: ReduxState) => {
     hints: selectCheats(state),
     is3d: selectIs3d(state),
     authService: selectAuthService(state),
-    isDev: selectIsDev(state)
+    isDev: selectIsDev(state),
   };
 };
 

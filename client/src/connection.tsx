@@ -131,7 +131,6 @@ class Connection extends React.Component<Props & DispatchProp> {
         const decoded: DecodedUserJWT = jwt_decode(this.props.authToken);
         userIdStr = "?userId=" + decoded.user_id;
       }
-      console.warn("I AM MAKING A NEW WEBSOCKET NOW :)", document.cookie);
       this.websocket = new WebSocket(
         `${window.location.protocol.endsWith("s:") ? "wss" : "ws"}://${
           window.location.hostname

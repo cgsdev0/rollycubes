@@ -58,6 +58,7 @@ const AppInner = () => {
         <SettingsMenu />
         <LoginPrompt />
         <Route path="/" component={RequiresSession(HomePage)} exact />
+        <Route path="/home" component={RequiresSession(HomePage)} exact />
         <Route path="/twitch_oauth" component={TwitchOAuthPage} />
         <Route path="/login" component={RequiresSession(LoginPage)} />
         <Route path="/register" component={RequiresSession(RegisterPage)} />
