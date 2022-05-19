@@ -36,10 +36,11 @@ const PlayerComponent = (props: Props) => {
   };
 
   const overridePosition = (
-    { left, top },
-    currentEvent,
-    currentTarget,
-    node
+    { left, top }: { left: number; top: number },
+    currentEvent: any,
+    currentTarget: any,
+
+    node: any
   ) => {
     const d = document.documentElement;
     left = Math.min(d.clientWidth - node.clientWidth, left);
@@ -81,7 +82,7 @@ const PlayerComponent = (props: Props) => {
         backgroundColor="#777"
         globalEventOff="click"
         isCapture={true}
-        afterShow={e => {
+        afterShow={(e) => {
           e.stopPropagation();
         }}
       >
@@ -99,7 +100,7 @@ const PlayerComponent = (props: Props) => {
         </p>
         <h2>Achievements</h2>
         <div>
-          {props.player.userData?.userToAchievements.map(ach => (
+          {props.player.userData?.userToAchievements.map((ach) => (
             <ReactTooltip
               id={`achievement-${n}-${ach.achievement.id}`}
               key={ach.achievement.id}
@@ -112,8 +113,8 @@ const PlayerComponent = (props: Props) => {
         <HorizontalScroll className="achievements-scroll">
           <div className="achievements">
             {props.player.userData?.userToAchievements
-              .filter(ach => ach.unlocked)
-              .map(ach => (
+              .filter((ach) => ach.unlocked)
+              .map((ach) => (
                 <img
                   data-tip
                   data-for={`achievement-${n}-${ach.achievement.id}`}
@@ -149,7 +150,7 @@ const mapStateToProps = (state: ReduxState) => {
   return {
     self_index: selectSelfIndex(state),
     turn_index: selectTurnIndex(state),
-    socket: state.socket
+    socket: state.socket,
   };
 };
 
