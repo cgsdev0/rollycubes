@@ -28,5 +28,6 @@ module.exports = function (app) {
       secure: false,
     })
   );
-  app.use(morgan("tiny"));
+  // uncomment me when ur having a bad day
+  // app.use(morgan("tiny"));
 };
