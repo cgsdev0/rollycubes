@@ -36,10 +36,7 @@ const ChatBox: React.FC<Props & DispatchProp> = (props) => {
           case "/username":
           case "/n":
           case "/u":
-            const name = chatMsg
-              .split(" ")
-              .slice(1)
-              .join(" ");
+            const name = chatMsg.split(" ").slice(1).join(" ");
             props.socket.send(JSON.stringify({ type: "update_name", name }));
             localStorage.setItem("name", name);
             break;

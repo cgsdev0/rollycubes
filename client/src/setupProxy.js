@@ -1,11 +1,32 @@
-// @ts-ignore
-const proxy = require("http-proxy-middleware");
+const { createProxyMiddleware } = require("http-proxy-middleware");
+const morgan = require("morgan");
 
-module.exports = function(app) {
-  app.use(proxy("/cookie", { target: "http://localhost:3001", secure: false }));
-  app.use(proxy("/list", { target: "http://localhost:3001", secure: false }));
-  app.use(proxy("/create", { target: "http://localhost:3001", secure: false }));
+module.exports = function (app) {
   app.use(
-    proxy("/ws", { target: "ws://localhost:3001", ws: true, secure: false })
+    createProxyMiddleware("/cookie", {
+      target: "http://localhost:3001",
+      secure: false,
+    })
   );
+  app.use(
+    createProxyMiddleware("/list", {
+      target: "http://localhost:3001",
+      secure: false,
+    })
+  );
+  app.use(
+    createProxyMiddleware("/create", {
+      target: "http://localhost:3001",
+      secure: false,
+    })
+  );
+  app.use(
+    createProxyMiddleware("/ws/", {
+      target: "ws://localhost:3001",
+      changeOrigin: true,
+      ws: true,
+      secure: false,
+    })
+  );
+  app.use(morgan("tiny"));
 };

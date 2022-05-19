@@ -6,9 +6,10 @@
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
     "cannon": "^0.6.2",
+    "http-proxy-middleware": "^2.0.6",
     "jwt-decode": "^3.1.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
     "react-horizontal-scrolling": "^0.1.8",
     "react-linkify": "^1.0.0-alpha",
     "react-redux": "^7.1.1",
@@ -20,7 +21,7 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "start": "BROWSER=none react-scripts start",
+    "start": "WDS_SOCKET_PORT=443 BROWSER=none react-scripts start",
     "start-off-stream": "PORT=3005 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -50,14 +51,15 @@
     "@types/jwt-decode": "^3.1.0",
     "@types/node": "12.7.5",
     "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2",
+    "@types/react-dom": "^18.0.4",
     "@types/react-linkify": "^1.0.1",
     "@types/react-redux": "^7.1.2",
     "@types/react-router-dom": "^4.3.5",
     "@types/reselect": "^2.2.0",
     "@types/uuid": "^8.3.1",
+    "morgan": "^1.10.0",
     "prettier": "^2.6.2",
-    "react-scripts": "^4.0.3",
+    "react-scripts": "^5.0.1",
     "typescript": "4.4.3"
   }
 }

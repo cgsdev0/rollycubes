@@ -65,7 +65,7 @@ class HomePage extends React.Component<Props, State> {
   render() {
     return (
       <div>
-        <h1>Rolly Cubes</h1>
+        <h1>Rolly Cubes HAI</h1>
         <p>the one where you roll some dice</p>
         <button onClick={this.onStart(false)} disabled={this.state.pressed}>
           New Public Game
@@ -83,7 +83,7 @@ class HomePage extends React.Component<Props, State> {
                 <th>Join</th>
                 <th>Spectate</th>
               </tr>
-              {this.state.games.map(game => (
+              {this.state.games.map((game) => (
                 <tr key={game.code}>
                   <td className="host">{game.host_name || "unknown"}</td>
                   <td>{game.player_count} / 8</td>
