@@ -375,10 +375,17 @@ int main(int argc, char **argv) {
         baseAuthUrl = authServerUrl;
     }
 
-    std::cout << "Selected auth server URL: " << baseAuthUrl << std::endl;
+    bool auth_enabled = true;
+    if (std::getenv("NO_AUTH")) {
+        auth_enabled = false;
+    }
 
     JWTVerifier jwt_verifier;
-    jwt_verifier.init(baseAuthUrl);
+
+    if (auth_enabled) {
+        std::cout << "Selected auth server URL: " << baseAuthUrl << std::endl;
+        jwt_verifier.init(baseAuthUrl);
+    }
 
     AuthServerRequestQueue authServer(baseAuthUrl, uWS::Loop::get());
 
