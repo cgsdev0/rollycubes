@@ -1,5 +1,8 @@
 #!/bin/bash
 
+mkdir -p ./secrets
+touch ./secrets/.pre-shared-key
+
 while true;
 do
     pkill GameServer
