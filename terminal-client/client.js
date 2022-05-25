@@ -3,7 +3,7 @@ const blessed = require("blessed");
 const args = require('yargs').argv;
 
 const room = args.room || args.r || "wKvsbw";
-const host = args.host || args.h || "rollycubes.live";
+const host = args.host || args.h || "rollycubes.com";
 const port = args.port || args.p;
 const insecure = args.insecure || args.i || false;
 const protocol = insecure ? "ws" : "wss";
