@@ -1,4 +1,5 @@
 #include "All.h"
+#include "Astronaut.h"
 #include "Doubles.h"
 #include "GettingStarted.h"
 #include "Negative.h"
@@ -20,6 +21,7 @@ std::vector<BaseAchievement *> initAchievements() {
         new Rude(),
         new Oops(),
         new Perfect(),
+        new Astronaut(),
     };
     return achievements;
 }
