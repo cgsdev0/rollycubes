@@ -1,9 +1,15 @@
-var blessed = require("blessed");
-
 const WebSocket = require("ws");
+const blessed = require("blessed");
+const args = require('yargs').argv;
+
+const room = args.room || args.r || "wKvsbw";
+const host = args.host || args.h || "rollycubes.com";
+const port = args.port || args.p;
+const insecure = args.insecure || args.i || false;
+const protocol = insecure ? "ws" : "wss";
 
 const state = {
-  room: "wKvsbw",
+  room,
   self_index: 0,
   game: {
     players: [],
@@ -168,7 +174,7 @@ async function welcome(action) {
   if (action.chatLog) {
     action.chatLog.reverse().forEach((msg) => chatbox.log(msg));
   }
-  statusline.log(`https://rollycubes.live/room/${state.room}`);
+  statusline.log(`${insecure ? 'http' : 'https'}://${host}${port !== undefined ? `:${port}` : ''}/room/${state.room}`);
   printPlayers();
   printDice();
   state.self_index = action.id;
@@ -273,7 +279,7 @@ const ACTION_MAP = {
 let ws = undefined;
 
 function setupSocket() {
-  const s = new WebSocket(`wss://rollycubes.live/ws/room/${state.room}`, {
+  const s = new WebSocket(`${protocol}://${host}${port !== undefined ? `:${port}` : ''}/ws/room/${state.room}`, {
     headers: {
       Cookie: "_session=nomnomjs",
     },
