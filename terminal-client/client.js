@@ -3,7 +3,7 @@ var blessed = require("blessed");
 const WebSocket = require("ws");
 
 const state = {
-  room: "JSxGGv",
+  room: "wKvsbw",
   self_index: 0,
   game: {
     players: [],
@@ -163,12 +163,12 @@ async function redirect(action) {
 }
 
 async function welcome(action) {
-  state.game = action.game;
+  state.game = action;
   chatbox.setContent("");
-  if (action.game.chat) {
-    action.game.chat.reverse().forEach((msg) => chatbox.log(msg));
+  if (action.chatLog) {
+    action.chatLog.reverse().forEach((msg) => chatbox.log(msg));
   }
-  statusline.log(`https://beta.rollycubes.com/room/${state.room}`);
+  statusline.log(`https://rollycubes.live/room/${state.room}`);
   printPlayers();
   printDice();
   state.self_index = action.id;
@@ -273,7 +273,7 @@ const ACTION_MAP = {
 let ws = undefined;
 
 function setupSocket() {
-  const s = new WebSocket(`wss://beta.rollycubes.com/ws/room/${state.room}`, {
+  const s = new WebSocket(`wss://rollycubes.live/ws/room/${state.room}`, {
     headers: {
       Cookie: "_session=nomnomjs",
     },
