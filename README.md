@@ -39,3 +39,6 @@ node client.js --host localhost --port 3001 --insecure --room wKvsbw
 ### Run the auth service locally
 - `cd auth; docker-compose up -d` to set up the database
 - `yarn; yarn start` to run the service
+
+## High-Level Services
+![Service architecture graph](/docs/system-graph.png?raw=true "Service architecture graph")
