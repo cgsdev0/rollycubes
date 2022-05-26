@@ -11,6 +11,7 @@
 </p>
 
 <h4 align="center"><i>Rolling the dice since 2019.</i></h4>
+<p align="center">A game of luck and... well, actually, it's mostly luck.</p>
 <hr>
 
 <p align="center">
