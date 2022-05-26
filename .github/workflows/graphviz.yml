@@ -24,9 +24,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      - run: cat system.dot | docker run --rm -i nshine/dot > graph.png
-      - name: Archive the image
-        uses: actions/upload-artifact@v3
+      - run: mkdir -p docs
+      - run: cat system.dot | docker run --rm -i nshine/dot > docs/system-graph.png
+      - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          name: system graph
-          path: graph.png
+          commit_message: Generate diagrams (graphviz)
