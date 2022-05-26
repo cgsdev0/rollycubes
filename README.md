@@ -13,10 +13,12 @@ To run the dice game on your local machine, there are a few requirements.
 * You will almost certainly want to be on linux
 
 ### Run the server
-Use `./run-server.sh` (linux only)
+Use `./game/run-server.sh` (linux only)
   - This will automatically recompile/restart the server any time you modify a source file
 
-Alternatively, run `make && ./GameServer` in the root directory
+Alternatively, run `make && ./GameServer` in the `game` directory
+
+**NOTE: If you are not running a local auth server, be sure to set `NO_AUTH=true`**
 
 ### Run the client
 Use `cd client; yarn; yarn start`
@@ -36,8 +38,8 @@ cd terminal-client
 node client.js --host localhost --port 3001 --insecure --room wKvsbw
 ```
 
-### Run the auth service locally
-- `cd auth; docker-compose up -d` to set up the database
+### Run the auth service locally (Optional)
+- `cd auth/devdb; docker-compose up -d` to set up the database
 - `yarn; yarn start` to run the service
 
 ## High-Level Services
