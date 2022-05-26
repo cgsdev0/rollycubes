@@ -1,5 +1,7 @@
 digraph {
-  GameServer -> AuthServer
+  layout="circo"
+  GameServer
+  GameServer -> AuthServer [label="sends stats\n+ achievements"]
   Client -> AuthServer
   AuthServer -> Client
   Client -> GameServer [dir="both",label="WS"]
