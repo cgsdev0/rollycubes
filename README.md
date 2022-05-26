@@ -1,12 +1,24 @@
-# Rolly Cubes
-_Rolling the dice since 2019_
 
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cgsdev0/rollycubes/context:cpp)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cgsdev0/rollycubes/context:javascript)
+<h1 align="center">Rolly Cubes</h1>
 
-Check out this project [in production](https://rollycubes.com/) or [in beta](https://beta.rollycubes.com/),
-and follow development [on Twitch.tv](https://twitch.tv/badcop_)!
+<p align="center">
+  <a href="https://lgtm.com/projects/g/cgsdev0/rollycubes/context:cpp">
+    <img src="https://img.shields.io/lgtm/grade/cpp/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)" />
+  </a>
+  <a href="https://lgtm.com/projects/g/cgsdev0/rollycubes/context:javascript">
+    <img src="https://img.shields.io/lgtm/grade/javascript/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)" />
+  </a>
+</p>
 
-## Contributing
+<h4 align="center"><i>Rolling the dice since 2019.</i></h4>
+<hr>
 
-Want to contribute to rolly cubes? Check out the [developer documentation here](https://docs.rollycubes.com/).
+<p align="center">
+  Check out this project <a href="https://rollycubes.com/">in production</a> or <a href="https://beta.rollycubes.com/">in beta</a>,
+  and follow development <a href="https://twitch.tv/badcop_">on Twitch.tv</a>!
+</p>
+
+<p align="center">
+  Want to contribute?<br/>
+  [<a href="https://docs.rollycubes.com/">Developer Documentation</a>]
+</p>
