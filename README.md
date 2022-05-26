@@ -42,5 +42,5 @@ node client.js --host localhost --port 3001 --insecure --room wKvsbw
 - `cd auth/devdb; docker-compose up -d` to set up the database
 - `yarn; yarn start` to run the service
 
-## High-Level Services
+## High-Level Service Overview
 ![Service architecture graph](/docs/system-graph.png?raw=true "Service architecture graph")
