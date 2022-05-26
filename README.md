@@ -1,4 +1,4 @@
-# dice-game
+# Rolly Cubes
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cgsdev0/rollycubes/context:cpp)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/cgsdev0/rollycubes/context:javascript)
 
