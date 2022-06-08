@@ -14,12 +14,12 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props & RouteComponentProps> = ({
   authService,
   history,
   dispatch,
-  authToken
+  authToken,
 }) => {
   React.useEffect(() => {
     if (authToken) {
       history.replace("/home", {
-        redirect: history.location.pathname
+        redirect: history.location.pathname,
       });
     }
   }, [history, authToken]);
@@ -36,9 +36,9 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props & RouteComponentProps> = ({
           body: JSON.stringify({ twitch_access_token }),
           headers: {
             "csrf-token": await getCsrf(authService),
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          method: "POST"
+          method: "POST",
         }
       );
       const { access_token } = await resp.json();
@@ -55,7 +55,7 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props & RouteComponentProps> = ({
 const mapStateToProps = (state: ReduxState) => {
   return {
     authService: selectAuthService(state),
-    authToken: state.authToken
+    authToken: state.auth.authToken,
   };
 };
 

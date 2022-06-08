@@ -22,9 +22,8 @@ const RollButton: React.FC<Props> = ({ socket }) => {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    socket: state.socket,
+    socket: state.connection.socket,
   };
 };
 
 export default connect(mapStateToProps)(RollButton);
-

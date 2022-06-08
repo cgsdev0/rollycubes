@@ -76,7 +76,7 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.props.history.replace(`/${pathParts[1]}/${data.room}`);
     } else {
       // I'm sorry
-      const otherUsers = (window as any).REDUX_STORE.getState().otherUsers;
+      const otherUsers = (window as any).REDUX_STORE.getState().auth.otherUsers;
       const { authServiceOrigin } = (window as any).REDUX_STORE.getState()
         .settings;
       const populateUser = (player: any) => {
@@ -177,7 +177,7 @@ class Connection extends React.Component<Props & DispatchProp> {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    authToken: state.authToken,
+    authToken: state.auth.authToken,
   };
 };
 export default connect(mapStateToProps)(Connection);

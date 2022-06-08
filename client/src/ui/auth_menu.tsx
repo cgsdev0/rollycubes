@@ -76,7 +76,7 @@ const AuthMenu: React.FC<Props & DispatchProp> = (props) => {
 const mapStateToProps = (state: ReduxState) => {
   return {
     authService: selectAuthService(state),
-    authToken: state.authToken,
+    authToken: state.auth.authToken,
     isDev: selectIsDev(state),
     isSignedIn: selectIsSignedIn(state),
   };

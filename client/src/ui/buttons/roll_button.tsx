@@ -21,7 +21,7 @@ const RollButton: React.FC<Props> = ({ socket, hasEnoughPlayers }) => {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    socket: state.socket,
+    socket: state.connection.socket,
     hasEnoughPlayers: selectHasMultiplePlayers(state),
   };
 };

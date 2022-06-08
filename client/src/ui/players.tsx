@@ -1,15 +1,17 @@
 import React from "react";
 import { connect } from "react-redux";
 import { selectCrownedPlayers } from "../selectors/game_selectors";
-import { Player, ReduxState } from "../store";
+import { ReduxState } from "../store";
 import PlayerComponent from "./player";
 import "../App.css";
+import { GameState } from "../reducers/game";
+import { Player } from "../types/store_types";
 
 interface Props {
-  players: ReduxState["players"];
+  players: GameState["players"];
 }
 
-const Players: React.FC<Props> = props => {
+const Players: React.FC<Props> = (props) => {
   return (
     <div className="PlayerPanel">
       {props.players.map((player: Player, i: number) => (
@@ -21,7 +23,7 @@ const Players: React.FC<Props> = props => {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    players: selectCrownedPlayers(state)
+    players: selectCrownedPlayers(state),
   };
 };
 

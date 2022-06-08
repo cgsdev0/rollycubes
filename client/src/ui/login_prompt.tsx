@@ -5,7 +5,7 @@ import "../App.css";
 import {
   selectAuthService,
   selectSelfFirstInitial,
-  selectSelfImageUrl
+  selectSelfImageUrl,
 } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import AuthSettings from "../ui/auth_menu";
@@ -19,7 +19,7 @@ interface Props {
   firstInitial: string;
 }
 
-const LoginPrompt: React.FC<Props & DispatchProp> = props => {
+const LoginPrompt: React.FC<Props & DispatchProp> = (props) => {
   const { authToken, dispatch, authService, imageUrl, firstInitial } = props;
 
   const [isOpen, setIsOpen] = React.useState(false);
@@ -30,7 +30,7 @@ const LoginPrompt: React.FC<Props & DispatchProp> = props => {
       try {
         const response = await window.fetch(authService + "refresh_token", {
           mode: "cors",
-          credentials: "include"
+          credentials: "include",
         });
         if (response.status === 200) {
           const { access_token } = await response.json();
@@ -55,8 +55,8 @@ const LoginPrompt: React.FC<Props & DispatchProp> = props => {
         mode: "cors",
         credentials: "include",
         headers: {
-          "x-access-token": authToken
-        }
+          "x-access-token": authToken,
+        },
       });
       const userData = await response.json();
       dispatch({ type: "GOT_SELF_USER_DATA", userData });
@@ -83,10 +83,10 @@ const LoginPrompt: React.FC<Props & DispatchProp> = props => {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    authToken: state.authToken,
+    authToken: state.auth.authToken,
     authService: selectAuthService(state),
     imageUrl: selectSelfImageUrl(state),
-    firstInitial: selectSelfFirstInitial(state)
+    firstInitial: selectSelfFirstInitial(state),
   };
 };
 

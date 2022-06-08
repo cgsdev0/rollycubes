@@ -33,7 +33,7 @@ const lookupTable: Record<string, number> = {
   "30": 3,
   "31": 3,
   "32": 3,
-  "33": 3
+  "33": 3,
 };
 const quatToRoll = (q: BABYLON.Quaternion) => {
   let { x, z } = q.toEulerAngles();
@@ -93,7 +93,7 @@ const makeDieCreator = () => {
         height: diceSize,
         depth: diceSize,
         faceUV: diceUV,
-        updatable: true
+        updatable: true,
       },
       scene
     );
@@ -163,7 +163,7 @@ export const destroyScene = async () => {
   document.removeEventListener("snapDice", snapListener);
   snapListener = undefined;
 };
-export const initScene = async (state: ReduxState) => {
+export const initScene = async () => {
   if (sceneInit) {
     return;
   }
@@ -192,7 +192,7 @@ export const initScene = async (state: ReduxState) => {
   // Load the 3D engine
   engine = new BABYLON.Engine(canvas, true, {
     preserveDrawingBuffer: true,
-    stencil: true
+    stencil: true,
   });
   scene = new BABYLON.Scene(engine);
 
@@ -293,7 +293,7 @@ export const initScene = async (state: ReduxState) => {
   //   wall.physicsImpostor.physicsBody.shapes[0].updateConvexPolyhedronRepresentation();
   //   console.log(wall.physicsImpostor.physicsBody);
   // };
-  walls.forEach(wall => {
+  walls.forEach((wall) => {
     wall.physicsImpostor = new BABYLON.PhysicsImpostor(
       wall,
       BABYLON.PhysicsImpostor.BoxImpostor,
@@ -323,7 +323,7 @@ export const initScene = async (state: ReduxState) => {
   };
   resizeWalls();
 
-  walls.forEach(wall => {
+  walls.forEach((wall) => {
     wall.material = greenMat;
     wall.visibility = 0;
   });
@@ -351,11 +351,11 @@ export const initScene = async (state: ReduxState) => {
     { name: "south", v: new BABYLON.Vector3(0, 0, 1), u: -1 },
     { name: "west", v: new BABYLON.Vector3(1, 0, 0), u: -1 },
     { name: "north", v: new BABYLON.Vector3(0, 0, 1), u: 1 },
-    { name: "east", v: new BABYLON.Vector3(1, 0, 0), u: 1 }
+    { name: "east", v: new BABYLON.Vector3(1, 0, 0), u: 1 },
   ];
   let lastRollWasDoubles = false;
   const roll = (serverRoll: number[], turn_index: number): void => {
-    lastRollWasDoubles = serverRoll.every(v => v === serverRoll[0]);
+    lastRollWasDoubles = serverRoll.every((v) => v === serverRoll[0]);
     // console.log(serverRoll);
     if (serverRoll.length === 0) {
       serverRoll = [3, 4];
@@ -366,7 +366,7 @@ export const initScene = async (state: ReduxState) => {
     scene.physicsEnabled = false;
     const direction = directions[turn_index % directions.length];
     scene.physicsEnabled = true;
-    dice.forEach(die => killAnimation(die));
+    dice.forEach((die) => killAnimation(die));
     //console.log(direction);
     const wall = walls[directions.indexOf(direction)];
     wall.position.y = -40;
@@ -380,7 +380,7 @@ export const initScene = async (state: ReduxState) => {
     dice[1].position.x = 0.2;
     dice[1].position.z = 0;
 
-    dice.forEach(die => {
+    dice.forEach((die) => {
       die.position.addInPlace(
         wall.position
           .multiply(direction.v)
@@ -403,8 +403,8 @@ export const initScene = async (state: ReduxState) => {
       );
     });
     const impostors = [
-      ...dice.map(die => die.physicsImpostor!),
-      ...walls.map(wall => wall.physicsImpostor!)
+      ...dice.map((die) => die.physicsImpostor!),
+      ...walls.map((wall) => wall.physicsImpostor!),
     ];
     let hasSignaledDone = false;
     for (let i = 0; i < 600; ++i) {
@@ -414,7 +414,7 @@ export const initScene = async (state: ReduxState) => {
         .executeStep(0.01667, impostors);
       if (
         wallIsOpen &&
-        dice.every(die => {
+        dice.every((die) => {
           if (
             die.position
               .multiply(direction.v)
@@ -437,12 +437,12 @@ export const initScene = async (state: ReduxState) => {
         const { x, y, z } = die.position;
         positions[j].push({
           frame: i,
-          value: new BABYLON.Vector3(x, y, z)
+          value: new BABYLON.Vector3(x, y, z),
         });
         const { x: rx, y: ry, z: rz, w: rw } = die.rotationQuaternion!;
         rotations[j].push({
           frame: i,
-          value: new BABYLON.Quaternion(rx, ry, rz, rw)
+          value: new BABYLON.Quaternion(rx, ry, rz, rw),
         });
       });
       if (
@@ -518,18 +518,20 @@ export const initScene = async (state: ReduxState) => {
 
   setTimeout(() => {
     // do a fake roll on init
-    state.rolls.forEach((roll, i) => {
-      const die = dice[i];
-      die.updateVerticesData(
-        BABYLON.VertexBuffer.UVKind,
-        diceUVBuffers[(6 + roll.value - 1) % 6]
-      );
-      die.position.y = diceSize / 1.2;
-      die.position.x = -i + diceSize;
-      die.position.z = Math.random();
-      die.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
-      die.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
-    });
+    (window as any).REDUX_STORE.getState().game.rolls.forEach(
+      (roll: any, i: number) => {
+        const die = dice[i];
+        die.updateVerticesData(
+          BABYLON.VertexBuffer.UVKind,
+          diceUVBuffers[(6 + roll.value - 1) % 6]
+        );
+        die.position.y = diceSize / 1.2;
+        die.position.x = -i + diceSize;
+        die.position.z = Math.random();
+        die.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
+        die.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
+      }
+    );
     signalRolled3D(false);
   }, 10);
 
@@ -622,8 +624,8 @@ export const initScene = async (state: ReduxState) => {
             target.x,
             target.y,
             target.z
-          ).normalize()
-        }
+          ).normalize(),
+        },
       ]);
       die.animations = [];
       die.animations.push(xSlide);
@@ -643,7 +645,7 @@ export const initScene = async (state: ReduxState) => {
   (window as any).roll_func = roll;
   document.addEventListener("roll", rollListener, false);
   document.addEventListener("snapDice", snapListener, false);
-  scene.onKeyboardObservable.add(kbInfo => {
+  scene.onKeyboardObservable.add((kbInfo) => {
     switch (kbInfo.type) {
       case BABYLON.KeyboardEventTypes.KEYDOWN:
         // if (kbInfo.event.key === "r") {
@@ -666,12 +668,12 @@ export const initScene = async (state: ReduxState) => {
   //   scene,
   //   function(scene) {}
   // );
-  engine.runRenderLoop(function() {
+  engine.runRenderLoop(function () {
     if (scene) {
       scene.render();
     }
   });
-  window.addEventListener("resize", function() {
+  window.addEventListener("resize", function () {
     if (engine) {
       engine.resize();
       resizeWalls();

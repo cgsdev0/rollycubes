@@ -5,13 +5,14 @@ import {
   selectIs3d,
   selectShouldShowDiceBoxes,
 } from "../selectors/game_selectors";
-import { DieRoll, ReduxState } from "../store";
+import { ReduxState } from "../store";
+import { DieRoll } from "../types/store_types";
 import "./buttons/buttons.css";
 import "./dice.css";
 import Die from "./die";
 
 interface Props {
-  dice: ReduxState["rolls"];
+  dice: ReduxState["game"]["rolls"];
   rolling: "rolled" | "rolling";
   is3d: boolean;
   showDiceBoxes: boolean;

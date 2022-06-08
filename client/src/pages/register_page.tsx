@@ -12,9 +12,9 @@ interface Props {
   authToken?: string | null;
 }
 
-const LoginPage: React.FC<DispatchProp &
-  Props &
-  RouteComponentProps> = props => {
+const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
+  props
+) => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [password2, setPassword2] = React.useState("");
@@ -26,7 +26,7 @@ const LoginPage: React.FC<DispatchProp &
   React.useEffect(() => {
     if (authToken) {
       history.replace("/home", {
-        redirect: history.location.pathname
+        redirect: history.location.pathname,
       });
     }
   }, [history, authToken]);
@@ -41,12 +41,12 @@ const LoginPage: React.FC<DispatchProp &
         credentials: "include",
         headers: {
           "csrf-token": await getCsrf(authService),
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
       if (response.status === 200) {
         history.replace("/login?registered=" + username, {
-          redirect: history.location.pathname
+          redirect: history.location.pathname,
         });
       } else {
         const error = await response.text();
@@ -64,18 +64,18 @@ const LoginPage: React.FC<DispatchProp &
       <form onSubmit={register}>
         <div className="loginForm">
           <input
-            onChange={e => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
             value={username}
           />
           <input
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             value={password}
             placeholder="Password"
             type="password"
           />
           <input
-            onChange={e => setPassword2(e.target.value)}
+            onChange={(e) => setPassword2(e.target.value)}
             value={password2}
             placeholder="Confirm Password"
             type="password"
@@ -100,7 +100,7 @@ const LoginPage: React.FC<DispatchProp &
 const mapStateToProps = (state: ReduxState) => {
   return {
     authService: selectAuthService(state),
-    authToken: state.authToken
+    authToken: state.auth.authToken,
   };
 };
 

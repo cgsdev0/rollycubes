@@ -16,9 +16,9 @@ interface Props {
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
-const LoginPage: React.FC<DispatchProp &
-  Props &
-  RouteComponentProps> = props => {
+const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
+  props
+) => {
   const query = useQuery();
   const [username, setUsername] = React.useState<string>(
     query.get("registered") || ""
@@ -30,7 +30,7 @@ const LoginPage: React.FC<DispatchProp &
   React.useEffect(() => {
     if (authToken) {
       props.history.replace("/home", {
-        redirect: props.history.location.pathname
+        redirect: props.history.location.pathname,
       });
     }
   }, [props.history, authToken]);
@@ -43,8 +43,8 @@ const LoginPage: React.FC<DispatchProp &
       credentials: "include",
       headers: {
         "csrf-token": await getCsrf(authService),
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
     const { access_token } = await response.json();
     if (access_token) {
@@ -59,12 +59,12 @@ const LoginPage: React.FC<DispatchProp &
       <form onSubmit={login}>
         <div className="loginForm">
           <input
-            onChange={e => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
             value={username}
           />
           <input
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             value={password}
             placeholder="Password"
             type="password"
@@ -85,7 +85,7 @@ const LoginPage: React.FC<DispatchProp &
 const mapStateToProps = (state: ReduxState) => {
   return {
     authService: selectAuthService(state),
-    authToken: state.authToken
+    authToken: state.auth.authToken,
   };
 };
 

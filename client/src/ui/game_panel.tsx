@@ -11,13 +11,14 @@ import {
   selectIs3dRollHappening,
   selectIs3d,
 } from "../selectors/game_selectors";
-import { ReduxState, DieRoll } from "../store";
+import { ReduxState } from "../store";
 import RollButton from "./buttons/roll_button";
 import RestartButton from "./buttons/restart_button";
 import AddSubButton from "./buttons/add_sub_button";
 import Dice from "./dice";
 import "../App.css";
 import "../ui/buttons/buttons.css";
+import { DieRoll } from "../types/store_types";
 
 interface Props {
   roll: boolean;

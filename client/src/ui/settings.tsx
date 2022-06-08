@@ -5,7 +5,6 @@ import {
   selectAuthService,
   selectCheats,
   selectIs3d,
-  selectIsDarkTheme,
   selectIsDev,
 } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
@@ -13,7 +12,6 @@ import "../ui/buttons/buttons.css";
 
 interface Props {
   socket?: WebSocket;
-  theme: boolean;
   hints: boolean;
   is3d: boolean;
   isDev: boolean;
@@ -71,13 +69,6 @@ const SettingsMenu: React.FC<Props & DispatchProp> = (props) => {
             </li>
             <li
               onClick={() => {
-                props.dispatch({ type: "TOGGLE_THEME" });
-              }}
-            >
-              [{props.theme ? "x" : " "}] Dark mode
-            </li>
-            <li
-              onClick={() => {
                 props.dispatch({ type: "CHEATS" });
               }}
             >
@@ -108,8 +99,7 @@ const SettingsMenu: React.FC<Props & DispatchProp> = (props) => {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    socket: state.socket,
-    theme: selectIsDarkTheme(state),
+    socket: state.connection.socket,
     hints: selectCheats(state),
     is3d: selectIs3d(state),
     authService: selectAuthService(state),

@@ -14,8 +14,6 @@ interface Props {
 const helpString = `--------------------HELP--------------------
 /name [string] - change your username
 /hints - toggle gameplay hints
-/dark - night mode
-/light - day mode
 /3d - 3D dice! [EXPERIMENTAL]
 ----------------------------------------------
 `;
@@ -39,14 +37,6 @@ const ChatBox: React.FC<Props & DispatchProp> = (props) => {
             const name = chatMsg.split(" ").slice(1).join(" ");
             props.socket.send(JSON.stringify({ type: "update_name", name }));
             localStorage.setItem("name", name);
-            break;
-          case "/night":
-          case "/dark":
-            props.dispatch({ type: "THEME_DARK" });
-            break;
-          case "/day":
-          case "/light":
-            props.dispatch({ type: "THEME_LIGHT" });
             break;
           case "/hints":
           case "/hint":
@@ -116,8 +106,8 @@ const ChatMsg = (props: { msg: string }) => {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    socket: state.socket,
-    chat: state.chat,
+    socket: state.connection.socket,
+    chat: state.chat.chat,
     isSpectator: selectIsSpectator(state),
   };
 };

@@ -4,11 +4,10 @@ import {
   createSelectorCreator,
 } from "reselect";
 import { ReduxState, selectState, TARGET_SCORES } from "../store";
-import { themes } from "../themes";
 
 export const selectOtherUsers = createSelector(
   selectState,
-  (state) => state.otherUsers
+  (state) => state.auth.otherUsers
 );
 
 export const selectIs3d = createSelector(
@@ -23,7 +22,7 @@ export const selectAuthService = createSelector(
 
 export const selectSelfUserData = createSelector(
   selectState,
-  (state) => state.userData
+  (state) => state.auth.userData
 );
 
 export const selectSelfImageUrl = createSelector(
@@ -53,14 +52,9 @@ export const selectIsDev = createSelector(
       (window.location.port === "3005" || window.location.port === "3000"))
 );
 
-export const selectIsDarkTheme = createSelector(
-  selectState,
-  (state) => state.settings.theme === themes.dark
-);
-
 export const selectDiceRolls = createSelector(
   selectState,
-  (state) => state.rolls
+  (state) => state.game.rolls
 );
 
 const DEBUG_PLAYERS = false;
@@ -68,7 +62,7 @@ const DEBUG_PLAYERS = false;
 export const selectPlayers = createSelector(selectState, (state) =>
   DEBUG_PLAYERS
     ? [
-        ...state.players,
+        ...state.game.players,
         { connected: true, name: "test", score: 10, win_count: 0 },
         { connected: false, name: "test2", score: 10, win_count: 0 },
         { connected: true, name: "test3", score: 10, win_count: 0 },
@@ -76,7 +70,7 @@ export const selectPlayers = createSelector(selectState, (state) =>
         { connected: true, name: "test0", score: 10, win_count: 0 },
         { connected: true, name: "test6", score: 10, win_count: 5 },
       ]
-    : state.players
+    : state.game.players
 );
 
 export const selectPlayersAndUserData = createSelector(
@@ -123,27 +117,27 @@ export const selectCrownedPlayers = createSelector(
 
 export const selectSelfIndex = createSelector(
   selectState,
-  (state) => state.self_index
+  (state) => state.game.self_index
 );
 export const selectTurnIndex = createSelector(
   selectState,
-  (state) => state.turn_index
+  (state) => state.game.turn_index
 );
 export const selectRollCount = createSelector(
   selectState,
-  (state) => state.rollCount
+  (state) => state.popText.rollCount
 );
 export const selectIsGameOver = createSelector(
   selectState,
-  (state) => state.victory
+  (state) => state.game.victory
 );
 export const selectDoublesCount = createSelector(
   selectState,
-  (state) => state.doublesCount
+  (state) => state.popText.doublesCount
 );
 export const selectIsReset = createSelector(
   selectState,
-  (state) => state.reset
+  (state) => state.popText.reset
 );
 export const selectCheats = createSelector(
   selectState,
@@ -233,7 +227,7 @@ export const selectIsMyTurn = createSelector(
 
 export const selectHasRolled = createSelector(
   selectState,
-  (state) => state.rolled
+  (state) => state.game.rolled
 );
 
 export const selectShouldShowRoll = createSelector(
@@ -248,7 +242,7 @@ export const selectTotalRoll = createSelector(selectDiceRolls, (rolls) =>
 
 export const selectIs3dRollHappening = createSelector(
   selectState,
-  (state) => state.settings.sick3dmode && !state.rolled3d
+  (state) => state.settings.sick3dmode && !state.game.rolled3d
 );
 
 export const selectShouldShowDiceBoxes = createSelector(

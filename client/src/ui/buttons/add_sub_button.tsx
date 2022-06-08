@@ -41,7 +41,7 @@ const AddSubButton: React.FC<Props> = ({ socket, addClass, subClass, n }) => {
 
 const mapStateToProps = (state: ReduxState, ownProps: OwnProps): StateProps => {
   return {
-    socket: state.socket,
+    socket: state.connection.socket,
     addClass: getAddSubButtonClassSelector(
       typeof ownProps.n === "number" ? ownProps.n + 1 : "add"
     )(state),
