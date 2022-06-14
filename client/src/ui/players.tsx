@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { selectCrownedPlayers } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import PlayerComponent from "./player";
-import "../App.css";
 import { GameState } from "../reducers/game";
 import { Player } from "../types/store_types";
 

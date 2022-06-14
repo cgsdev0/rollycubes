@@ -1,5 +1,4 @@
 import React from "react";
-import "./achievement.css";
 
 interface Props {
   achievement_id: string;

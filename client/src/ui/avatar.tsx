@@ -1,5 +1,4 @@
 import React from "react";
-import "../App.css";
 
 interface Props {
   imageUrl?: string | null;
@@ -8,7 +7,7 @@ interface Props {
   size?: number;
 }
 
-const Avatar: React.FC<Props> = props => {
+const Avatar: React.FC<Props> = (props) => {
   const { size, imageUrl, firstInitial, n } = props;
 
   const size2 = size || 24;

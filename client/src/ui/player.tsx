@@ -2,7 +2,6 @@ import React from "react";
 import HorizontalScroll from "react-horizontal-scrolling";
 import { connect } from "react-redux";
 import ReactTooltip from "react-tooltip";
-import "../App.css";
 import { selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import { Player } from "../types/store_types";

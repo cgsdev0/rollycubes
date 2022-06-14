@@ -6,7 +6,6 @@ import { getCsrf } from "../auth";
 import { selectAuthService } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import { TwitchButton } from "../twitch";
-import "./login.css";
 
 interface Props {
   authService: string;

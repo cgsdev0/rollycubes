@@ -16,8 +16,6 @@ import RollButton from "./buttons/roll_button";
 import RestartButton from "./buttons/restart_button";
 import AddSubButton from "./buttons/add_sub_button";
 import Dice from "./dice";
-import "../App.css";
-import "../ui/buttons/buttons.css";
 import { DieRoll } from "../types/store_types";
 
 interface Props {

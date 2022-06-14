@@ -2,7 +2,6 @@ import React from "react";
 import { RequiresSession } from "../hocs/requires_session";
 import { connect, DispatchProp } from "react-redux";
 import ConnBanner from "../ui/conn_banner";
-import "../App.css";
 import Connection from "../connection";
 import {
   selectDoublesCount,
@@ -151,22 +150,10 @@ class GamePage extends React.Component<Props & DispatchProp> {
 
             <div id="PlayerChatWrapper">
               <Players />
-              <ul className="TabHeader">
-                <a href="#rules">
-                  <li>Rules</li>
-                </a>
-                <a href="#chat">
-                  <li>Chat</li>
-                </a>
-                <a href="#minimized">
-                  <li>Minimize</li>
-                </a>
-              </ul>
               <div id="RuleBox" className={`TabContainer Rules`}>
                 <h2 className="HideMobile">Rules</h2>
                 <p>
-                  Each roll, you may add or subtract the total value shown on
-                  the dice from your score.
+                  Take turns rolling the dice, trying to reach a winning score.
                 </p>
                 <p>Winning Scores:</p>
                 <ul>
@@ -177,15 +164,14 @@ class GamePage extends React.Component<Props & DispatchProp> {
                 <p>Additional Rules:</p>
                 <ul>
                   <li>
-                    If you roll doubles, you <strong>must</strong> roll again.
+                    <strong>Sevens:</strong> split.
                   </li>
                   <li>
-                    If you match a player's score, they are{" "}
+                    <strong>Doubles:</strong> roll again.
+                  </li>
+                  <li>
+                    If you match another player's score, they are{" "}
                     <strong>reset</strong> to 0.
-                  </li>
-                  <li>
-                    If you roll a seven, you may <strong>split</strong> the dice
-                    into 2 rolls.
                   </li>
                 </ul>
               </div>

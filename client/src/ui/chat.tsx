@@ -2,7 +2,6 @@ import React, { FormEvent } from "react";
 import { ReduxState } from "../store";
 import { connect, DispatchProp } from "react-redux";
 import Linkify from "react-linkify";
-import "../App.css";
 import { selectIsSpectator } from "../selectors/game_selectors";
 
 interface Props {

@@ -1,8 +1,6 @@
 import React from "react";
 import { connect, DispatchProp } from "react-redux";
-import "../App.css";
 import { ReduxState } from "../store";
-import "../ui/buttons/buttons.css";
 import {
   selectAuthService,
   selectIsDev,

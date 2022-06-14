@@ -7,8 +7,6 @@ import {
 } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import { DieRoll } from "../types/store_types";
-import "./buttons/buttons.css";
-import "./dice.css";
 import Die from "./die";
 
 interface Props {

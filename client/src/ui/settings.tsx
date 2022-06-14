@@ -1,6 +1,5 @@
 import React from "react";
 import { connect, DispatchProp } from "react-redux";
-import "../App.css";
 import {
   selectAuthService,
   selectCheats,
@@ -8,7 +7,6 @@ import {
   selectIsDev,
 } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
-import "../ui/buttons/buttons.css";
 
 interface Props {
   socket?: WebSocket;

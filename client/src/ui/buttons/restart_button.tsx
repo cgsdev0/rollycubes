@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import { ReduxState } from "../../store";
-import "./buttons.css";
 
 interface Props {
   socket?: WebSocket;

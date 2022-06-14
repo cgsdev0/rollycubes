@@ -1,7 +1,6 @@
 import React from "react";
 import { connect, DispatchProp } from "react-redux";
 import { Link } from "react-router-dom";
-import "../App.css";
 import {
   selectAuthService,
   selectSelfFirstInitial,
@@ -9,7 +8,6 @@ import {
 } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import AuthSettings from "../ui/auth_menu";
-import "../ui/buttons/buttons.css";
 import Avatar from "./avatar";
 
 interface Props {
@@ -68,10 +66,7 @@ const LoginPrompt: React.FC<Props & DispatchProp> = (props) => {
       {authToken === null ? <Link to="/login">Login</Link> : null}
       {authToken ? (
         <>
-          <div
-            onClick={() => setIsOpen(true)}
-            style={{ display: "flex", justifyContent: "flex-end" }}
-          >
+          <div onClick={() => setIsOpen(true)}>
             <Avatar imageUrl={imageUrl} firstInitial={firstInitial} />
           </div>
           <AuthSettings isOpen={isOpen} setIsOpen={setIsOpen} />

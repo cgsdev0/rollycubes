@@ -1,6 +1,5 @@
 import React from "react";
 import { connect } from "react-redux";
-import "./pages/login.css";
 import { selectAuthService } from "./selectors/game_selectors";
 import { ReduxState } from "./store";
 
@@ -11,7 +10,7 @@ const twitchLogin = (authService: string) => () => {
 };
 
 const UnconnectedTwitchButton: React.FC<{ authService: string }> = ({
-  authService
+  authService,
 }) => {
   return (
     <button onClick={twitchLogin(authService)} className="twitchButton">
@@ -22,7 +21,7 @@ const UnconnectedTwitchButton: React.FC<{ authService: string }> = ({
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    authService: selectAuthService(state)
+    authService: selectAuthService(state),
   };
 };
 export const TwitchButton = connect(mapStateToProps)(UnconnectedTwitchButton);

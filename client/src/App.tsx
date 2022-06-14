@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { v4 as uuidv4 } from "uuid";
-import "./App.css";
 import GamePage from "./pages/game_page";
 import HomePage from "./pages/home_page";
 import LoginPage from "./pages/login_page";
@@ -59,7 +58,7 @@ const AppInner = () => {
 
 const TabErrorPage = () => {
   return (
-    <div style={{ marginTop: "40vh", textAlign: "center" }}>
+    <div>
       <h1>Error</h1>
       <p>You already have a tab opened for that room.</p>
       <a href="/">Back to Home</a>
