@@ -1,7 +1,8 @@
 import React from "react";
+import { RequiresSession } from "../hocs/requires_session";
 import { connect, DispatchProp } from "react-redux";
-import { useLocation } from "react-router";
-import { Link, RouteComponentProps } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getCsrf } from "../auth";
 import { selectAuthService } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
@@ -16,9 +17,7 @@ interface Props {
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
-const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
-  props
-) => {
+const LoginPage: React.FC<DispatchProp & Props> = (props) => {
   const query = useQuery();
   const [username, setUsername] = React.useState<string>(
     query.get("registered") || ""
@@ -27,13 +26,6 @@ const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
 
   const { authToken, authService, dispatch } = props;
 
-  React.useEffect(() => {
-    if (authToken) {
-      props.history.replace("/home", {
-        redirect: props.history.location.pathname,
-      });
-    }
-  }, [props.history, authToken]);
   const login = async (e: any) => {
     e.preventDefault();
     const response = await window.fetch(authService + "login", {
@@ -51,6 +43,12 @@ const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
       dispatch({ type: "AUTHENTICATE", access_token });
     }
   };
+
+  const location = useLocation();
+  if (authToken)
+    return (
+      <Navigate to="/home" replace state={{ redirect: location.pathname }} />
+    );
 
   return (
     <div className="loginContainer">
@@ -90,4 +88,4 @@ const mapStateToProps = (state: ReduxState) => {
 };
 
 const ConnectedLoginPage = connect(mapStateToProps)(LoginPage);
-export default ConnectedLoginPage;
+export default RequiresSession(ConnectedLoginPage);

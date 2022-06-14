@@ -1,27 +1,25 @@
 import React from "react";
-import { RouteComponentProps } from "react-router";
+import { useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-const RedirectIfNoSession = (history: any) => {
-  React.useEffect(() => {
-    if (!document.cookie.includes("_session")) {
-      history.replace("/", {
-        redirect: history.location.pathname
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+const RequiresSessionWrapper = (children: any) => {
+  const location = useLocation();
+  if (!document.cookie.includes("_session")) {
+    return (
+      <Navigate to="/" replace={true} state={{ redirect: location.pathname }} />
+    );
+  }
+  return children;
 };
 
-export const RequiresSession = <P extends unknown>(
+export const RequiresSession = <P extends object>(
   C: React.ComponentType<P>
-): React.ComponentType<P & RouteComponentProps> => {
-  return function(props: P & RouteComponentProps) {
-    RedirectIfNoSession(props.history);
-
-    if (!document.cookie.includes("_session")) {
-      return null;
-    }
-
-    return <C {...props} />;
+): React.ComponentType<P> => {
+  return function (props: P) {
+    return (
+      <RequiresSessionWrapper>
+        <C {...props} />
+      </RequiresSessionWrapper>
+    );
   };
 };

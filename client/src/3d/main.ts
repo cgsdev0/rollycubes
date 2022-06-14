@@ -1,10 +1,9 @@
 /* eslint no-loop-func: "off" */
-import * as cannon from "cannon";
-import { CannonJSPlugin } from "babylonjs";
-
 import * as BABYLON from "babylonjs";
+import { CannonJSPlugin } from "babylonjs";
 import "babylonjs-loaders";
-import { store, ReduxState } from "../store";
+import * as cannon from "cannon";
+import { store } from "../store";
 
 const frameRate = 60;
 

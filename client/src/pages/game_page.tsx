@@ -1,6 +1,6 @@
 import React from "react";
+import { RequiresSession } from "../hocs/requires_session";
 import { connect, DispatchProp } from "react-redux";
-import { RouteComponentProps } from "react-router-dom";
 import ConnBanner from "../ui/conn_banner";
 import "../App.css";
 import Connection from "../connection";
@@ -18,11 +18,13 @@ import Players from "../ui/players";
 import { destroyScene } from "../3d/main";
 import ChatBox from "../ui/chat";
 import { Player } from "../types/store_types";
-
-interface TParams {
-  room: string;
-  mode: string;
-}
+import {
+  Location,
+  NavigateFunction,
+  useNavigate,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 
 interface Props {
   doublesCount: number;
@@ -32,6 +34,10 @@ interface Props {
   turn: number;
   somebodyIsNice: boolean;
   authToken?: string | null;
+  navigate: NavigateFunction;
+  location: Location;
+  mode?: string;
+  room?: string;
 }
 
 const clearSelection = () => {
@@ -53,14 +59,12 @@ const zones = [
   "EmptyDiceBox",
   "PlayerChatWrapper",
 ];
-class GamePage extends React.Component<
-  Props & DispatchProp & RouteComponentProps<TParams>
-> {
+class GamePage extends React.Component<Props & DispatchProp> {
   inputRef: React.RefObject<HTMLInputElement>;
   listeners: any[] = [];
   doubleTap: boolean = false;
   doubleTapTimer: number | undefined;
-  constructor(props: Props & DispatchProp & RouteComponentProps<TParams>) {
+  constructor(props: Props & DispatchProp) {
     super(props);
     this.inputRef = React.createRef();
   }
@@ -98,6 +102,7 @@ class GamePage extends React.Component<
   }
 
   componentWillUnmount() {
+    console.warn("oh shit i unmounted too lol");
     this.listeners.forEach((l) =>
       document.body.removeEventListener(l.type, l.fn, true)
     );
@@ -106,29 +111,29 @@ class GamePage extends React.Component<
 
   render() {
     const {
+      mode,
+      room,
       somebodyIsNice,
       authToken,
       doublesCount,
       winner,
       reset,
       turn,
-      location,
-      match,
-      history,
     } = this.props;
-    const { hash } = location;
 
-    const rulesSel = !hash || hash === "#rules";
-    const chatSel = hash === "#chat";
-    const minimized = !rulesSel && !chatSel;
+    if (!mode || !room) {
+      return <p>Error</p>;
+    }
 
+    console.log("I AM RENDERIN", authToken);
     return (
       <React.Fragment>
         {authToken === undefined ? null : (
           <Connection
-            room={match.params.room}
-            mode={match.params.mode}
-            history={history}
+            room={room}
+            mode={mode}
+            navigate={this.props.navigate}
+            location={this.props.location}
           />
         )}
 
@@ -159,12 +164,7 @@ class GamePage extends React.Component<
                   <li>Minimize</li>
                 </a>
               </ul>
-              <div
-                id="RuleBox"
-                className={`TabContainer Rules ${
-                  hash && hash !== "#rules" ? " HideMobile" : ""
-                }`}
-              >
+              <div id="RuleBox" className={`TabContainer Rules`}>
                 <h2 className="HideMobile">Rules</h2>
                 <p>
                   Each roll, you may add or subtract the total value shown on
@@ -191,11 +191,7 @@ class GamePage extends React.Component<
                   </li>
                 </ul>
               </div>
-              <div
-                className={`TabContainer Chat ${
-                  hash !== "#chat" ? " HideMobile" : ""
-                }`}
-              >
+              <div className={`TabContainer Chat`}>
                 <ChatBox />
               </div>
             </div>
@@ -206,6 +202,20 @@ class GamePage extends React.Component<
     );
   }
 }
+
+const HookMeUp = (C: any) => {
+  return function () {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const navigate = useNavigate();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const location = useLocation();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { mode, room } = useParams();
+    return (
+      <C navigate={navigate} location={location} mode={mode} room={room} />
+    );
+  };
+};
 
 const mapStateToProps = (state: ReduxState) => {
   return {
@@ -221,4 +231,4 @@ const mapStateToProps = (state: ReduxState) => {
 
 const ConnectedGamePage = connect(mapStateToProps)(GamePage);
 
-export default ConnectedGamePage;
+export default HookMeUp(RequiresSession(ConnectedGamePage));

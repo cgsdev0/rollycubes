@@ -1,4 +1,5 @@
 import React from "react";
+import { Transition } from "react-transition-group";
 import { connect, DispatchProp } from "react-redux";
 import { ReduxState } from "../store";
 
@@ -7,24 +8,20 @@ interface Props {
 }
 
 const ConnBanner: React.FC<Props & DispatchProp> = ({ connected }) => {
-  const banner_timer = React.useRef<any>(null);
-  const [showBanner, setShowBanner] = React.useState(false);
-  React.useEffect(() => {
-    if (!connected) {
-      banner_timer.current = setTimeout(() => {
-        setShowBanner(true);
-      }, 6000);
-    } else {
-      clearTimeout(banner_timer.current);
-      setShowBanner(false);
-    }
-  }, [connected]);
+  const ref = React.useRef<any>();
   return (
-    <div className={`connBannerWrapper${showBanner ? " connBannerOpen" : ""}`}>
-      <div className={`connBanner${showBanner ? "" : " connBannerHidden"}`}>
-        Reconnecting...
-      </div>
-    </div>
+    <Transition
+      in={!connected}
+      timeout={{ enter: 6000, exit: 0 }}
+      nodeRef={ref}
+      appear
+    >
+      {(state) => (
+        <div className={`connBannerWrapper connBanner-${state}`} ref={ref}>
+          <div className={`connBanner`}>Reconnecting...</div>
+        </div>
+      )}
+    </Transition>
   );
 };
 

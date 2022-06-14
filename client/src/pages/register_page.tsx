@@ -1,6 +1,7 @@
 import React from "react";
+import { RequiresSession } from "../hocs/requires_session";
 import { connect, DispatchProp } from "react-redux";
-import { RouteComponentProps } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { getCsrf } from "../auth";
 import { selectAuthService } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
@@ -12,24 +13,17 @@ interface Props {
   authToken?: string | null;
 }
 
-const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
-  props
-) => {
+const LoginPage: React.FC<DispatchProp & Props> = (props) => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [password2, setPassword2] = React.useState("");
   const [isPressed, setIsPressed] = React.useState(false);
   const [errorText, setErrorText] = React.useState("");
 
-  const { authToken, authService, history } = props;
+  const { authToken, authService } = props;
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  React.useEffect(() => {
-    if (authToken) {
-      history.replace("/home", {
-        redirect: history.location.pathname,
-      });
-    }
-  }, [history, authToken]);
   const register = async (e: any) => {
     setIsPressed(true);
     try {
@@ -45,8 +39,11 @@ const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
         },
       });
       if (response.status === 200) {
-        history.replace("/login?registered=" + username, {
-          redirect: history.location.pathname,
+        navigate("/login?registered=" + username, {
+          replace: true,
+          state: {
+            redirect: location.pathname,
+          },
         });
       } else {
         const error = await response.text();
@@ -57,6 +54,10 @@ const LoginPage: React.FC<DispatchProp & Props & RouteComponentProps> = (
     }
   };
 
+  if (authToken)
+    return (
+      <Navigate to="/home" replace state={{ redirect: location.pathname }} />
+    );
   return (
     <div className="loginContainer">
       <h1>Rolly Cubes</h1>
@@ -105,4 +106,4 @@ const mapStateToProps = (state: ReduxState) => {
 };
 
 const ConnectedLoginPage = connect(mapStateToProps)(LoginPage);
-export default ConnectedLoginPage;
+export default RequiresSession(ConnectedLoginPage);

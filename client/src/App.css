@@ -440,7 +440,7 @@ a {
     background-color: #e44c4d;
 }
 
-.connBannerOpen {
+.connBanner-entered {
     transition: height 500ms ease-out;
     height: 30px;
 }

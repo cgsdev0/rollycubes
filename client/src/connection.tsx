@@ -1,15 +1,17 @@
-import { History } from "history";
 import jwt_decode from "jwt-decode";
 import React from "react";
 import { connect, DispatchProp } from "react-redux";
+import { NavigateFunction } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ReduxState } from "./store";
 import { Achievement } from "./ui/achievement";
+import { Location } from "react-router-dom";
 
 interface Props {
   room: string;
   mode: string;
-  history: History;
+  navigate: NavigateFunction;
+  location: Location;
   authToken?: string | null;
 }
 
@@ -58,7 +60,8 @@ class Connection extends React.Component<Props & DispatchProp> {
 
   onMessage = (e: MessageEvent) => {
     if (e.data === "cookie") {
-      this.props.history.replace("/");
+      this.props.navigate("/", { replace: true });
+      console.log("close socket bc of cookie msg");
       if (this.websocket) this.websocket.close();
       return;
     }
@@ -68,12 +71,12 @@ class Connection extends React.Component<Props & DispatchProp> {
     } else if ("error" in data) {
       if (data.error === "already connected") {
         if (this.websocket) this.websocket.close();
-        this.props.history.replace(`/multiple-tabs`);
+        this.props.navigate(`/multiple-tabs`, { replace: true });
       }
       console.error(data || data.error);
     } else if (data.type === "redirect") {
-      const pathParts = this.props.history.location.pathname.split("/");
-      this.props.history.replace(`/${pathParts[1]}/${data.room}`);
+      const pathParts = this.props.location.pathname.split("/");
+      this.props.navigate(`/${pathParts[1]}/${data.room}`, { replace: true });
     } else {
       // I'm sorry
       const otherUsers = (window as any).REDUX_STORE.getState().auth.otherUsers;
@@ -151,6 +154,7 @@ class Connection extends React.Component<Props & DispatchProp> {
   componentDidUpdate(prev: Props) {
     if (prev.room !== this.props.room) {
       if (this.websocket) {
+        console.warn("closing socket bc idk");
         this.websocket.close();
       }
       this.openSocket();
@@ -166,6 +170,7 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.websocket.removeEventListener("close", this.onClose);
       this.websocket.removeEventListener("open", this.onOpen);
       this.websocket.removeEventListener("message", this.onMessage);
+      console.warn("closing socket bc unmount");
       this.websocket.close();
     }
   }

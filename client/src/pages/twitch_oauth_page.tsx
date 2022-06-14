@@ -3,26 +3,18 @@ import { connect, DispatchProp } from "react-redux";
 import { selectAuthService } from "../selectors/game_selectors";
 import { getCsrf } from "../auth";
 import { ReduxState } from "../store";
-import { RouteComponentProps } from "react-router";
+import { Navigate, useLocation } from "react-router-dom";
 
 interface Props {
   authService: string;
   authToken?: string | null;
 }
 
-const TwitchOAuthPage: React.FC<DispatchProp & Props & RouteComponentProps> = ({
+const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
   authService,
-  history,
   dispatch,
   authToken,
 }) => {
-  React.useEffect(() => {
-    if (authToken) {
-      history.replace("/home", {
-        redirect: history.location.pathname,
-      });
-    }
-  }, [history, authToken]);
   React.useEffect(() => {
     (async () => {
       const hash = window.location.hash.replace("#", "");
@@ -49,6 +41,11 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props & RouteComponentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const location = useLocation();
+  if (authToken)
+    return (
+      <Navigate to="/home" replace state={{ redirect: location.pathname }} />
+    );
   return null;
 };
 

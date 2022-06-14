@@ -1,5 +1,4 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { ChatMsg } from "../types/server_messages";
 
 export interface ConnectionState {
   socket?: WebSocket;
