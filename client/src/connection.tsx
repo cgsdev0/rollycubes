@@ -61,7 +61,6 @@ class Connection extends React.Component<Props & DispatchProp> {
   onMessage = (e: MessageEvent) => {
     if (e.data === "cookie") {
       this.props.navigate("/", { replace: true });
-      console.log("close socket bc of cookie msg");
       if (this.websocket) this.websocket.close();
       return;
     }
@@ -154,7 +153,6 @@ class Connection extends React.Component<Props & DispatchProp> {
   componentDidUpdate(prev: Props) {
     if (prev.room !== this.props.room) {
       if (this.websocket) {
-        console.warn("closing socket bc idk");
         this.websocket.close();
       }
       this.openSocket();
@@ -170,7 +168,6 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.websocket.removeEventListener("close", this.onClose);
       this.websocket.removeEventListener("open", this.onOpen);
       this.websocket.removeEventListener("message", this.onMessage);
-      console.warn("closing socket bc unmount");
       this.websocket.close();
     }
   }

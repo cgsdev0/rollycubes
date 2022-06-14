@@ -102,7 +102,6 @@ class GamePage extends React.Component<Props & DispatchProp> {
   }
 
   componentWillUnmount() {
-    console.warn("oh shit i unmounted too lol");
     this.listeners.forEach((l) =>
       document.body.removeEventListener(l.type, l.fn, true)
     );
@@ -125,7 +124,6 @@ class GamePage extends React.Component<Props & DispatchProp> {
       return <p>Error</p>;
     }
 
-    console.log("I AM RENDERIN", authToken);
     return (
       <React.Fragment>
         {authToken === undefined ? null : (
