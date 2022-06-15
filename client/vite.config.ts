@@ -25,6 +25,9 @@ export default defineConfig({
     }),
   ],
   server: {
+    hmr: {
+      clientPort: 443,
+    },
     proxy: {
       "/cookie": {
         target: "http://localhost:3001",
