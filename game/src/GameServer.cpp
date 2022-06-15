@@ -283,29 +283,27 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                             auto it = games.find(room);
                             if (it != games.end()) {
                                 Game *g = it->second;
-                                try {
-                                    g->handleMessage(
-                                        [ws, room, app](auto s) {
-                                            // ws->send(s, uWS::OpCode::TEXT);
-                                            app->publish(room, s, uWS::OpCode::TEXT);
-                                        },
-                                        {.send =
-                                             [ws](auto s) { ws->send(s, uWS::OpCode::TEXT); },
-                                         .reportStats = [&authServer](auto url, auto json) { authServer.send(url, json); },
-                                         .reportStats2 = [&authServer](auto url, auto json, auto cb) { authServer.send(url, json, cb); }},
-                                        data, session);
-                                    /*if (data["type"].is_string()) {
+                                g->handleMessage(
+                                    [ws, room, app](auto s) {
+                                        // ws->send(s, uWS::OpCode::TEXT);
+                                        app->publish(room, s, uWS::OpCode::TEXT);
+                                    },
+                                    {.send =
+                                         [ws](auto s) { ws->send(s, uWS::OpCode::TEXT); },
+                                     .reportStats = [&authServer](auto url, auto json) { authServer.send(url, json); },
+                                     .reportStats2 = [&authServer](auto url, auto json, auto cb) { authServer.send(url, json, cb); }},
+                                    data, session);
+                                /*if (data["type"].is_string()) {
                                   if (data["type"] == "leave") {
                                   ws->close();
                                   }
                                   }*/
-                                } catch (GameError &e) {
-                                    response = GameError(e.what()).toString();
-                                }
                             } else {
                                 response = GameError("Room not found: " + room).toString();
                             }
                         }
+                    } catch (GameError &e) {
+                        response = GameError(e.what()).toString();
                     } catch (nlohmann::detail::parse_error &e) {
                         std::cout << "RECEIVED BAD JSON (parse_error): " << message
                                   << std::endl
