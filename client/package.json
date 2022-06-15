@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.2",
+    "@stitches/react": "^1.2.8",
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
     "cannon": "^0.6.2",
@@ -64,6 +65,8 @@
     "prettier": "^2.6.2",
     "typescript": "4.4.3",
     "vite": "^2.9.12",
-    "vite-plugin-svgr": "^2.1.0"
+    "vite-aliases": "^0.9.2",
+    "vite-plugin-svgr": "^2.1.0",
+    "vite-tsconfig-paths": "^3.5.0"
   }
 }

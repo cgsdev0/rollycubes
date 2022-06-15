@@ -1,13 +1,21 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
+import tsconfigPaths from "vite-tsconfig-paths";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      "stitches.config": path.resolve(__dirname, "./src/stitches.config.ts"),
+    },
+  },
   build: {
     outDir: "build",
   },
   plugins: [
+    tsconfigPaths(),
     react(),
     svgrPlugin({
       svgrOptions: {

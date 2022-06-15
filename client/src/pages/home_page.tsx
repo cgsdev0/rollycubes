@@ -1,6 +1,9 @@
+import { css } from "stitches.config";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { RequiresSession } from "../hocs/requires_session";
+import { useWindowSize } from "../hooks/window_size";
+import { Button } from "../ui/buttons/button";
 
 interface Game {
   last_updated: number;
@@ -9,7 +12,49 @@ interface Game {
   player_count: number;
 }
 
+const container = css({
+  height: 700,
+  width: 1080,
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  marginLeft: -1080 / 2,
+  marginTop: -700 / 2,
+});
+
+const innerContainer = css({
+  display: "flex",
+  border: "2px solid black",
+  borderRadius: 16,
+  margin: 24,
+  padding: 48,
+  height: "100%",
+  gap: 24,
+  "& table": {
+    width: "100%",
+    textAlign: "left",
+  },
+});
+
+const content = css({
+  width: "100%",
+});
+
+const gameInfoPanel = css({
+  borderRadius: 12,
+  display: "flex",
+  flexDirection: "column",
+  backgroundColor: "blue",
+  width: 400,
+  padding: 48,
+});
+
 const HomePage = () => {
+  const size = useWindowSize();
+  const transformString = `scale(${Math.min(
+    1,
+    Math.min(size!.width! / 1080, size.height! / 700)
+  )})`;
   const [pressed, setPressed] = React.useState(false);
   const [hasData, setHasData] = React.useState(false);
   const [games, setGames] = React.useState<Game[]>([]);
@@ -58,42 +103,43 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Rolly Cubes</h1>
-      <p>the one where you roll some dice</p>
-      <button onClick={onStart(false)} disabled={pressed}>
-        New Public Game
-      </button>
-      <button onClick={onStart(true)} disabled={pressed}>
-        New Private Game
-      </button>
-      <h2>Public Lobbies</h2>
-      {games.length ? (
-        <table className="lobby-table">
-          <tbody>
-            <tr>
-              <th className="host">Host</th>
-              <th>Players</th>
-              <th>Join</th>
-              <th>Spectate</th>
-            </tr>
-            {games.map((game) => (
-              <tr key={game.code}>
-                <td className="host">{game.host_name || "unknown"}</td>
-                <td>{game.player_count} / 8</td>
-                <td>
-                  <Link to={`/room/${game.code}`}>Link</Link>
-                </td>
-                <td>
-                  <Link to={`/spectate/${game.code}`}>Spectate</Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>{!hasData ? "Loading..." : "No public lobbies found"}</p>
-      )}
+    <div className={container()} style={{ transform: transformString }}>
+      <div className={innerContainer()}>
+        <div className={content()}>
+          <h1>Rolly Cubes</h1>
+          {games.length ? (
+            <table className="lobby-table">
+              <tbody>
+                <tr>
+                  <th className="host">Host</th>
+                  <th>Players</th>
+                  <th>&nbsp;</th>
+                  <th>&nbsp;</th>
+                </tr>
+                {games.map((game) => (
+                  <tr key={game.code}>
+                    <td className="host">{game.host_name || "unknown"}</td>
+                    <td>{game.player_count} / 8</td>
+                    <td>
+                      <Link to={`/room/${game.code}`}>Link</Link>
+                    </td>
+                    <td>
+                      <Link to={`/spectate/${game.code}`}>Spectate</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>{!hasData ? "Loading..." : "No public lobbies found"}</p>
+          )}
+        </div>
+        <div className={gameInfoPanel()}>
+          <Button onClick={onStart(false)} disabled={pressed}>
+            Start Game
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
