@@ -47,9 +47,9 @@ jobs:
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.channel }}
         
-#    - name: Build client
-#      run: yarn install && ( yarn build || echo "errors are delicious nom nom nom" )
-#      working-directory: client
+    - name: Build client
+      run: yarn install && ( yarn build || echo "errors are delicious nom nom nom" )
+      working-directory: client
       
     # Deploy it
     - name: ssh-scp-ssh-pipelines
@@ -65,7 +65,7 @@ jobs:
         # scp from local to remote
         scp: |
           game/docker-compose.yml => '/root/game/${{ github.event.inputs.channel }}'
-#          'client/build/*' => '/root/client/${{ github.event.inputs.channel }}/'
+          'client/build/*' => '/root/client/${{ github.event.inputs.channel }}/'
         # execute post-commands after scp
         last_ssh: |
           cd /root/game/${{ github.event.inputs.channel }}
