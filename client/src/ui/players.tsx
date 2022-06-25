@@ -5,14 +5,25 @@ import { ReduxState } from "../store";
 import PlayerComponent from "./player";
 import { GameState } from "../reducers/game";
 import { Player } from "../types/store_types";
+import { css } from "stitches.config";
 
 interface Props {
   players: GameState["players"];
 }
 
+const playerPanel = css({
+  borderRadius: 16,
+  backgroundColor: "#151515",
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  width: 276,
+  padding: 30,
+});
+
 const Players: React.FC<Props> = (props) => {
   return (
-    <div className="PlayerPanel">
+    <div className={playerPanel()}>
       {props.players.map((player: Player, i: number) => (
         <PlayerComponent key={`${i}${player.name}`} n={i} player={player} />
       ))}

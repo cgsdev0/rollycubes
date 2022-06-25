@@ -17,8 +17,8 @@ const ConnBanner: React.FC<Props & DispatchProp> = ({ connected }) => {
       appear
     >
       {(state) => (
-        <div className={`connBannerWrapper connBanner-${state}`} ref={ref}>
-          <div className={`connBanner`}>Reconnecting...</div>
+        <div ref={ref}>
+          <div>Reconnecting...</div>
         </div>
       )}
     </Transition>

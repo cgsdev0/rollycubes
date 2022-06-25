@@ -8,6 +8,7 @@ import {
 import { ReduxState } from "../store";
 import { DieRoll } from "../types/store_types";
 import Die from "./die";
+import "./dice.css";
 
 interface Props {
   dice: ReduxState["game"]["rolls"];

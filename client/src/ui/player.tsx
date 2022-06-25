@@ -2,6 +2,7 @@ import React from "react";
 import HorizontalScroll from "react-horizontal-scrolling";
 import { connect } from "react-redux";
 import ReactTooltip from "react-tooltip";
+import { css } from "stitches.config";
 import { selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import { Player } from "../types/store_types";
@@ -14,6 +15,23 @@ interface Props {
   turn_index: number;
   socket?: WebSocket;
 }
+
+const playerRow = css({
+  display: "flex",
+  justifyContent: "space-between",
+});
+
+const avatarAndName = css({
+  display: "flex",
+  overflow: "hidden",
+  maxWidth: "75%",
+  alignItems: "center",
+});
+
+const score = css({
+  display: "flex",
+  alignItems: "center",
+});
 
 const PlayerComponent = (props: Props) => {
   const changeName = () => {
@@ -124,19 +142,18 @@ const PlayerComponent = (props: Props) => {
         </HorizontalScroll>
       </ReactTooltip>
       <div
-        className={`Player${!player.connected ? " Disconnected" : ""}`}
+        className={playerRow()}
         onClick={
           self_index === n ? changeName : player.connected ? undefined : onKick
         }
       >
-        <div className={`${player.crowned ? "Crown " : ""}Name`}>
+        <span className={avatarAndName()}>
           {showAvatar ? (
             <Avatar imageUrl={imageUrl} firstInitial={firstInitial} n={n} />
           ) : null}
           {player.name || `User${n + 1}`}
-          <div className="You">{self_index === n ? " (You)" : null}</div>
-        </div>
-        <div className="Score">{JSON.stringify(player.score)}</div>
+        </span>
+        <span className={score()}>{JSON.stringify(player.score)}</span>
       </div>
     </>
   );

@@ -17,6 +17,7 @@ import RestartButton from "./buttons/restart_button";
 import AddSubButton from "./buttons/add_sub_button";
 import Dice from "./dice";
 import { DieRoll } from "../types/store_types";
+import { css } from "stitches.config";
 
 interface Props {
   roll: boolean;
@@ -32,6 +33,26 @@ interface Props {
 
 type RollingState = "rolled" | "rolling";
 
+const gamePanel = css({
+  display: "flex",
+  justifyContent: "center",
+  width: "100%",
+  minHeight: 160,
+});
+
+const gamePanelInner = css({
+  display: "flex",
+  flexDirection: "column",
+});
+
+const buttonPanel = css({
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "stretch",
+  justifyContent: "stretch",
+  minHeight: "40px",
+  maxHeight: "40px",
+});
 const GamePanel: React.FC<Props & DispatchProp> = ({
   isDoubles,
   is3d,
@@ -88,11 +109,11 @@ const GamePanel: React.FC<Props & DispatchProp> = ({
       : null;
   };
   return (
-    <div className="GamePanel">
-      <div className="GamePanelInner">
+    <div className={gamePanel()}>
+      <div className={gamePanelInner()}>
         {victory ? <RestartButton /> : null}
         <Dice rolling={rolling} />
-        <div className="ButtonPanel">
+        <div className={buttonPanel()}>
           {renderRoll()}
           {renderAddSub()}
           {renderSplit()}

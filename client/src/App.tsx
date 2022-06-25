@@ -1,10 +1,12 @@
 import { useWindowSize } from "hooks/window_size";
+import { TabErrorPage } from "pages/tab_error_page";
+import { AuthProvider } from "providers/auth";
 import React, { StrictMode } from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { css, globalCss } from "stitches.config";
+import { css, globalCss, globalStyles } from "stitches.config";
 import { Octocat } from "ui/buttons/octocat";
 import { v4 as uuidv4 } from "uuid";
 import GamePage from "./pages/game_page";
@@ -13,8 +15,6 @@ import LoginPage from "./pages/login_page";
 import RegisterPage from "./pages/register_page";
 import TwitchOAuthPage from "./pages/twitch_oauth_page";
 import { store } from "./store";
-import LoginPrompt from "./ui/login_prompt";
-import SettingsMenu from "./ui/settings";
 
 const App = () => {
   // make a cookie DONT FORGET TO SET THE PATH AHHHHHHHHHHHHHHHHHHHH
@@ -36,15 +36,12 @@ const App = () => {
   );
 };
 
-const globalStyles = globalCss({
-  "*": { margin: 0, padding: 0 },
-});
-
 const app = css({
   backgroundColor: "#151515",
   marign: 0,
   minHeight: "100vh",
 });
+
 const container = css({
   height: 700,
   width: 1080,
@@ -54,10 +51,8 @@ const container = css({
   marginLeft: -1080 / 2,
   marginTop: -700 / 2,
   "& h1": {
-    color: "#FFFFFF",
-    textShadow:
-      "0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #FFF, 0 0 20px #49ff18, 0 0 30px #49FF18, 0 0 40px #49FF18, 0 0 55px #49FF18, 0 0 75px #49ff18",
     fontFamily: "Caveat",
+    marginBottom: 32,
     fontSize: 66,
   },
 });
@@ -69,6 +64,7 @@ const innerContainer = css({
   margin: 24,
   padding: 48,
   height: "calc(100% - 96px - 48px)",
+  justifyContent: "space-between",
   gap: 24,
   "& table": {
     width: "100%",
@@ -84,37 +80,29 @@ const AppInner = () => {
     Math.min(size!.width! / 1080, size.height! / 700)
   )})`;
   return (
-    <Router>
-      <div className={app()}>
-        <Octocat />
-        <div className={container()} style={{ transform: transformString }}>
-          <div className={innerContainer()}>
-            <Routes>
-              <Route path="/">
-                <Route index element={<HomePage />} />
-                <Route path="home" element={<HomePage />} />
-                <Route path="twitch_oauth" element={<TwitchOAuthPage />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="register" element={<RegisterPage />} />
-                <Route path="multiple-tabs" element={<TabErrorPage />} />
+    <AuthProvider>
+      <Router>
+        <div className={app()}>
+          <Octocat />
+          <div className={container()} style={{ transform: transformString }}>
+            <div className={innerContainer()}>
+              <Routes>
+                <Route path="/">
+                  <Route index element={<HomePage />} />
+                  <Route path="home" element={<HomePage />} />
+                  <Route path="twitch_oauth" element={<TwitchOAuthPage />} />
+                  <Route path="login" element={<LoginPage />} />
+                  <Route path="register" element={<RegisterPage />} />
+                  <Route path="multiple-tabs" element={<TabErrorPage />} />
 
-                <Route path=":mode/:room" element={<GamePage />} />
-              </Route>
-            </Routes>
+                  <Route path=":mode/:room" element={<GamePage />} />
+                </Route>
+              </Routes>
+            </div>
           </div>
         </div>
-      </div>
-    </Router>
-  );
-};
-
-const TabErrorPage = () => {
-  return (
-    <div>
-      <h1>Error</h1>
-      <p>You already have a tab opened for that room.</p>
-      <a href="/">Back to Home</a>
-    </div>
+      </Router>
+    </AuthProvider>
   );
 };
 

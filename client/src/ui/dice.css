@@ -21,8 +21,7 @@
       display: flex;
       justify-content: center;
       flex-direction: row;
-      flex-basis: 100%;
-      min-width: 216px;
+      min-width: 160px;
   }
 
 

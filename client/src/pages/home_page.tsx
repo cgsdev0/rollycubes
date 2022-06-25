@@ -1,8 +1,7 @@
-import { css } from "stitches.config";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { css } from "stitches.config";
 import { RequiresSession } from "../hocs/requires_session";
-import { useWindowSize } from "../hooks/window_size";
 import { Button } from "../ui/buttons/button";
 
 interface Game {
@@ -13,15 +12,29 @@ interface Game {
 }
 
 const content = css({
-  width: "100%",
+  width: 576,
+  display: "flex",
+  flexDirection: "column",
 });
 
+const hostNameCol = css({
+  textOverflow: "ellipsis",
+  overflow: "hidden",
+  maxWidth: 210,
+});
+const playerCountCol = css({
+  width: 120,
+});
+const tableWrapper = css({
+  overflowY: "auto",
+  display: "flex",
+});
 const gameInfoPanel = css({
   borderRadius: 16,
   backgroundColor: "#151515",
   display: "flex",
   flexDirection: "column",
-  width: 400,
+  width: 240,
   padding: 48,
 });
 
@@ -78,28 +91,32 @@ const HomePage = () => {
       <div className={content()}>
         <h1>Rolly Cubes</h1>
         {games.length ? (
-          <table className="lobby-table">
-            <tbody>
-              <tr>
-                <th className="host">Host</th>
-                <th>Players</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-              </tr>
-              {games.map((game) => (
-                <tr key={game.code}>
-                  <td className="host">{game.host_name || "unknown"}</td>
-                  <td>{game.player_count} / 8</td>
-                  <td>
-                    <Link to={`/room/${game.code}`}>Link</Link>
-                  </td>
-                  <td>
-                    <Link to={`/spectate/${game.code}`}>Spectate</Link>
-                  </td>
+          <div className={tableWrapper()}>
+            <table className="lobby-table">
+              <tbody>
+                <tr>
+                  <th className="host">Host</th>
+                  <th colSpan={3}>Players</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                {games.map((game) => (
+                  <tr key={game.code}>
+                    <td className={hostNameCol()}>
+                      {game.host_name || "unknown"}
+                    </td>
+                    <td className={playerCountCol()}>
+                      {game.player_count} / 8
+                    </td>
+                    <td>
+                      <Link to={`/room/${game.code}`}>Join →</Link>
+                    </td>
+                    <td>
+                      <Link to={`/spectate/${game.code}`}>Watch →</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p>{!hasData ? "Loading..." : "No public lobbies found"}</p>
         )}

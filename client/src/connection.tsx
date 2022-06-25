@@ -119,6 +119,7 @@ class Connection extends React.Component<Props & DispatchProp> {
     console.error("oh god why", e);
   };
   openSocket = () => {
+    console.warn("hi");
     if (
       !this.websocket ||
       this.websocket.readyState === WebSocket.CLOSED ||
