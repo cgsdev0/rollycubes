@@ -58,7 +58,7 @@ const container = css({
 });
 
 const innerContainer = css({
-  backgroundColor: "#2A2A2A",
+  backgroundColor: "$gray800",
   display: "flex",
   borderRadius: 16,
   margin: 24,

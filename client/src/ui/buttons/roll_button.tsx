@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { ReduxState } from "../../store";
 import { selectHasMultiplePlayers } from "../../selectors/game_selectors";
 import { css } from "stitches.config";
+import "./buttons.css";
 
 interface Props {
   socket?: WebSocket;

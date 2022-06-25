@@ -1,4 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
+import { CheatsAction } from "actions/settings";
 import { destroyScene, initScene } from "../3d/main";
 
 export interface SettingsState {
@@ -26,6 +27,9 @@ export const settingsReducer = createReducer<SettingsState>(
         } else {
           destroyScene();
         }
+      })
+      .addCase("CHEATS", (state, action: CheatsAction) => {
+        state.cheats = action.newState;
       })
       .addCase("DEV_AUTH_SERVICE_TOGGLE", (state, action) => {
         if (state.authServiceOrigin === PROD_AUTH_SERVICE) {

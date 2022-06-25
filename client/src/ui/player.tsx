@@ -16,14 +16,23 @@ interface Props {
   socket?: WebSocket;
 }
 
+const playerName = css({
+  overflow: "hidden",
+  height: "100%",
+  width: "100%",
+  alignItems: "center",
+  display: "flex",
+});
+
 const playerRow = css({
   display: "flex",
   justifyContent: "space-between",
+  lineHeight: 0,
+  minHeight: 36,
 });
 
 const avatarAndName = css({
   display: "flex",
-  overflow: "hidden",
   maxWidth: "75%",
   alignItems: "center",
 });
@@ -69,7 +78,7 @@ const PlayerComponent = (props: Props) => {
   const { n, player, self_index, turn_index } = props;
   const imageUrl = player.userData?.image_url;
   const firstInitial = player.name ? player.name[0] : "U";
-  const showAvatar = Boolean(player.user_id);
+  const showAvatar = Boolean(player.user_id) || true;
 
   const doubles = player.userData?.stats?.doubles || 0;
   const wins = player.userData?.stats?.wins || 0;
@@ -143,15 +152,24 @@ const PlayerComponent = (props: Props) => {
       </ReactTooltip>
       <div
         className={playerRow()}
+        style={{
+          zIndex: n,
+        }}
         onClick={
-          self_index === n ? changeName : player.connected ? undefined : onKick
+          self_index === n ? undefined : player.connected ? undefined : onKick
         }
       >
         <span className={avatarAndName()}>
           {showAvatar ? (
-            <Avatar imageUrl={imageUrl} firstInitial={firstInitial} n={n} />
+            <Avatar
+              disconnected={!player.connected}
+              imageUrl={imageUrl}
+              firstInitial={firstInitial}
+              n={n}
+              crown={player.crowned}
+            />
           ) : null}
-          {player.name || `User${n + 1}`}
+          <span className={playerName()}>{player.name || `User${n + 1}`}</span>
         </span>
         <span className={score()}>{JSON.stringify(player.score)}</span>
       </div>

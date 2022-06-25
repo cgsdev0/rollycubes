@@ -16,6 +16,7 @@ const playerPanel = css({
   backgroundColor: "#151515",
   display: "flex",
   flexDirection: "column",
+  gap: 6,
   height: "100%",
   width: 276,
   padding: 30,

@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { getAddSubButtonClassSelector } from "../../selectors/game_selectors";
 import { ReduxState } from "../../store";
+import "./buttons.css";
 
 interface OwnProps {
   n?: number;

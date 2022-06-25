@@ -1,8 +1,10 @@
+import { cheatsAction } from "actions/settings";
 import React, { FormEvent } from "react";
-import { ReduxState } from "../store";
-import { connect, DispatchProp } from "react-redux";
 import Linkify from "react-linkify";
+import { connect, DispatchProp } from "react-redux";
+import { css, styled } from "stitches.config";
 import { selectIsSpectator } from "../selectors/game_selectors";
+import { ReduxState } from "../store";
 
 interface Props {
   socket?: WebSocket;
@@ -17,8 +19,65 @@ const helpString = `--------------------HELP--------------------
 ----------------------------------------------
 `;
 
+const ChatBar = styled("input", {
+  width: "calc(100% - 26px)",
+  fontFamily: "Amiko",
+  fontSize: 18,
+  marginTop: 8,
+  borderRadius: 6,
+  backgroundColor: "$gray700",
+  color: "$primary",
+  "&:focus": {
+    outline: "none",
+  },
+  border: 0,
+  padding: 10,
+  paddingLeft: 16,
+});
+
+const ChatWrapper = styled("div", {
+  overflow: "hidden",
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+});
+
+const MessageBox = styled("div", {
+  overflowX: "hidden",
+  overflowWrap: "anywhere",
+  overflowY: "scroll",
+  width: "calc(100% - 16px)",
+  height: "100%",
+  paddingRight: 16,
+  "&::-webkit-scrollbar": {
+    width: "6px",
+  },
+
+  "&::-webkit-scrollbar-track": {
+    background: "#232323",
+    borderRadius: 6,
+  },
+
+  /* Handle */
+  "&::-webkit-scrollbar-thumb": {
+    background: "$gray500",
+  },
+
+  /* Handle on hover */
+  "&::-webkit-scrollbar-thumb:hover": {
+    background: "$gray600",
+  },
+});
+
 const ChatBox: React.FC<Props & DispatchProp> = (props) => {
   const [chatMsg, setChatMsg] = React.useState("");
+
+  const bottomRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [bottomRef, props.chat]);
 
   const sendChat = (e: FormEvent) => {
     if (props.socket) {
@@ -42,7 +101,7 @@ const ChatBox: React.FC<Props & DispatchProp> = (props) => {
           case "/cheat":
           case "/cheats":
           case "/guide":
-            props.dispatch({ type: "CHEATS" });
+            props.dispatch(cheatsAction());
             break;
           case "/3d":
             props.dispatch({ type: "TOGGLE_3D" });
@@ -57,9 +116,18 @@ const ChatBox: React.FC<Props & DispatchProp> = (props) => {
   };
 
   return (
-    <React.Fragment>
+    <ChatWrapper>
+      <MessageBox>
+        {props.chat
+          .slice()
+          .reverse()
+          .map((msg, i) => (
+            <ChatMsg msg={msg} key={i} />
+          ))}
+        <div ref={bottomRef}></div>
+      </MessageBox>
       <form onSubmit={sendChat}>
-        <input
+        <ChatBar
           value={chatMsg}
           onChange={(e) => {
             setChatMsg(e.target.value);
@@ -67,19 +135,9 @@ const ChatBox: React.FC<Props & DispatchProp> = (props) => {
           maxLength={400}
           placeholder="Type a message..."
           disabled={props.isSpectator}
-        ></input>
-        <button type="submit" disabled={props.isSpectator}>
-          Send
-        </button>
+        ></ChatBar>
       </form>
-      <div className="Messages">
-        {props.chat.map((msg, i) => (
-          <React.Fragment key={i}>
-            <ChatMsg msg={msg} />
-          </React.Fragment>
-        ))}
-      </div>
-    </React.Fragment>
+    </ChatWrapper>
   );
 };
 

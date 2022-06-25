@@ -16,7 +16,11 @@ export const {
       primary: "#fafafb",
       primaryDimmed: "#aaaaab",
       gray400: "gainsboro",
-      gray500: "lightgray",
+      gray500: "#888888",
+      gray600: "#555555",
+      gray700: "#3E3E3F",
+      gray800: "#2A2A2A",
+      gray900: "#151515",
     },
   },
   media: {

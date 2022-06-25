@@ -1,36 +1,48 @@
 import React from "react";
-import { css } from "stitches.config";
+import { css, styled } from "stitches.config";
+import defaultIcon from "../../public/default_player.png";
+import crownIcon from "../../public/crown.png";
+import { DisconnectedIcon } from "./icons/disconnected";
 
 interface Props {
   imageUrl?: string | null;
   firstInitial: string;
   n?: number;
   size?: number;
+  crown?: boolean;
+  disconnected?: boolean;
 }
 
 const avatarWrapper = css({
   alignItems: "center",
   marginRight: 8,
+  position: "relative",
   cursor: "pointer",
-  "& img": {
+  "& .avatar": {
     borderRadius: "50%",
   },
 });
 
-const avatar = css({
+const disconnectedWrapper = css({
+  position: "absolute",
+  bottom: -5,
+  zIndex: 5,
+  left: -3,
+  transform: "scale(80%)",
+  backgroundColor: "#000000aa",
   borderRadius: "50%",
-  backgroundColor: "green",
-  color: "white",
-  textAlign: "center",
-  fontSize: "14pt",
-  fontWeight: "bold",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
+});
+const Crown = styled("img", {
+  position: "absolute",
+  top: -6,
+  zIndex: 5,
+  left: 6,
 });
 
 const Avatar: React.FC<Props> = (props) => {
-  const { size, imageUrl, firstInitial, n } = props;
+  const { size, imageUrl, firstInitial, n, crown, disconnected } = props;
+
+  const forSureImageUrl = imageUrl || defaultIcon;
 
   const size2 = size || 36;
 
@@ -41,13 +53,21 @@ const Avatar: React.FC<Props> = (props) => {
       data-tip="custom show"
       data-event="click focus"
     >
-      {imageUrl ? (
-        <img alt="avatar" src={imageUrl} width={size2} height={size2} />
-      ) : (
-        <div className={avatar()} style={{ width: size2, height: size2 }}>
-          {firstInitial.toUpperCase()}
-        </div>
-      )}
+      <img
+        className="avatar"
+        alt="avatar"
+        src={forSureImageUrl}
+        width={size2}
+        height={size2}
+      />
+      {crown ? (
+        <Crown alt="crown" src={crownIcon} width={24} height={18} />
+      ) : null}
+      {disconnected ? (
+        <span className={disconnectedWrapper()}>
+          <DisconnectedIcon />
+        </span>
+      ) : null}
     </span>
   );
 };
