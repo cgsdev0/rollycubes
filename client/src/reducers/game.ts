@@ -105,7 +105,7 @@ export const gameReducer = createReducer<GameState>(
         state.players[action.id].connected = true;
       })
       .addCase("kick", (state, action: KickMsg) => {
-        state.players.splice(action.id);
+        state.players.splice(action.id, 1);
         if (state.self_index !== undefined) {
           if (action.id < state.self_index) {
             state.self_index--;

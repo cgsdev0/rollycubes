@@ -1,6 +1,6 @@
 export interface Player {
   connected: boolean;
-  name: string;
+  name?: string;
   score: number;
   win_count: number;
   user_id?: string;

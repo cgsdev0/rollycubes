@@ -15,6 +15,8 @@ export const {
     colors: {
       primary: "#fafafb",
       primaryDimmed: "#aaaaab",
+      brand: "#3acecd",
+      brandFaded: "rgba(58, 256, 255, 0.4)",
       gray400: "gainsboro",
       gray500: "#888888",
       gray600: "#555555",
@@ -37,6 +39,7 @@ export const globalStyles = globalCss({
     fontFamily: "Amiko",
     color: "$primary",
     fontSize: 20,
+    overflow: "hidden",
   },
   a: {
     textDecoration: "none",

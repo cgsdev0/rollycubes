@@ -16,10 +16,11 @@ const playerPanel = css({
   backgroundColor: "#151515",
   display: "flex",
   flexDirection: "column",
-  gap: 6,
+  gap: 2,
   height: "100%",
-  width: 276,
-  padding: 30,
+  width: 336,
+  paddingTop: 30,
+  paddingBottom: 30,
 });
 
 const Players: React.FC<Props> = (props) => {

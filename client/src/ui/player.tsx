@@ -1,12 +1,17 @@
-import React from "react";
 import HorizontalScroll from "react-horizontal-scrolling";
 import { connect } from "react-redux";
 import ReactTooltip from "react-tooltip";
 import { css } from "stitches.config";
 import { selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
-import { Player } from "../types/store_types";
+import { Achievement, Player } from "../types/store_types";
 import Avatar from "./avatar";
+import { usePopperTooltip } from "react-popper-tooltip";
+
+// TODO: remove
+import "react-popper-tooltip/dist/styles.css";
+import { KickIcon } from "./icons/kick";
+import React from "react";
 
 interface Props {
   player: Player;
@@ -29,6 +34,14 @@ const playerRow = css({
   justifyContent: "space-between",
   lineHeight: 0,
   minHeight: 36,
+  "&.highlight": {
+    backgroundColor: "$brandFaded",
+  },
+  paddingLeft: 30,
+  paddingRight: 30,
+  paddingTop: 2,
+  paddingBottom: 2,
+  position: "relative",
 });
 
 const avatarAndName = css({
@@ -40,6 +53,16 @@ const avatarAndName = css({
 const score = css({
   display: "flex",
   alignItems: "center",
+});
+
+const kick = css({
+  display: "flex",
+  alignItems: "center",
+  cursor: "pointer",
+  height: "100%",
+  position: "absolute",
+  top: 0,
+  left: 5,
 });
 
 const PlayerComponent = (props: Props) => {
@@ -60,6 +83,16 @@ const PlayerComponent = (props: Props) => {
     }
   };
 
+  const [tooltipVisible, setTooltipVisible] = React.useState(false);
+  const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } =
+    usePopperTooltip({
+      visible: tooltipVisible,
+      onVisibleChange: setTooltipVisible,
+      interactive: true,
+      trigger: "click",
+    });
+
+  console.log(tooltipVisible);
   const overridePosition = (
     { left, top }: { left: number; top: number },
     currentEvent: any,
@@ -77,9 +110,50 @@ const PlayerComponent = (props: Props) => {
 
   const { n, player, self_index, turn_index } = props;
   const imageUrl = player.userData?.image_url;
-  const firstInitial = player.name ? player.name[0] : "U";
-  const showAvatar = Boolean(player.user_id) || true;
 
+  const turnHighlight = turn_index === n ? " highlight" : "";
+
+  return (
+    <>
+      {tooltipVisible && (
+        <div
+          ref={setTooltipRef}
+          {...getTooltipProps({ className: "tooltip-container" })}
+        >
+          <div {...getArrowProps({ className: "tooltip-arrow" })} />
+          <TooltipContents {...props} />
+        </div>
+      )}
+      <div
+        className={playerRow() + turnHighlight}
+        style={{
+          zIndex: n,
+        }}
+      >
+        <span className={avatarAndName()}>
+          <Avatar
+            ref={setTriggerRef}
+            disconnected={!player.connected}
+            imageUrl={imageUrl}
+            n={n}
+            crown={player.crowned}
+          />
+          <span className={playerName()}>{player.name || `User${n + 1}`}</span>
+        </span>
+        <span className={score()}>{JSON.stringify(player.score)}</span>
+        {player.connected ? null : (
+          <span className={kick()} onClick={onKick}>
+            <KickIcon />
+          </span>
+        )}
+      </div>
+    </>
+  );
+};
+
+const TooltipContents: typeof PlayerComponent = (props) => {
+  const { n, player } = props;
+  const imageUrl = player.userData?.image_url;
   const doubles = player.userData?.stats?.doubles || 0;
   const wins = player.userData?.stats?.wins || 0;
   const games = player.userData?.stats?.games || 0;
@@ -95,23 +169,11 @@ const PlayerComponent = (props: Props) => {
     .split(" ");
   join_date.shift();
 
-  return (
-    <>
-      <ReactTooltip
-        className="player-tooltip"
-        id={`player-${n}`}
-        effect="solid"
-        place="bottom"
-        overridePosition={overridePosition}
-        backgroundColor="#777"
-        globalEventOff="click"
-        isCapture={true}
-        afterShow={(e) => {
-          e.stopPropagation();
-        }}
-      >
+  return React.useMemo(
+    () => (
+      <>
         <h1>
-          <Avatar imageUrl={imageUrl} firstInitial={firstInitial} size={32} />
+          <Avatar imageUrl={imageUrl} size={32} />
           <span>{player.name || `User${n + 1}`}</span>
         </h1>
         <p>Player since {join_date.join(" ")}</p>
@@ -123,57 +185,46 @@ const PlayerComponent = (props: Props) => {
           Games: {wins} W / {losses} L ({win_rate}%)
         </p>
         <h2>Achievements</h2>
-        <div>
-          {props.player.userData?.userToAchievements.map((ach) => (
-            <ReactTooltip
-              id={`achievement-${n}-${ach.achievement.id}`}
-              key={ach.achievement.id}
-            >
-              <h1>{ach.achievement.name}</h1>
-              <p>{ach.achievement.description}</p>
-            </ReactTooltip>
-          ))}
+        <div className="achievements">
+          {props.player.userData?.userToAchievements
+            .filter((ach) => ach.unlocked)
+            .map((ach) => (
+              <AchievementImg {...ach} key={ach.achievement.id} />
+            ))}
         </div>
-        <HorizontalScroll className="achievements-scroll">
-          <div className="achievements">
-            {props.player.userData?.userToAchievements
-              .filter((ach) => ach.unlocked)
-              .map((ach) => (
-                <img
-                  data-tip
-                  data-for={`achievement-${n}-${ach.achievement.id}`}
-                  key={ach.achievement.id}
-                  alt={ach.achievement.description}
-                  src={ach.achievement.image_url || "//via.placeholder.com/48"}
-                />
-              ))}
+      </>
+    ),
+    []
+  );
+};
+
+const AchievementImg = (props: Achievement) => {
+  const [tooltipVisible, setTooltipVisible] = React.useState(false);
+  const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } =
+    usePopperTooltip({
+      visible: tooltipVisible,
+      onVisibleChange: setTooltipVisible,
+    });
+  return React.useMemo(
+    () => (
+      <>
+        {tooltipVisible && (
+          <div
+            ref={setTooltipRef}
+            {...getTooltipProps({ className: "tooltip-container" })}
+          >
+            <div {...getArrowProps({ className: "tooltip-arrow" })} />
+            Tooltip
           </div>
-        </HorizontalScroll>
-      </ReactTooltip>
-      <div
-        className={playerRow()}
-        style={{
-          zIndex: n,
-        }}
-        onClick={
-          self_index === n ? undefined : player.connected ? undefined : onKick
-        }
-      >
-        <span className={avatarAndName()}>
-          {showAvatar ? (
-            <Avatar
-              disconnected={!player.connected}
-              imageUrl={imageUrl}
-              firstInitial={firstInitial}
-              n={n}
-              crown={player.crowned}
-            />
-          ) : null}
-          <span className={playerName()}>{player.name || `User${n + 1}`}</span>
-        </span>
-        <span className={score()}>{JSON.stringify(player.score)}</span>
-      </div>
-    </>
+        )}
+        <img
+          ref={setTriggerRef}
+          alt={props.achievement.description}
+          src={props.achievement.image_url || "//via.placeholder.com/48"}
+        />
+      </>
+    ),
+    [tooltipVisible, getTooltipProps]
   );
 };
 

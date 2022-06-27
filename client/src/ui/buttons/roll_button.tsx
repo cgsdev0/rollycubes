@@ -1,16 +1,17 @@
 import React from "react";
 import { connect } from "react-redux";
+import { styled } from "stitches.config";
+import {
+  selectHasMultiplePlayers,
+  selectIsMyTurn,
+  selectTurnName,
+} from "../../selectors/game_selectors";
 import { ReduxState } from "../../store";
-import { selectHasMultiplePlayers } from "../../selectors/game_selectors";
-import { css } from "stitches.config";
 import "./buttons.css";
 
-interface Props {
-  socket?: WebSocket;
-  hasEnoughPlayers: boolean;
-}
+type Props = ReturnType<typeof mapStateToProps>;
 
-const subtitle = css({
+const Subtitle = styled("p", {
   color: "$primaryDimmed",
   textAlign: "center",
   width: "100%",
@@ -18,14 +19,19 @@ const subtitle = css({
   fontSize: 16,
 });
 
-const RollButton: React.FC<Props> = ({ socket, hasEnoughPlayers }) => {
+const RollButton: React.FC<Props> = ({
+  socket,
+  hasEnoughPlayers,
+  myTurn,
+  turnName,
+}) => {
   const onClick = () => {
     if (socket) {
       socket.send(JSON.stringify({ type: "roll" }));
     }
   };
-  if (!hasEnoughPlayers)
-    return <p className={subtitle()}>Waiting for players...</p>;
+  if (!hasEnoughPlayers) return <Subtitle>Waiting for players...</Subtitle>;
+  if (!myTurn) return <Subtitle>{turnName}'s turn</Subtitle>;
   return <button onClick={onClick}>Roll</button>;
 };
 
@@ -33,6 +39,8 @@ const mapStateToProps = (state: ReduxState) => {
   return {
     socket: state.connection.socket,
     hasEnoughPlayers: selectHasMultiplePlayers(state),
+    myTurn: selectIsMyTurn(state),
+    turnName: selectTurnName(state),
   };
 };
 

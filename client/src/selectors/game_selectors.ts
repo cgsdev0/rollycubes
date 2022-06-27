@@ -109,6 +109,7 @@ export const selectCrownedPlayers = createSelector(
   selectWinnerCount,
   (players, wins, winners) => {
     if (winners > 1) return players;
+    if (players.length <= 1) return players;
     return players.map((p) =>
       p.win_count === wins ? { ...p, crowned: true } : p
     );
@@ -142,6 +143,12 @@ export const selectIsReset = createSelector(
 export const selectCheats = createSelector(
   selectState,
   (state) => state.settings.cheats
+);
+
+export const selectTurnName = createSelector(
+  selectTurnIndex,
+  selectPlayers,
+  (turn, players) => players[turn]?.name || `User${turn + 1}`
 );
 
 export const selectSelf = createSelector(
@@ -233,7 +240,7 @@ export const selectHasRolled = createSelector(
 export const selectShouldShowRoll = createSelector(
   selectIsMyTurn,
   selectHasRolled,
-  (myTurn, hasRolled) => myTurn && !hasRolled
+  (myTurn, hasRolled) => (myTurn && !hasRolled) || !myTurn
 );
 
 export const selectTotalRoll = createSelector(selectDiceRolls, (rolls) =>

@@ -241,7 +241,7 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.5.5", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.18.3", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.7":
   version "7.18.3"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.18.3.tgz#c7b654b57f6f63cf7f8b418ac9ca04408c4579f4"
   integrity sha512-38Y8f7YUhce/K7RMwTp7m0uCumpv9hZkitCbBClqQIow1qSbCvGkcegKOXpEWCQLfWmevgRiWokZ1GkpfhbZug==
@@ -352,6 +352,11 @@
   dependencies:
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
+
+"@popperjs/core@^2.11.5":
+  version "2.11.5"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.5.tgz#db5a11bf66bdab39569719555b0f76e138d7bd64"
+  integrity sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==
 
 "@reduxjs/toolkit@^1.8.2":
   version "1.8.2"
@@ -1269,7 +1274,7 @@ linkify-it@^2.0.3:
   dependencies:
     uc.micro "^1.0.1"
 
-loose-envify@^1.1.0, loose-envify@^1.4.0:
+loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
   integrity sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
@@ -1413,6 +1418,11 @@ react-dom@^18.1.0:
     loose-envify "^1.1.0"
     scheduler "^0.22.0"
 
+react-fast-compare@^3.0.1:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.0.tgz#641a9da81b6a6320f270e89724fb45a0b39e43bb"
+  integrity sha512-rtGImPZ0YyLrscKI9xTpV8psd6I8VAtjKCzQDlzyDvqJA8XOW78TXYQwNRNd8g8JZnDu8q9Fu/1v4HPAVwVdHA==
+
 react-horizontal-scrolling@^0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/react-horizontal-scrolling/-/react-horizontal-scrolling-0.1.8.tgz#8c32bdef77f42e18fa3c0628a31bcc5bdd313fd1"
@@ -1440,6 +1450,23 @@ react-linkify@^1.0.0-alpha:
   dependencies:
     linkify-it "^2.0.3"
     tlds "^1.199.0"
+
+"react-popper-tooltip@npm:@cgsdev0/react-popper-tooltip@4.4.2":
+  version "4.4.2"
+  resolved "https://npm.pkg.github.com/download/@cgsdev0/react-popper-tooltip/4.4.2/af205208295a75b61d52e49cd6363d6a0ed8c8a3019140f5adf44c54a384a785#021aac9273d9fe54c2cd2e520240623a9dfc303a"
+  integrity sha512-QBVf8OlVQldsvXCNafbqbAQ1FuSWDsdACcfISs0LXXrD5iVMU+1QZbjeqbCZ+LKMXmxukHOinzrQ4ySg0rsOXg==
+  dependencies:
+    "@babel/runtime" "^7.18.3"
+    "@popperjs/core" "^2.11.5"
+    react-popper "^2.3.0"
+
+react-popper@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-2.3.0.tgz#17891c620e1320dce318bad9fede46a5f71c70ba"
+  integrity sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==
+  dependencies:
+    react-fast-compare "^3.0.1"
+    warning "^4.0.2"
 
 react-redux@^8.0.1:
   version "8.0.1"
@@ -1744,6 +1771,13 @@ vite@^2.7.10, vite@^2.9.12:
     rollup "^2.59.0"
   optionalDependencies:
     fsevents "~2.3.2"
+
+warning@^4.0.2:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/warning/-/warning-4.0.3.tgz#16e9e077eb8a86d6af7d64aa1e05fd85b4678ca3"
+  integrity sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==
+  dependencies:
+    loose-envify "^1.0.0"
 
 yaml@^1.10.0:
   version "1.10.2"

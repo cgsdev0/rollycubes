@@ -6,7 +6,6 @@ import { DisconnectedIcon } from "./icons/disconnected";
 
 interface Props {
   imageUrl?: string | null;
-  firstInitial: string;
   n?: number;
   size?: number;
   crown?: boolean;
@@ -39,20 +38,15 @@ const Crown = styled("img", {
   left: 6,
 });
 
-const Avatar: React.FC<Props> = (props) => {
-  const { size, imageUrl, firstInitial, n, crown, disconnected } = props;
+const Avatar = React.forwardRef<HTMLSpanElement, Props>((props, ref) => {
+  const { size, imageUrl, n, crown, disconnected } = props;
 
   const forSureImageUrl = imageUrl || defaultIcon;
 
   const size2 = size || 36;
 
   return (
-    <span
-      className={avatarWrapper()}
-      data-for={`player-${n}`}
-      data-tip="custom show"
-      data-event="click focus"
-    >
+    <span className={avatarWrapper()} ref={ref}>
       <img
         className="avatar"
         alt="avatar"
@@ -70,6 +64,6 @@ const Avatar: React.FC<Props> = (props) => {
       ) : null}
     </span>
   );
-};
+});
 
 export default Avatar;
