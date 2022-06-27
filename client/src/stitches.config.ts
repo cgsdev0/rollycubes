@@ -40,6 +40,7 @@ export const globalStyles = globalCss({
     color: "$primary",
     fontSize: 20,
     overflow: "hidden",
+    userSelect: "none",
   },
   a: {
     textDecoration: "none",

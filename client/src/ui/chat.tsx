@@ -45,6 +45,7 @@ const ChatWrapper = styled("div", {
 
 const MessageBox = styled("div", {
   overflowX: "hidden",
+  userSelect: "text",
   overflowWrap: "anywhere",
   overflowY: "scroll",
   width: "calc(100% - 16px)",

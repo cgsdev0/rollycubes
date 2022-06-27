@@ -186,11 +186,13 @@ const TooltipContents: typeof PlayerComponent = (props) => {
         </p>
         <h2>Achievements</h2>
         <div className="achievements">
-          {props.player.userData?.userToAchievements
-            .filter((ach) => ach.unlocked)
-            .map((ach) => (
-              <AchievementImg {...ach} key={ach.achievement.id} />
-            ))}
+          <HorizontalScroll>
+            {props.player.userData?.userToAchievements
+              .filter((ach) => ach.unlocked)
+              .map((ach) => (
+                <AchievementImg {...ach} key={ach.achievement.id} />
+              ))}
+          </HorizontalScroll>
         </div>
       </>
     ),
@@ -214,11 +216,14 @@ const AchievementImg = (props: Achievement) => {
             {...getTooltipProps({ className: "tooltip-container" })}
           >
             <div {...getArrowProps({ className: "tooltip-arrow" })} />
-            Tooltip
+            <header>{props.achievement.name}</header>
+            <p>{props.achievement.description}</p>
           </div>
         )}
         <img
           ref={setTriggerRef}
+          width={48}
+          height={48}
           alt={props.achievement.description}
           src={props.achievement.image_url || "//via.placeholder.com/48"}
         />
