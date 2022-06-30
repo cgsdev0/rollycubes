@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { styled } from "stitches.config";
 import {
   selectHasMultiplePlayers,
+  selectIsGameOver,
   selectIsMyTurn,
   selectTurnName,
 } from "../../selectors/game_selectors";
@@ -32,6 +33,7 @@ const RollButton: React.FC<Props> = ({
   hasEnoughPlayers,
   myTurn,
   turnName,
+  victory,
 }) => {
   const onClick = () => {
     if (socket) {
@@ -54,6 +56,7 @@ const mapStateToProps = (state: ReduxState) => {
     hasEnoughPlayers: selectHasMultiplePlayers(state),
     myTurn: selectIsMyTurn(state),
     turnName: selectTurnName(state),
+    victory: selectIsGameOver(state),
   };
 };
 
