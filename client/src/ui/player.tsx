@@ -92,7 +92,6 @@ const PlayerComponent = (props: Props) => {
       trigger: "click",
     });
 
-  console.log(tooltipVisible);
   const overridePosition = (
     { left, top }: { left: number; top: number },
     currentEvent: any,
