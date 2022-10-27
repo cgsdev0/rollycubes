@@ -47,8 +47,8 @@ export const selectSelfFirstInitial = createSelector(
 export const selectIsDev = createSelector(
   (state: ReduxState) => {},
   (_) =>
-    !process.env.NODE_ENV ||
-    (process.env.NODE_ENV === "development" &&
+    !import.meta.env.NODE_ENV ||
+    (import.meta.env.NODE_ENV === "development" &&
       (window.location.port === "3005" || window.location.port === "3000"))
 );
 
