@@ -10,7 +10,7 @@ ADD src /build/src
 RUN cd /build; ls -la .; make release
 
 FROM alpine:edge as prod
-RUN apk add libstdc++ libgcc
+RUN apk add libstdc++ libgcc openssl-dev
 COPY --from=build /build/GameServer .
 COPY entry.sh .
 
