@@ -40,6 +40,7 @@ const RollButton: React.FC<Props> = ({
       socket.send(JSON.stringify({ type: "roll" }));
     }
   };
+  if (victory) return null;
   if (!hasEnoughPlayers) return <Subtitle>Waiting for players...</Subtitle>;
   if (!myTurn)
     return (
