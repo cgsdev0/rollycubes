@@ -1,6 +1,5 @@
 import HorizontalScroll from "react-horizontal-scrolling";
 import { connect } from "react-redux";
-import ReactTooltip from "react-tooltip";
 import { css } from "stitches.config";
 import { selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
