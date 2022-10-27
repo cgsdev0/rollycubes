@@ -31,7 +31,7 @@ const initialGameState: GameState = {
   // TODO: why does this exist?
   rolled3d: false,
   turn_index: 0,
-  self_index: 0,
+  self_index: undefined,
   victory: false,
 };
 

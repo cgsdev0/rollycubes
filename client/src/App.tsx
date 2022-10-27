@@ -11,8 +11,7 @@ import { Octocat } from "ui/buttons/octocat";
 import { v4 as uuidv4 } from "uuid";
 import GamePage from "./pages/game_page";
 import HomePage from "./pages/home_page";
-import LoginPage from "./pages/login_page";
-import RegisterPage from "./pages/register_page";
+import OnboardPage from "./pages/onboard_page";
 import TwitchOAuthPage from "./pages/twitch_oauth_page";
 import { store } from "./store";
 
@@ -91,8 +90,7 @@ const AppInner = () => {
                   <Route index element={<HomePage />} />
                   <Route path="home" element={<HomePage />} />
                   <Route path="twitch_oauth" element={<TwitchOAuthPage />} />
-                  <Route path="login" element={<LoginPage />} />
-                  <Route path="register" element={<RegisterPage />} />
+                  <Route path="onboard" element={<OnboardPage />} />
                   <Route path="multiple-tabs" element={<TabErrorPage />} />
 
                   <Route path=":mode/:room" element={<GamePage />} />

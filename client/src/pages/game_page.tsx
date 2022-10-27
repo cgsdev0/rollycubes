@@ -7,6 +7,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
+import OnboardPage from "./onboard_page";
 import { css } from "stitches.config";
 import Connection from "../connection";
 import { RequiresSession } from "../hocs/requires_session";
@@ -47,6 +48,8 @@ const GamePage: React.FC<Props & DispatchProp> = ({
   reset,
   turn,
 }) => {
+
+  const [hasOnboarded, setHasOnboarded] = React.useState(false);
   const navigate = useNavigate();
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const location = useLocation();
@@ -57,6 +60,9 @@ const GamePage: React.FC<Props & DispatchProp> = ({
     return <p>Error</p>;
   }
 
+  if (authToken === null && !hasOnboarded && mode === "room") {
+    return <OnboardPage intent={`${mode}/${room}`} onBoard={() => setHasOnboarded(true)}/>;
+  }
   return (
     <React.Fragment>
       {authToken === undefined ? null : (

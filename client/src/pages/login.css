@@ -15,11 +15,3 @@ div.loginForm {
     padding: 6px 6px;
 }
 
-.twitchButton {
-    background-color: #9146FF;
-    color: #FFFFFF;
-}
-
-.twitchButton:active {
-    background-color: #6903ff;
-}

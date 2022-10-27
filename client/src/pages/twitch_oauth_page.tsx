@@ -3,7 +3,7 @@ import { connect, DispatchProp } from "react-redux";
 import { selectAuthService } from "../selectors/game_selectors";
 import { getCsrf } from "../auth";
 import { ReduxState } from "../store";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 interface Props {
   authService: string;
@@ -41,11 +41,30 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const location = useLocation();
-  if (authToken)
-    return (
-      <Navigate to="/home" replace state={{ redirect: location.pathname }} />
-    );
+  const navigate = useNavigate();
+  React.useEffect(() => {
+  (async function() {
+  if (authToken) {
+    const intent = localStorage.getItem("intent");
+    if (intent) localStorage.removeItem("intent");
+    if (intent == "start") {
+    const result = await window.fetch(`/create?public`);
+    if (!result.ok) {
+    navigate("/home",{ replace: true } );
+    } else {
+      const dest = await result.text();
+      navigate(`/room/${dest}`,{ replace: true } );
+    }
+    }
+    else if (intent) {
+      console.warn("INTENT FOUND", {intent});
+      navigate(`/${intent}`,{ replace: true } );
+    }
+    else {
+    navigate("/home",{ replace: true } );
+    }
+    }
+    })(); }, [authToken, navigate ]);
   return null;
 };
 

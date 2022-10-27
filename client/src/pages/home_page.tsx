@@ -70,14 +70,7 @@ const HomePage = () => {
     }
   };
   const onStart = (priv: boolean) => async () => {
-    setPressed(true);
-    const result = await window.fetch(`/create${priv ? "" : "?public"}`);
-    if (!result.ok) {
-      setPressed(false);
-    } else {
-      const dest = await result.text();
-      navigate(`/room/${dest}`);
-    }
+    navigate(`/onboard`);
   };
 
   React.useEffect(() => {

@@ -17,9 +17,9 @@ export const RequiresSession = <P extends object>(
 ): React.ComponentType<P> => {
   return function (props: P) {
     return (
-      <RequiresSessionWrapper>
+      // <RequiresSessionWrapper>
         <C {...props} />
-      </RequiresSessionWrapper>
+      // </RequiresSessionWrapper>
     );
   };
 };
