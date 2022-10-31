@@ -16,7 +16,7 @@ jobs:
     - name: Deploy
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
       with:
-        host: rollycubes.com
+        host: ${{ secrets.DO_SERVER_IP }}
         user: root
         key: ${{ secrets.DO_SSH_KEY }}
         first_ssh: |
