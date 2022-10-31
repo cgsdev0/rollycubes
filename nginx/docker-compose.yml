@@ -21,7 +21,7 @@ services:
       - ../client/beta:/var/www/client/beta
       - ../client/prod:/var/www/client/prod
   otel-collector:
-    image: otel/opentelemetry-collector
+    image: opentelemetry-collector-contrib
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
