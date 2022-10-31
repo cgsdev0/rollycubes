@@ -22,6 +22,8 @@ services:
       - ../client/prod:/var/www/client/prod
   otel-collector:
     image: opentelemetry-collector-contrib
+    external_links:
+      - "postgres:postgres"
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
