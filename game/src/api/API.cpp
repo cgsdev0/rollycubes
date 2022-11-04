@@ -29,16 +29,52 @@
 #include "RestartMsgType.hpp"
 #include "WelcomeMsg.hpp"
 #include "WelcomeMsgType.hpp"
+#include "GameState.hpp"
+#include "GameStateType.hpp"
+#include "ServerPlayer.hpp"
+#include "IGameState.hpp"
 #include "Player.hpp"
 #include "UserData.hpp"
 #include "Achievement.hpp"
 #include "AchievementClass.hpp"
 #include "UserStats.hpp"
+#include "RoomList.hpp"
+#include "Room.hpp"
+#include "Redirect.hpp"
+#include "RedirectType.hpp"
+#include "GameError.hpp"
+#include "GameErrorType.hpp"
 #include "DieRoll.hpp"
+#include "ReportStats.hpp"
+#include "AchievementUnlock.hpp"
+#include "AchievementUnlockType.hpp"
+#include "AchievementProgress.hpp"
+#include "AchievementProgressType.hpp"
 
 namespace nlohmann {
+    void from_json(const json & j, API::AchievementProgress & x);
+    void to_json(json & j, const API::AchievementProgress & x);
+
+    void from_json(const json & j, API::AchievementUnlock & x);
+    void to_json(json & j, const API::AchievementUnlock & x);
+
+    void from_json(const json & j, API::ReportStats & x);
+    void to_json(json & j, const API::ReportStats & x);
+
     void from_json(const json & j, API::DieRoll & x);
     void to_json(json & j, const API::DieRoll & x);
+
+    void from_json(const json & j, API::GameError & x);
+    void to_json(json & j, const API::GameError & x);
+
+    void from_json(const json & j, API::Redirect & x);
+    void to_json(json & j, const API::Redirect & x);
+
+    void from_json(const json & j, API::Room & x);
+    void to_json(json & j, const API::Room & x);
+
+    void from_json(const json & j, API::RoomList & x);
+    void to_json(json & j, const API::RoomList & x);
 
     void from_json(const json & j, API::UserStats & x);
     void to_json(json & j, const API::UserStats & x);
@@ -54,6 +90,15 @@ namespace nlohmann {
 
     void from_json(const json & j, API::Player & x);
     void to_json(json & j, const API::Player & x);
+
+    void from_json(const json & j, API::IGameState & x);
+    void to_json(json & j, const API::IGameState & x);
+
+    void from_json(const json & j, API::ServerPlayer & x);
+    void to_json(json & j, const API::ServerPlayer & x);
+
+    void from_json(const json & j, API::GameState & x);
+    void to_json(json & j, const API::GameState & x);
 
     void from_json(const json & j, API::WelcomeMsg & x);
     void to_json(json & j, const API::WelcomeMsg & x);
@@ -94,6 +139,21 @@ namespace nlohmann {
     void from_json(const json & j, API::UpdateMsg & x);
     void to_json(json & j, const API::UpdateMsg & x);
 
+    void from_json(const json & j, API::AchievementProgressType & x);
+    void to_json(json & j, const API::AchievementProgressType & x);
+
+    void from_json(const json & j, API::AchievementUnlockType & x);
+    void to_json(json & j, const API::AchievementUnlockType & x);
+
+    void from_json(const json & j, API::GameErrorType & x);
+    void to_json(json & j, const API::GameErrorType & x);
+
+    void from_json(const json & j, API::RedirectType & x);
+    void to_json(json & j, const API::RedirectType & x);
+
+    void from_json(const json & j, API::GameStateType & x);
+    void to_json(json & j, const API::GameStateType & x);
+
     void from_json(const json & j, API::WelcomeMsgType & x);
     void to_json(json & j, const API::WelcomeMsgType & x);
 
@@ -133,6 +193,57 @@ namespace nlohmann {
     void from_json(const json & j, API::UpdateMsgType & x);
     void to_json(json & j, const API::UpdateMsgType & x);
 
+    inline void from_json(const json & j, API::AchievementProgress& x) {
+        x.achievement_id = j.at("achievement_id").get<std::string>();
+        x.progress = j.at("progress").get<double>();
+        x.type = j.at("type").get<API::AchievementProgressType>();
+        x.user_id = j.at("user_id").get<std::string>();
+    }
+
+    inline void to_json(json & j, const API::AchievementProgress & x) {
+        j = json::object();
+        j["achievement_id"] = x.achievement_id;
+        j["progress"] = x.progress;
+        j["type"] = x.type;
+        j["user_id"] = x.user_id;
+    }
+
+    inline void from_json(const json & j, API::AchievementUnlock& x) {
+        x.description = j.at("description").get<std::string>();
+        x.id = j.at("id").get<std::string>();
+        x.image_url = j.at("image_url").get<std::string>();
+        x.max_progress = j.at("max_progress").get<double>();
+        x.name = j.at("name").get<std::string>();
+        x.type = j.at("type").get<API::AchievementUnlockType>();
+    }
+
+    inline void to_json(json & j, const API::AchievementUnlock & x) {
+        j = json::object();
+        j["description"] = x.description;
+        j["id"] = x.id;
+        j["image_url"] = x.image_url;
+        j["max_progress"] = x.max_progress;
+        j["name"] = x.name;
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, API::ReportStats& x) {
+        x.doubles = j.at("doubles").get<double>();
+        x.games = j.at("games").get<double>();
+        x.id = j.at("id").get<std::string>();
+        x.rolls = j.at("rolls").get<double>();
+        x.wins = j.at("wins").get<double>();
+    }
+
+    inline void to_json(json & j, const API::ReportStats & x) {
+        j = json::object();
+        j["doubles"] = x.doubles;
+        j["games"] = x.games;
+        j["id"] = x.id;
+        j["rolls"] = x.rolls;
+        j["wins"] = x.wins;
+    }
+
     inline void from_json(const json & j, API::DieRoll& x) {
         x.used = j.at("used").get<bool>();
         x.value = j.at("value").get<double>();
@@ -142,6 +253,52 @@ namespace nlohmann {
         j = json::object();
         j["used"] = x.used;
         j["value"] = x.value;
+    }
+
+    inline void from_json(const json & j, API::GameError& x) {
+        x.error = j.at("error").get<std::string>();
+        x.type = j.at("type").get<API::GameErrorType>();
+    }
+
+    inline void to_json(json & j, const API::GameError & x) {
+        j = json::object();
+        j["error"] = x.error;
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, API::Redirect& x) {
+        x.room = j.at("room").get<std::string>();
+        x.type = j.at("type").get<API::RedirectType>();
+    }
+
+    inline void to_json(json & j, const API::Redirect & x) {
+        j = json::object();
+        j["room"] = x.room;
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, API::Room& x) {
+        x.code = j.at("code").get<std::string>();
+        x.host_name = j.at("host_name").get<std::string>();
+        x.last_updated = j.at("last_updated").get<std::string>();
+        x.player_count = j.at("player_count").get<double>();
+    }
+
+    inline void to_json(json & j, const API::Room & x) {
+        j = json::object();
+        j["code"] = x.code;
+        j["host_name"] = x.host_name;
+        j["last_updated"] = x.last_updated;
+        j["player_count"] = x.player_count;
+    }
+
+    inline void from_json(const json & j, API::RoomList& x) {
+        x.rooms = j.at("rooms").get<std::vector<API::Room>>();
+    }
+
+    inline void to_json(json & j, const API::RoomList & x) {
+        j = json::object();
+        j["rooms"] = x.rooms;
     }
 
     inline void from_json(const json & j, API::UserStats& x) {
@@ -227,6 +384,83 @@ namespace nlohmann {
         j["user_id"] = x.user_id;
         j["userData"] = x.user_data;
         j["win_count"] = x.win_count;
+    }
+
+    inline void from_json(const json & j, API::IGameState& x) {
+        x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
+        x.players = j.at("players").get<std::vector<API::Player>>();
+        x.private_session = j.at("privateSession").get<bool>();
+        x.rolled = j.at("rolled").get<bool>();
+        x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.turn_index = j.at("turn_index").get<double>();
+        x.used = j.at("used").get<std::vector<bool>>();
+        x.victory = j.at("victory").get<bool>();
+    }
+
+    inline void to_json(json & j, const API::IGameState & x) {
+        j = json::object();
+        j["chatLog"] = x.chat_log;
+        j["players"] = x.players;
+        j["privateSession"] = x.private_session;
+        j["rolled"] = x.rolled;
+        j["rolls"] = x.rolls;
+        j["turn_index"] = x.turn_index;
+        j["used"] = x.used;
+        j["victory"] = x.victory;
+    }
+
+    inline void from_json(const json & j, API::ServerPlayer& x) {
+        x.connected = j.at("connected").get<bool>();
+        x.crowned = API::get_optional<bool>(j, "crowned");
+        x.doubles_count = j.at("doubles_count").get<double>();
+        x.name = API::get_optional<std::string>(j, "name");
+        x.roll_count = j.at("roll_count").get<double>();
+        x.score = j.at("score").get<double>();
+        x.session = j.at("session").get<std::string>();
+        x.turn_count = j.at("turn_count").get<double>();
+        x.user_id = API::get_optional<std::string>(j, "user_id");
+        x.user_data = API::get_optional<API::UserData>(j, "userData");
+        x.win_count = j.at("win_count").get<double>();
+    }
+
+    inline void to_json(json & j, const API::ServerPlayer & x) {
+        j = json::object();
+        j["connected"] = x.connected;
+        j["crowned"] = x.crowned;
+        j["doubles_count"] = x.doubles_count;
+        j["name"] = x.name;
+        j["roll_count"] = x.roll_count;
+        j["score"] = x.score;
+        j["session"] = x.session;
+        j["turn_count"] = x.turn_count;
+        j["user_id"] = x.user_id;
+        j["userData"] = x.user_data;
+        j["win_count"] = x.win_count;
+    }
+
+    inline void from_json(const json & j, API::GameState& x) {
+        x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
+        x.players = j.at("players").get<std::vector<API::ServerPlayer>>();
+        x.private_session = j.at("privateSession").get<bool>();
+        x.rolled = j.at("rolled").get<bool>();
+        x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.turn_index = j.at("turn_index").get<double>();
+        x.type = j.at("type").get<API::GameStateType>();
+        x.used = j.at("used").get<std::vector<bool>>();
+        x.victory = j.at("victory").get<bool>();
+    }
+
+    inline void to_json(json & j, const API::GameState & x) {
+        j = json::object();
+        j["chatLog"] = x.chat_log;
+        j["players"] = x.players;
+        j["privateSession"] = x.private_session;
+        j["rolled"] = x.rolled;
+        j["rolls"] = x.rolls;
+        j["turn_index"] = x.turn_index;
+        j["type"] = x.type;
+        j["used"] = x.used;
+        j["victory"] = x.victory;
     }
 
     inline void from_json(const json & j, API::WelcomeMsg& x) {
@@ -398,6 +632,66 @@ namespace nlohmann {
         j["used"] = x.used;
     }
 
+    inline void from_json(const json & j, API::AchievementProgressType & x) {
+        if (j == "achievement_progress") x = API::AchievementProgressType::ACHIEVEMENT_PROGRESS;
+        else throw "Input JSON does not conform to schema";
+    }
+
+    inline void to_json(json & j, const API::AchievementProgressType & x) {
+        switch (x) {
+            case API::AchievementProgressType::ACHIEVEMENT_PROGRESS: j = "achievement_progress"; break;
+            default: throw "This should not happen";
+        }
+    }
+
+    inline void from_json(const json & j, API::AchievementUnlockType & x) {
+        if (j == "achievement_unlock") x = API::AchievementUnlockType::ACHIEVEMENT_UNLOCK;
+        else throw "Input JSON does not conform to schema";
+    }
+
+    inline void to_json(json & j, const API::AchievementUnlockType & x) {
+        switch (x) {
+            case API::AchievementUnlockType::ACHIEVEMENT_UNLOCK: j = "achievement_unlock"; break;
+            default: throw "This should not happen";
+        }
+    }
+
+    inline void from_json(const json & j, API::GameErrorType & x) {
+        if (j == "error") x = API::GameErrorType::ERROR;
+        else throw "Input JSON does not conform to schema";
+    }
+
+    inline void to_json(json & j, const API::GameErrorType & x) {
+        switch (x) {
+            case API::GameErrorType::ERROR: j = "error"; break;
+            default: throw "This should not happen";
+        }
+    }
+
+    inline void from_json(const json & j, API::RedirectType & x) {
+        if (j == "redirect") x = API::RedirectType::REDIRECT;
+        else throw "Input JSON does not conform to schema";
+    }
+
+    inline void to_json(json & j, const API::RedirectType & x) {
+        switch (x) {
+            case API::RedirectType::REDIRECT: j = "redirect"; break;
+            default: throw "This should not happen";
+        }
+    }
+
+    inline void from_json(const json & j, API::GameStateType & x) {
+        if (j == "game_state") x = API::GameStateType::GAME_STATE;
+        else throw "Input JSON does not conform to schema";
+    }
+
+    inline void to_json(json & j, const API::GameStateType & x) {
+        switch (x) {
+            case API::GameStateType::GAME_STATE: j = "game_state"; break;
+            default: throw "This should not happen";
+        }
+    }
+
     inline void from_json(const json & j, API::WelcomeMsgType & x) {
         if (j == "welcome") x = API::WelcomeMsgType::WELCOME;
         else throw "Input JSON does not conform to schema";
@@ -554,6 +848,7 @@ namespace nlohmann {
         }
     }
 }
+namespace API {
 std::string Achievement::toString() const {
 json j;
 to_json(j, *this);
@@ -569,6 +864,24 @@ to_json(j, *this);
 return j.dump();
 }
 void AchievementClass::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AchievementProgress::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AchievementProgress::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AchievementUnlock::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AchievementUnlock::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -596,6 +909,33 @@ to_json(j, *this);
 return j.dump();
 }
 void DisconnectMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string GameError::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void GameError::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string GameState::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void GameState::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string IGameState::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void IGameState::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -635,6 +975,24 @@ void ReconnectMsg::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
+std::string Redirect::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Redirect::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string ReportStats::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void ReportStats::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
 std::string RestartMsg::toString() const {
 json j;
 to_json(j, *this);
@@ -659,6 +1017,33 @@ to_json(j, *this);
 return j.dump();
 }
 void RollMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string Room::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Room::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string RoomList::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void RoomList::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string ServerPlayer::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void ServerPlayer::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -724,4 +1109,5 @@ return j.dump();
 void WinMsg::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
+}
 }

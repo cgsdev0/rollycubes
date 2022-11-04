@@ -19,16 +19,18 @@ Game::~Game() {
 }
 
 bool Game::isInitialized() { return state.players.size() > 0; }
-bool Game::isPrivate() const { return state.privateSession; }
+bool Game::isPrivate() const { return state.private_session; }
 
-bool isSignedIn(const API::PlayerState &player) {
+bool isSignedIn(const API::ServerPlayer &player) {
     return (player.session.find("guest:") != 0);
 }
 
 std::string Game::hostName() const {
     if (state.players.size() < 1)
         return "unknown";
-    return state.players[0].name;
+    if (state.players[0].name == nullptr)
+      return "unknown";
+    return *state.players[0].name;
 }
 
 int Game::totalRoll() {
@@ -73,10 +75,11 @@ json Game::addPlayer(const PerSocketData &data) {
         return result;
     }
     auto &player = state.players.emplace_back();
+    player.connected = true;
     player.session = data.session;
     if (isSignedIn(player)) {
-        player.name = data.display_name;
-        result["name"] = player.name;
+        player.name = std::make_shared<std::string>(data.display_name);
+        result["name"] = *player.name;
         result["user_id"] = player.session;
     }
     result["type"] = "join";
@@ -113,7 +116,7 @@ void Game::advanceTurn() {
         turn_token = state.players[0].session;
         state.turn_index = 0;
     } else {
-        state.turn_index = (state.turn_index + 1) % state.players.size();
+        state.turn_index = (int)(state.turn_index + 1) % state.players.size();
         turn_token = state.players[state.turn_index].session;
     }
 }
@@ -177,7 +180,7 @@ static const std::unordered_map<
 
 #undef ACTION
 
-void Game::processEvent(const API::PlayerState *player, HandlerArgs *server, const json &data, const API::GameState &prev) {
+void Game::processEvent(const API::ServerPlayer *player, HandlerArgs *server, const json &data, const API::GameState &prev) {
     if (!isSignedIn(*player)) return;
 
     for (auto achievement : this->achievements) {
@@ -185,11 +188,11 @@ void Game::processEvent(const API::PlayerState *player, HandlerArgs *server, con
         if (progress <= 0) continue;
         API::AchievementProgress ap{
             .achievement_id = achievement->getAchievementID(),
-            .user_id = player->session,
-            .progress = progress};
+            .progress = progress,
+            .user_id = player->session};
         auto send = server->send;
         server->reportStats2("achievement_progress", ap.toString(), [send](auto s) {
-            API::Achievement_Unlock a;
+            API::AchievementUnlock a;
             try {
                 a.fromString(s);
                 send(a.toString());
@@ -199,21 +202,24 @@ void Game::processEvent(const API::PlayerState *player, HandlerArgs *server, con
         });
     }
 }
+
 void Game::handleMessage(HANDLER_ARGS) {
     if (!data["type"].is_string())
-        throw GameError("Type is not specified correctly");
+        throw API::GameError("Type is not specified correctly");
     // Copy a snapshot of the current game state
+    std::cout << "STATE: " << this->state.rolls.capacity() << " " << this->state.rolls.size() << std::endl;
     API::GameState prev(state);
-    const API::PlayerState *player = nullptr;
-    player = &state.getPlayer(session);
+    std::cout << "PREV: " << prev.rolls.capacity() << " " << prev.rolls.size() << std::endl;
+    const API::ServerPlayer *player = nullptr;
+    player = &getPlayer(state, session);
     if (player == nullptr)
-        throw GameError("unknown player");
+        throw API::GameError("unknown player");
     auto action_type = data["type"].get<std::string>();
     auto it = action_map.find(action_type);
     if (it != action_map.end()) {
         it->second(this, broadcast, server, data, session);
     } else {
-        throw GameError("Unknown action type");
+        throw API::GameError("Unknown action type");
     }
     processEvent(player, &server, data, prev);
     updated = std::chrono::system_clock::now();
@@ -222,12 +228,14 @@ void Game::handleMessage(HANDLER_ARGS) {
 void Game::chat(HANDLER_ARGS) {
     json res;
     if (!data["msg"].is_string())
-        throw GameError("Message must be a string");
+        throw API::GameError("Message must be a string");
     for (uint i = 0; i < state.players.size(); ++i) {
         if (state.players[i].session == session) {
             res["type"] = data["type"];
             auto msg = data["msg"].get<std::string>();
-            std::string name = state.players[i].name;
+            std::string name;
+            if (state.players[i].name)
+              name = *state.players[i].name;
             if (name == "") {
                 name = "User" + std::to_string(i + 1);
             }
@@ -235,9 +243,9 @@ void Game::chat(HANDLER_ARGS) {
             if (fullMsg.length() > MAX_CHAT_LEN) {
                 fullMsg = trimString(fullMsg, MAX_CHAT_LEN, true);
             }
-            state.chatLog.push_front(fullMsg);
-            if (state.chatLog.size() > MAX_CHAT_LOG) {
-                state.chatLog.pop_back();
+            state.chat_log.insert(state.chat_log.begin(), fullMsg);
+            if (state.chat_log.size() > MAX_CHAT_LOG) {
+                state.chat_log.pop_back();
             }
             res["msg"] = fullMsg;
             broadcast(res.dump());
@@ -268,12 +276,12 @@ void Game::leave(HANDLER_ARGS) {
 
 void Game::kick(HANDLER_ARGS) {
     if (!data["id"].is_number())
-        throw GameError("pass a number please");
+        throw API::GameError("pass a number please");
     uint id = data["id"].get<uint>();
     if (state.players.empty())
-        throw GameError("uhhh this should never happen");
+        throw API::GameError("uhhh this should never happen");
     if (id >= state.players.size())
-        throw GameError("out of bounds");
+        throw API::GameError("out of bounds");
 
     json res;
     res["type"] = "kick";
@@ -299,9 +307,9 @@ void Game::kick(HANDLER_ARGS) {
 
 void Game::restart(HANDLER_ARGS) {
     if (state.players.empty())
-        throw GameError("uhhh this should never happen");
+        throw API::GameError("uhhh this should never happen");
     if (!state.victory)
-        throw GameError("game still in progress");
+        throw API::GameError("game still in progress");
 
     json res;
     for (auto &player : state.players) {
@@ -319,17 +327,19 @@ void Game::restart(HANDLER_ARGS) {
 
 void Game::update_name(HANDLER_ARGS) {
     if (!data["name"].is_string())
-        throw GameError("name must be a string");
+        throw API::GameError("name must be a string");
     std::string name = data["name"].get<std::string>();
     for (uint i = 0; i < state.players.size(); ++i) {
         if (state.players[i].session == session) {
             if (isSignedIn(state.players[i])) {
-                throw GameError("signed in players can't change names that way");
+                throw API::GameError("signed in players can't change names that way");
             }
-            state.players[i].name = name;
+            state.players[i].name = std::make_shared<std::string>(name);
             json msg;
             msg["type"] = "update_name";
-            msg["name"] = state.players[i].name;
+            if (state.players[i].name != nullptr) {
+              msg["name"] = *state.players[i].name;
+            }
             msg["id"] = i;
             broadcast(msg.dump());
             return;
@@ -338,11 +348,11 @@ void Game::update_name(HANDLER_ARGS) {
 }
 void Game::guardUpdate(const std::string &session) {
     if (state.victory)
-        throw GameError("game is over");
+        throw API::GameError("game is over");
     if (session != turn_token)
-        throw GameError("not your turn");
+        throw API::GameError("not your turn");
     if (!state.rolled)
-        throw GameError("you need to roll first");
+        throw API::GameError("you need to roll first");
 }
 
 void Game::roll(HANDLER_ARGS) {
@@ -352,13 +362,13 @@ void Game::roll(HANDLER_ARGS) {
     /*     broadcast(a.toString()); */
     /* }); */
     if (state.victory)
-        throw GameError("game is over");
+        throw API::GameError("game is over");
     if (session != turn_token)
-        throw GameError("not your turn");
+        throw API::GameError("not your turn");
     if (state.rolled)
-        throw GameError("now's not the time for that");
+        throw API::GameError("now's not the time for that");
     if (state.players.size() <= 1)
-        throw GameError("invite some friends first!");
+        throw API::GameError("invite some friends first!");
     json resp;
     resp["type"] = "roll";
     for (uint i = 0; i < DICE_COUNT; ++i) {
@@ -387,7 +397,7 @@ void Game::roll(HANDLER_ARGS) {
 void Game::add(HANDLER_ARGS) {
     guardUpdate(session);
     if (isSplit())
-        throw GameError("you must add invdividually");
+        throw API::GameError("you must add invdividually");
     json j = json(totalRoll());
     update(broadcast, server, j, session);
 }
@@ -395,21 +405,21 @@ void Game::add(HANDLER_ARGS) {
 void Game::sub(HANDLER_ARGS) {
     guardUpdate(session);
     if (isSplit())
-        throw GameError("you must add invdividually");
+        throw API::GameError("you must add invdividually");
     json j = json(-totalRoll());
     update(broadcast, server, j, session);
 }
 
 int Game::guardNth(const json &data) {
     if (!isSplit())
-        throw GameError("This is not a split");
+        throw API::GameError("This is not a split");
     if (!data.is_number())
-        throw GameError("NaN");
+        throw API::GameError("NaN");
     uint n = data.get<uint>();
     if (n >= DICE_COUNT)
-        throw GameError("too high");
+        throw API::GameError("too high");
     if (state.used[n])
-        throw GameError("already spent");
+        throw API::GameError("already spent");
     state.used[n] = true;
     return n;
 }
@@ -451,11 +461,11 @@ void Game::update(HANDLER_ARGS) {
                 for (uint i = 0; i < state.players.size(); ++i) {
                     if (!isSignedIn(state.players[i])) continue;
                     API::ReportStats stats{
+                        .doubles = state.players[i].doubles_count,
+                        .games = 1,
                         .id = state.players[i].session,
                         .rolls = state.players[i].roll_count,
-                        .wins = (winnerId == i ? 1 : 0),
-                        .games = 1,
-                        .doubles = state.players[i].doubles_count};
+                        .wins = (winnerId == i ? 1 : 0)};
                     server.reportStats2("add_stats", stats.toString(), [broadcast](auto s) {
                         std::cout << "AUTH SAYS: " << s << std::endl;
                         /* API::Achievement_Unlock a{ */

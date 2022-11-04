@@ -9,8 +9,8 @@ class Negative : public BaseAchievement {
   public:
     virtual int processEvent(const json &event, const API::GameState &before, const API::GameState &after, const std::string &session) {
         try {
-            auto beforePlayer = before.getPlayer(session);
-            auto afterPlayer = after.getPlayer(session);
+            auto beforePlayer = getPlayer(before, session);
+            auto afterPlayer = getPlayer(after, session);
             if (beforePlayer.score >= 0 && afterPlayer.score < 0) {
                 return 1;
             }

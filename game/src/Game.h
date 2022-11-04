@@ -4,7 +4,7 @@
 #include "Consts.h"
 #include "achievements/BaseAchievement.h"
 
-#include "API.h"
+#include "api/API.hpp"
 #include <chrono>
 #include <deque>
 #include <functional>
@@ -32,8 +32,10 @@ class Game {
     Game();
     ~Game();
     Game(bool isPrivate) : Game() {
-        this->state.privateSession = isPrivate;
+        this->state.private_session = isPrivate;
         this->state.players.reserve(MAX_PLAYERS);
+        this->state.rolls.resize(DICE_COUNT);
+        this->state.used.resize(DICE_COUNT);
         for (uint i = 0; i < DICE_COUNT; ++i) {
             this->state.rolls[i] = 1;
             this->state.used[i] = false;
@@ -41,8 +43,8 @@ class Game {
     }
 
     // Rehydrate game from disk
-    Game(const API::GameState &g) : Game() {
-        this->state = g;
+    Game(const API::GameState &g) : Game(false) {
+        // this->state = g;
         for (auto &player : this->state.players) {
             player.connected = false;
         }
@@ -93,14 +95,27 @@ class Game {
 
     int connectedPlayerCount();
 
-    API::Welcome toWelcomeMsg() {
-        return API::Welcome(this->state);
+    API::WelcomeMsg toWelcomeMsg() {
+        std::vector<API::Player> players;
+        for(const auto& player : this->state.players) {
+          players.emplace_back(player.connected, player.crowned, player.name, player.score, player.user_id, player.user_data, player.win_count);
+        }
+        return API::WelcomeMsg{
+         .chat_log = this->state.chat_log,
+         .players = players,
+         .private_session = this->state.private_session,
+         .rolled = this->state.rolled,
+         .rolls = this->state.rolls,
+         .turn_index = this->state.turn_index,
+         .used = this->state.used,
+         .victory = this->state.victory
+            };
     }
 
     std::string toString() const {
         return this->state.toString();
     }
-    void processEvent(const API::PlayerState *player, HandlerArgs *server, const json &data, const API::GameState &prev);
+    void processEvent(const API::ServerPlayer *player, HandlerArgs *server, const json &data, const API::GameState &prev);
 
   private:
     std::uniform_int_distribution<int> dis{1, 6};

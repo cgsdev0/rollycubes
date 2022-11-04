@@ -1,7 +1,27 @@
-import { Player } from "./store_types";
+import { Player, ServerPlayer } from "./store_types";
 
-export interface WelcomeMsg {
-  type: "welcome";
+export interface GameError {
+  type: "error";
+  error: string;
+}
+
+export interface Redirect {
+  type: "redirect";
+  room: string;
+}
+
+export interface Room {
+  code: string;
+  host_name: string;
+  last_updated: string;
+  player_count: bigint;
+}
+
+export interface RoomList {
+  rooms: Room[];
+}
+
+export interface IGameState {
   players: Player[];
   chatLog: string[];
   turn_index: number;
@@ -10,6 +30,15 @@ export interface WelcomeMsg {
   rolled: boolean;
   victory: boolean;
   privateSession: boolean;
+}
+
+export interface GameState extends IGameState {
+  type: "game_state";
+  players: ServerPlayer[];
+}
+
+export interface WelcomeMsg extends IGameState {
+  type: "welcome";
   id: number; // self_id; -1 means spectator
 }
 

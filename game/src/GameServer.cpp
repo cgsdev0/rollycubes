@@ -23,7 +23,7 @@
 #include "Game.h"
 #include "StringUtils.h"
 
-#include "API.h"
+#include "api/API.hpp"
 #include "AuthServerRequestQueue.h"
 #include "JWTVerifier.h"
 #include "MoveOnlyFunction.h"
@@ -261,7 +261,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     try {
                         auto data = json::parse(message);
                         if (!data["type"].is_string())
-                            throw GameError("Type is not specified correctly");
+                            throw API::GameError("Type is not specified correctly");
                         auto action_type = data["type"].get<std::string>();
                         if (action_type == "authenticate") {
                             auto token = data["access_token"].get<std::string>();
@@ -299,21 +299,21 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                   }
                                   }*/
                             } else {
-                                response = GameError("Room not found: " + room).toString();
+                                response = API::GameError("Room not found: " + room).toString();
                             }
                         }
-                    } catch (GameError &e) {
-                        response = GameError(e.what()).toString();
+                    } catch (API::GameError &e) {
+                        response = e.toString();
                     } catch (nlohmann::detail::parse_error &e) {
                         std::cout << "RECEIVED BAD JSON (parse_error): " << message
                                   << std::endl
                                   << e.what() << std::endl;
-                        response = GameError(e.what()).toString();
+                        response = API::GameError(e.what()).toString();
                     } catch (nlohmann::detail::type_error &e) {
                         std::cout << "HANDLED BAD JSON (type_error): " << message
                                   << std::endl
                                   << e.what() << std::endl;
-                        response = GameError(e.what()).toString();
+                        response = API::GameError(e.what()).toString();
                     }
                     if (response.length())
                         ws->send(response, uWS::OpCode::TEXT);
@@ -391,7 +391,7 @@ int main(int argc, char **argv) {
     app.get("/list",
             [](auto *res, auto *req) {
                 res->writeHeader("Content-Type", "application/json");
-                API::Room_List respList;
+                API::RoomList respList;
                 for (auto const &[code, game] : games) {
                     if (game->isPrivate()) {
                         continue;

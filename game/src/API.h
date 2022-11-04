@@ -21,7 +21,7 @@ struct GameError {
     std::string error;
 };
 
-namespace API {
+namespace API_DEPRECATED {
     // Represents the state of a player in a particular session
     struct PlayerState {
         PlayerState()
@@ -56,7 +56,7 @@ namespace API {
         bool victory = false;
         bool privateSession;
 
-        const API::PlayerState &getPlayer(const std::string &session) const {
+        const API_DEPRECATED::PlayerState &getPlayer(const std::string &session) const {
             for (uint i = 0; i < players.size(); ++i) {
                 if (players[i].session == session) {
                     return players[i];
@@ -146,6 +146,6 @@ namespace API {
 
         FWD_DECLARE_JSON_SERIALIZABLE()
     };
-} // namespace API
+} // namespace API_DEPRECATED
 
 #endif

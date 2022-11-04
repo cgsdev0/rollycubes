@@ -7,7 +7,7 @@
 class Perfect : public BaseAchievement {
   public:
     virtual int processEvent(const json &event, const API::GameState &before, const API::GameState &after, const std::string &session) {
-        if (!before.victory && after.victory && after.getPlayer(session).turn_count == 1) {
+        if (!before.victory && after.victory && getPlayer(after, session).turn_count == 1) {
             return 1;
         }
         return 0;

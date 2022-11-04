@@ -69,7 +69,7 @@ std::string GameError::toString() const {
 |                                                 |
 \*************************************************/
 
-namespace API {
+namespace API_DEPRECATED {
     JSON_SERIALIZATION(PlayerState, session, name, score, win_count, connected, turn_count)
     JSON_SERIALIZATION(GameState, players, chatLog, turn_index, rolls, used, rolled, victory, privateSession)
     JSON_SERIALIZATION(Achievement_Unlock, id, image_url, name, description, max_progress)
@@ -81,4 +81,4 @@ namespace API {
     JSON_SERIALIZATION(ReportStats, id, rolls, wins, games, doubles)
     JSON_SERIALIZATION(Room, code, host_name, last_updated, player_count)
     JSON_SERIALIZATION(Room_List, rooms)
-} // namespace API
+} // namespace API_DEPRECATED

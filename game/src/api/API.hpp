@@ -1,13 +1,30 @@
+#include <memory>
+#include <vector>
 
 #pragma once
 
 
+#include "AchievementProgressType.hpp"
+#include "AchievementProgress.hpp"
+#include "AchievementUnlockType.hpp"
+#include "AchievementUnlock.hpp"
+#include "ReportStats.hpp"
 #include "DieRoll.hpp"
+#include "GameErrorType.hpp"
+#include "GameError.hpp"
+#include "RedirectType.hpp"
+#include "Redirect.hpp"
+#include "Room.hpp"
+#include "RoomList.hpp"
 #include "UserStats.hpp"
 #include "AchievementClass.hpp"
 #include "Achievement.hpp"
 #include "UserData.hpp"
 #include "Player.hpp"
+#include "IGameState.hpp"
+#include "ServerPlayer.hpp"
+#include "GameStateType.hpp"
+#include "GameState.hpp"
 #include "WelcomeMsgType.hpp"
 #include "WelcomeMsg.hpp"
 #include "RestartMsgType.hpp"

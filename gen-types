@@ -41,6 +41,7 @@ structs=$(grep "struct.*{" * \
   | cut -d':' -f2 \
   | sed 's/.*struct \(.*\) {/\1/')
 
+echo "namespace API {" >> API.cpp
 for struct in $structs; do
   echo "std::string $struct::toString() const {" >> API.cpp
   echo "json j;" >> API.cpp
@@ -52,4 +53,7 @@ for struct in $structs; do
   echo "from_json(j, *this);" >> API.cpp
   echo "}" >> API.cpp
 done
+echo "}" >> API.cpp
 
+sed -i '1s/^/#include <vector>\n/' API.hpp 
+sed -i '1s/^/#include <memory>\n/' API.hpp

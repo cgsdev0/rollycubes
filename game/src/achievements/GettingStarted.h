@@ -7,7 +7,7 @@ class GettingStarted : public BaseAchievement {
 
     virtual int processEvent(const json &event, const API::GameState &before, const API::GameState &after, const std::string &session) {
         if (event["type"] == "roll" &&
-            before.getPlayer(session).roll_count == 0) {
+            getPlayer(before, session).roll_count == 0) {
             return 1;
         }
         return 0;

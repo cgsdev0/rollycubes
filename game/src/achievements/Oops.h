@@ -18,7 +18,7 @@ class Oops : public BaseAchievement {
         // Save state for the first half of a split roll
         if (event["type"] == "add_nth" || event["type"] == "sub_nth") {
             if (!before.used[0] && !before.used[1]) {
-                this->originalScore = before.getPlayer(session).score;
+                this->originalScore = getPlayer(before, session).score;
                 return 0;
             }
         }
@@ -29,7 +29,7 @@ class Oops : public BaseAchievement {
         if (isDoubles(before)) return 0;
         if (after.victory) return 0;
 
-        auto score = before.getPlayer(session).score;
+        auto score = getPlayer(before, session).score;
         auto roll = before.rolls[0] + before.rolls[1];
         if (event["type"] == "add") {
             return TARGET_SCORES.count(score - roll) > 0;

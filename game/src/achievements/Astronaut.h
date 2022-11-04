@@ -7,7 +7,7 @@
 class Astronaut : public BaseAchievement {
   public:
     virtual int processEvent(const json &event, const API::GameState &before, const API::GameState &after, const std::string &session) {
-        if (!before.victory && after.victory && after.getPlayer(session).score == 100) {
+        if (!before.victory && after.victory && getPlayer(after, session).score == 100) {
             return 1;
         }
         return 0;
