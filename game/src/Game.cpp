@@ -207,9 +207,7 @@ void Game::handleMessage(HANDLER_ARGS) {
     if (!data["type"].is_string())
         throw API::GameError("Type is not specified correctly");
     // Copy a snapshot of the current game state
-    std::cout << "STATE: " << this->state.rolls.capacity() << " " << this->state.rolls.size() << std::endl;
     API::GameState prev(state);
-    std::cout << "PREV: " << prev.rolls.capacity() << " " << prev.rolls.size() << std::endl;
     const API::ServerPlayer *player = nullptr;
     player = &getPlayer(state, session);
     if (player == nullptr)
