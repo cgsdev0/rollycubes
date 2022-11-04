@@ -32,4 +32,4 @@ find . -type f \
 
 mv Generators.hpp API.cpp
 
-grep "struct.*{" * -l | grep -vE 'helper\.hpp|API\.cpp' | xargs sed -ie '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
+grep "struct.*{" * -l | grep -vE 'helper\.hpp|API\.cpp' | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
