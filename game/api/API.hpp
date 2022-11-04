@@ -1,0 +1,38 @@
+
+#pragma once
+
+
+#include "DieRoll.hpp"
+#include "UserStats.hpp"
+#include "AchievementClass.hpp"
+#include "Achievement.hpp"
+#include "UserData.hpp"
+#include "Player.hpp"
+#include "WelcomeMsgType.hpp"
+#include "WelcomeMsg.hpp"
+#include "RestartMsgType.hpp"
+#include "RestartMsg.hpp"
+#include "WinMsgType.hpp"
+#include "WinMsg.hpp"
+#include "RollMsgType.hpp"
+#include "RollMsg.hpp"
+#include "RollAgainMsgType.hpp"
+#include "RollAgainMsg.hpp"
+#include "JoinMsgType.hpp"
+#include "JoinMsg.hpp"
+#include "DisconnectMsgType.hpp"
+#include "DisconnectMsg.hpp"
+#include "ReconnectMsgType.hpp"
+#include "ReconnectMsg.hpp"
+#include "KickMsgType.hpp"
+#include "KickMsg.hpp"
+#include "ChatMsgType.hpp"
+#include "ChatMsg.hpp"
+#include "UpdateTurnMsgType.hpp"
+#include "UpdateTurnMsg.hpp"
+#include "UpdateNameMsgType.hpp"
+#include "UpdateNameMsg.hpp"
+#include "UpdateMsgType.hpp"
+#include "UpdateMsg.hpp"
+namespace API {
+}

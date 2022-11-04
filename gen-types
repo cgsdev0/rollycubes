@@ -1,0 +1,30 @@
+#!/bin/bash
+
+cd "${0%/*}"
+
+rm game/api/*
+
+./node_modules/.bin/quicktype \
+  -o game/api/API.hpp \
+  --code-format with-struct \
+  --no-boost \
+  --source-style multi-source \
+  --lang c++ \
+  --namespace API \
+  client/src/types/*.ts 
+
+# avert your eyes, this next part is a crime
+
+cd game/api
+
+find . -type f \
+  | grep -v Generators.hpp \
+  | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
+
+find . -type f \
+  | xargs -L1 basename \
+  | cut -d'.' -f1 \
+  | xargs -I {} sed -i 's/{}Type type;/{}Type type = 0;/g' {}.hpp
+
+rm helper.hpp
+mv Generators.hpp API.cpp
