@@ -554,3 +554,174 @@ namespace nlohmann {
         }
     }
 }
+std::string Achievement::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Achievement::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AchievementClass::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AchievementClass::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string ChatMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void ChatMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string DieRoll::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void DieRoll::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string DisconnectMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void DisconnectMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string JoinMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void JoinMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string KickMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void KickMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string Player::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Player::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string ReconnectMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void ReconnectMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string RestartMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void RestartMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string RollAgainMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void RollAgainMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string RollMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void RollMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string UpdateMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void UpdateMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string UpdateNameMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void UpdateNameMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string UpdateTurnMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void UpdateTurnMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string UserData::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void UserData::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string UserStats::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void UserStats::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string WelcomeMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void WelcomeMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string WinMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void WinMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}

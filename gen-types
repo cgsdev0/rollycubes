@@ -32,4 +32,24 @@ find . -type f \
 
 mv Generators.hpp API.cpp
 
-grep "struct.*{" * -l | grep -vE 'helper\.hpp|API\.cpp' | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
+grep "struct.*{" * -l \
+  | grep -vE 'helper\.hpp|API\.cpp' \
+  | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
+
+structs=$(grep "struct.*{" * \
+  | grep -v "^helper.hpp" \
+  | cut -d':' -f2 \
+  | sed 's/.*struct \(.*\) {/\1/')
+
+for struct in $structs; do
+  echo "std::string $struct::toString() const {" >> API.cpp
+  echo "json j;" >> API.cpp
+  echo "to_json(j, *this);" >> API.cpp
+  echo "return j.dump();" >> API.cpp
+  echo "}" >> API.cpp
+  echo "void $struct::fromString(const std::string &s) {" >> API.cpp
+  echo "auto j = json::parse(s);" >> API.cpp
+  echo "from_json(j, *this);" >> API.cpp
+  echo "}" >> API.cpp
+done
+
