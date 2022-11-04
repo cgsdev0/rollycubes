@@ -7,8 +7,6 @@ cd "${0%/*}"
 mkdir -p game/src/api
 rm -f game/src/api/*
 
-# cat schema.schema | jq '. += { "anyOf": ['$(cat schema.schema | jq -r '.definitions | keys[]' | sed 's/$/"}/;s/^/{"$ref":"#definitions\//' | paste -sd ',')']}' > schema2.schema
-
 ./node_modules/.bin/quicktype \
   -o game/src/api/API.hpp \
   --lang c++ \
@@ -17,7 +15,7 @@ rm -f game/src/api/*
   --source-style multi-source \
   --namespace API \
   --src-lang schema \
-  "./schema.schema#/definitions/"
+  "./schema.json#/definitions/"
 
 # avert your eyes, this next part is a crime
 
