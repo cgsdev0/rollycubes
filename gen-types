@@ -1,18 +1,23 @@
 #!/bin/bash
 
+set -eu
+
 cd "${0%/*}"
 
 mkdir -p game/src/api
-rm game/src/api/*
+rm -f game/src/api/*
+
+# cat schema.schema | jq '. += { "anyOf": ['$(cat schema.schema | jq -r '.definitions | keys[]' | sed 's/$/"}/;s/^/{"$ref":"#definitions\//' | paste -sd ',')']}' > schema2.schema
 
 ./node_modules/.bin/quicktype \
   -o game/src/api/API.hpp \
+  --lang c++ \
   --code-format with-struct \
   --no-boost \
   --source-style multi-source \
-  --lang c++ \
   --namespace API \
-  client/src/types/*.ts 
+  --src-lang schema \
+  "./schema.schema#/definitions/"
 
 # avert your eyes, this next part is a crime
 

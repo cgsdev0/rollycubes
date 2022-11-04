@@ -1,0 +1,917 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "Player": {
+            "title": "Player",
+            "type": "object",
+            "properties": {
+                "connected": {
+                    "type": "boolean",
+                    "title": "connected"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "score": {
+                    "type": "number",
+                    "title": "score"
+                },
+                "win_count": {
+                    "type": "number",
+                    "title": "win_count"
+                },
+                "user_id": {
+                    "type": "string",
+                    "title": "user_id"
+                },
+                "crowned": {
+                    "type": "boolean",
+                    "title": "crowned"
+                },
+                "userData": {
+                    "$ref": "#/definitions/UserData",
+                    "title": "userData"
+                }
+            },
+            "required": [
+                "connected",
+                "score",
+                "win_count"
+            ]
+        },
+        "AchievementProgress": {
+            "title": "AchievementProgress",
+            "type": "object",
+            "properties": {
+                "achievement_id": {
+                    "type": "string",
+                    "title": "achievement_id"
+                },
+                "user_id": {
+                    "type": "string",
+                    "title": "user_id"
+                },
+                "progress": {
+                    "type": "number",
+                    "title": "progress"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "achievement_progress"
+                    ],
+                    "title": "type"
+                }
+            },
+            "required": [
+                "achievement_id",
+                "progress",
+                "type",
+                "user_id"
+            ]
+        },
+        "AchievementUnlock": {
+            "title": "AchievementUnlock",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "title": "id"
+                },
+                "image_url": {
+                    "type": "string",
+                    "title": "image_url"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "description": {
+                    "type": "string",
+                    "title": "description"
+                },
+                "max_progress": {
+                    "type": "number",
+                    "title": "max_progress"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "achievement_unlock"
+                    ],
+                    "title": "type"
+                }
+            },
+            "required": [
+                "description",
+                "id",
+                "image_url",
+                "max_progress",
+                "name",
+                "type"
+            ]
+        },
+        "ReportStats": {
+            "title": "ReportStats",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "title": "id"
+                },
+                "rolls": {
+                    "type": "number",
+                    "title": "rolls"
+                },
+                "wins": {
+                    "type": "number",
+                    "title": "wins"
+                },
+                "games": {
+                    "type": "number",
+                    "title": "games"
+                },
+                "doubles": {
+                    "type": "number",
+                    "title": "doubles"
+                }
+            },
+            "required": [
+                "doubles",
+                "games",
+                "id",
+                "rolls",
+                "wins"
+            ]
+        },
+        "ServerPlayer": {
+            "title": "ServerPlayer",
+            "type": "object",
+            "properties": {
+                "session": {
+                    "type": "string",
+                    "title": "session"
+                },
+                "turn_count": {
+                    "type": "number",
+                    "title": "turn_count"
+                },
+                "roll_count": {
+                    "type": "number",
+                    "title": "roll_count"
+                },
+                "doubles_count": {
+                    "type": "number",
+                    "title": "doubles_count"
+                },
+                "connected": {
+                    "type": "boolean",
+                    "title": "connected"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "score": {
+                    "type": "number",
+                    "title": "score"
+                },
+                "win_count": {
+                    "type": "number",
+                    "title": "win_count"
+                },
+                "user_id": {
+                    "type": "string",
+                    "title": "user_id"
+                },
+                "crowned": {
+                    "type": "boolean",
+                    "title": "crowned"
+                },
+                "userData": {
+                    "$ref": "#/definitions/UserData",
+                    "title": "userData"
+                }
+            },
+            "required": [
+                "connected",
+                "doubles_count",
+                "roll_count",
+                "score",
+                "session",
+                "turn_count",
+                "win_count"
+            ]
+        },
+        "UserStats": {
+            "title": "UserStats",
+            "type": "object",
+            "properties": {
+                "rolls": {
+                    "type": "number",
+                    "title": "rolls"
+                },
+                "doubles": {
+                    "type": "number",
+                    "title": "doubles"
+                },
+                "games": {
+                    "type": "number",
+                    "title": "games"
+                },
+                "wins": {
+                    "type": "number",
+                    "title": "wins"
+                }
+            },
+            "required": [
+                "doubles",
+                "games",
+                "rolls",
+                "wins"
+            ]
+        },
+        "Achievement": {
+            "title": "Achievement",
+            "type": "object",
+            "properties": {
+                "progress": {
+                    "type": "number",
+                    "title": "progress"
+                },
+                "unlocked": {
+                    "type": "string",
+                    "title": "unlocked"
+                },
+                "achievement": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string",
+                            "title": "description"
+                        },
+                        "image_url": {
+                            "type": [
+                                "null",
+                                "string"
+                            ],
+                            "title": "image_url"
+                        },
+                        "id": {
+                            "type": "string",
+                            "title": "id"
+                        },
+                        "name": {
+                            "type": "string",
+                            "title": "name"
+                        },
+                        "max_progress": {
+                            "type": "number",
+                            "title": "max_progress"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "id",
+                        "image_url",
+                        "max_progress",
+                        "name"
+                    ],
+                    "title": "achievement"
+                }
+            },
+            "required": [
+                "achievement",
+                "progress",
+                "unlocked"
+            ]
+        },
+        "UserData": {
+            "title": "UserData",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "title": "id"
+                },
+                "username": {
+                    "type": "string",
+                    "title": "username"
+                },
+                "image_url": {
+                    "type": [
+                        "null",
+                        "string"
+                    ],
+                    "title": "image_url"
+                },
+                "stats": {
+                    "$ref": "#/definitions/UserStats",
+                    "title": "stats"
+                },
+                "userToAchievements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Achievement"
+                    },
+                    "title": "userToAchievements"
+                },
+                "createdDate": {
+                    "type": "string",
+                    "title": "createdDate"
+                }
+            },
+            "required": [
+                "createdDate",
+                "id",
+                "userToAchievements",
+                "username"
+            ]
+        },
+        "DieRoll": {
+            "title": "DieRoll",
+            "type": "object",
+            "properties": {
+                "used": {
+                    "type": "boolean",
+                    "title": "used"
+                },
+                "value": {
+                    "type": "number",
+                    "title": "value"
+                }
+            },
+            "required": [
+                "used",
+                "value"
+            ]
+        },
+        "GameError": {
+            "title": "GameError",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "error"
+                    ],
+                    "title": "type"
+                },
+                "error": {
+                    "type": "string",
+                    "title": "error"
+                }
+            },
+            "required": [
+                "error",
+                "type"
+            ]
+        },
+        "Redirect": {
+            "title": "Redirect",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "redirect"
+                    ],
+                    "title": "type"
+                },
+                "room": {
+                    "type": "string",
+                    "title": "room"
+                }
+            },
+            "required": [
+                "room",
+                "type"
+            ]
+        },
+        "Room": {
+            "title": "Room",
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "title": "code"
+                },
+                "host_name": {
+                    "type": "string",
+                    "title": "host_name"
+                },
+                "last_updated": {
+                    "type": "string",
+                    "title": "last_updated"
+                },
+                "player_count": {
+                    "type": "number",
+                    "title": "player_count"
+                }
+            },
+            "required": [
+                "code",
+                "host_name",
+                "last_updated",
+                "player_count"
+            ]
+        },
+        "RoomList": {
+            "title": "RoomList",
+            "type": "object",
+            "properties": {
+                "rooms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Room"
+                    },
+                    "title": "rooms"
+                }
+            },
+            "required": [
+                "rooms"
+            ]
+        },
+        "IGameState": {
+            "title": "IGameState",
+            "type": "object",
+            "properties": {
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Player"
+                    },
+                    "title": "players"
+                },
+                "chatLog": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "chatLog"
+                },
+                "turn_index": {
+                    "type": "number",
+                    "title": "turn_index"
+                },
+                "rolls": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "title": "rolls"
+                },
+                "used": {
+                    "type": "array",
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "title": "used"
+                },
+                "rolled": {
+                    "type": "boolean",
+                    "title": "rolled"
+                },
+                "victory": {
+                    "type": "boolean",
+                    "title": "victory"
+                },
+                "privateSession": {
+                    "type": "boolean",
+                    "title": "privateSession"
+                }
+            },
+            "required": [
+                "chatLog",
+                "players",
+                "privateSession",
+                "rolled",
+                "rolls",
+                "turn_index",
+                "used",
+                "victory"
+            ]
+        },
+        "GameState": {
+            "title": "GameState",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "game_state"
+                    ],
+                    "title": "type"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ServerPlayer"
+                    },
+                    "title": "players"
+                },
+                "chatLog": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "chatLog"
+                },
+                "turn_index": {
+                    "type": "number",
+                    "title": "turn_index"
+                },
+                "rolls": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "title": "rolls"
+                },
+                "used": {
+                    "type": "array",
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "title": "used"
+                },
+                "rolled": {
+                    "type": "boolean",
+                    "title": "rolled"
+                },
+                "victory": {
+                    "type": "boolean",
+                    "title": "victory"
+                },
+                "privateSession": {
+                    "type": "boolean",
+                    "title": "privateSession"
+                }
+            },
+            "required": [
+                "chatLog",
+                "players",
+                "privateSession",
+                "rolled",
+                "rolls",
+                "turn_index",
+                "type",
+                "used",
+                "victory"
+            ]
+        },
+        "WelcomeMsg": {
+            "title": "WelcomeMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "welcome"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                },
+                "players": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Player"
+                    },
+                    "title": "players"
+                },
+                "chatLog": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "chatLog"
+                },
+                "turn_index": {
+                    "type": "number",
+                    "title": "turn_index"
+                },
+                "rolls": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "title": "rolls"
+                },
+                "used": {
+                    "type": "array",
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "title": "used"
+                },
+                "rolled": {
+                    "type": "boolean",
+                    "title": "rolled"
+                },
+                "victory": {
+                    "type": "boolean",
+                    "title": "victory"
+                },
+                "privateSession": {
+                    "type": "boolean",
+                    "title": "privateSession"
+                }
+            },
+            "required": [
+                "chatLog",
+                "id",
+                "players",
+                "privateSession",
+                "rolled",
+                "rolls",
+                "turn_index",
+                "type",
+                "used",
+                "victory"
+            ]
+        },
+        "RestartMsg": {
+            "title": "RestartMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "restart"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "WinMsg": {
+            "title": "WinMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "win"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "RollMsg": {
+            "title": "RollMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "roll"
+                    ],
+                    "title": "type"
+                },
+                "rolls": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "title": "rolls"
+                }
+            },
+            "required": [
+                "rolls",
+                "type"
+            ]
+        },
+        "RollAgainMsg": {
+            "title": "RollAgainMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "roll_again"
+                    ],
+                    "title": "type"
+                }
+            },
+            "required": [
+                "type"
+            ]
+        },
+        "JoinMsg": {
+            "title": "JoinMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "join"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "user_id": {
+                    "type": "string",
+                    "title": "user_id"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "DisconnectMsg": {
+            "title": "DisconnectMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "disconnect"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "ReconnectMsg": {
+            "title": "ReconnectMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "reconnect"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "KickMsg": {
+            "title": "KickMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "kick"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "ChatMsg": {
+            "title": "ChatMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "chat"
+                    ],
+                    "title": "type"
+                },
+                "msg": {
+                    "type": "string",
+                    "title": "msg"
+                }
+            },
+            "required": [
+                "msg",
+                "type"
+            ]
+        },
+        "UpdateTurnMsg": {
+            "title": "UpdateTurnMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "update_turn"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                }
+            },
+            "required": [
+                "id",
+                "type"
+            ]
+        },
+        "UpdateNameMsg": {
+            "title": "UpdateNameMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "update_name"
+                    ],
+                    "title": "type"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "type"
+            ]
+        },
+        "UpdateMsg": {
+            "title": "UpdateMsg",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "update"
+                    ],
+                    "title": "type"
+                },
+                "id": {
+                    "type": "number",
+                    "title": "id"
+                },
+                "score": {
+                    "type": "number",
+                    "title": "score"
+                },
+                "used": {
+                    "type": "array",
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "title": "used"
+                },
+                "reset": {
+                    "type": "boolean",
+                    "title": "reset"
+                }
+            },
+            "required": [
+                "id",
+                "score",
+                "type"
+            ]
+        }
+    }
+}
