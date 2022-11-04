@@ -1,15 +1,6 @@
-//  To parse this JSON data, first install
-//
-//      json.hpp  https://github.com/nlohmann/json
-//
-//  Then include this file, and then do
-//
-//     Generators.hpp data = nlohmann::json::parse(jsonString);
 
-#pragma once
 
 #include "json.hpp"
-#include "helper.hpp"
 
 #include "UpdateMsg.hpp"
 #include "UpdateMsgType.hpp"

@@ -22,6 +22,8 @@ find . -type f \
   | grep -v Generators.hpp \
   | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
 
+sed -i -E '/pragma|helper.hpp|^\/\//d' Generators.hpp
+
 find . -type f \
   | xargs -L1 basename \
   | cut -d'.' -f1 \
