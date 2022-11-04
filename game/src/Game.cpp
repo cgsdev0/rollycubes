@@ -21,10 +21,6 @@ Game::~Game() {
 bool Game::isInitialized() { return state.players.size() > 0; }
 bool Game::isPrivate() const { return state.private_session; }
 
-bool isSignedIn(const API::ServerPlayer &player) {
-    return (player.session.find("guest:") != 0);
-}
-
 std::string Game::hostName() const {
     if (state.players.size() < 1)
         return "unknown";

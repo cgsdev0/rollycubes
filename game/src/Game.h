@@ -18,6 +18,10 @@ typedef std::function<void(std::string)> SendFunc;
 typedef std::function<void(std::string, std::string)> AuthSendFunc;
 typedef std::function<void(std::string, std::string, SendFunc)> AuthSendFunc2;
 
+inline bool isSignedIn(const API::ServerPlayer &player) {
+    return (player.session.find("guest:") != 0);
+}
+
 struct HandlerArgs {
     SendFunc send;
     AuthSendFunc reportStats;
@@ -98,7 +102,11 @@ class Game {
     API::WelcomeMsg toWelcomeMsg() {
         std::vector<API::Player> players;
         for(const auto& player : this->state.players) {
-          players.emplace_back(player.connected, player.crowned, player.name, player.score, player.user_id, player.user_data, player.win_count);
+          std::string user_id;
+          if (isSignedIn(player)) {
+            user_id = player.session;
+          }
+          players.emplace_back(player.connected, player.crowned, player.name, player.score, std::make_shared<std::string>(user_id), player.user_data, player.win_count);
         }
         return API::WelcomeMsg{
          .chat_log = this->state.chat_log,
