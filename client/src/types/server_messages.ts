@@ -14,7 +14,7 @@ export interface Room {
   code: string;
   host_name: string;
   last_updated: string;
-  player_count: bigint;
+  player_count: number;
 }
 
 export interface RoomList {
