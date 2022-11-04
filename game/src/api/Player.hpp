@@ -7,6 +7,8 @@
 namespace API {
 
     struct Player {
+std::string toString() const;
+void fromString(const std::string &str);
         bool connected;
         std::shared_ptr<bool> crowned;
         std::shared_ptr<std::string> name;

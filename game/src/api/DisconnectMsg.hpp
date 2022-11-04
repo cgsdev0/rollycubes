@@ -9,7 +9,9 @@ namespace API {
 namespace API {
 
     struct DisconnectMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         double id;
-        DisconnectMsgType type = 0;
+        DisconnectMsgType type = static_cast<DisconnectMsgType>(0);
     };
 }

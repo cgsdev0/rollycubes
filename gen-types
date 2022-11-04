@@ -20,14 +20,16 @@ cd game/src/api
 
 find . -type f \
   | grep -v Generators.hpp \
+  | grep -v helper.hpp \
   | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
 
-sed -i -E '/pragma|helper.hpp|^\/\//d' Generators.hpp
+sed -i -E '/pragma|^\/\//d' Generators.hpp
 
 find . -type f \
   | xargs -L1 basename \
   | cut -d'.' -f1 \
-  | xargs -I {} sed -i 's/{}Type type;/{}Type type = 0;/g' {}.hpp
+  | xargs -I {} sed -i 's/{}Type type;/{}Type type = static_cast<{}Type>(0);/g' {}.hpp
 
-rm helper.hpp
 mv Generators.hpp API.cpp
+
+grep "struct.*{" * -l | grep -vE 'helper\.hpp|API\.cpp' | xargs sed -ie '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'

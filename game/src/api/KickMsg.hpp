@@ -9,7 +9,9 @@ namespace API {
 namespace API {
 
     struct KickMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         double id;
-        KickMsgType type = 0;
+        KickMsgType type = static_cast<KickMsgType>(0);
     };
 }

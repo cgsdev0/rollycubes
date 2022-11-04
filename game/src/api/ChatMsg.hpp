@@ -9,7 +9,9 @@ namespace API {
 namespace API {
 
     struct ChatMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         std::string msg;
-        ChatMsgType type = 0;
+        ChatMsgType type = static_cast<ChatMsgType>(0);
     };
 }

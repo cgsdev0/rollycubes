@@ -9,6 +9,8 @@ namespace API {
 namespace API {
 
     struct RollAgainMsg {
-        RollAgainMsgType type = 0;
+std::string toString() const;
+void fromString(const std::string &str);
+        RollAgainMsgType type = static_cast<RollAgainMsgType>(0);
     };
 }

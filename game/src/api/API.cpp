@@ -1,6 +1,7 @@
 
 
 #include "json.hpp"
+#include "helper.hpp"
 
 #include "UpdateMsg.hpp"
 #include "UpdateMsgType.hpp"

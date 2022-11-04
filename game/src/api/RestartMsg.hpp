@@ -9,7 +9,9 @@ namespace API {
 namespace API {
 
     struct RestartMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         double id;
-        RestartMsgType type = 0;
+        RestartMsgType type = static_cast<RestartMsgType>(0);
     };
 }

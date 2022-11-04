@@ -9,7 +9,9 @@ namespace API {
 namespace API {
 
     struct UpdateTurnMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         double id;
-        UpdateTurnMsgType type = 0;
+        UpdateTurnMsgType type = static_cast<UpdateTurnMsgType>(0);
     };
 }
