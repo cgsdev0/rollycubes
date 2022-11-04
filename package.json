@@ -1,0 +1,26 @@
+{
+  "name": "rollycubes",
+  "version": "1.0.0",
+  "description": "<h1 align=\"center\">Rolly Cubes</h1>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "nocache": "^3.0.1",
+    "quicktype": "^15.1.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cgsdev0/rollycubes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cgsdev0/rollycubes/issues"
+  },
+  "homepage": "https://github.com/cgsdev0/rollycubes#readme"
+}
