@@ -2,10 +2,11 @@
 
 cd "${0%/*}"
 
-rm game/api/*
+mkdir -p game/src/api
+rm game/src/api/*
 
 ./node_modules/.bin/quicktype \
-  -o game/api/API.hpp \
+  -o game/src/api/API.hpp \
   --code-format with-struct \
   --no-boost \
   --source-style multi-source \
@@ -15,7 +16,7 @@ rm game/api/*
 
 # avert your eyes, this next part is a crime
 
-cd game/api
+cd game/src/api
 
 find . -type f \
   | grep -v Generators.hpp \
