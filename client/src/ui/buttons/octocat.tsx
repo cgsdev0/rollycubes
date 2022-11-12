@@ -18,7 +18,7 @@ export const Octocat = () => {
       target="_blank"
       href="https://github.com/cgsdev0/rollycubes"
       className={octocat()}
-      aria-label="View source on GitHub"
+      aria-label="View source on GitHub" rel="noreferrer"
     >
       <svg
         width="80"
