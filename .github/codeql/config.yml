@@ -1,0 +1,6 @@
+name: "CodeQL config"
+
+paths-ignore: 
+  - game/includes
+  - game/uWebSockets
+  - game/api
