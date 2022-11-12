@@ -8,7 +8,7 @@ OBJ=$(SRC:.cpp=.o)
 DEP=$(OBJ:.o=.d)
 
 $(TARGET): $(OBJ) $(UWS)
-	cd uWebSockets/uSockets && WITH_SSL=0 make
+	cd uWebSockets/uSockets && WITH_SSL=0 make CC=$(CC)
 	$(CXX) -flto $(CXXFLAGS) $(OBJ) -o $(TARGET) $(LDFLAGS) uWebSockets/uSockets/*.o;
 
 %.d: %.cpp
