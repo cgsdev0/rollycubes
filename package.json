@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "nocache": "^3.0.1",
-    "quicktype": "^15.1.0"
+    "quicktype": "^23.0.10"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
