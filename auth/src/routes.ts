@@ -47,18 +47,19 @@ export const Routes: Route[] = [
     action: "logout",
     requires_auth: true,
   },
-  {
-    method: "post",
-    route: "/register",
-    controller: UserController,
-    action: "register",
-  },
-  {
-    method: "post",
-    route: "/login",
-    controller: UserController,
-    action: "login",
-  },
+  // Disable user registration and login (twitch only for now)
+  // {
+  //   method: "post",
+  //   route: "/register",
+  //   controller: UserController,
+  //   action: "register",
+  // },
+  // {
+  //   method: "post",
+  //   route: "/login",
+  //   controller: UserController,
+  //   action: "login",
+  // },
   {
     method: "get",
     route: "/refresh_token",
