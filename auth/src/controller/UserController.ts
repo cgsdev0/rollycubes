@@ -180,33 +180,34 @@ export class UserController {
     let twitchId = await TwitchIdentity.findOne(user_id, {
       relations: ["user"],
     });
+    // Ask twitch for user details
+    const userDataResp = await fetch(
+      "https://api.twitch.tv/helix/users?id=" + user_id,
+      {
+        headers: {
+          Authorization: "Bearer " + twitch_access_token,
+          "Client-Id": client_id,
+        },
+      }
+    );
+    const { data } = await userDataResp.json();
+    const [twitchUserData] = data;
+
+    const user = twitchId ? twitchId.user : new User();
+    user.username = twitchUserData.display_name;
+    user.image_url = twitchUserData.profile_image_url;
+    user.hashed_password = "";
     if (!twitchId) {
       // registration flow
-
-      // Ask twitch for user details
-      const userDataResp = await fetch(
-        "https://api.twitch.tv/helix/users?id=" + user_id,
-        {
-          headers: {
-            Authorization: "Bearer " + twitch_access_token,
-            "Client-Id": client_id,
-          },
-        }
-      );
-      const { data } = await userDataResp.json();
-      const [twitchUserData] = data;
-      const user = new User();
-      user.username = twitchUserData.display_name;
-      user.image_url = twitchUserData.profile_image_url;
-      user.hashed_password = "";
       twitchId = new TwitchIdentity();
       twitchId.twitch_id = user_id;
       twitchId.twitch_login = login;
       await twitchId.save();
       user.twitch = twitchId;
-      await user.save();
-      twitchId.user = user;
     }
+    await user.save();
+    twitchId.user = user;
+
     // login flow
     return await this.login_helper(twitchId.user, response);
   }
