@@ -2,5 +2,5 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "devcontainer",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "postCreateCommand": "bash scripts/setup-dev-env"
+  "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/scripts/setup-dev-env &> /workspaces/${localWorkspaceFolderBasename}/setup-log.log"
 }
