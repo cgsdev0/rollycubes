@@ -10,3 +10,5 @@ gcm.cache/
 *.d
 **/.pre-shared-key
 auth/.twitch_secrets
+
+.setup-log.log
