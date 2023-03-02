@@ -27,4 +27,5 @@ jobs:
       with:
         imageName: ghcr.io/cgsdev0/rollycubes-devcontainer
         cacheFrom: ghcr.io/cgsdev0/rollycubes-devcontainer
+        subFolder: .github
         push: always
