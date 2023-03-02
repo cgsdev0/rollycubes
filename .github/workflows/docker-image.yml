@@ -3,7 +3,7 @@ name: Prebuild devcontainer
 on:
   push:
     branches: [ "main" ]
-    paths: [ '.devcontainer/Dockerfile' ]
+    paths: [ '.github/.devcontainer/Dockerfile' ]
   workflow_dispatch: {}
   
 jobs:

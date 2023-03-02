@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "${0%/*}/.."
+
 PRESHARED_KEY=$(head -c 48 /dev/urandom | base64)
 
 mkdir -p auth/secrets

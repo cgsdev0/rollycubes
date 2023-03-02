@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -eu 
+
+cd "${0%/*}/.."
+
+./create-dev-keys
+
+pushd auth
+npm install
+popd
+
+pushd client
+npm install
+popd
