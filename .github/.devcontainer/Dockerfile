@@ -1,5 +1,6 @@
-FROM mcr.microsoft.com/devcontainers/typescript-node
+FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
+# install gcc 11
 RUN apt update && \
   apt install -y build-essential manpages-dev software-properties-common && \
   add-apt-repository ppa:ubuntu-toolchain-r/test && \
@@ -12,3 +13,7 @@ RUN apt update && \
     --slave /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-11 \
     --slave /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-11 && \
   update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-11 110
+
+# install node and npm v19
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - &&\
+  apt-get install -y nodejs
