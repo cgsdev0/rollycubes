@@ -71,6 +71,8 @@ json Game::addPlayer(const PerSocketData &data) {
         return result;
     }
     auto &player = state.players.emplace_back();
+    player.crowned = std::make_shared<bool>(false);
+    player.win_count = 0;
     player.connected = true;
     player.session = data.session;
     if (isSignedIn(player)) {
@@ -453,6 +455,7 @@ void Game::update(HANDLER_ARGS) {
                 json win;
                 state.players[winnerId].win_count++;
                 for (uint i = 0; i < state.players.size(); ++i) {
+                    state.players[i].crowned = std::make_shared<bool>(false);
                     if (!isSignedIn(state.players[i])) continue;
                     API::ReportStats stats{
                         .doubles = state.players[i].doubles_count,
@@ -467,6 +470,8 @@ void Game::update(HANDLER_ARGS) {
                         /* broadcast(a.toString()); */
                     });
                 }
+
+                state.players[winnerId].crowned = std::make_shared<bool>(true);
 
                 win["type"] = "win";
                 win["id"] = winnerId;
@@ -505,6 +510,7 @@ void Game::update(HANDLER_ARGS) {
                     update["type"] = "update";
                     update["id"] = i;
                     update["score"] = 0;
+                    update["reset"] = true;
                     broadcast(update.dump());
                     break;
                 }
