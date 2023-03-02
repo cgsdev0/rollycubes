@@ -1,0 +1,20 @@
+name: Prebuild devcontainer
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: [ '.devcontainer/Dockerfile' ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Pre-build dev container image
+      uses: devcontainers/ci@v0.3
+      with:
+        imageName: ghcr.io/cgsdev0/rollycubes-devcontainer
+        cacheFrom: ghcr.io/cgsdev0/rollycubes-devcontainer
+        push: always
