@@ -44,7 +44,7 @@ class Connection extends React.Component<Props & DispatchProp> {
     console.log("Socket opened to room", this.props.room);
     this.props.dispatch({ type: "socket_open" });
     const name = localStorage.getItem("name");
-    if (this.websocket && this.props.authToken && this.props.mode === "play") {
+    if (this.websocket && this.props.authToken && this.props.mode === "room") {
       // test
       this.websocket.send(
         JSON.stringify({
@@ -130,7 +130,7 @@ class Connection extends React.Component<Props & DispatchProp> {
         portString = `:${window.location.port}`;
       }
       let userIdStr = "";
-      if (this.props.authToken && this.props.mode === "play") {
+      if (this.props.authToken && this.props.mode === "room") {
         const decoded: DecodedUserJWT = jwt_decode(this.props.authToken);
         userIdStr = "?userId=" + decoded.user_id;
       }
