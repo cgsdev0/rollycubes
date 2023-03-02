@@ -44,7 +44,7 @@ class Connection extends React.Component<Props & DispatchProp> {
     console.log("Socket opened to room", this.props.room);
     this.props.dispatch({ type: "socket_open" });
     const name = localStorage.getItem("name");
-    if (this.websocket && this.props.authToken) {
+    if (this.websocket && this.props.authToken && this.props.mode === "play") {
       // test
       this.websocket.send(
         JSON.stringify({
@@ -78,9 +78,9 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.props.navigate(`/${pathParts[1]}/${data.room}`, { replace: true });
     } else {
       // I'm sorry
-      const otherUsers = (window as any).REDUX_STORE.getState().auth.otherUsers;
-      const { authServiceOrigin } = (window as any).REDUX_STORE.getState()
-        .settings;
+      const reduxState = ((window as any).REDUX_STORE.getState() as ReduxState)
+      const otherUsers = reduxState.auth.otherUsers;
+      const { authServiceOrigin } =  reduxState.settings;
       const populateUser = (player: any) => {
         if (player.hasOwnProperty("user_id") && player.user_id) {
           if (!otherUsers.hasOwnProperty(player.user_id)) {
@@ -130,7 +130,7 @@ class Connection extends React.Component<Props & DispatchProp> {
         portString = `:${window.location.port}`;
       }
       let userIdStr = "";
-      if (this.props.authToken) {
+      if (this.props.authToken && this.props.mode === "play") {
         const decoded: DecodedUserJWT = jwt_decode(this.props.authToken);
         userIdStr = "?userId=" + decoded.user_id;
       }

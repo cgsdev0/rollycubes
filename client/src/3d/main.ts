@@ -148,15 +148,18 @@ export const destroyScene = async () => {
   }
   sceneInit = false;
 
-  var canvas: any = document.getElementById("renderCanvas");
-  canvas.setAttribute("class", "hidden");
-
   if (scene) {
     scene.dispose();
   }
   if (engine) {
     engine.dispose();
   }
+
+  var canvas: any = document.getElementById("renderCanvas");
+  const gl = canvas.getContext("webgl2");
+  gl.clearColor(0,0,0,0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
   document.removeEventListener("roll", rollListener);
   rollListener = undefined;
   document.removeEventListener("snapDice", snapListener);
@@ -187,7 +190,6 @@ export const initScene = async () => {
   //     }
   //   });
   var canvas: any = document.getElementById("renderCanvas");
-  canvas.classList.remove("hidden");
   // Load the 3D engine
   engine = new BABYLON.Engine(canvas, true, {
     preserveDrawingBuffer: true,

@@ -65,6 +65,11 @@ export const gameReducer = createReducer<GameState>(
       })
       .addCase("win", (state, action: WinMsg) => {
         state.players[action.id].win_count++;
+        state.players = state.players.map(player => {
+          player.crowned = false;
+          return player;
+        });
+        state.players[action.id].crowned = true;
         state.victory = true;
       })
       .addCase("update_turn", (state, action: UpdateTurnMsg) => {

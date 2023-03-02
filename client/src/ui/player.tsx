@@ -1,7 +1,7 @@
 import HorizontalScroll from "react-horizontal-scrolling";
 import { connect } from "react-redux";
 import { css } from "stitches.config";
-import { selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
+import { selectIsSpectator, selectSelfIndex, selectTurnIndex } from "../selectors/game_selectors";
 import { ReduxState } from "../store";
 import { Achievement, Player } from "../types/store_types";
 import Avatar from "./avatar";
@@ -18,6 +18,7 @@ interface Props {
   self_index?: number;
   turn_index: number;
   socket?: WebSocket;
+  isSpectator: boolean;
 }
 
 const playerName = css({
@@ -139,7 +140,7 @@ const PlayerComponent = (props: Props) => {
           <span className={playerName()}>{player.name || `User${n + 1}`}</span>
         </span>
         <span className={score()}>{JSON.stringify(player.score)}</span>
-        {player.connected ? null : (
+        {player.connected || props.isSpectator ? null : (
           <span className={kick()} onClick={onKick}>
             <KickIcon />
           </span>
@@ -236,6 +237,7 @@ const mapStateToProps = (state: ReduxState) => {
     self_index: selectSelfIndex(state),
     turn_index: selectTurnIndex(state),
     socket: state.connection.socket,
+    isSpectator: selectIsSpectator(state),
   };
 };
 

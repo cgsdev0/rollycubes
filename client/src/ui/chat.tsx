@@ -41,6 +41,18 @@ const ChatWrapper = styled("div", {
   height: "100%",
   display: "flex",
   flexDirection: "column",
+  a: {
+    textDecoration: "none",
+    textTransform: "none",
+    color: "$brand",
+    fontSize: "inherit",
+    letterSpacing: "inherit",
+  },
+  "a:hover": {
+    fontSize: "inherit",
+    textDecoration: "underline",
+    color: "$primaryDimmed",
+  },
 });
 
 const MessageBox = styled("div", {

@@ -1,68 +1,89 @@
-import React from "react";
-import { connect, DispatchProp } from "react-redux";
+import React from 'react'
+import { connect, DispatchProp } from 'react-redux'
 import {
   Location,
   NavigateFunction,
   useLocation,
   useNavigate,
   useParams,
-} from "react-router-dom";
-import OnboardPage from "./onboard_page";
-import { css } from "stitches.config";
-import Connection from "../connection";
-import { RequiresSession } from "../hocs/requires_session";
+} from 'react-router-dom'
+import OnboardPage from './onboard_page'
+import { css } from 'stitches.config'
+import Connection from '../connection'
+import { RequiresSession } from '../hocs/requires_session'
 import {
-  selectDoublesCount,
+  selectIs3d,
   selectIsReset,
   selectIsSpectator,
   selectSomebodyIsNice,
   selectTurnIndex,
   selectWinner,
-} from "../selectors/game_selectors";
-import { ReduxState } from "../store";
-import { Player } from "../types/store_types";
-import ChatBox from "../ui/chat";
-import GamePanel from "../ui/game_panel";
-import Players from "../ui/players";
+} from '../selectors/game_selectors'
+import { ReduxState } from '../store'
+import { Player } from '../types/store_types'
+import ChatBox from '../ui/chat'
+import GamePanel from '../ui/game_panel'
+import Players from '../ui/players'
+import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help'
+import { useDispatch } from 'react-redux'
+import { destroyScene, initScene } from '3d/main'
+import { PopText } from '../ui/poptext';
 
 interface Props {
-  doublesCount: number;
-  winner?: Player;
-  reset: boolean;
-  isSpectator: boolean;
-  turn: number;
-  somebodyIsNice: boolean;
-  authToken?: string | null;
+  winner?: Player
+  reset: boolean
+  isSpectator: boolean
+  turn: number
+  is3DMode: boolean
+  somebodyIsNice: boolean
+  authToken?: string | null
 }
 
 const flexColumn = css({
-  display: "flex",
-  flexDirection: "column",
-});
+  display: 'flex',
+  flexDirection: 'column',
+})
 
 const GamePage: React.FC<Props & DispatchProp> = ({
+  is3DMode,
   somebodyIsNice,
   authToken,
-  doublesCount,
   winner,
   reset,
   turn,
 }) => {
+  const [hasOnboarded, setHasOnboarded] = React.useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { mode, room } = useParams()
 
-  const [hasOnboarded, setHasOnboarded] = React.useState(false);
-  const navigate = useNavigate();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const location = useLocation();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { mode, room } = useParams();
+  const dispatch = useDispatch()
+
+  const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room';
+
+  const [showHelp, setShowHelp] = React.useState(false);
+
+  React.useEffect(() => {
+    if (is3DMode && !needsToOnboard) {
+    initScene();
+    return () => { destroyScene() } ;
+    }
+  }, [is3DMode, needsToOnboard]);
 
   if (!mode || !room) {
-    return <p>Error</p>;
+    return <p>Error</p>
   }
 
-  if (authToken === null && !hasOnboarded && mode === "room") {
-    return <OnboardPage intent={`${mode}/${room}`} onBoard={() => setHasOnboarded(true)}/>;
+
+  if (needsToOnboard) {
+    return (
+      <OnboardPage
+        intent={`${mode}/${room}`}
+        onBoard={() => setHasOnboarded(true)}
+      />
+    )
   }
+
   return (
     <React.Fragment>
       {authToken === undefined ? null : (
@@ -74,6 +95,21 @@ const GamePage: React.FC<Props & DispatchProp> = ({
         />
       )}
 
+      <div
+        id="floating-button-bar"
+        style={{
+          position: 'absolute',
+          top: -16,
+          left: 36,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        <HelpIcon onClick={() => setShowHelp((help) => !help)} />
+        <DiceIcon onClick={() => dispatch({ type: 'TOGGLE_3D' })} />
+        <HomeIcon onClick={() => navigate('/')} />
+      </div>
       {/* TODO: Refactor all this garbage */}
       {/* {doublesCount ? ( */}
       {/*   <h6 key={doublesCount} id="Doubles"> */}
@@ -92,51 +128,57 @@ const GamePage: React.FC<Props & DispatchProp> = ({
         <GamePanel />
         <Players />
       </div>
-      <ChatBox />
+      { showHelp ? <Rules /> : <ChatBox />}
+      <PopText />
     </React.Fragment>
-  );
-};
+  )
+}
 
 const Rules = () => {
   return (
     <div>
-      <h2>Rules</h2>
-      <p>Take turns rolling the dice, trying to reach a winning score.</p>
-      <p>Winning Scores:</p>
-      <ul>
-        <li>33</li>
-        <li>66, 67</li>
-        <li>98, 99, 100</li>
-      </ul>
-      <p>Additional Rules:</p>
-      <ul>
-        <li>
-          <strong>Sevens:</strong> split.
-        </li>
+      <h1>Rules</h1>
+      <p>On your turn:
+      <br />
+      <br />
+      <ol style={{ marginLeft: 40 }}>
+      <li>Roll the dice</li>
+      <li>Add the two dice together</li>
+      <li>Add or subtract the sum from your score</li>
+      </ol>
+      <br />
+      First player to reach a winning score wins!</p>
+      <br/>
+      <p>Additionally...</p>
+      <br />
+      <ul style={{ marginLeft: 40 }}>
         <li>
           <strong>Doubles:</strong> roll again.
         </li>
         <li>
-          If you match another player's score, they are <strong>reset</strong>{" "}
+          <strong>Sevens:</strong> split; treat the dice as separate rolls.
+        </li>
+        <li>
+          If you match another player's score, they are <strong>reset</strong>{' '}
           to 0.
         </li>
       </ul>
     </div>
-  );
-};
+  )
+}
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    doublesCount: selectDoublesCount(state),
+    is3DMode: selectIs3d(state),
     winner: selectWinner(state),
     turn: selectTurnIndex(state),
     reset: selectIsReset(state),
     isSpectator: selectIsSpectator(state),
     somebodyIsNice: selectSomebodyIsNice(state),
     authToken: state.auth.authToken,
-  };
-};
+  }
+}
 
-const ConnectedGamePage = connect(mapStateToProps)(GamePage);
+const ConnectedGamePage = connect(mapStateToProps)(GamePage)
 
-export default RequiresSession(ConnectedGamePage);
+export default RequiresSession(ConnectedGamePage)
