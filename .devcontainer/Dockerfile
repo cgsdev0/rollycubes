@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
 # Install the xz-utils package
 RUN apt update && \
-  apt install build-essential manpages-dev software-properties-common && \
+  apt install -y build-essential manpages-dev software-properties-common && \
   add-apt-repository ppa:ubuntu-toolchain-r/test && \
   apt update && \
-  sudo apt install gcc-11 g++-11 && \
+  sudo apt install -y gcc-11 g++-11 && \
   update-alternatives \
     --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 \
     --slave /usr/bin/g++ g++ /usr/bin/g++-9 \
