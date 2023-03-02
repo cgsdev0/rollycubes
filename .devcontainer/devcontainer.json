@@ -1,3 +1,6 @@
 {
-  "image": "ghcr.io/cgsdev0/rollycubes-devcontainer"
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "devcontainer",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+    "postCreateCommand": "bash scripts/setup-dev-env.sh"
 }
