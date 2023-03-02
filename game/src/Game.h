@@ -37,6 +37,7 @@ class Game {
     ~Game();
     Game(bool isPrivate) : Game() {
         this->state.private_session = isPrivate;
+        this->state.victory = false;
         this->state.players.reserve(MAX_PLAYERS);
         this->state.rolls.resize(DICE_COUNT);
         this->state.used.resize(DICE_COUNT);
