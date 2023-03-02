@@ -1,3 +1,5 @@
 {
-    "image": "ghcr.io/cgsdev0/rollycubes-devcontainer"
+  "build": {
+    "dockerfile": "Dockerfile"
+  }
 }
