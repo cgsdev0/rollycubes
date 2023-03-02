@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-set -eu 
+set -eux
 
 cd "${0%/*}/.."
 
-./create-dev-keys
+scripts/create-dev-keys
 
 pushd auth
 npm install
