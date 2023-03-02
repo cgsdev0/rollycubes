@@ -1,6 +1,3 @@
 {
-    "build": {
-        // Path is relataive to the devcontainer.json file.
-        "dockerfile": "Dockerfile"
-    }
+    "image": "ghcr.io/cgsdev0/rollycubes-devcontainer"
 }
