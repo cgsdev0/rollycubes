@@ -48,7 +48,7 @@ jobs:
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.channel }}
         
     - name: Build client
-      run: yarn install && ( yarn build || echo "errors are delicious nom nom nom" )
+      run: npm install && npm run build
       working-directory: client
       
     # Deploy it

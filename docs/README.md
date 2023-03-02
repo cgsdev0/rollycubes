@@ -9,7 +9,6 @@ And follow development [on Twitch.tv](https://twitch.tv/badcop_)!
 
 To run the dice game on your local machine, there are a few requirements.
 * You will need a compiler with C++17 support (g++ preferred)
-* You will need the yarn package manager (https://yarnpkg.com/lang/en/)
 * You will almost certainly want to be on linux
 
 ### Run the server
@@ -21,7 +20,7 @@ Alternatively, run `make && ./GameServer` in the `game` directory
 **NOTE: If you are not running a local auth server, be sure to set `NO_AUTH=true`**
 
 ### Run the client
-Use `cd client; yarn; yarn start`
+Use `cd client; npm i; npm start`
   - Navigate to `localhost:3000`
   - This will also hot reload any time you modify a file in the client folder
 
@@ -40,7 +39,7 @@ node client.js --host localhost --port 3001 --insecure --room wKvsbw
 
 ### Run the auth service locally (Optional)
 - `cd auth/devdb; docker-compose up -d` to set up the database
-- `yarn; yarn start` to run the service
+- `npm i; npm start` to run the service
 
 ## High-Level Service Overview
 ![Service architecture graph](/docs/system-graph.png?raw=true "Service architecture graph")
