@@ -10,7 +10,6 @@ import {
 import OnboardPage from './onboard_page'
 import { css } from 'stitches.config'
 import Connection from '../connection'
-import { RequiresSession } from '../hocs/requires_session'
 import {
   selectIs3d,
   selectIsReset,
@@ -181,4 +180,4 @@ const mapStateToProps = (state: ReduxState) => {
 
 const ConnectedGamePage = connect(mapStateToProps)(GamePage)
 
-export default RequiresSession(ConnectedGamePage)
+export default ConnectedGamePage

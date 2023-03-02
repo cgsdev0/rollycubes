@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { css } from "stitches.config";
-import { RequiresSession } from "../hocs/requires_session";
 import { Button } from "../ui/buttons/button";
 
 interface Game {
@@ -123,4 +122,4 @@ const HomePage = () => {
   );
 };
 
-export default RequiresSession(HomePage);
+export default HomePage;
