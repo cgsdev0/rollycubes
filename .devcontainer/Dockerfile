@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
-# Install the xz-utils package
+
 RUN apt update && \
   apt install -y build-essential manpages-dev software-properties-common && \
   add-apt-repository ppa:ubuntu-toolchain-r/test && \
