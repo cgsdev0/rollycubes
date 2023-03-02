@@ -11,7 +11,7 @@
     "quicktype": "^23.0.10"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm start\" \"cd auth; npm run start-dev\" \"cd game; sleep 10; ./run-server.sh\""
   },
   "repository": {
     "type": "git",
@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/cgsdev0/rollycubes/issues"
   },
-  "homepage": "https://github.com/cgsdev0/rollycubes#readme"
+  "homepage": "https://github.com/cgsdev0/rollycubes#readme",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
 }

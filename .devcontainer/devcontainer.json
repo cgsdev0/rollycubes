@@ -2,5 +2,6 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "devcontainer",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "postCreateCommand": "bash -c '/workspaces/${localWorkspaceFolderBasename}/scripts/setup-dev-env &> /workspaces/${localWorkspaceFolderBasename}/.setup-log.log'"
+  "postCreateCommand": "bash -c '/workspaces/${localWorkspaceFolderBasename}/scripts/setup-dev-env &> /workspaces/${localWorkspaceFolderBasename}/.setup-log.log'",
+  "forwardPorts": [3000]
 }
