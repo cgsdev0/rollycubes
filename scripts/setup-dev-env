@@ -6,6 +6,8 @@ cd "${0%/*}/.."
 
 scripts/create-dev-keys
 
+npm install
+
 pushd auth
 npm install
 popd
