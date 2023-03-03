@@ -2,6 +2,7 @@ version: '3'
 services:
   auth:
     image: ghcr.io/cgsdev0/rollycubes-auth
+    restart: always
     environment:
       - "ROLLY_CUBES_AUTH_PASSPHRASE"
     depends_on:
@@ -12,6 +13,7 @@ services:
       - ../secrets/:/secrets
   postgres:
     image: "postgres:9.6.1"
+    restart: always
     environment:
       POSTGRES_USER: "test"
       POSTGRES_PASSWORD: "test"
