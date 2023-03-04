@@ -2,11 +2,8 @@
 <h1 align="center">Rolly Cubes</h1>
 
 <p align="center">
-  <a href="https://lgtm.com/projects/g/cgsdev0/rollycubes/context:cpp">
-    <img src="https://img.shields.io/lgtm/grade/cpp/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)" />
-  </a>
-  <a href="https://lgtm.com/projects/g/cgsdev0/rollycubes/context:javascript">
-    <img src="https://img.shields.io/lgtm/grade/javascript/g/cgsdev0/rollycubes.svg?logo=lgtm&logoWidth=18)" />
+  <a href="https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=208182009&machine=basicLinux32gb&devcontainer_path=.devcontainer%2Fdevcontainer.json&location=WestUs2">
+    <img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" />
   </a>
 </p>
 
@@ -20,6 +17,7 @@
 </p>
 
 <p align="center">
-  Want to contribute?<br/>
+  <strong>Want to contribute?</strong>
+  <br/>
   [<a href="https://docs.rollycubes.com/">Developer Documentation</a>]
 </p>
