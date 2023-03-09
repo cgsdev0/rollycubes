@@ -22,6 +22,9 @@ env:
 
 jobs:
   build:
+    environment: 
+      name: ${{ github.event.inputs.channel }}
+      url: ${{ fromJson('{ "prod": "https://rollycubes.com", "beta": "https://beta.rollycubes.com" }')[github.event.inputs.channel] }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
