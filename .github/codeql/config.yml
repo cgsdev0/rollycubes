@@ -4,3 +4,4 @@ paths-ignore:
   - game/includes
   - game/uWebSockets
   - game/api
+  - game/prometheus-cpp
