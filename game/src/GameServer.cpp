@@ -402,16 +402,9 @@ int main(int argc, char **argv) {
     AuthServerRequestQueue authServer(baseAuthUrl, uWS::Loop::get());
 
     auto registry = std::make_shared<prometheus::Registry>();
-    auto& packet_counter = prometheus::BuildCounter()
-                             .Name("observed_packets_total")
-                             .Help("Number of observed packets")
-                             .Register(*registry);
-    auto& tcp_rx_counter =
-      packet_counter.Add({{"protocol", "tcp"}, {"direction", "rx"}});
 
     uWS::App app;
     app.get("/metrics", [&](auto *res, auto *req) {
-            tcp_rx_counter.Increment();
             const prometheus::TextSerializer serializer;
             auto metrics =  registry->Collect();
             res->write(serializer.Serialize(metrics));
