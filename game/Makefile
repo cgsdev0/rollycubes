@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++20 -W -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes -Iprometheus-cpp/pull/include
+CXXFLAGS=-std=c++20 -W -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes -Iprometheus-cpp/core/include
 LDFLAGS=-lprometheus-cpp-pull -lprometheus-cpp-core -lz -lpthread -lssl -lcrypto
 TARGET=GameServer
 
