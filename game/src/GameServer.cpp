@@ -28,6 +28,10 @@
 #include "JWTVerifier.h"
 #include "MoveOnlyFunction.h"
 
+#include <prometheus/counter.h>
+#include <prometheus/registry.h>
+#include <prometheus/text_serializer.h>
+
 // for convenience
 using json = nlohmann::json;
 
@@ -188,13 +192,19 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
     }
 }
 
-uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer) {
+uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer, std::shared_ptr<prometheus::Registry> registry) {
+
+  auto& ws_counter = prometheus::BuildGauge()
+                             .Name("websocket_conn_total")
+                             .Help("Number of websocket connections total")
+                             .Register(*registry).Add({});
+
     return {/* Settings */
             .compression = uWS::SHARED_COMPRESSOR,
             .maxPayloadLength = 16 * 1024,
             /* Handlers */
             .upgrade =
-                [](auto *res, auto *req, auto *context) {
+                [&, app](auto *res, auto *req, auto *context) {
                     std::string session = getSession(req);
                     bool is_verified = true;
                     std::string mode = std::string(req->getParameter(0));
@@ -216,6 +226,8 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     res->template upgrade<PerSocketData>(
                         {.session = session,
                          .room = room,
+                         .display_name = "",
+                         .user_id = "",
                          .is_verified = is_verified,
                          .spectator = (mode == "spectate"),
                          .dedupe_conns = dedupe_conns},
@@ -225,7 +237,8 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         context);
                 },
             .open =
-                [app](auto *ws) {
+                [&, app](auto *ws) {
+                    ws_counter.Increment();
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
 
@@ -248,7 +261,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     connectNewPlayer(app, ws, userData);
                 },
             .message =
-                [app, &jwt_verifier, &authServer](auto *ws, std::string_view message, uWS::OpCode opCode) {
+                [&, app](auto *ws, std::string_view message, uWS::OpCode opCode) {
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
 
@@ -319,9 +332,10 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         ws->send(response, uWS::OpCode::TEXT);
                 },
             .close =
-                [app](auto *ws, int code, std::string_view message) {
+                [&, app](auto *ws, int code, std::string_view message) {
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
+                    ws_counter.Decrement();
 
                     if (userData->spectator) return;
                     if (userData->dedupe_conns) return;
@@ -387,9 +401,23 @@ int main(int argc, char **argv) {
 
     AuthServerRequestQueue authServer(baseAuthUrl, uWS::Loop::get());
 
+    auto registry = std::make_shared<prometheus::Registry>();
+    auto& packet_counter = prometheus::BuildCounter()
+                             .Name("observed_packets_total")
+                             .Help("Number of observed packets")
+                             .Register(*registry);
+    auto& tcp_rx_counter =
+      packet_counter.Add({{"protocol", "tcp"}, {"direction", "rx"}});
+
     uWS::App app;
-    app.get("/list",
-            [](auto *res, auto *req) {
+    app.get("/metrics", [&](auto *res, auto *req) {
+            tcp_rx_counter.Increment();
+            const prometheus::TextSerializer serializer;
+            auto metrics =  registry->Collect();
+            res->write(serializer.Serialize(metrics));
+            res->end();
+        }).get("/list",
+            [&](auto *res, auto *req) {
                 res->writeHeader("Content-Type", "application/json");
                 API::RoomList respList;
                 for (auto const &[code, game] : games) {
@@ -408,7 +436,7 @@ int main(int argc, char **argv) {
                 res->end();
             })
         .get("/create",
-             [](auto *res, auto *req) {
+             [&](auto *res, auto *req) {
                  std::string session = getSession(req);
                  bool isPrivate = true;
                  if (req->getQuery().find("public") != std::string::npos) {
@@ -422,7 +450,7 @@ int main(int argc, char **argv) {
              })
         .ws<PerSocketData>(
             "/ws/:mode/:room",
-            makeWebsocketBehavior(&app, jwt_verifier, authServer))
+            makeWebsocketBehavior(&app, jwt_verifier, authServer, registry))
         .listen(port,
                 [port](auto *token) {
                     if (token) {

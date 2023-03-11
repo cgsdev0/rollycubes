@@ -1,6 +1,6 @@
 CXX=g++
-CXXFLAGS=-std=c++20 -Wall -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes
-LDFLAGS=-lz -lpthread -lssl -lcrypto
+CXXFLAGS=-std=c++20 -W -IuWebSockets/src -IuWebSockets/uSockets/src -Iincludes -Iprometheus-cpp/pull/include
+LDFLAGS=-lprometheus-cpp-pull -lprometheus-cpp-core -lz -lpthread -lssl -lcrypto
 TARGET=GameServer
 
 SRC=$(shell find src/ -type f -name '*.cpp')

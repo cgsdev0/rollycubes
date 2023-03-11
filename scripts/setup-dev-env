@@ -32,3 +32,4 @@ cd _build
 cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF
 cmake --build . --parallel 4
 sudo cmake --install .
+sudo ldconfig

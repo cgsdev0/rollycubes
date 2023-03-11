@@ -111,6 +111,7 @@ class Game {
         }
         return API::WelcomeMsg{
          .chat_log = this->state.chat_log,
+         .id = -1,
          .players = players,
          .private_session = this->state.private_session,
          .rolled = this->state.rolled,
@@ -118,7 +119,7 @@ class Game {
          .turn_index = this->state.turn_index,
          .used = this->state.used,
          .victory = this->state.victory
-            };
+        };
     }
 
     std::string toString() const {
