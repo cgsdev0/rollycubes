@@ -27,7 +27,7 @@
     "node-fetch": "2",
     "pg": "^8.4.0",
     "reflect-metadata": "^0.1.10",
-    "typeorm": "0.2.40"
+    "typeorm": "0.3.14"
   },
   "scripts": {
     "start": "bash -c 'source .env; ts-node src/index.ts'",
