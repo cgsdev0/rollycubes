@@ -5,9 +5,8 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.2",
     "@stitches/react": "^1.2.8",
-    "babylonjs": "^4.2.0",
-    "babylonjs-loaders": "^4.2.0",
-    "cannon": "^0.6.2",
+    "babylonjs": "^5.57.0",
+    "babylonjs-loaders": "^5.57.0",
     "http-proxy-middleware": "^2.0.6",
     "jwt-decode": "^3.1.2",
     "react": "^18.1.0",
@@ -53,7 +52,6 @@
     ]
   },
   "devDependencies": {
-    "@types/cannon": "^0.1.5",
     "@types/jest": "24.0.18",
     "@types/jwt-decode": "^3.1.0",
     "@types/node": "12.7.5",

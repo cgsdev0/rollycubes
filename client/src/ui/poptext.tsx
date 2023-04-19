@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { styled, css, keyframes } from 'stitches.config';
+import { styled, keyframes } from 'stitches.config';
 import {
   selectLatestPopText,
   selectCrownedPlayer,
