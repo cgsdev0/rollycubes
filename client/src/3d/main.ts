@@ -184,10 +184,13 @@ export const destroyScene = async () => {
   snapListener = undefined
 }
 export const initScene = async () => {
-  if (sceneInit) {
+  if (sceneInit || !window.hasOwnProperty('Ammo')) {
     return
   }
   await (window as any).Ammo()
+  if (typeof (window as any).Ammo === 'function') {
+    await (window as any).Ammo()
+  }
   sceneInit = true
   // const result = await window.fetch("http://localhost:3000/simulated.txt");
   // const data = await result.text();
