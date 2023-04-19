@@ -1,6 +1,5 @@
-import { useDonateMutation } from 'api/auth';
 import React from 'react';
-import { connect, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 import { styled } from 'stitches.config';
 import {
   selectHasMultiplePlayers,
@@ -11,7 +10,7 @@ import {
 import { ReduxState } from '../../store';
 import { Button } from './button';
 
-type Props = ReturnType<typeof mapStateToProps>;
+type Props = ReturnType<typeof mapStateToProps>
 
 const Subtitle = styled('p', {
   color: '$primaryDimmed',
@@ -41,9 +40,9 @@ const RollButton: React.FC<Props> = ({
     if (socket) {
       socket.send(JSON.stringify({ type: 'roll' }));
     }
-  };
-  if (victory) return null;
-  if (!hasEnoughPlayers) return <Subtitle>Waiting for players...</Subtitle>;
+  }
+  if (victory) return null
+  if (!hasEnoughPlayers) return <Subtitle>Waiting for players...</Subtitle>
   if (!myTurn)
     return (
       <Subtitle>
@@ -60,7 +59,7 @@ const mapStateToProps = (state: ReduxState) => {
     myTurn: selectIsMyTurn(state),
     turnName: selectTurnName(state),
     victory: selectIsGameOver(state),
-  };
-};
+  }
+}
 
-export default connect(mapStateToProps)(RollButton);
+export default connect(mapStateToProps)(RollButton)
