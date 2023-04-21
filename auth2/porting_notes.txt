@@ -1,0 +1,39 @@
+GET /users (DEPRECATED)
+
+Public Routes
+===========================
+[ ] POST /twitch_login_or_register
+[X] GET /public_key
+[ ] GET /users/:id
+[ ] GET /me
+[X] POST /logout
+[ ] GET /refresh_token <-- should be POST
+   --> cookie should have path=/refresh
+
+Server Routes - should not require csrf
+--> nested router?
+===========================
+[ ] POST /add_stats
+[ ] POST /achievement_progress
+
+
+
+
+
+
+
+
+Domains:
+ * rollycubes.com
+ * beta.rollycubes.com
+ * auth.rollycubes.com
+ * dev.rollycubes.com
+
+:(
+ * rollycubes.live
+
+
+
+
+
+
