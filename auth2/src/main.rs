@@ -74,12 +74,31 @@ async fn main() {
 }
 
 #[derive(Serialize)]
+struct PlayerStats {
+    rolls: i32,
+    doubles: i32,
+    games: i32,
+    wins: i32,
+}
+
+#[derive(Serialize)]
+struct AchievementProgress {
+    #[serde(rename = "achievementId")]
+    achievement_id: String,
+    progress: i32,
+    #[serde(with = "time::serde::rfc3339::option")]
+    unlocked: Option<OffsetDateTime>,
+}
+
+#[derive(Serialize)]
 struct User {
     id: Uuid,
     username: String,
     image_url: String,
     #[serde(rename = "createdDate", with = "time::serde::rfc3339")]
     created_date: OffsetDateTime,
+    achievements: Vec<AchievementProgress>,
+    stats: Option<PlayerStats>,
 }
 
 #[axum::debug_handler]
@@ -87,26 +106,63 @@ async fn user_by_id(
     Path(user_id): Path<Uuid>,
     State(client): State<Arc<Client>>,
 ) -> Result<Json<User>, StatusCode> {
-    println!("{}", user_id);
-    let result = client.query("SELECT id, username, image_url, \"user\".\"createdDate\" as fuck FROM public.\"user\" LEFT JOIN user_to_achievement ON id=\"userId\" WHERE id=$1::UUID", &[&user_id]).await;
+    let result = client
+        .query(
+            "
+SELECT
+    id,
+    username,
+    image_url,
+    \"user\".\"createdDate\" as created_date,
+    user_to_achievement.\"achievementId\" as achievement_id,
+    unlocked,
+    progress,
+    rolls,
+    doubles,
+    games,
+    wins
+FROM public.\"user\"
+LEFT JOIN user_to_achievement ON id=user_to_achievement.\"userId\"
+LEFT JOIN player_stats ON id=player_stats.\"userId\"
+WHERE id=$1::UUID",
+            &[&user_id],
+        )
+        .await;
     match result {
-        Ok(rows) => match rows.len() {
-            0 => Err(StatusCode::IM_A_TEAPOT),
-            _ => {
-                let row = &rows[0];
-                let user = User {
-                    id: row.get("id"),
-                    username: row.get("username"),
-                    image_url: row.get("image_url"),
-                    created_date: row.get::<'_, _, PrimitiveDateTime>("fuck").assume_utc(),
-                };
-                Ok(Json(user))
-            }
-        },
+        Ok(rows) if !rows.is_empty() => {
+            let row = &rows[0];
+            let rolls: Option<i32> = row.get("rolls");
+            let user = User {
+                id: row.get("id"),
+                username: row.get("username"),
+                image_url: row.get("image_url"),
+                created_date: row
+                    .get::<'_, _, PrimitiveDateTime>("created_date")
+                    .assume_utc(),
+                stats: rolls.map(|_| PlayerStats {
+                    rolls: row.get("rolls"),
+                    games: row.get("games"),
+                    wins: row.get("wins"),
+                    doubles: row.get("doubles"),
+                }),
+                achievements: rows
+                    .iter()
+                    .map(|r| AchievementProgress {
+                        achievement_id: r.get("achievement_id"),
+                        unlocked: r
+                            .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
+                            .map(PrimitiveDateTime::assume_utc),
+                        progress: r.get("progress"),
+                    })
+                    .collect(),
+            };
+            Ok(Json(user))
+        }
         Err(e) => {
             println!("{}", e);
             Err(StatusCode::IM_A_TEAPOT)
         }
+        _ => Err(StatusCode::IM_A_TEAPOT),
     }
 }
 
