@@ -6,33 +6,72 @@ use axum::{
     Json, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
+use bb8_postgres::PostgresConnectionManager;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use time::{OffsetDateTime, PrimitiveDateTime};
+use time::{Duration, OffsetDateTime, PrimitiveDateTime};
 use tokio_postgres::{tls::NoTlsStream, Client, Connection, NoTls, Socket};
+use twitch_oauth2::{AccessToken, TwitchToken, UserToken};
 use uuid::Uuid;
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Claims {
+    exp: i64,
+    user_id: Uuid,
+    display_name: String,
+}
+
+impl Claims {
+    fn new(user_id: Uuid, display_name: String) -> Claims {
+        let exp = OffsetDateTime::now_utc()
+            .checked_add(Duration::hours(2))
+            .unwrap()
+            .unix_timestamp();
+        Claims {
+            exp,
+            user_id,
+            display_name,
+        }
+    }
+}
 
 mod embedded {
     use refinery::embed_migrations;
     embed_migrations!("migrations");
 }
 
+#[derive(Clone)]
+struct RouterState {
+    jwt_signer: Arc<JWTSigner>,
+    pool: bb8::Pool<PostgresConnectionManager<NoTls>>,
+}
+
+struct JWTSigner {
+    private_key: String,
+}
+impl JWTSigner {
+    fn sign_jwt(&self, claims: Claims) -> Result<String, Error> {
+        let token = jsonwebtoken::encode(
+            &jsonwebtoken::Header::new(jsonwebtoken::Algorithm::RS256),
+            &claims,
+            &jsonwebtoken::EncodingKey::from_rsa_pem(self.private_key.as_bytes())?,
+        )?;
+        return Ok(token);
+    }
+}
+
 #[tokio::main]
 async fn main() {
-    let (mut client, con) =
-        tokio_postgres::connect("host=localhost user=test password=test", NoTls)
-            .await
-            .unwrap();
+    let manager = bb8_postgres::PostgresConnectionManager::new_from_stringlike(
+        "host=localhost user=test password=test",
+        NoTls,
+    )
+    .unwrap();
+    let pool = bb8::Pool::builder().build(manager).await.unwrap();
 
-    tokio::spawn(async move {
-        if let Err(e) = con.await {
-            panic!("connection error: {}", e);
-        }
-    });
-
-    run_migrations(&mut client)
+    run_migrations(&mut pool.get().await.unwrap())
         .await
         .expect("can run DB migrations: {}");
 
@@ -40,13 +79,19 @@ async fn main() {
         fs::read_to_string("./secrets/.id.pub").expect("Should have been able to read the file"),
     );
 
-    let shared_client = Arc::new(client);
+    let router_state = RouterState {
+        jwt_signer: Arc::new(JWTSigner {
+            private_key: fs::read_to_string("./secrets/.id")
+                .expect("Should have been able to read the file"),
+        }),
+        pool,
+    };
 
     tracing_subscriber::fmt::init();
 
     // build our application with a route
     let user_routes = Router::new()
-        // .route("/twitch_login_or_register", post(login))
+        .route("/twitch_login_or_register", post(login))
         .route("/logout", post(logout))
         // .route("/refresh_token", get(refresh_token))
         .route(
@@ -63,7 +108,7 @@ async fn main() {
     let app = Router::new()
         .nest("/", user_routes)
         .nest("/server", server_routes)
-        .with_state(Arc::clone(&shared_client));
+        .with_state(router_state);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3031));
     tracing::debug!("listening on {}", addr);
@@ -97,15 +142,144 @@ struct User {
     image_url: String,
     #[serde(rename = "createdDate", with = "time::serde::rfc3339")]
     created_date: OffsetDateTime,
-    achievements: Vec<AchievementProgress>,
+    achievements: Option<Vec<AchievementProgress>>,
     stats: Option<PlayerStats>,
+}
+
+#[derive(Serialize)]
+struct LoginResponse {
+    access_token: String,
+}
+
+#[derive(Deserialize)]
+struct LoginPayload {
+    twitch_access_token: String,
+}
+
+#[axum::debug_handler]
+async fn login(
+    State(s): State<RouterState>,
+    jar: CookieJar,
+    Json(payload): Json<LoginPayload>,
+) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
+    let token = AccessToken::new(payload.twitch_access_token);
+    let http_client = reqwest::Client::new();
+    let twitch_client = twitch_api::HelixClient::with_client(http_client.clone());
+    let Ok(mut client) = s.pool.get().await else {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
+
+    match UserToken::from_existing(&http_client, token, None, None).await {
+        Ok(t) => {
+            // TODO: check this for a match t.client_id().as_str();
+            let twitch_user = twitch_client.get_user_from_id(&t.user_id, &t).await;
+            let Ok(Some(user)) = twitch_user else {
+                return Err(StatusCode::IM_A_TEAPOT);
+            };
+            let result = client
+                .query_one(
+                    "
+SELECT twitch_id, \"userId\" FROM twitch_identity
+WHERE twitch_id = $1::TEXT",
+                    &[&t.user_id.as_str()],
+                )
+                .await;
+            let x = if let Ok(row) = result {
+                let id: Uuid = row.get("userId");
+                // Update the existing user
+                client
+                    .execute(
+                        "
+UPDATE public.\"user\"
+SET
+    username = $1::TEXT,
+    image_url = $2::TEXT
+WHERE
+    id = $3::UUID
+",
+                        &[&user.display_name.as_str(), &user.profile_image_url, &id],
+                    )
+                    .await
+                    .unwrap();
+                id
+            } else {
+                // Create the user
+                let id = Uuid::new_v4();
+
+                let Ok(transaction) = client.transaction().await else {
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                };
+                transaction
+                    .execute(
+                        "
+INSERT INTO public.\"user\" (username, image_url, id)
+VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
+                        &[&user.display_name.as_str(), &user.profile_image_url, &id],
+                    )
+                    .await
+                    .unwrap();
+                transaction
+                    .execute(
+                        "
+INSERT INTO twitch_identity (twitch_id, twitch_login, \"userId\")
+VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
+                        &[&t.user_id.as_str(), &t.login.as_str(), &id],
+                    )
+                    .await
+                    .unwrap();
+                let Ok(_) = transaction.commit().await else {
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                };
+                id
+            };
+            // Do the login
+            match s
+                .jwt_signer
+                .sign_jwt(Claims::new(x, user.display_name.to_string()))
+            {
+                Ok(access_token) => {
+                    // Create a refresh token
+                    let token_id = Uuid::new_v4();
+                    let exp = OffsetDateTime::now_utc()
+                        .checked_add(Duration::days(30))
+                        .unwrap();
+                    client
+                        .execute(
+                            "
+INSERT INTO refresh_token (id, \"userId\")
+VALUES ($1::UUID, $2::UUID)",
+                            &[&token_id, &x],
+                        )
+                        .await
+                        .unwrap();
+                    Ok((
+                        jar.add(
+                            Cookie::build("refresh_token", token_id.to_string())
+                                .secure(true)
+                                .http_only(true)
+                                .same_site(axum_extra::extract::cookie::SameSite::None)
+                                .path("/refresh_token")
+                                .expires(exp)
+                                .finish(),
+                        ),
+                        Json(LoginResponse { access_token }),
+                    ))
+                }
+                Err(_e) => Err(StatusCode::FORBIDDEN),
+            }
+        }
+        Err(..) => Err(StatusCode::IM_A_TEAPOT),
+    }
 }
 
 #[axum::debug_handler]
 async fn user_by_id(
     Path(user_id): Path<Uuid>,
-    State(client): State<Arc<Client>>,
+    State(s): State<RouterState>,
 ) -> Result<Json<User>, StatusCode> {
+    let Ok(client) = s.pool.get().await else {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
     let result = client
         .query(
             "
@@ -145,28 +319,28 @@ WHERE id=$1::UUID",
                     wins: row.get("wins"),
                     doubles: row.get("doubles"),
                 }),
-                achievements: rows
-                    .iter()
-                    .map(|r| AchievementProgress {
-                        achievement_id: r.get("achievement_id"),
-                        unlocked: r
-                            .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
-                            .map(PrimitiveDateTime::assume_utc),
-                        progress: r.get("progress"),
-                    })
-                    .collect(),
+                achievements: Some(
+                    rows.iter()
+                        .map(|r| AchievementProgress {
+                            achievement_id: r.get("achievement_id"),
+                            unlocked: r
+                                .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
+                                .map(PrimitiveDateTime::assume_utc),
+                            progress: r.get("progress"),
+                        })
+                        .collect(),
+                ),
             };
             Ok(Json(user))
-        }
-        Err(e) => {
-            println!("{}", e);
-            Err(StatusCode::IM_A_TEAPOT)
         }
         _ => Err(StatusCode::IM_A_TEAPOT),
     }
 }
 
-async fn logout(jar: CookieJar, State(client): State<Arc<Client>>) -> CookieJar {
+async fn logout(jar: CookieJar, State(s): State<RouterState>) -> Result<CookieJar, StatusCode> {
+    let Ok(client) = s.pool.get().await else {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
     // 1. check for refresh cookie
     if let Some(token) = jar.get("refresh_token") {
         // DELETE FROM refresh_token WHERE id=token.value()
@@ -181,9 +355,9 @@ async fn logout(jar: CookieJar, State(client): State<Arc<Client>>) -> CookieJar 
                 .ok();
         }
         // 3. clear the refresh cookie in the response
-        return jar.remove(Cookie::named("refresh_token"));
+        return Ok(jar.remove(Cookie::named("refresh_token")));
     }
-    jar
+    Ok(jar)
 }
 
 async fn public_key(public_key_text: Arc<String>) -> String {

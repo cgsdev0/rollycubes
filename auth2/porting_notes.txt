@@ -1,10 +1,12 @@
 GET /users (DEPRECATED)
+TODO: remove passphrase on prod rsa key
+ssh-keygen -p -m PKCS8
 
 Public Routes
 ===========================
-[ ] POST /twitch_login_or_register
+[X] POST /twitch_login_or_register
 [X] GET /public_key
-[ ] GET /users/:id
+[X] GET /users/:id
 [ ] GET /me
 [X] POST /logout
 [ ] GET /refresh_token <-- should be POST
