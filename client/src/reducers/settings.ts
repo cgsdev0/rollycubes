@@ -14,8 +14,8 @@ const LOCAL_AUTH_SERVICE = 'http://localhost:3031/'
 export const settingsReducer = createReducer<SettingsState>(
   {
     cheats: true,
-    sick3dmode: localStorage.getItem('3d_mode') !== "false",
-    authServiceOrigin: PROD_AUTH_SERVICE,
+    sick3dmode: localStorage.getItem('3d_mode') !== 'false',
+    authServiceOrigin: LOCAL_AUTH_SERVICE,
   },
   (builder) => {
     builder
@@ -23,10 +23,9 @@ export const settingsReducer = createReducer<SettingsState>(
         state.sick3dmode = !state.sick3dmode
         // TODO: remove these side effects
         if (!state.sick3dmode) {
-          localStorage.setItem('3d_mode', "false");
-        }
-        else {
-          localStorage.removeItem('3d_mode');
+          localStorage.setItem('3d_mode', 'false')
+        } else {
+          localStorage.removeItem('3d_mode')
         }
       })
       .addCase('CHEATS', (state, action: CheatsAction) => {
