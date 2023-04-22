@@ -1,6 +1,7 @@
+use axum::http::{HeaderName, HeaderValue, Method};
 use axum::{
     extract::{Path, State},
-    http::StatusCode,
+    http::{header::HeaderMap, StatusCode},
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
@@ -13,6 +14,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use time::{Duration, OffsetDateTime, PrimitiveDateTime};
 use tokio_postgres::{tls::NoTlsStream, Client, Connection, NoTls, Socket};
+use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
 use twitch_oauth2::{AccessToken, TwitchToken, UserToken};
 use uuid::Uuid;
 
@@ -24,7 +26,7 @@ struct Claims {
 }
 
 impl Claims {
-    fn new(user_id: Uuid, display_name: String) -> Claims {
+    fn new(user_id: Uuid, display_name: &str) -> Claims {
         let exp = OffsetDateTime::now_utc()
             .checked_add(Duration::hours(2))
             .unwrap()
@@ -32,7 +34,7 @@ impl Claims {
         Claims {
             exp,
             user_id,
-            display_name,
+            display_name: display_name.to_string(),
         }
     }
 }
@@ -44,14 +46,15 @@ mod embedded {
 
 #[derive(Clone)]
 struct RouterState {
-    jwt_signer: Arc<JWTSigner>,
+    jwt: Arc<Jwt>,
     pool: bb8::Pool<PostgresConnectionManager<NoTls>>,
 }
 
-struct JWTSigner {
+struct Jwt {
     private_key: String,
+    public_key: String,
 }
-impl JWTSigner {
+impl Jwt {
     fn sign_jwt(&self, claims: Claims) -> Result<String, Error> {
         let token = jsonwebtoken::encode(
             &jsonwebtoken::Header::new(jsonwebtoken::Algorithm::RS256),
@@ -59,6 +62,13 @@ impl JWTSigner {
             &jsonwebtoken::EncodingKey::from_rsa_pem(self.private_key.as_bytes())?,
         )?;
         return Ok(token);
+    }
+    fn verify(&self, token: &str) -> Result<jsonwebtoken::TokenData<Claims>, anyhow::Error> {
+        Ok(jsonwebtoken::decode::<Claims>(
+            &token,
+            &jsonwebtoken::DecodingKey::from_rsa_pem(self.public_key.as_bytes())?,
+            &jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::RS256),
+        )?)
     }
 }
 
@@ -75,17 +85,34 @@ async fn main() {
         .await
         .expect("can run DB migrations: {}");
 
-    let public_key_text = Arc::new(
-        fs::read_to_string("./secrets/.id.pub").expect("Should have been able to read the file"),
-    );
-
     let router_state = RouterState {
-        jwt_signer: Arc::new(JWTSigner {
+        jwt: Arc::new(Jwt {
             private_key: fs::read_to_string("./secrets/.id")
+                .expect("Should have been able to read the file"),
+            public_key: fs::read_to_string("./secrets/.id.pub")
                 .expect("Should have been able to read the file"),
         }),
         pool,
     };
+
+    let cors = CorsLayer::new()
+        // allow `GET` and `POST` when accessing the resource
+        .allow_methods([Method::GET, Method::POST])
+        // allow requests from any origin
+        .allow_credentials(true)
+        .allow_headers(AllowHeaders::list([
+            HeaderName::from_static("csrf-token"),
+            HeaderName::from_static("content-type"),
+            HeaderName::from_static("x-access-token"),
+        ]))
+        .allow_origin(AllowOrigin::list([
+            HeaderValue::from_static("https://rollycubes.com"),
+            HeaderValue::from_static("https://beta.rollycubes.com"),
+            HeaderValue::from_static("https://www.rollycubes.com"),
+            HeaderValue::from_static("https://rollycubes.live"),
+            HeaderValue::from_static("http://localhost:3000"),
+            HeaderValue::from_static("http://localhost:3005"),
+        ]));
 
     tracing_subscriber::fmt::init();
 
@@ -93,13 +120,11 @@ async fn main() {
     let user_routes = Router::new()
         .route("/twitch_login_or_register", post(login))
         .route("/logout", post(logout))
-        // .route("/refresh_token", get(refresh_token))
-        .route(
-            "/public_key",
-            get(move || public_key(Arc::clone(&public_key_text))),
-        )
-        // .route("/me", get(user_self))
-        .route("/users/:id", get(user_by_id));
+        .route("/refresh_token", get(refresh_token))
+        .route("/public_key", get(public_key))
+        .route("/me", get(user_self))
+        .route("/users/:id", get(user_by_id))
+        .layer(cors);
 
     let server_routes = Router::new();
     // .route("/add_stats", post(add_stats))
@@ -154,6 +179,102 @@ struct LoginResponse {
 #[derive(Deserialize)]
 struct LoginPayload {
     twitch_access_token: String,
+}
+
+async fn login_helper(
+    s: &RouterState,
+    jar: CookieJar,
+    x: &Uuid,
+    username: &str,
+) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
+    // Do the login
+    let Ok(client) = s.pool.get().await else {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
+    match s.jwt.sign_jwt(Claims::new(*x, username)) {
+        Ok(access_token) => {
+            // Create a refresh token
+            let token_id = Uuid::new_v4();
+            let exp = OffsetDateTime::now_utc()
+                .checked_add(Duration::days(30))
+                .unwrap();
+            client
+                .execute(
+                    "
+INSERT INTO refresh_token (id, \"userId\")
+VALUES ($1::UUID, $2::UUID)",
+                    &[&token_id, &x],
+                )
+                .await
+                .unwrap();
+            Ok((
+                jar.add(
+                    Cookie::build("refresh_token", token_id.to_string())
+                        .secure(true)
+                        .http_only(true)
+                        .same_site(axum_extra::extract::cookie::SameSite::None)
+                        .path("/refresh_token")
+                        .expires(exp)
+                        .finish(),
+                ),
+                Json(LoginResponse { access_token }),
+            ))
+        }
+        Err(_e) => Err(StatusCode::FORBIDDEN),
+    }
+}
+#[axum::debug_handler]
+async fn refresh_token(
+    State(s): State<RouterState>,
+    jar: CookieJar,
+) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
+    let Some(r_token) = jar.get("refresh_token") else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    let Ok(parsed_token) = Uuid::parse_str(r_token.value()) else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    let Ok(client) = s.pool.get().await else {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
+    let result = client
+        .query_one(
+            "
+SELECT username, \"userId\", issued_at FROM refresh_token
+LEFT JOIN public.\"user\" ON public.\"user\".id = \"userId\"
+WHERE refresh_token.id = $1::UUID
+",
+            &[&parsed_token],
+        )
+        .await;
+    match result {
+        Ok(row) => {
+            // delete the token, log them in
+            client
+                .execute(
+                    "
+DELETE FROM refresh_token
+WHERE id = $1::UUID",
+                    &[&parsed_token],
+                )
+                .await
+                .unwrap();
+            // check expiration
+            let issued_at: PrimitiveDateTime = row.get("issued_at");
+            let dur = OffsetDateTime::now_utc() - issued_at.assume_utc();
+            if dur > Duration::days(30) {
+                return Err(StatusCode::UNAUTHORIZED);
+            }
+            login_helper(
+                &s,
+                jar,
+                &row.get::<_, Uuid>("userId"),
+                row.get::<_, &str>("username"),
+            )
+            .await
+        }
+        Err(e) => Err(StatusCode::UNAUTHORIZED),
+    }
 }
 
 #[axum::debug_handler]
@@ -232,46 +353,25 @@ VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
                 };
                 id
             };
-            // Do the login
-            match s
-                .jwt_signer
-                .sign_jwt(Claims::new(x, user.display_name.to_string()))
-            {
-                Ok(access_token) => {
-                    // Create a refresh token
-                    let token_id = Uuid::new_v4();
-                    let exp = OffsetDateTime::now_utc()
-                        .checked_add(Duration::days(30))
-                        .unwrap();
-                    client
-                        .execute(
-                            "
-INSERT INTO refresh_token (id, \"userId\")
-VALUES ($1::UUID, $2::UUID)",
-                            &[&token_id, &x],
-                        )
-                        .await
-                        .unwrap();
-                    Ok((
-                        jar.add(
-                            Cookie::build("refresh_token", token_id.to_string())
-                                .secure(true)
-                                .http_only(true)
-                                .same_site(axum_extra::extract::cookie::SameSite::None)
-                                .path("/refresh_token")
-                                .expires(exp)
-                                .finish(),
-                        ),
-                        Json(LoginResponse { access_token }),
-                    ))
-                }
-                Err(_e) => Err(StatusCode::FORBIDDEN),
-            }
+            login_helper(&s, jar, &x, user.display_name.as_str()).await
         }
         Err(..) => Err(StatusCode::IM_A_TEAPOT),
     }
 }
 
+#[axum::debug_handler]
+async fn user_self(
+    headers: HeaderMap,
+    State(s): State<RouterState>,
+) -> Result<Json<User>, StatusCode> {
+    let Some(access_token) = headers.get("x-access-token") else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    let Ok(verified_token) = s.jwt.verify(access_token.to_str().unwrap()) else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    user_by_id(Path(verified_token.claims.user_id), State(s)).await
+}
 #[axum::debug_handler]
 async fn user_by_id(
     Path(user_id): Path<Uuid>,
@@ -306,6 +406,7 @@ WHERE id=$1::UUID",
         Ok(rows) if !rows.is_empty() => {
             let row = &rows[0];
             let rolls: Option<i32> = row.get("rolls");
+            let achievement_id: Option<String> = row.get("achievement_id");
             let user = User {
                 id: row.get("id"),
                 username: row.get("username"),
@@ -319,7 +420,7 @@ WHERE id=$1::UUID",
                     wins: row.get("wins"),
                     doubles: row.get("doubles"),
                 }),
-                achievements: Some(
+                achievements: achievement_id.map(|_| {
                     rows.iter()
                         .map(|r| AchievementProgress {
                             achievement_id: r.get("achievement_id"),
@@ -328,8 +429,8 @@ WHERE id=$1::UUID",
                                 .map(PrimitiveDateTime::assume_utc),
                             progress: r.get("progress"),
                         })
-                        .collect(),
-                ),
+                        .collect()
+                }),
             };
             Ok(Json(user))
         }
@@ -360,8 +461,8 @@ async fn logout(jar: CookieJar, State(s): State<RouterState>) -> Result<CookieJa
     Ok(jar)
 }
 
-async fn public_key(public_key_text: Arc<String>) -> String {
-    public_key_text.to_string()
+async fn public_key(State(s): State<RouterState>) -> String {
+    s.jwt.public_key.clone()
 }
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;

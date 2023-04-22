@@ -195,8 +195,8 @@ const TooltipContents: typeof PlayerComponent = (props) => {
         <h2>Achievements</h2>
         <div className="achievements">
           <HorizontalScroll>
-            {props.player.userData?.userToAchievements
-              .filter((ach) => ach.unlocked)
+            {props.player.userData?.achievements
+              ?.filter((ach) => ach.unlocked)
               .map((ach) => (
                 <AchievementImg {...ach} key={ach.achievement.id} />
               ))}

@@ -7,9 +7,9 @@ Public Routes
 [X] POST /twitch_login_or_register
 [X] GET /public_key
 [X] GET /users/:id
-[ ] GET /me
+[X] GET /me
 [X] POST /logout
-[ ] GET /refresh_token <-- should be POST
+[X] GET /refresh_token <-- should be POST
    --> cookie should have path=/refresh
 
 Server Routes - should not require csrf

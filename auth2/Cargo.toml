@@ -23,3 +23,5 @@ twitch_api = {version="0.7.0-rc.4", features=["helix", "reqwest", "twitch_oauth2
 bb8-postgres = { version = "0.8.1", features = [ "with-uuid-1", "with-time-0_3" ]}
 bb8 = "0.8.0"
 jsonwebtoken = "8.3.0"
+anyhow = "1.0.70"
+tower-http = { version = "0.4.0", features = [ "cors" ] }
