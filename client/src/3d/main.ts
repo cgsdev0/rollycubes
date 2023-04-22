@@ -187,7 +187,7 @@ export const initScene = async () => {
   if (sceneInit || !window.hasOwnProperty('Ammo')) {
     return
   }
-  await (window as any).Ammo()
+
   if (typeof (window as any).Ammo === 'function') {
     await (window as any).Ammo()
   }
