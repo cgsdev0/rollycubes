@@ -7,8 +7,7 @@
     "doc": "docs"
   },
   "dependencies": {
-    "nocache": "^3.0.1",
-    "quicktype": "^23.0.10"
+    "nocache": "^3.0.1"
   },
   "scripts": {
     "start": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm start\" \"cd auth; npm run start-dev\" \"cd game; sleep 10; ./run-server.sh\""
@@ -24,6 +23,7 @@
   },
   "homepage": "https://github.com/cgsdev0/rollycubes#readme",
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "quicktype": "15.1.0"
   }
 }
