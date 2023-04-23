@@ -35,6 +35,14 @@ pub async fn auth_layer<B>(request: Request<B>, next: Next<B>) -> Response {
 #[derive(Deserialize)]
 pub struct AddStatsPayload {
     id: Uuid,
+    rolls: f32,
+    doubles: f32,
+    games: f32,
+    wins: f32,
+}
+
+pub struct AddStatsPayloadSomeday {
+    id: Uuid,
     rolls: i32,
     doubles: i32,
     games: i32,
@@ -44,10 +52,17 @@ pub struct AddStatsPayload {
 #[axum::debug_handler]
 pub async fn add_stats(
     State(s): State<RouterState>,
-    Json(mut body): Json<AddStatsPayload>,
+    Json(body_input): Json<AddStatsPayload>,
 ) -> StatusCode {
     let Ok(client) = s.pool.get().await else {
         return StatusCode::INTERNAL_SERVER_ERROR;
+    };
+    let mut body = AddStatsPayloadSomeday {
+        rolls: body_input.rolls.round() as i32,
+        doubles: body_input.doubles.round() as i32,
+        games: body_input.games.round() as i32,
+        wins: body_input.wins.round() as i32,
+        id: body_input.id,
     };
     let result = client
         .query(

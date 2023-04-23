@@ -12,7 +12,6 @@ namespace http {
         } else {
             response = request.send("POST", json, {"Content-Type: application/json"});
         }
-        std::cout << "Status code: " << response.status << std::endl;
         return std::string{response.body.begin(), response.body.end()};
     }
 
