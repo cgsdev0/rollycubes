@@ -35,9 +35,9 @@
 #include "IGameState.hpp"
 #include "Player.hpp"
 #include "UserData.hpp"
+#include "UserStats.hpp"
 #include "Achievement.hpp"
 #include "AchievementClass.hpp"
-#include "UserStats.hpp"
 #include "RoomList.hpp"
 #include "Room.hpp"
 #include "Redirect.hpp"
@@ -76,14 +76,14 @@ namespace nlohmann {
     void from_json(const json & j, API::RoomList & x);
     void to_json(json & j, const API::RoomList & x);
 
-    void from_json(const json & j, API::UserStats & x);
-    void to_json(json & j, const API::UserStats & x);
-
     void from_json(const json & j, API::AchievementClass & x);
     void to_json(json & j, const API::AchievementClass & x);
 
     void from_json(const json & j, API::Achievement & x);
     void to_json(json & j, const API::Achievement & x);
+
+    void from_json(const json & j, API::UserStats & x);
+    void to_json(json & j, const API::UserStats & x);
 
     void from_json(const json & j, API::UserData & x);
     void to_json(json & j, const API::UserData & x);
@@ -301,21 +301,6 @@ namespace nlohmann {
         j["rooms"] = x.rooms;
     }
 
-    inline void from_json(const json & j, API::UserStats& x) {
-        x.doubles = j.at("doubles").get<double>();
-        x.games = j.at("games").get<double>();
-        x.rolls = j.at("rolls").get<double>();
-        x.wins = j.at("wins").get<double>();
-    }
-
-    inline void to_json(json & j, const API::UserStats & x) {
-        j = json::object();
-        j["doubles"] = x.doubles;
-        j["games"] = x.games;
-        j["rolls"] = x.rolls;
-        j["wins"] = x.wins;
-    }
-
     inline void from_json(const json & j, API::AchievementClass& x) {
         x.description = j.at("description").get<std::string>();
         x.id = j.at("id").get<std::string>();
@@ -346,23 +331,38 @@ namespace nlohmann {
         j["unlocked"] = x.unlocked;
     }
 
+    inline void from_json(const json & j, API::UserStats& x) {
+        x.doubles = j.at("doubles").get<double>();
+        x.games = j.at("games").get<double>();
+        x.rolls = j.at("rolls").get<double>();
+        x.wins = j.at("wins").get<double>();
+    }
+
+    inline void to_json(json & j, const API::UserStats & x) {
+        j = json::object();
+        j["doubles"] = x.doubles;
+        j["games"] = x.games;
+        j["rolls"] = x.rolls;
+        j["wins"] = x.wins;
+    }
+
     inline void from_json(const json & j, API::UserData& x) {
+        x.achievements = API::get_optional<std::vector<API::Achievement>>(j, "achievements");
         x.created_date = j.at("createdDate").get<std::string>();
         x.id = j.at("id").get<std::string>();
         x.image_url = API::get_optional<std::string>(j, "image_url");
         x.stats = API::get_optional<API::UserStats>(j, "stats");
         x.username = j.at("username").get<std::string>();
-        x.user_to_achievements = j.at("userToAchievements").get<std::vector<API::Achievement>>();
     }
 
     inline void to_json(json & j, const API::UserData & x) {
         j = json::object();
+        j["achievements"] = x.achievements;
         j["createdDate"] = x.created_date;
         j["id"] = x.id;
         j["image_url"] = x.image_url;
         j["stats"] = x.stats;
         j["username"] = x.username;
-        j["userToAchievements"] = x.user_to_achievements;
     }
 
     inline void from_json(const json & j, API::Player& x) {
@@ -849,21 +849,21 @@ namespace nlohmann {
     }
 }
 namespace API {
-std::string Achievement::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void Achievement::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string AchievementClass::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void AchievementClass::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string Achievement::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Achievement::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
