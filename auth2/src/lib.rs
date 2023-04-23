@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate lazy_static;
+
 use anyhow::Error;
 use bb8_postgres::PostgresConnectionManager;
 use serde::{Deserialize, Serialize};

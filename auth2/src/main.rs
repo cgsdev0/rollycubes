@@ -64,8 +64,9 @@ async fn main() {
         .route("/users/:id", get(user_routes::user_by_id))
         .layer(cors);
 
-    let server_routes = Router::new();
-    // .route("/add_stats", post(add_stats))
+    let server_routes = Router::new()
+        .route("/add_stats", post(server_routes::add_stats))
+        .layer(axum::middleware::from_fn(server_routes::auth_layer));
     // .route("/achievement_progress", post(achievement_progress));
 
     let app = Router::new()

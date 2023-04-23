@@ -58,6 +58,7 @@ dependencies = [
  "bb8",
  "bb8-postgres",
  "jsonwebtoken",
+ "lazy_static",
  "refinery",
  "reqwest",
  "serde",
