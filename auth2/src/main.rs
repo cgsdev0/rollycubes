@@ -66,8 +66,12 @@ async fn main() {
     let server_routes = Router::new()
         .route("/add_stats", post(server_routes::add_stats))
         .route("/public_key", get(server_routes::public_key))
+        .route("/achievements", get(server_routes::achievements))
+        .route(
+            "/achievement_progress",
+            post(server_routes::achievement_progress),
+        )
         .layer(axum::middleware::from_fn(server_routes::auth_layer));
-    // .route("/achievement_progress", post(achievement_progress));
 
     let app = Router::new()
         .nest("/", user_routes)
