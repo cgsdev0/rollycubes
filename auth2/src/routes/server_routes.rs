@@ -9,7 +9,6 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs;
 use std::time::SystemTime;
-use time::OffsetDateTime;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -26,7 +25,7 @@ lazy_static! {
         .trim()
         .to_string();
     static ref ACHIEVEMENTS: HashMap<String, Achievement> =
-        serde_json::from_str(include_str!("../../../achievements.json")).unwrap();
+        serde_json::from_str(include_str!("../../achievements.json")).unwrap();
 }
 
 pub async fn auth_layer<B>(request: Request<B>, next: Next<B>) -> Response {
