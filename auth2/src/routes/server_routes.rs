@@ -6,14 +6,27 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::fs;
+use std::time::SystemTime;
+use time::OffsetDateTime;
 use uuid::Uuid;
 
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Achievement {
+    id: String,
+    name: String,
+    image_url: Option<String>,
+    description: String,
+    max_progress: Option<i32>,
+}
 lazy_static! {
     static ref PRE_SHARED_KEY: String = fs::read_to_string("./secrets/.pre-shared-key")
         .expect("Should have been able to read the file")
         .trim()
         .to_string();
+    static ref ACHIEVEMENTS: HashMap<String, Achievement> =
+        serde_json::from_str(include_str!("../../../achievements.json")).unwrap();
 }
 
 pub async fn auth_layer<B>(request: Request<B>, next: Next<B>) -> Response {
@@ -112,13 +125,103 @@ ON CONFLICT(\"userId\") DO UPDATE SET
 }
 
 #[derive(Serialize)]
+pub struct AchievementUnlock {
+    #[serde(rename = "type")]
+    unlock_type: String,
+    #[serde(flatten)]
+    achievement: Achievement,
+}
+
+#[derive(Deserialize)]
+pub struct AchievementProgressPayload {
+    user_id: Uuid,
+    achievement_id: String,
+    progress: f32,
+}
+
+#[axum::debug_handler]
+pub async fn achievement_progress(
+    State(s): State<RouterState>,
+    Json(body): Json<AchievementProgressPayload>,
+) -> Result<Json<AchievementUnlock>, StatusCode> {
+    if body.progress <= 0.0 {
+        // nothing to do
+        return Err(StatusCode::OK);
+    }
+    let Some(a) = ACHIEVEMENTS.get(&body.achievement_id) else {
+        return Err(StatusCode::BAD_REQUEST);
+    };
+    let Ok(client) = s.pool.get().await else {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
+    let progress = body.progress.round() as i32;
+    let current_time = SystemTime::now();
+    let mut unlocked: Option<SystemTime> = None;
+    if let Some(max_progress) = a.max_progress {
+        if progress >= max_progress {
+            unlocked = Some(current_time);
+        }
+    }
+    let result = client
+        .query_one(
+            "
+INSERT INTO user_to_achievement
+    (
+        unlocked,
+        progress,
+        \"userId\",
+        \"achievementId\"
+    )
+VALUES
+    (
+        $1::TIMESTAMP,
+        $2::INTEGER,
+        $3::UUID,
+        $4::TEXT
+    )
+ON CONFLICT(\"userId\", \"achievementId\") DO UPDATE SET
+    progress = user_to_achievement.progress + $2::INTEGER,
+    unlocked = (CASE WHEN user_to_achievement.progress + $2::INTEGER >= $5::INTEGER THEN $6::TIMESTAMP
+        ELSE user_to_achievement.unlocked
+        END)
+    WHERE user_to_achievement.unlocked IS NULL
+    RETURNING user_to_achievement.unlocked
+",
+            &[
+                &unlocked,
+                &progress,
+                &body.user_id,
+                &a.id,
+                &a.max_progress.unwrap_or(0),
+                &current_time,
+            ],
+        )
+        .await;
+    match result {
+        Ok(row) => match row.try_get::<'_, _, SystemTime>("unlocked") {
+            Ok(..) => Ok(Json(AchievementUnlock {
+                unlock_type: "achievement_unlock".to_string(),
+                achievement: a.clone(),
+            })),
+            Err(..) => Err(StatusCode::OK),
+        },
+        Err(..) => Err(StatusCode::OK),
+    }
+}
+#[derive(Serialize)]
 pub struct PublicKeyResp {
     #[serde(rename = "publicKey")]
     public_key: String,
 }
 
+#[axum::debug_handler]
 pub async fn public_key(State(s): State<RouterState>) -> Json<PublicKeyResp> {
     Json(PublicKeyResp {
         public_key: s.jwt.public_key.clone(),
     })
+}
+
+#[axum::debug_handler]
+pub async fn achievements() -> Json<HashMap<String, Achievement>> {
+    Json(ACHIEVEMENTS.clone())
 }

@@ -1,4 +1,5 @@
-GET /users (DEPRECATED)
+TODO: fetch achievement list in client
+TODO: fix client types for achievements
 TODO: remove passphrase on prod rsa key
 ssh-keygen -p -m PKCS8
 
@@ -15,8 +16,8 @@ Public Routes
 Server Routes - should not require csrf
 --> nested router?
 ===========================
-[ ] POST /add_stats
-[ ] POST /achievement_progress
+[X] POST /add_stats
+[X] POST /achievement_progress
 
 
 
