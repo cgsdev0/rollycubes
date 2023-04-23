@@ -26,7 +26,7 @@ import Players from '../ui/players'
 import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help'
 import { useDispatch } from 'react-redux'
 import { destroyScene, initScene } from '3d/main'
-import { PopText } from '../ui/poptext';
+import { PopText } from '../ui/poptext'
 
 interface Props {
   winner?: Player
@@ -58,21 +58,22 @@ const GamePage: React.FC<Props & DispatchProp> = ({
 
   const dispatch = useDispatch()
 
-  const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room';
+  const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room'
 
-  const [showHelp, setShowHelp] = React.useState(false);
+  const [showHelp, setShowHelp] = React.useState(false)
 
   React.useEffect(() => {
-    if (is3DMode && !needsToOnboard) {
-    initScene();
-    return () => { destroyScene() } ;
+    if (is3DMode && !needsToOnboard && authToken !== undefined) {
+      initScene()
+      return () => {
+        destroyScene()
+      }
     }
-  }, [is3DMode, needsToOnboard]);
+  }, [is3DMode, needsToOnboard, authToken])
 
   if (!mode || !room) {
     return <p>Error</p>
   }
-
 
   if (needsToOnboard) {
     return (
@@ -127,7 +128,7 @@ const GamePage: React.FC<Props & DispatchProp> = ({
         <GamePanel />
         <Players />
       </div>
-      { showHelp ? <Rules /> : <ChatBox />}
+      {showHelp ? <Rules /> : <ChatBox />}
       <PopText />
     </React.Fragment>
   )
@@ -137,17 +138,19 @@ const Rules = () => {
   return (
     <div>
       <h1>Rules</h1>
-      <p>On your turn:
+      <p>
+        On your turn:
+        <br />
+        <br />
+        <ol style={{ marginLeft: 40 }}>
+          <li>Roll the dice</li>
+          <li>Add the two dice together</li>
+          <li>Add or subtract the sum from your score</li>
+        </ol>
+        <br />
+        First player to reach a winning score wins!
+      </p>
       <br />
-      <br />
-      <ol style={{ marginLeft: 40 }}>
-      <li>Roll the dice</li>
-      <li>Add the two dice together</li>
-      <li>Add or subtract the sum from your score</li>
-      </ol>
-      <br />
-      First player to reach a winning score wins!</p>
-      <br/>
       <p>Additionally...</p>
       <br />
       <ul style={{ marginLeft: 40 }}>
