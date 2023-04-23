@@ -327,7 +327,3 @@ pub async fn logout(jar: CookieJar, State(s): State<RouterState>) -> Result<Cook
     }
     Ok(jar)
 }
-
-pub async fn public_key(State(s): State<RouterState>) -> String {
-    s.jwt.public_key.clone()
-}

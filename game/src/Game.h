@@ -49,7 +49,7 @@ class Game {
 
     // Rehydrate game from disk
     Game(const API::GameState &g) : Game(false) {
-        // this->state = g;
+        this->state = g;
         for (auto &player : this->state.players) {
             player.connected = false;
         }

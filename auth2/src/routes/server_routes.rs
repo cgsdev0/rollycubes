@@ -17,17 +17,19 @@ lazy_static! {
 }
 
 pub async fn auth_layer<B>(request: Request<B>, next: Next<B>) -> Response {
+    if request.method().is_safe() {
+        return next.run(request).await;
+    }
     if let Some(auth_header) = request.headers().get("Authorization") {
         if let Ok(auth_header_val) = auth_header.to_str() {
             let split = auth_header_val.split(" ").collect::<Vec<_>>();
             if split.len() == 2 && String::from(split[1]).eq(&*PRE_SHARED_KEY) {
-                let response = next.run(request).await;
-                return response;
+                return next.run(request).await;
             }
         }
     }
     // they failed the vibe check
-    (StatusCode::UNAUTHORIZED).into_response()
+    (StatusCode::UNAUTHORIZED, "forbidden").into_response()
 }
 
 #[derive(Deserialize)]
@@ -92,4 +94,16 @@ ON CONFLICT(\"userId\") DO UPDATE SET
         }
         Err(..) => StatusCode::INTERNAL_SERVER_ERROR,
     }
+}
+
+#[derive(Serialize)]
+pub struct PublicKeyResp {
+    #[serde(rename = "publicKey")]
+    public_key: String,
+}
+
+pub async fn public_key(State(s): State<RouterState>) -> Json<PublicKeyResp> {
+    Json(PublicKeyResp {
+        public_key: s.jwt.public_key.clone(),
+    })
 }

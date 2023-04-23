@@ -376,8 +376,8 @@ int main(int argc, char **argv) {
         std::cout << e.what() << std::endl;
     }
 
-    std::string authServerUrl("http://auth:3031/");
-    std::string devAuthServerUrl("http://localhost:3031/");
+    std::string authServerUrl("http://auth:3031/server/");
+    std::string devAuthServerUrl("http://localhost:3031/server/");
 
     std::string baseAuthUrl;
 

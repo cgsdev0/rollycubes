@@ -1,6 +1,8 @@
 #include "HTTPClient.h"
 #include "HTTPRequest.hpp"
 
+#include <iostream>
+
 namespace http {
     std::string post(std::string url, std::string json, std::string preSharedKey) {
         http::Request request{url};
@@ -10,6 +12,7 @@ namespace http {
         } else {
             response = request.send("POST", json, {"Content-Type: application/json"});
         }
+        std::cout << "Status code: " << response.status << std::endl;
         return std::string{response.body.begin(), response.body.end()};
     }
 

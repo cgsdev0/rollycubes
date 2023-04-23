@@ -59,13 +59,13 @@ async fn main() {
         .route("/twitch_login_or_register", post(user_routes::login))
         .route("/logout", post(user_routes::logout))
         .route("/refresh_token", get(user_routes::refresh_token))
-        .route("/public_key", get(user_routes::public_key))
         .route("/me", get(user_routes::user_self))
         .route("/users/:id", get(user_routes::user_by_id))
         .layer(cors);
 
     let server_routes = Router::new()
         .route("/add_stats", post(server_routes::add_stats))
+        .route("/public_key", get(server_routes::public_key))
         .layer(axum::middleware::from_fn(server_routes::auth_layer));
     // .route("/achievement_progress", post(achievement_progress));
 
