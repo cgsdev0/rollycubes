@@ -61,11 +61,13 @@ async fn login_helper(
     println!("we got a client from the pool again");
     match s.jwt.sign_jwt(Claims::new(*x, username)) {
         Ok(access_token) => {
+            println!("we signed the thing it was good");
             // Create a refresh token
             let token_id = Uuid::new_v4();
             let exp = OffsetDateTime::now_utc()
                 .checked_add(Duration::days(30))
                 .unwrap();
+            println!("we made a date");
             client
                 .execute(
                     "
@@ -75,6 +77,7 @@ VALUES ($1::UUID, $2::UUID)",
                 )
                 .await
                 .unwrap();
+            println!("we inserted a refresh token");
             Ok((
                 jar.add(
                     Cookie::build("refresh_token", token_id.to_string())
