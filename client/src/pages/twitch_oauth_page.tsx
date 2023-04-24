@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect, DispatchProp } from 'react-redux'
 import { selectAuthService } from '../selectors/game_selectors'
-import { getCsrf } from '../auth'
 import { ReduxState } from '../store'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 
@@ -28,7 +27,6 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
           credentials: 'include',
           body: JSON.stringify({ twitch_access_token }),
           headers: {
-            'csrf-token': await getCsrf(authService),
             'Content-Type': 'application/json',
           },
           method: 'POST',

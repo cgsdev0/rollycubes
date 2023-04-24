@@ -1,39 +1,38 @@
-import React from "react";
-import { connect, DispatchProp } from "react-redux";
-import { ReduxState } from "../store";
+import React from 'react'
+import { connect, DispatchProp } from 'react-redux'
+import { ReduxState } from '../store'
 import {
   selectAuthService,
   selectIsDev,
   selectIsSignedIn,
-} from "../selectors/game_selectors";
-import { getCsrf } from "../auth";
+} from '../selectors/game_selectors'
 
 interface Props {
-  authService: string;
-  authToken?: string | null;
-  isSignedIn: boolean;
-  isOpen: boolean;
-  setIsOpen: (a: boolean) => void;
+  authService: string
+  authToken?: string | null
+  isSignedIn: boolean
+  isOpen: boolean
+  setIsOpen: (a: boolean) => void
 }
 
 const AuthMenu: React.FC<Props & DispatchProp> = (props) => {
-  const { isOpen, setIsOpen } = props;
+  const { isOpen, setIsOpen } = props
   // register a click handler to close settings
   React.useEffect(() => {
     const closeAuth = (e: any) => {
-      if (!e.path.map((el: any) => el.id).includes("authSettingsBox")) {
-        setIsOpen(false);
+      if (!e.path.map((el: any) => el.id).includes('authSettingsBox')) {
+        setIsOpen(false)
       }
-    };
+    }
     if (isOpen) {
       setTimeout(() => {
-        document.addEventListener("click", closeAuth);
-      }, 0);
+        document.addEventListener('click', closeAuth)
+      }, 0)
       return () => {
-        document.removeEventListener("click", closeAuth);
-      };
+        document.removeEventListener('click', closeAuth)
+      }
     }
-  }, [isOpen, setIsOpen]);
+  }, [isOpen, setIsOpen])
 
   return (
     <div id="authSettingsBox">
@@ -45,20 +44,19 @@ const AuthMenu: React.FC<Props & DispatchProp> = (props) => {
                 onClick={async () => {
                   if (props.authToken) {
                     const res = await window.fetch(
-                      props.authService + "logout",
+                      props.authService + 'logout',
                       {
-                        method: "post",
-                        mode: "cors",
-                        credentials: "include",
+                        method: 'post',
+                        mode: 'cors',
+                        credentials: 'include',
                         headers: {
-                          "csrf-token": await getCsrf(props.authService),
-                          "x-access-token": props.authToken,
+                          'x-access-token': props.authToken,
                         },
                       }
-                    );
-                    await res.text();
+                    )
+                    await res.text()
                   }
-                  props.dispatch({ type: "LOGOUT" });
+                  props.dispatch({ type: 'LOGOUT' })
                 }}
               >
                 Logout
@@ -68,8 +66,8 @@ const AuthMenu: React.FC<Props & DispatchProp> = (props) => {
         </div>
       ) : null}
     </div>
-  );
-};
+  )
+}
 
 const mapStateToProps = (state: ReduxState) => {
   return {
@@ -77,7 +75,7 @@ const mapStateToProps = (state: ReduxState) => {
     authToken: state.auth.authToken,
     isDev: selectIsDev(state),
     isSignedIn: selectIsSignedIn(state),
-  };
-};
+  }
+}
 
-export default connect(mapStateToProps)(AuthMenu);
+export default connect(mapStateToProps)(AuthMenu)
