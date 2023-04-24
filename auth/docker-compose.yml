@@ -3,6 +3,8 @@ services:
   auth:
     image: ghcr.io/cgsdev0/rollycubes-auth
     restart: always
+    environment:
+      DB_HOST: "db"
     depends_on:
       - "postgres"
     links:

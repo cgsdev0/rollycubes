@@ -15,7 +15,10 @@ use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
 #[tokio::main]
 async fn main() {
     let manager = bb8_postgres::PostgresConnectionManager::new_from_stringlike(
-        "host=localhost user=test password=test",
+        format!(
+            "host={} user=test password=test",
+            std::env::var("DB_HOST").unwrap_or("localhost".to_string())
+        ),
         NoTls,
     )
     .unwrap();
