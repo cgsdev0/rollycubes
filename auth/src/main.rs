@@ -16,7 +16,7 @@ use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    tracing_log::LogTracer::init().unwrap();
+    tracing_log::LogTracer::init().ok();
 
     let manager = bb8_postgres::PostgresConnectionManager::new_from_stringlike(
         format!(
