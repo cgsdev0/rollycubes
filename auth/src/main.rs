@@ -39,7 +39,7 @@ async fn main() {
     };
 
     let cors = CorsLayer::new()
-        .allow_methods([Method::GET, Method::POST])
+        .allow_methods([Method::GET, Method::POST, Method::HEAD, Method::OPTIONS])
         .allow_credentials(true)
         .allow_headers(AllowHeaders::list([
             HeaderName::from_static("csrf-token"),
