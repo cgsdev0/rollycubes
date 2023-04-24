@@ -82,7 +82,7 @@ async fn main() {
         .nest("/server", server_routes)
         .with_state(router_state);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3031));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3031));
     tracing::debug!("listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
