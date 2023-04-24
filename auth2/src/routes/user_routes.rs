@@ -140,7 +140,7 @@ WHERE id = $1::UUID",
             )
             .await
         }
-        Err(e) => Err(StatusCode::UNAUTHORIZED),
+        Err(..) => Err(StatusCode::UNAUTHORIZED),
     }
 }
 
