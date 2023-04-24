@@ -9,7 +9,7 @@ COPY .cargo .cargo
 COPY Cargo.* .
 COPY achievements.json .
 
-RUN cargo build --debug
+RUN cargo build
 
 FROM rust:1.67-alpine as prod
 
