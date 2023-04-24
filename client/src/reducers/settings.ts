@@ -1,6 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { CheatsAction } from 'actions/settings'
-import { destroyScene, initScene } from '../3d/main'
 
 export interface SettingsState {
   cheats: boolean
