@@ -1,26 +1,18 @@
-FROM node:16 as base
+FROM rust:1.69-alpine as build
+RUN apk add musl-dev pkgconfig make openssl-dev
 
-# Create app directory
-WORKDIR /usr/src/app
+WORKDIR /usr/build
 
-# Install app dependencies
+COPY migrations migrations
+COPY src src
+COPY .cargo .cargo
+COPY Cargo.* .
+COPY achievements.json .
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
+RUN cargo build --release
 
-RUN npm i
+FROM rust:1.67-alpine as prod
 
-COPY . .
+COPY --from=build /usr/build/target/release/auth .
 
-FROM base as production
-
-ENV NODE_PATH=/build
-RUN npm run build
-
-FROM gcr.io/distroless/nodejs
-
-
-COPY --from=production /usr/src/app/build /
-EXPOSE 3031
-CMD ["index.js"]
+ENTRYPOINT ["./auth"]
