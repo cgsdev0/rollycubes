@@ -9,10 +9,10 @@ COPY .cargo .cargo
 COPY Cargo.* .
 COPY achievements.json .
 
-RUN cargo build --release
+RUN cargo build --debug
 
 FROM rust:1.67-alpine as prod
 
-COPY --from=build /usr/build/target/release/auth .
+COPY --from=build /usr/build/target/debug/auth .
 
 ENTRYPOINT ["./auth"]
