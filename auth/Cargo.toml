@@ -27,3 +27,4 @@ jsonwebtoken = "8.3.0"
 anyhow = "1.0.70"
 tower-http = { version = "0.4.0", features = [ "cors", "catch-panic" ] }
 lazy_static = "1.4.0"
+tracing-log = "0.1.3"

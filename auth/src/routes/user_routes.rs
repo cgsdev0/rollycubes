@@ -156,8 +156,11 @@ pub async fn login(
 ) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
     tracing::debug!("we are doing the login");
     let token = AccessToken::new(payload.twitch_access_token);
+    tracing::debug!("we got the access token");
     let http_client = reqwest::Client::new();
+    tracing::debug!("we made an http client");
     let twitch_client = twitch_api::HelixClient::with_client(http_client.clone());
+    tracing::debug!("we made the twitch client");
     let Ok(mut client) = s.pool.get().await else {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };

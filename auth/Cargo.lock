@@ -68,6 +68,7 @@ dependencies = [
  "tokio-postgres",
  "tower-http",
  "tracing",
+ "tracing-log",
  "tracing-subscriber",
  "twitch_api",
  "twitch_oauth2",

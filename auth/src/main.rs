@@ -15,6 +15,9 @@ use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
+    tracing_log::LogTracer::init().unwrap();
+
     let manager = bb8_postgres::PostgresConnectionManager::new_from_stringlike(
         format!(
             "host={} user=test password=test",
@@ -55,8 +58,6 @@ async fn main() {
             HeaderValue::from_static("http://localhost:3000"),
             HeaderValue::from_static("http://localhost:3005"),
         ]));
-
-    tracing_subscriber::fmt::init();
 
     // build our application with a route
     let user_routes = Router::new()
