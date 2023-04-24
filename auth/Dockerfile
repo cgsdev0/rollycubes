@@ -1,5 +1,5 @@
 FROM rust:1.69-alpine as build
-RUN apk add musl-dev pkgconfig make openssl-dev
+RUN apk add musl-dev pkgconfig make perl
 
 WORKDIR /usr/build
 

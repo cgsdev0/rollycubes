@@ -18,7 +18,7 @@ serde = { version = "1.0", features = ["derive"] }
 axum-extra = { version = "0.7.4", features = ["cookie"] }
 serde_json = "1.0"
 reqwest = { version = "0.11", features = ["json"] }
-# openssl-sys = { version = "0.9.86", features = [ "vendored" ] }
+openssl-sys = { version = "0.9.86", features = [ "vendored" ] }
 twitch_oauth2 = {version = "0.10", features = [ "reqwest" ] }
 twitch_api = {version="0.7.0-rc.4", features=["helix", "reqwest", "twitch_oauth2", "client"] }
 bb8-postgres = { version = "0.8.1", features = [ "with-uuid-1", "with-time-0_3" ]}
