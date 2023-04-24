@@ -1,5 +1,5 @@
 import HorizontalScroll from 'react-horizontal-scrolling'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { css } from 'stitches.config'
 import {
   selectIsSpectator,
@@ -7,7 +7,7 @@ import {
   selectTurnIndex,
 } from '../selectors/game_selectors'
 import { ReduxState } from '../store'
-import { Achievement, Player } from '../types/store_types'
+import { Achievement, AchievementData, Player } from '../types/store_types'
 import Avatar from './avatar'
 import { usePopperTooltip } from 'react-popper-tooltip'
 
@@ -197,9 +197,10 @@ const TooltipContents: typeof PlayerComponent = (props) => {
           <HorizontalScroll>
             {props.player.userData?.achievements
               ?.filter((ach) => ach.unlocked)
-              .map((ach) => (
-                <AchievementImg {...ach} key={ach.achievement.id} />
-              ))}
+              .map((ach) => {
+                console.log(ach)
+                return <AchievementImg {...ach} key={ach.id} />
+              })}
           </HorizontalScroll>
         </div>
       </>
@@ -208,7 +209,17 @@ const TooltipContents: typeof PlayerComponent = (props) => {
   )
 }
 
+const defaultAchievementData: AchievementData = {
+  description: 'unknown',
+  image_url: '//via.placeholder.com/48',
+  id: 'unknown',
+  name: 'Unknown',
+  max_progress: null,
+}
 const AchievementImg = (props: Achievement) => {
+  const achievements =
+    useSelector((state: ReduxState) => state.auth.achievements) || {}
+  const achData = achievements[props.id] || defaultAchievementData
   const [tooltipVisible, setTooltipVisible] = React.useState(false)
   const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } =
     usePopperTooltip({
@@ -224,16 +235,16 @@ const AchievementImg = (props: Achievement) => {
             {...getTooltipProps({ className: 'tooltip-container' })}
           >
             <div {...getArrowProps({ className: 'tooltip-arrow' })} />
-            <header>{props.achievement.name}</header>
-            <p>{props.achievement.description}</p>
+            <header>{achData.name}</header>
+            <p>{achData.description}</p>
           </div>
         )}
         <img
           ref={setTriggerRef}
           width={48}
           height={48}
-          alt={props.achievement.description}
-          src={props.achievement.image_url || '//via.placeholder.com/48'}
+          alt={achData.description}
+          src={achData.image_url || '//via.placeholder.com/48'}
         />
       </>
     ),

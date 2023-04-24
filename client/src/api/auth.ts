@@ -6,6 +6,7 @@ import {
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react'
 import { ReduxState } from 'store'
+import { AchievementData } from 'types/store_types'
 
 interface AuthAPIUser {
   id: string
@@ -19,6 +20,8 @@ interface AuthAPIUser {
     wins: number
   } | null
 }
+
+export type AchievementList = Record<string, AchievementData>
 
 interface RefreshTokenResponse {
   access_token: string
@@ -49,9 +52,16 @@ export const authApi = createApi({
     getSelfUserData: builder.query<AuthAPIUser, void>({
       query: () => ({ url: 'me', mode: 'cors', credentials: 'include' }),
     }),
+    getAchievementList: builder.query<AchievementList, void>({
+      query: () => ({ url: 'server/achievements', mode: 'cors' }),
+    }),
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetRefreshTokenQuery, useGetSelfUserDataQuery } = authApi
+export const {
+  useGetRefreshTokenQuery,
+  useGetSelfUserDataQuery,
+  useGetAchievementListQuery,
+} = authApi

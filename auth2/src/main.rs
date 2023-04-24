@@ -61,7 +61,7 @@ async fn main() {
         .route("/refresh_token", get(user_routes::refresh_token))
         .route("/me", get(user_routes::user_self))
         .route("/users/:id", get(user_routes::user_by_id))
-        .layer(cors);
+        .layer(cors.clone());
 
     let server_routes = Router::new()
         .route("/add_stats", post(server_routes::add_stats))
@@ -71,7 +71,8 @@ async fn main() {
             "/achievement_progress",
             post(server_routes::achievement_progress),
         )
-        .layer(axum::middleware::from_fn(server_routes::auth_layer));
+        .layer(axum::middleware::from_fn(server_routes::auth_layer))
+        .layer(cors);
 
     let app = Router::new()
         .nest("/", user_routes)
