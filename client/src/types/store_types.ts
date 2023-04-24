@@ -17,10 +17,10 @@ export interface AchievementProgress {
 
 export interface AchievementUnlock {
   id: string
-  image_url: string
+  image_url: string | null
   name: string
   description: string
-  max_progress: number
+  max_progress: number | null
   type: 'achievement_unlock'
 }
 
@@ -46,15 +46,17 @@ export interface UserStats {
 }
 
 export interface Achievement {
+  id: string
   progress: number
   unlocked: string
-  achievement: {
-    description: string
-    image_url: string | null
-    id: string
-    name: string
-    max_progress: number
-  }
+}
+
+export type AchievementData = {
+  description: string
+  image_url: string | null
+  id: string
+  name: string
+  max_progress: number | null
 }
 
 export interface UserData {

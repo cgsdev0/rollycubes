@@ -1,12 +1,13 @@
 import { useWindowSize } from 'hooks/window_size'
 import { TabErrorPage } from 'pages/tab_error_page'
+import { AchievementProvider } from 'providers/achievements'
 import { AuthProvider } from 'providers/auth'
-import React, { StrictMode } from 'react'
+import { StrictMode } from 'react'
 import { Provider } from 'react-redux'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { styled, css, globalCss, globalStyles } from 'stitches.config'
+import { styled, css, globalStyles } from 'stitches.config'
 import { Octocat } from 'ui/buttons/octocat'
 import { v4 as uuidv4 } from 'uuid'
 import GamePage from './pages/game_page'
@@ -92,26 +93,28 @@ const AppInner = () => {
 
   return (
     <AuthProvider>
-      <Router>
-        <div className={app()}>
-          <Octocat />
-          <div className={container()} style={{ transform: transformString }}>
-            <div className={innerContainer()}>
-              <Routes>
-                <Route path="/">
-                  <Route index element={<HomePage />} />
-                  <Route path="home" element={<HomePage />} />
-                  <Route path="twitch_oauth" element={<TwitchOAuthPage />} />
-                  <Route path="onboard" element={<OnboardPage />} />
-                  <Route path="multiple-tabs" element={<TabErrorPage />} />
-                  <Route path=":mode/:room" element={<GamePage />} />
-                </Route>
-              </Routes>
+      <AchievementProvider>
+        <Router>
+          <div className={app()}>
+            <Octocat />
+            <div className={container()} style={{ transform: transformString }}>
+              <div className={innerContainer()}>
+                <Routes>
+                  <Route path="/">
+                    <Route index element={<HomePage />} />
+                    <Route path="home" element={<HomePage />} />
+                    <Route path="twitch_oauth" element={<TwitchOAuthPage />} />
+                    <Route path="onboard" element={<OnboardPage />} />
+                    <Route path="multiple-tabs" element={<TabErrorPage />} />
+                    <Route path=":mode/:room" element={<GamePage />} />
+                  </Route>
+                </Routes>
+              </div>
             </div>
           </div>
-        </div>
-        <RenderCanvas id="renderCanvas" />
-      </Router>
+          <RenderCanvas id="renderCanvas" />
+        </Router>
+      </AchievementProvider>
     </AuthProvider>
   )
 }

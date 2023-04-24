@@ -25,7 +25,7 @@ pub struct PlayerStats {
 
 #[derive(Serialize)]
 pub struct AchievementProgress {
-    #[serde(rename = "achievementId")]
+    #[serde(rename = "id")]
     achievement_id: String,
     progress: i32,
     #[serde(with = "time::serde::rfc3339::option")]
