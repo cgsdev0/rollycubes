@@ -5,6 +5,7 @@ services:
     restart: always
     environment:
       DB_HOST: "db"
+      RUST_LOG: "debug"
     depends_on:
       - "postgres"
     links:

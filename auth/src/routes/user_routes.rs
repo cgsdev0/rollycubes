@@ -58,6 +58,7 @@ async fn login_helper(
     let Ok(client) = s.pool.get().await else {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };
+    println!("we got a client from the pool again");
     match s.jwt.sign_jwt(Claims::new(*x, username)) {
         Ok(access_token) => {
             // Create a refresh token
@@ -150,15 +151,18 @@ pub async fn login(
     jar: CookieJar,
     Json(payload): Json<LoginPayload>,
 ) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
+    println!("we are doing the login");
     let token = AccessToken::new(payload.twitch_access_token);
     let http_client = reqwest::Client::new();
     let twitch_client = twitch_api::HelixClient::with_client(http_client.clone());
     let Ok(mut client) = s.pool.get().await else {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };
+    println!("we got a client from the pool");
 
     match UserToken::from_existing(&http_client, token, None, None).await {
         Ok(t) => {
+            println!("the user token was ok");
             // TODO: check this for a match t.client_id().as_str();
             let twitch_user = twitch_client.get_user_from_id(&t.user_id, &t).await;
             let Ok(Some(user)) = twitch_user else {
@@ -172,6 +176,7 @@ WHERE twitch_id = $1::TEXT",
                     &[&t.user_id.as_str()],
                 )
                 .await;
+            println!("we found a twitch identity");
             let x = if let Ok(row) = result {
                 let id: Uuid = row.get("userId");
                 // Update the existing user
@@ -189,6 +194,7 @@ WHERE
                     )
                     .await
                     .unwrap();
+                println!("we updated the user record");
                 id
             } else {
                 // Create the user
@@ -197,6 +203,7 @@ WHERE
                 let Ok(transaction) = client.transaction().await else {
                     return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 };
+                println!("we're going to insert a new user");
                 transaction
                     .execute(
                         "
@@ -206,6 +213,7 @@ VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
                     )
                     .await
                     .unwrap();
+                println!("we inserted a new user");
                 transaction
                     .execute(
                         "
@@ -215,9 +223,11 @@ VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
                     )
                     .await
                     .unwrap();
+                println!("we inserted a new identity");
                 let Ok(_) = transaction.commit().await else {
                     return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 };
+                println!("we committed the transaction");
                 id
             };
             login_helper(&s, jar, &x, user.display_name.as_str()).await
