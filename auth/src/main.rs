@@ -10,6 +10,7 @@ use std::fs;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio_postgres::NoTls;
+use tower_http::catch_panic::CatchPanicLayer;
 use tower_http::cors::{AllowHeaders, AllowOrigin, CorsLayer};
 
 #[tokio::main]
@@ -79,6 +80,7 @@ async fn main() {
         .nest("/", user_routes)
         .nest("/server", server_routes)
         .layer(cors)
+        .layer(CatchPanicLayer::new())
         .with_state(router_state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3031));
