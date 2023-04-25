@@ -71,7 +71,7 @@ async fn login_helper(
             client
                 .execute(
                     "
-INSERT INTO refresh_token (id, \"userId\")
+INSERT INTO refresh_token (id, user_id)
 VALUES ($1::UUID, $2::UUID)",
                     &[&token_id, &x],
                 )
@@ -111,8 +111,8 @@ pub async fn refresh_token(
     let result = client
         .query_one(
             "
-SELECT username, \"userId\", issued_at FROM refresh_token
-LEFT JOIN public.\"user\" ON public.\"user\".id = \"userId\"
+SELECT username, user_id, issued_at FROM refresh_token
+LEFT JOIN public.user_id ON users.id = user_id
 WHERE refresh_token.id = $1::UUID
 ",
             &[&parsed_token],
@@ -139,7 +139,7 @@ WHERE id = $1::UUID",
             login_helper(
                 &s,
                 jar,
-                &row.get::<_, Uuid>("userId"),
+                &row.get::<_, Uuid>("user_id"),
                 row.get::<_, &str>("username"),
             )
             .await
@@ -177,19 +177,19 @@ pub async fn login(
             let result = client
                 .query_one(
                     "
-SELECT twitch_id, \"userId\" FROM twitch_identity
+SELECT twitch_id, userId FROM twitch_identity
 WHERE twitch_id = $1::TEXT",
                     &[&t.user_id.as_str()],
                 )
                 .await;
             tracing::debug!("we found a twitch identity");
             let x = if let Ok(row) = result {
-                let id: Uuid = row.get("userId");
+                let id: Uuid = row.get("user_id");
                 // Update the existing user
                 client
                     .execute(
                         "
-UPDATE public.\"user\"
+UPDATE users
 SET
     username = $1::TEXT,
     image_url = $2::TEXT
@@ -213,7 +213,7 @@ WHERE
                 transaction
                     .execute(
                         "
-INSERT INTO public.\"user\" (username, image_url, id)
+INSERT INTO users (username, image_url, id)
 VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
                         &[&user.display_name.as_str(), &user.profile_image_url, &id],
                     )
@@ -223,7 +223,7 @@ VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
                 transaction
                     .execute(
                         "
-INSERT INTO twitch_identity (twitch_id, twitch_login, \"userId\")
+INSERT INTO twitch_identity (twitch_id, twitch_login, user_id)
 VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
                         &[&t.user_id.as_str(), &t.login.as_str(), &id],
                     )
@@ -270,17 +270,17 @@ SELECT
     id,
     username,
     image_url,
-    \"user\".\"createdDate\" as created_date,
-    user_to_achievement.\"achievementId\" as achievement_id,
+    user.created_date as created_date,
+    user_to_achievement.achievement_id as achievement_id,
     unlocked,
     progress,
     rolls,
     doubles,
     games,
     wins
-FROM public.\"user\"
-LEFT JOIN user_to_achievement ON id=user_to_achievement.\"userId\"
-LEFT JOIN player_stats ON id=player_stats.\"userId\"
+FROM users
+LEFT JOIN user_to_achievement ON id=user_to_achievement.user_id
+LEFT JOIN player_stats ON id=player_stats.user_id
 WHERE id=$1::UUID",
             &[&user_id],
         )

@@ -80,7 +80,7 @@ pub async fn add_stats(
         .query(
             "
 SELECT rolls, doubles, games, wins FROM player_stats
-WHERE \"userId\" = $1::UUID
+WHERE user_id = $1::UUID
 ",
             &[&body.id],
         )
@@ -97,9 +97,9 @@ WHERE \"userId\" = $1::UUID
             let insert_result = client
                 .execute(
                     "
-INSERT INTO player_stats (rolls, doubles, games, wins, \"userId\")
+INSERT INTO player_stats (rolls, doubles, games, wins, user_id)
 VALUES ($1::INTEGER, $2::INTEGER, $3::INTEGER, $4::INTEGER, $5::UUID)
-ON CONFLICT(\"userId\") DO UPDATE SET
+ON CONFLICT(user_id) DO UPDATE SET
     rolls = $1::INTEGER,
     doubles = $2::INTEGER,
     games = $3::INTEGER,
@@ -168,8 +168,8 @@ INSERT INTO user_to_achievement
     (
         unlocked,
         progress,
-        \"userId\",
-        \"achievementId\"
+        user_id,
+        achievement_id
     )
 VALUES
     (
@@ -178,7 +178,7 @@ VALUES
         $3::UUID,
         $4::TEXT
     )
-ON CONFLICT(\"userId\", \"achievementId\") DO UPDATE SET
+ON CONFLICT(user_id, achievement_id) DO UPDATE SET
     progress = user_to_achievement.progress + $2::INTEGER,
     unlocked = (CASE WHEN user_to_achievement.progress + $2::INTEGER >= $5::INTEGER THEN $6::TIMESTAMP
         ELSE user_to_achievement.unlocked
