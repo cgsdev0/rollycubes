@@ -270,7 +270,7 @@ SELECT
     id,
     username,
     image_url,
-    user.created_date as created_date,
+    users.created_date as created_date,
     user_to_achievement.achievement_id as achievement_id,
     unlocked,
     progress,
