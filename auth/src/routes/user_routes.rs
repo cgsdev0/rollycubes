@@ -30,6 +30,8 @@ pub struct AchievementProgress {
     progress: i32,
     #[serde(with = "time::serde::rfc3339::option")]
     unlocked: Option<OffsetDateTime>,
+    rn: i64,
+    rd: i64,
 }
 
 #[derive(Serialize)]
@@ -41,8 +43,6 @@ pub struct User {
     created_date: OffsetDateTime,
     achievements: Option<Vec<AchievementProgress>>,
     stats: Option<PlayerStats>,
-    rn: i64,
-    rd: i64,
 }
 
 #[derive(Deserialize)]
@@ -310,8 +310,6 @@ WHERE id=$1::UUID",
                 id: row.get("id"),
                 username: row.get("username"),
                 image_url: row.get("image_url"),
-                rd: row.get("rd"),
-                rn: row.get("rn"),
                 created_date: row
                     .get::<'_, _, PrimitiveDateTime>("created_date")
                     .assume_utc(),
@@ -328,6 +326,8 @@ WHERE id=$1::UUID",
                             unlocked: r
                                 .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
                                 .map(PrimitiveDateTime::assume_utc),
+                            rd: row.get("rd"),
+                            rn: row.get("rn"),
                             progress: r.get("progress"),
                         })
                         .collect()
