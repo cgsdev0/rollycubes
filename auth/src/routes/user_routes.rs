@@ -305,13 +305,17 @@ pub async fn user_by_id(
 WITH total_users AS
 (
     SELECT COUNT(*) AS user_count from users
+    LEFT JOIN anon_identity ON user_id = id
+    WHERE anon_identity.anon_id IS NULL
 ),
 users_ach_totals AS
 (
-    SELECT COUNT(user_id) achievement_count,
+    SELECT COUNT(user_to_achievement.user_id) achievement_count,
     achievement_id as id
     FROM user_to_achievement
-    WHERE unlocked IS NOT NULL
+    LEFT JOIN anon_identity ON anon_identity.user_id = user_to_achievement.user_id
+    WHERE anon_identity.anon_id IS NULL
+    AND unlocked IS NOT NULL
     GROUP BY id
 )
 SELECT
