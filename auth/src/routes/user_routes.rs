@@ -112,7 +112,7 @@ pub async fn refresh_token(
         .query_one(
             "
 SELECT username, user_id, issued_at FROM refresh_token
-LEFT JOIN public.user_id ON users.id = user_id
+LEFT JOIN users ON users.id = user_id
 WHERE refresh_token.id = $1::UUID
 ",
             &[&parsed_token],
