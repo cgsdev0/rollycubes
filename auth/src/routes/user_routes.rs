@@ -177,7 +177,7 @@ pub async fn login(
             let result = client
                 .query_one(
                     "
-SELECT twitch_id, userId FROM twitch_identity
+SELECT twitch_id, user_id FROM twitch_identity
 WHERE twitch_id = $1::TEXT",
                     &[&t.user_id.as_str()],
                 )
