@@ -2,8 +2,6 @@
 #pragma once
 
 
-#include "UserData.hpp"
-
 namespace API {
 
     struct Player {
@@ -14,7 +12,6 @@ void fromString(const std::string &str);
         std::shared_ptr<std::string> name;
         double score;
         std::shared_ptr<std::string> user_id;
-        std::shared_ptr<UserData> user_data;
         double win_count;
     };
 }

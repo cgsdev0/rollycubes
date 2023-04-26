@@ -44,9 +44,16 @@ pub async fn auth_layer<B>(request: Request<B>, next: Next<B>) -> Response {
     (StatusCode::UNAUTHORIZED, "forbidden").into_response()
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "type", content = "id")]
+enum UserId {
+    User(Uuid),
+    Anonymous(String),
+}
+
 #[derive(Deserialize)]
 pub struct AddStatsPayload {
-    id: Uuid,
+    user_id: UserId,
     rolls: f32,
     doubles: f32,
     games: f32,
@@ -54,13 +61,64 @@ pub struct AddStatsPayload {
 }
 
 pub struct AddStatsPayloadSomeday {
-    id: Uuid,
+    user_id: UserId,
     rolls: i32,
     doubles: i32,
     games: i32,
     wins: i32,
 }
 
+async fn find_user_id(s: &RouterState, user: UserId) -> Result<Uuid, StatusCode> {
+    let Ok(mut client) = s.pool.get().await else {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
+    match user {
+        UserId::Anonymous(id) => {
+            // Find the anonymous user
+            match client
+                .query(
+                    "
+SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT
+",
+                    &[&id],
+                )
+                .await
+            {
+                Ok(rows) => {
+                    if rows.is_empty() {
+                        // Create a new user
+                        let new_id = Uuid::new_v4();
+
+                        let Ok(transaction) = client.transaction().await else {
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                };
+                        transaction
+                            .execute("INSERT INTO users (id) VALUES ($1::UUID)", &[&new_id])
+                            .await
+                            .unwrap();
+                        transaction
+                            .execute("INSERT INTO anon_identity (anon_id, user_id) VALUES ($1::TEXT, $2::UUID)",
+                                &[&id, &new_id],
+                            )
+                            .await
+                            .unwrap();
+
+                        let Ok(_) = transaction.commit().await else {
+                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                        };
+                        Ok(new_id)
+                    } else {
+                        Ok(rows[0].get::<'_, _, Uuid>("user_id"))
+                    }
+                }
+                Err(..) => {
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                }
+            }
+        }
+        UserId::User(id) => Ok(id),
+    }
+}
 #[axum::debug_handler]
 pub async fn add_stats(
     State(s): State<RouterState>,
@@ -74,7 +132,13 @@ pub async fn add_stats(
         doubles: body_input.doubles.round() as i32,
         games: body_input.games.round() as i32,
         wins: body_input.wins.round() as i32,
-        id: body_input.id,
+        user_id: body_input.user_id,
+    };
+    let user_id = match find_user_id(&s, body.user_id).await {
+        Ok(uid) => uid,
+        Err(code) => {
+            return code;
+        }
     };
     let result = client
         .query(
@@ -82,7 +146,7 @@ pub async fn add_stats(
 SELECT rolls, doubles, games, wins FROM player_stats
 WHERE user_id = $1::UUID
 ",
-            &[&body.id],
+            &[&user_id],
         )
         .await;
     match result {
@@ -104,13 +168,14 @@ ON CONFLICT(user_id) DO UPDATE SET
     doubles = $2::INTEGER,
     games = $3::INTEGER,
     wins = $4::INTEGER
+
 ",
                     &[
                         &body.rolls,
                         &body.doubles,
                         &body.games,
                         &body.wins,
-                        &body.id,
+                        &user_id,
                     ],
                 )
                 .await;
@@ -133,7 +198,7 @@ pub struct AchievementUnlock {
 
 #[derive(Deserialize)]
 pub struct AchievementProgressPayload {
-    user_id: Uuid,
+    user_id: UserId,
     achievement_id: String,
     progress: f32,
 }
@@ -161,6 +226,14 @@ pub async fn achievement_progress(
             unlocked = Some(current_time);
         }
     }
+
+    let user_id = match find_user_id(&s, body.user_id).await {
+        Ok(uid) => uid,
+        Err(code) => {
+            return Err(code);
+        }
+    };
+
     let result = client
         .query_one(
             "
@@ -189,7 +262,7 @@ ON CONFLICT(user_id, achievement_id) DO UPDATE SET
             &[
                 &unlocked,
                 &progress,
-                &body.user_id,
+                &user_id,
                 &a.id,
                 &a.max_progress.unwrap_or(0),
                 &current_time,

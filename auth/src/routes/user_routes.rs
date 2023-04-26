@@ -205,18 +205,50 @@ WHERE
                 tracing::debug!("we updated the user record");
                 id
             } else {
-                // Create the user
-                let id = Uuid::new_v4();
-
+                // Check if we should promote an anonymous user
                 let Ok(transaction) = client.transaction().await else {
                     return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 };
-                tracing::debug!("we're going to insert a new user");
+                let id = if let Some(session) = jar.get("_session") {
+                    println!("GOT SESSION: {}", session);
+                    match transaction
+                        .query(
+                            "
+SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT",
+                            &[&format!("{}{}", "guest:", session.value())],
+                        )
+                        .await
+                    {
+                        Ok(rows) => {
+                            if rows.is_empty() {
+                                Uuid::new_v4()
+                            } else {
+                                let new_id = rows[0].get::<'_, _, Uuid>("user_id");
+                                println!("GOT ID: {}", new_id);
+                                transaction
+                                    .execute(
+                                        "
+DELETE FROM anon_identity WHERE user_id = $1::UUID",
+                                        &[&new_id],
+                                    )
+                                    .await
+                                    .unwrap();
+                                new_id
+                            }
+                        }
+                        Err(..) => {
+                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                        }
+                    }
+                } else {
+                    Uuid::new_v4()
+                };
+                // Create a brand new user
                 transaction
                     .execute(
                         "
 INSERT INTO users (username, image_url, id)
-VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
+VALUES ($1::TEXT, $2::TEXT, $3::UUID) ON CONFLICT(id) DO NOTHING",
                         &[&user.display_name.as_str(), &user.profile_image_url, &id],
                     )
                     .await

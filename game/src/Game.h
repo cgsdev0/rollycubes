@@ -107,7 +107,7 @@ class Game {
           if (isSignedIn(player)) {
             user_id = player.session;
           }
-          players.emplace_back(player.connected, player.crowned, player.name, player.score, std::make_shared<std::string>(user_id), player.user_data, player.win_count);
+          players.emplace_back(player.connected, player.crowned, player.name, player.score, std::make_shared<std::string>(user_id), player.win_count);
         }
         return API::WelcomeMsg{
          .chat_log = this->state.chat_log,

@@ -7,9 +7,16 @@ export interface Player {
   crowned?: boolean;
 }
 
+export type UserId =
+  | {
+      type: 'User';
+      id: string;
+    }
+  | { type: 'Anonymous'; id: string };
+
 export interface AchievementProgress {
   achievement_id: string;
-  user_id: string;
+  user_id: UserId;
   progress: number;
   type: 'achievement_progress';
 }
@@ -24,7 +31,7 @@ export interface AchievementUnlock {
 }
 
 export interface ReportStats {
-  id: string;
+  user_id: UserId;
   rolls: number;
   wins: number;
   games: number;

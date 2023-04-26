@@ -179,15 +179,18 @@ static const std::unordered_map<
 #undef ACTION
 
 void Game::processEvent(const API::ServerPlayer *player, HandlerArgs *server, const json &data, const API::GameState &prev) {
-    if (!isSignedIn(*player)) return;
+    API::AchievementProgressUserId user_id({ .id = player->session, .type = API::UserIdType::ANONYMOUS });
 
+    if (isSignedIn(*player)) {
+      user_id.type = API::UserIdType::USER;
+    };
     for (auto achievement : this->achievements) {
         auto progress = achievement->processEvent(data, prev, state, player->session);
         if (progress <= 0) continue;
         API::AchievementProgress ap{
             .achievement_id = achievement->getAchievementID(),
             .progress = progress,
-            .user_id = player->session};
+            .user_id = user_id};
         auto send = server->send;
         server->reportStats2("achievement_progress", ap.toString(), [send](auto s) {
             API::AchievementUnlock a;
@@ -456,12 +459,15 @@ void Game::update(HANDLER_ARGS) {
                 state.players[winnerId].win_count++;
                 for (uint i = 0; i < state.players.size(); ++i) {
                     state.players[i].crowned = std::make_shared<bool>(false);
-                    if (!isSignedIn(state.players[i])) continue;
+                    API::ReportStatsUserId user_id({ .id = state.players[i].session, .type = API::UserIdType::ANONYMOUS });
+                    if (isSignedIn(state.players[i])) {
+                      user_id.type = API::UserIdType::USER;
+                    }
                     API::ReportStats stats{
                         .doubles = state.players[i].doubles_count,
                         .games = 1,
-                        .id = state.players[i].session,
                         .rolls = state.players[i].roll_count,
+                        .user_id = user_id,
                         .wins = (winnerId == i ? 1 : 0)};
                     server.reportStats2("add_stats", stats.toString(), [broadcast](auto s) {
                         std::cout << "AUTH SAYS: " << s << std::endl;

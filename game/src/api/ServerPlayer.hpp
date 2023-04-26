@@ -2,8 +2,6 @@
 #pragma once
 
 
-#include "UserData.hpp"
-
 namespace API {
 
     struct ServerPlayer {
@@ -18,7 +16,6 @@ void fromString(const std::string &str);
         std::string session;
         double turn_count;
         std::shared_ptr<std::string> user_id;
-        std::shared_ptr<UserData> user_data;
         double win_count;
     };
 }

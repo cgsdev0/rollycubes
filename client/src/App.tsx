@@ -30,7 +30,7 @@ const RenderCanvas = styled('canvas', {
 const App = () => {
   // make a cookie DONT FORGET TO SET THE PATH AHHHHHHHHHHHHHHHHHHHH
   if (!document.cookie.includes('_session')) {
-    document.cookie = `_session=${uuidv4()}; Path=/; Secure`;
+    document.cookie = `_session=${uuidv4()}; Path=/; Secure; SameSite=None; Max-Age=86400000`;
   }
 
   return (
