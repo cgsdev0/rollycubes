@@ -1,4 +1,4 @@
-import { createReducer } from "@reduxjs/toolkit";
+import { createReducer } from '@reduxjs/toolkit';
 
 export interface ConnectionState {
   socket?: WebSocket;
@@ -6,7 +6,7 @@ export interface ConnectionState {
 }
 
 export interface WebsocketAction {
-  type: "WEBSOCKET";
+  type: 'WEBSOCKET';
   socket?: WebSocket;
 }
 
@@ -14,13 +14,13 @@ export const connectionReducer = createReducer<ConnectionState>(
   { connected: false },
   (builder) => {
     builder
-      .addCase("WEBSOCKET", (state, action: WebsocketAction) => {
+      .addCase('WEBSOCKET', (state, action: WebsocketAction) => {
         state.socket = action.socket;
       })
-      .addCase("socket_open", (state, action) => {
+      .addCase('socket_open', (state, action) => {
         state.connected = true;
       })
-      .addCase("socket_close", (state, action) => {
+      .addCase('socket_close', (state, action) => {
         state.connected = false;
       });
   }

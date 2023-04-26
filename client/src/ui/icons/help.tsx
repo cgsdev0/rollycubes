@@ -1,4 +1,4 @@
-import { styled } from 'stitches.config'
+import { styled } from 'stitches.config';
 
 export const ColoredSvg = styled('svg', {
   fill: '$gray600',
@@ -6,10 +6,10 @@ export const ColoredSvg = styled('svg', {
     fill: '$gray400',
     cursor: 'pointer',
   },
-})
+});
 
 interface IconProps {
-  onClick?(): void
+  onClick?(): void;
 }
 export const HomeIcon = (props: IconProps) => {
   return (
@@ -22,8 +22,8 @@ export const HomeIcon = (props: IconProps) => {
     >
       <path d="M27 18.039L16 9.501 5 18.039V14.56l11-8.54 11 8.538v3.481zm-2.75-.31v8.251h-5.5v-5.5h-5.5v5.5h-5.5v-8.25L16 11.543l8.25 6.186z" />
     </ColoredSvg>
-  )
-}
+  );
+};
 export const ShareIcon = (props: IconProps) => {
   return (
     <ColoredSvg
@@ -38,8 +38,8 @@ export const ShareIcon = (props: IconProps) => {
         fill-rule="evenodd"
       />
     </ColoredSvg>
-  )
-}
+  );
+};
 export const DiceIcon = (props: IconProps) => {
   return (
     <ColoredSvg
@@ -121,8 +121,8 @@ export const DiceIcon = (props: IconProps) => {
         />
       </g>
     </ColoredSvg>
-  )
-}
+  );
+};
 export const HelpIcon = (props: IconProps) => {
   return (
     <ColoredSvg
@@ -135,5 +135,5 @@ export const HelpIcon = (props: IconProps) => {
     >
       <path d="M12 3C7.04 3 3 7.04 3 12C3 16.96 7.04 21 12 21C16.96 21 21 16.96 21 12C21 7.04 16.96 3 12 3ZM12 19.5C7.86 19.5 4.5 16.14 4.5 12C4.5 7.86 7.86 4.5 12 4.5C16.14 4.5 19.5 7.86 19.5 12C19.5 16.14 16.14 19.5 12 19.5ZM14.3 7.7C14.91 8.31 15.25 9.13 15.25 10C15.25 10.87 14.91 11.68 14.3 12.3C13.87 12.73 13.33 13.03 12.75 13.16V13.5C12.75 13.91 12.41 14.25 12 14.25C11.59 14.25 11.25 13.91 11.25 13.5V12.5C11.25 12.09 11.59 11.75 12 11.75C12.47 11.75 12.91 11.57 13.24 11.24C13.57 10.91 13.75 10.47 13.75 10C13.75 9.53 13.57 9.09 13.24 8.76C12.58 8.1 11.43 8.1 10.77 8.76C10.44 9.09 10.26 9.53 10.26 10C10.26 10.41 9.92 10.75 9.51 10.75C9.1 10.75 8.76 10.41 8.76 10C8.76 9.13 9.1 8.32 9.71 7.7C10.94 6.47 13.08 6.47 14.31 7.7H14.3ZM13 16.25C13 16.8 12.55 17.25 12 17.25C11.45 17.25 11 16.8 11 16.25C11 15.7 11.45 15.25 12 15.25C12.55 15.25 13 15.7 13 16.25Z" />
     </ColoredSvg>
-  )
-}
+  );
+};

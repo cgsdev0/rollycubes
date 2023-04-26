@@ -1,18 +1,18 @@
-import React from "react";
-import { connect } from "react-redux";
+import React from 'react';
+import { connect } from 'react-redux';
 import {
   selectDiceRolls,
   selectIs3d,
   selectShouldShowDiceBoxes,
-} from "../selectors/game_selectors";
-import { ReduxState } from "../store";
-import { DieRoll } from "../types/store_types";
-import Die from "./die";
-import "./dice.css";
+} from '../selectors/game_selectors';
+import { ReduxState } from '../store';
+import { DieRoll } from '../types/store_types';
+import Die from './die';
+import './dice.css';
 
 interface Props {
-  dice: ReduxState["game"]["rolls"];
-  rolling: "rolled" | "rolling";
+  dice: ReduxState['game']['rolls'];
+  rolling: 'rolled' | 'rolling';
   is3d: boolean;
   showDiceBoxes: boolean;
 }

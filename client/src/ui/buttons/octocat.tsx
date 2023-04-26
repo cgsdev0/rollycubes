@@ -1,10 +1,10 @@
-import { css, keyframes } from 'stitches.config'
+import { css, keyframes } from 'stitches.config';
 
 const octocatWave = keyframes({
   '0%,100%': { transform: 'rotate(0)' },
   '20%,60%': { transform: 'rotate(-25deg)' },
   '40%,80%': { transform: 'rotate(10deg)' },
-})
+});
 
 const octocat = css({
   '&:hover .octo-arm': {
@@ -16,7 +16,7 @@ const octocat = css({
   '@hbp0': {
     display: 'none',
   },
-})
+});
 
 export const Octocat = () => {
   return (
@@ -55,5 +55,5 @@ export const Octocat = () => {
         ></path>
       </svg>
     </a>
-  )
-}
+  );
+};

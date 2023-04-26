@@ -1,5 +1,5 @@
 // stitches.config.ts
-import { createStitches } from '@stitches/react'
+import { createStitches } from '@stitches/react';
 
 export const {
   styled,
@@ -33,7 +33,7 @@ export const {
   utils: {
     marginX: (value: number) => ({ marginLeft: value, marginRight: value }),
   },
-})
+});
 
 export const globalStyles = globalCss({
   '*': { margin: 0, padding: 0 },
@@ -78,4 +78,4 @@ export const globalStyles = globalCss({
   '.flex-col': {
     flexDirection: 'column',
   },
-})
+});

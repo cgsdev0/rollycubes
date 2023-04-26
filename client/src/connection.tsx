@@ -1,36 +1,36 @@
-import jwt_decode from 'jwt-decode'
-import React from 'react'
-import { connect, DispatchProp } from 'react-redux'
-import { NavigateFunction } from 'react-router-dom'
-import { toast } from 'react-toastify'
-import { ReduxState } from './store'
-import { Achievement } from './ui/achievement'
-import { Location } from 'react-router-dom'
+import jwt_decode from 'jwt-decode';
+import React from 'react';
+import { connect, DispatchProp } from 'react-redux';
+import { NavigateFunction } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { ReduxState } from './store';
+import { Achievement } from './ui/achievement';
+import { Location } from 'react-router-dom';
 
 interface Props {
-  room: string
-  mode: string
-  navigate: NavigateFunction
-  location: Location
-  authToken?: string | null
+  room: string;
+  mode: string;
+  navigate: NavigateFunction;
+  location: Location;
+  authToken?: string | null;
 }
 
 export interface DecodedUserJWT {
-  display_name: string
-  exp: number
-  iat: number
-  user_id: string
+  display_name: string;
+  exp: number;
+  iat: number;
+  user_id: string;
 }
 
 class Connection extends React.Component<Props & DispatchProp> {
-  websocket?: WebSocket
-  timer?: any
+  websocket?: WebSocket;
+  timer?: any;
 
   onClose = (_: CloseEvent) => {
-    console.error('Socket closed, reconnecting...')
-    this.props.dispatch({ type: 'socket_close' })
-    this.timer = setTimeout(this.openSocket, 5000)
-  }
+    console.error('Socket closed, reconnecting...');
+    this.props.dispatch({ type: 'socket_close' });
+    this.timer = setTimeout(this.openSocket, 5000);
+  };
 
   onOpen = (_: Event) => {
     // toast(
@@ -41,9 +41,9 @@ class Connection extends React.Component<Props & DispatchProp> {
     // achievement_id: "fake_test"
     // })
     // );
-    console.log('Socket opened to room', this.props.room)
-    this.props.dispatch({ type: 'socket_open' })
-    const name = localStorage.getItem('name')
+    console.log('Socket opened to room', this.props.room);
+    this.props.dispatch({ type: 'socket_open' });
+    const name = localStorage.getItem('name');
     if (this.websocket && this.props.authToken && this.props.mode === 'room') {
       // test
       this.websocket.send(
@@ -51,135 +51,135 @@ class Connection extends React.Component<Props & DispatchProp> {
           type: 'authenticate',
           access_token: this.props.authToken,
         })
-      )
+      );
     } else if (this.websocket && name) {
-      this.websocket.send(JSON.stringify({ type: 'update_name', name }))
+      this.websocket.send(JSON.stringify({ type: 'update_name', name }));
     }
     //this.websocket!.send(JSON.stringify({ type: "roll", n: 0, msg: "Hello world!" }))
-  }
+  };
 
   onMessage = (e: MessageEvent) => {
     if (e.data === 'cookie') {
-      this.props.navigate('/', { replace: true })
-      if (this.websocket) this.websocket.close()
-      return
+      this.props.navigate('/', { replace: true });
+      if (this.websocket) this.websocket.close();
+      return;
     }
-    const data: any = JSON.parse(e.data)
+    const data: any = JSON.parse(e.data);
     if (!data) {
-      console.error('empty action from server')
+      console.error('empty action from server');
     } else if ('error' in data) {
       if (data.error === 'already connected') {
-        if (this.websocket) this.websocket.close()
-        this.props.navigate(`/multiple-tabs`, { replace: true })
+        if (this.websocket) this.websocket.close();
+        this.props.navigate(`/multiple-tabs`, { replace: true });
       }
-      console.error(data || data.error)
+      console.error(data || data.error);
     } else if (data.type === 'redirect') {
-      const pathParts = this.props.location.pathname.split('/')
-      this.props.navigate(`/${pathParts[1]}/${data.room}`, { replace: true })
+      const pathParts = this.props.location.pathname.split('/');
+      this.props.navigate(`/${pathParts[1]}/${data.room}`, { replace: true });
     } else {
       // I'm sorry
-      const reduxState = (window as any).REDUX_STORE.getState() as ReduxState
-      const otherUsers = reduxState.auth.otherUsers
-      const { authServiceOrigin } = reduxState.settings
+      const reduxState = (window as any).REDUX_STORE.getState() as ReduxState;
+      const otherUsers = reduxState.auth.otherUsers;
+      const { authServiceOrigin } = reduxState.settings;
       const populateUser = (player: any) => {
         if (player.hasOwnProperty('user_id') && player.user_id) {
           if (!otherUsers.hasOwnProperty(player.user_id)) {
-            ;(async () => {
+            (async () => {
               try {
                 const resp = await window.fetch(
                   authServiceOrigin + 'users/' + player.user_id
-                )
-                const data = await resp.json()
+                );
+                const data = await resp.json();
                 if (!data.hasOwnProperty('id')) {
-                  console.error('failed to get user info for', player.user_id)
-                  return
+                  console.error('failed to get user info for', player.user_id);
+                  return;
                 }
-                this.props.dispatch({ type: 'GOT_USER_DATA', data })
+                this.props.dispatch({ type: 'GOT_USER_DATA', data });
               } catch (e) {
-                console.error('Something went wrong fetching user data', e)
+                console.error('Something went wrong fetching user data', e);
               }
-            })()
+            })();
           }
         }
-      }
+      };
       if (data.type === 'achievement_unlock') {
-        toast(Achievement(data), { autoClose: 0 })
+        toast(Achievement(data), { autoClose: 0 });
       }
       if (data.type === 'welcome') {
-        data.players.forEach(populateUser)
+        data.players.forEach(populateUser);
       }
       if (data.type === 'join') {
-        populateUser(data)
+        populateUser(data);
       }
-      this.props.dispatch(data)
+      this.props.dispatch(data);
     }
-  }
+  };
 
   onError = (e: any) => {
-    console.error('oh god why', e)
-  }
+    console.error('oh god why', e);
+  };
   openSocket = () => {
     if (
       !this.websocket ||
       this.websocket.readyState === WebSocket.CLOSED ||
       this.websocket.readyState === WebSocket.CLOSING
     ) {
-      let portString = ''
+      let portString = '';
       if (window.location.port !== '80') {
-        portString = `:${window.location.port}`
+        portString = `:${window.location.port}`;
       }
-      let userIdStr = ''
+      let userIdStr = '';
       if (this.props.authToken && this.props.mode === 'room') {
-        const decoded: DecodedUserJWT = jwt_decode(this.props.authToken)
-        userIdStr = '?userId=' + decoded.user_id
+        const decoded: DecodedUserJWT = jwt_decode(this.props.authToken);
+        userIdStr = '?userId=' + decoded.user_id;
       }
       this.websocket = new WebSocket(
         `${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${
           window.location.hostname
         }${portString}/ws/${this.props.mode}/${this.props.room}${userIdStr}`
-      )
-      this.websocket.addEventListener('close', this.onClose)
-      this.websocket.addEventListener('open', this.onOpen)
-      this.websocket.addEventListener('message', this.onMessage)
-      this.websocket.addEventListener('error', this.onError)
-      this.props.dispatch({ type: 'WEBSOCKET', socket: this.websocket })
+      );
+      this.websocket.addEventListener('close', this.onClose);
+      this.websocket.addEventListener('open', this.onOpen);
+      this.websocket.addEventListener('message', this.onMessage);
+      this.websocket.addEventListener('error', this.onError);
+      this.props.dispatch({ type: 'WEBSOCKET', socket: this.websocket });
     }
-  }
+  };
 
   componentDidMount() {
-    this.openSocket()
+    this.openSocket();
   }
 
   componentDidUpdate(prev: Props) {
     if (prev.room !== this.props.room) {
       if (this.websocket) {
-        this.websocket.close()
+        this.websocket.close();
       }
-      this.openSocket()
+      this.openSocket();
     }
   }
 
   componentWillUnmount() {
-    this.props.dispatch({ type: 'WEBSOCKET', socket: undefined })
+    this.props.dispatch({ type: 'WEBSOCKET', socket: undefined });
     if (this.websocket) {
       if (this.timer) {
-        clearTimeout(this.timer)
+        clearTimeout(this.timer);
       }
-      this.websocket.removeEventListener('close', this.onClose)
-      this.websocket.removeEventListener('open', this.onOpen)
-      this.websocket.removeEventListener('message', this.onMessage)
-      this.websocket.close()
+      this.websocket.removeEventListener('close', this.onClose);
+      this.websocket.removeEventListener('open', this.onOpen);
+      this.websocket.removeEventListener('message', this.onMessage);
+      this.websocket.close();
     }
   }
 
   render() {
-    return null
+    return null;
   }
 }
 
 const mapStateToProps = (state: ReduxState) => {
   return {
     authToken: state.auth.authToken,
-  }
-}
-export default connect(mapStateToProps)(Connection)
+  };
+};
+export default connect(mapStateToProps)(Connection);

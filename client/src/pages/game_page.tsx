@@ -1,15 +1,15 @@
-import React from 'react'
-import { connect, DispatchProp } from 'react-redux'
+import React from 'react';
+import { connect, DispatchProp } from 'react-redux';
 import {
   Location,
   NavigateFunction,
   useLocation,
   useNavigate,
   useParams,
-} from 'react-router-dom'
-import OnboardPage from './onboard_page'
-import { css, styled } from 'stitches.config'
-import Connection from '../connection'
+} from 'react-router-dom';
+import OnboardPage from './onboard_page';
+import { css, styled } from 'stitches.config';
+import Connection from '../connection';
 import {
   selectIs3d,
   selectIsReset,
@@ -17,31 +17,31 @@ import {
   selectSomebodyIsNice,
   selectTurnIndex,
   selectWinner,
-} from '../selectors/game_selectors'
-import { ReduxState } from '../store'
-import { Player } from '../types/store_types'
-import ChatBox from '../ui/chat'
-import GamePanel from '../ui/game_panel'
-import Players from '../ui/players'
-import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help'
-import { useDispatch } from 'react-redux'
-import { destroyScene, initScene } from '3d/main'
-import { PopText } from '../ui/poptext'
+} from '../selectors/game_selectors';
+import { ReduxState } from '../store';
+import { Player } from '../types/store_types';
+import ChatBox from '../ui/chat';
+import GamePanel from '../ui/game_panel';
+import Players from '../ui/players';
+import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help';
+import { useDispatch } from 'react-redux';
+import { destroyScene, initScene } from '3d/main';
+import { PopText } from '../ui/poptext';
 
 interface Props {
-  winner?: Player
-  reset: boolean
-  isSpectator: boolean
-  turn: number
-  is3DMode: boolean
-  somebodyIsNice: boolean
-  authToken?: string | null
+  winner?: Player;
+  reset: boolean;
+  isSpectator: boolean;
+  turn: number;
+  is3DMode: boolean;
+  somebodyIsNice: boolean;
+  authToken?: string | null;
 }
 
 const flexColumn = css({
   display: 'flex',
   flexDirection: 'column',
-})
+});
 
 const FloatingButtonBar = styled('div', {
   '@bp1': {
@@ -52,7 +52,7 @@ const FloatingButtonBar = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: 8,
-})
+});
 
 const GamePage: React.FC<Props & DispatchProp> = ({
   is3DMode,
@@ -62,28 +62,28 @@ const GamePage: React.FC<Props & DispatchProp> = ({
   reset,
   turn,
 }) => {
-  const [hasOnboarded, setHasOnboarded] = React.useState(false)
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { mode, room } = useParams()
+  const [hasOnboarded, setHasOnboarded] = React.useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { mode, room } = useParams();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room'
+  const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room';
 
-  const [showHelp, setShowHelp] = React.useState(false)
+  const [showHelp, setShowHelp] = React.useState(false);
 
   React.useEffect(() => {
     if (is3DMode && !needsToOnboard && authToken !== undefined) {
-      initScene()
+      initScene();
       return () => {
-        destroyScene()
-      }
+        destroyScene();
+      };
     }
-  }, [is3DMode, needsToOnboard, authToken])
+  }, [is3DMode, needsToOnboard, authToken]);
 
   if (!mode || !room) {
-    return <p>Error</p>
+    return <p>Error</p>;
   }
 
   if (needsToOnboard) {
@@ -92,7 +92,7 @@ const GamePage: React.FC<Props & DispatchProp> = ({
         intent={`${mode}/${room}`}
         onBoard={() => setHasOnboarded(true)}
       />
-    )
+    );
   }
 
   return (
@@ -132,8 +132,8 @@ const GamePage: React.FC<Props & DispatchProp> = ({
       {showHelp ? <Rules /> : <ChatBox />}
       <PopText />
     </React.Fragment>
-  )
-}
+  );
+};
 
 const RulesDiv = styled('div', {
   '@bp0': {
@@ -146,7 +146,7 @@ const RulesDiv = styled('div', {
     left: -8,
     zIndex: 10,
   },
-})
+});
 const Rules = () => {
   return (
     <RulesDiv>
@@ -179,8 +179,8 @@ const Rules = () => {
         </li>
       </ul>
     </RulesDiv>
-  )
-}
+  );
+};
 
 const mapStateToProps = (state: ReduxState) => {
   return {
@@ -191,9 +191,9 @@ const mapStateToProps = (state: ReduxState) => {
     isSpectator: selectIsSpectator(state),
     somebodyIsNice: selectSomebodyIsNice(state),
     authToken: state.auth.authToken,
-  }
-}
+  };
+};
 
-const ConnectedGamePage = connect(mapStateToProps)(GamePage)
+const ConnectedGamePage = connect(mapStateToProps)(GamePage);
 
-export default ConnectedGamePage
+export default ConnectedGamePage;

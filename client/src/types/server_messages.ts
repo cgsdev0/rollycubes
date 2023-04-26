@@ -1,12 +1,12 @@
-import { Player, ServerPlayer } from "./store_types";
+import { Player, ServerPlayer } from './store_types';
 
 export interface GameError {
-  type: "error";
+  type: 'error';
   error: string;
 }
 
 export interface Redirect {
-  type: "redirect";
+  type: 'redirect';
   room: string;
 }
 
@@ -33,36 +33,36 @@ export interface IGameState {
 }
 
 export interface GameState extends IGameState {
-  type: "game_state";
+  type: 'game_state';
   players: ServerPlayer[];
 }
 
 export interface WelcomeMsg extends IGameState {
-  type: "welcome";
+  type: 'welcome';
   id: number; // self_id; -1 means spectator
 }
 
 export interface RestartMsg {
-  type: "restart";
+  type: 'restart';
   id: number; // starting turn index
 }
 
 export interface WinMsg {
-  type: "win";
+  type: 'win';
   id: number; // winner turn index
 }
 
 export interface RollMsg {
-  type: "roll";
+  type: 'roll';
   rolls: number[];
 }
 
 export interface RollAgainMsg {
-  type: "roll_again";
+  type: 'roll_again';
 }
 
 export interface JoinMsg {
-  type: "join";
+  type: 'join';
   id: number;
   /* only if the user is signed in */
   name?: string;
@@ -70,38 +70,38 @@ export interface JoinMsg {
 }
 
 export interface DisconnectMsg {
-  type: "disconnect";
+  type: 'disconnect';
   id: number;
 }
 
 export interface ReconnectMsg {
-  type: "reconnect";
+  type: 'reconnect';
   id: number;
 }
 
 export interface KickMsg {
-  type: "kick";
+  type: 'kick';
   id: number;
 }
 
 export interface ChatMsg {
-  type: "chat";
+  type: 'chat';
   msg: string;
 }
 
 export interface UpdateTurnMsg {
-  type: "update_turn";
+  type: 'update_turn';
   id: number; // new turn index
 }
 
 export interface UpdateNameMsg {
-  type: "update_name";
+  type: 'update_name';
   name: string;
   id: number; // new turn index
 }
 
 export interface UpdateMsg {
-  type: "update";
+  type: 'update';
   id: number; // new turn index
   score: number;
   used?: boolean[];

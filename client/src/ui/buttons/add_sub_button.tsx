@@ -1,8 +1,8 @@
-import React from "react";
-import { connect } from "react-redux";
-import { getAddSubButtonClassSelector } from "../../selectors/game_selectors";
-import { ReduxState } from "../../store";
-import "./buttons.css";
+import React from 'react';
+import { connect } from 'react-redux';
+import { getAddSubButtonClassSelector } from '../../selectors/game_selectors';
+import { ReduxState } from '../../store';
+import './buttons.css';
 
 interface OwnProps {
   n?: number;
@@ -29,10 +29,10 @@ const AddSubButton: React.FC<Props> = ({ socket, addClass, subClass, n }) => {
 
   return (
     <React.Fragment>
-      <button onClick={() => onClick("add")} className={`Add${addClass}`}>
+      <button onClick={() => onClick('add')} className={`Add${addClass}`}>
         +
       </button>
-      <button onClick={() => onClick("sub")} className={`Subtract${subClass}`}>
+      <button onClick={() => onClick('sub')} className={`Subtract${subClass}`}>
         -
       </button>
     </React.Fragment>
@@ -43,10 +43,10 @@ const mapStateToProps = (state: ReduxState, ownProps: OwnProps): StateProps => {
   return {
     socket: state.connection.socket,
     addClass: getAddSubButtonClassSelector(
-      typeof ownProps.n === "number" ? ownProps.n + 1 : "add"
+      typeof ownProps.n === 'number' ? ownProps.n + 1 : 'add'
     )(state),
     subClass: getAddSubButtonClassSelector(
-      typeof ownProps.n === "number" ? -(ownProps.n + 1) : "sub"
+      typeof ownProps.n === 'number' ? -(ownProps.n + 1) : 'sub'
     )(state),
   };
 };

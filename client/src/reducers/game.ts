@@ -1,4 +1,4 @@
-import { createReducer } from "@reduxjs/toolkit";
+import { createReducer } from '@reduxjs/toolkit';
 import {
   DisconnectMsg,
   JoinMsg,
@@ -12,8 +12,8 @@ import {
   UpdateTurnMsg,
   WelcomeMsg,
   WinMsg,
-} from "../types/server_messages";
-import { DieRoll, Player } from "../types/store_types";
+} from '../types/server_messages';
+import { DieRoll, Player } from '../types/store_types';
 
 export interface GameState {
   players: Player[];
@@ -39,7 +39,7 @@ export const gameReducer = createReducer<GameState>(
   initialGameState,
   (builder) => {
     builder
-      .addCase("welcome", (state, action: WelcomeMsg) => {
+      .addCase('welcome', (state, action: WelcomeMsg) => {
         state.rolls = action.rolls.map((value, i) => ({
           used: action.used[i],
           value,
@@ -54,7 +54,7 @@ export const gameReducer = createReducer<GameState>(
           state.self_index = action.id;
         }
       })
-      .addCase("restart", (state, action: RestartMsg) => {
+      .addCase('restart', (state, action: RestartMsg) => {
         state.players = state.players.map((player) => {
           player.score = 0;
           return player;
@@ -63,24 +63,24 @@ export const gameReducer = createReducer<GameState>(
         state.rolled = false;
         state.turn_index = action.id;
       })
-      .addCase("win", (state, action: WinMsg) => {
+      .addCase('win', (state, action: WinMsg) => {
         state.players[action.id].win_count++;
-        state.players = state.players.map(player => {
+        state.players = state.players.map((player) => {
           player.crowned = false;
           return player;
         });
         state.players[action.id].crowned = true;
         state.victory = true;
       })
-      .addCase("update_turn", (state, action: UpdateTurnMsg) => {
+      .addCase('update_turn', (state, action: UpdateTurnMsg) => {
         state.turn_index = action.id;
         state.rolled = false;
         state.rolled3d = false;
       })
-      .addCase("update_name", (state, action: UpdateNameMsg) => {
+      .addCase('update_name', (state, action: UpdateNameMsg) => {
         state.players[action.id].name = action.name;
       })
-      .addCase("update", (state, action: UpdateMsg) => {
+      .addCase('update', (state, action: UpdateMsg) => {
         state.players[action.id].score = action.score;
         if (action.used) {
           for (let i = 0; i < action.used.length; ++i) {
@@ -88,28 +88,28 @@ export const gameReducer = createReducer<GameState>(
           }
         }
       })
-      .addCase("roll_again", (state, action: RollAgainMsg) => {
+      .addCase('roll_again', (state, action: RollAgainMsg) => {
         state.rolled = false;
         state.rolled3d = false;
       })
-      .addCase("join", (state, action: JoinMsg) => {
+      .addCase('join', (state, action: JoinMsg) => {
         if (!state.players.length || action.id === state.self_index) {
           return;
         }
         state.players.push({
           connected: true,
-          name: action.name || "",
+          name: action.name || '',
           score: 0,
           win_count: 0,
         });
       })
-      .addCase("disconnect", (state, action: DisconnectMsg) => {
+      .addCase('disconnect', (state, action: DisconnectMsg) => {
         state.players[action.id].connected = false;
       })
-      .addCase("reconnect", (state, action: ReconnectMsg) => {
+      .addCase('reconnect', (state, action: ReconnectMsg) => {
         state.players[action.id].connected = true;
       })
-      .addCase("kick", (state, action: KickMsg) => {
+      .addCase('kick', (state, action: KickMsg) => {
         state.players.splice(action.id, 1);
         if (state.self_index !== undefined) {
           if (action.id < state.self_index) {
@@ -117,13 +117,13 @@ export const gameReducer = createReducer<GameState>(
           }
         }
       })
-      .addCase("FINISH_3D_ROLL", (state, action) => {
+      .addCase('FINISH_3D_ROLL', (state, action) => {
         state.rolled3d = true;
       })
-      .addCase("roll", (state, action: RollMsg) => {
+      .addCase('roll', (state, action: RollMsg) => {
         // TODO: remove this side effect
         document.dispatchEvent(
-          new CustomEvent<any>("roll", {
+          new CustomEvent<any>('roll', {
             detail: { rolls: action.rolls, turn_index: state.turn_index },
           })
         );

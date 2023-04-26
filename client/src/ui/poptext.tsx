@@ -1,16 +1,16 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { styled, css, keyframes } from 'stitches.config'
+import React from 'react';
+import { connect } from 'react-redux';
+import { styled, css, keyframes } from 'stitches.config';
 import {
   selectLatestPopText,
   selectCrownedPlayer,
-} from '../selectors/game_selectors'
-import { ReduxState } from '../store'
-import { useDispatch } from 'react-redux'
+} from '../selectors/game_selectors';
+import { ReduxState } from '../store';
+import { useDispatch } from 'react-redux';
 
 interface Props {
-  latestPopText?: { text: string; color: string; id: number }
-  crownedPlayer: ReturnType<typeof selectCrownedPlayer>
+  latestPopText?: { text: string; color: string; id: number };
+  crownedPlayer: ReturnType<typeof selectCrownedPlayer>;
 }
 
 const popTextAnim = keyframes({
@@ -18,7 +18,7 @@ const popTextAnim = keyframes({
   '8%': { opacity: 1, marginTop: 0 },
   '40%': { opacity: 1, marginTop: 0 },
   '100%': { opacity: 0, marginTop: -200 },
-})
+});
 
 const PopTextContainer = styled('div', {
   position: 'absolute',
@@ -37,34 +37,34 @@ const PopTextContainer = styled('div', {
     animation: `${popTextAnim} 1.4s ease-out forwards`,
     fontWeight: 'bold',
   },
-})
+});
 
 const PopupText = ({
   text,
   player,
 }: {
-  text: NonNullable<Props['latestPopText']>
-  player: ReturnType<typeof selectCrownedPlayer>
+  text: NonNullable<Props['latestPopText']>;
+  player: ReturnType<typeof selectCrownedPlayer>;
 }) => {
   return (
     <h6 style={{ color: text.color }} key={text.id}>
       {text.text.replace('{winner}', player?.name || 'Someone')}
     </h6>
-  )
-}
+  );
+};
 const UnconnectedPopText: React.FC<Props> = ({
   latestPopText,
   crownedPlayer,
 }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     if (latestPopText) {
       // queue up a removal
-      const timeout = setTimeout(() => dispatch({ type: 'POP_NEXT' }), 1500)
-      return () => clearTimeout(timeout)
+      const timeout = setTimeout(() => dispatch({ type: 'POP_NEXT' }), 1500);
+      return () => clearTimeout(timeout);
     }
-  }, [latestPopText])
+  }, [latestPopText]);
 
   return (
     <PopTextContainer id="pop-text-container">
@@ -74,14 +74,14 @@ const UnconnectedPopText: React.FC<Props> = ({
 
       {/* <ConnBanner /> */}
     </PopTextContainer>
-  )
-}
+  );
+};
 
 const mapStateToProps = (state: ReduxState) => {
   return {
     latestPopText: selectLatestPopText(state),
     crownedPlayer: selectCrownedPlayer(state),
-  }
-}
+  };
+};
 
-export const PopText = connect(mapStateToProps)(UnconnectedPopText)
+export const PopText = connect(mapStateToProps)(UnconnectedPopText);

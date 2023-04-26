@@ -1,31 +1,31 @@
-import HorizontalScroll from 'react-horizontal-scrolling'
-import { connect, useSelector } from 'react-redux'
-import { css, styled } from 'stitches.config'
+import HorizontalScroll from 'react-horizontal-scrolling';
+import { connect, useSelector } from 'react-redux';
+import { css, styled } from 'stitches.config';
 import {
   selectIsSpectator,
   selectSelfIndex,
   selectTurnIndex,
-} from '../selectors/game_selectors'
-import { ReduxState } from '../store'
-import { Achievement, AchievementData, Player } from '../types/store_types'
-import Avatar from './avatar'
-import { usePopperTooltip } from 'react-popper-tooltip'
+} from '../selectors/game_selectors';
+import { ReduxState } from '../store';
+import { Achievement, AchievementData, Player } from '../types/store_types';
+import Avatar from './avatar';
+import { usePopperTooltip } from 'react-popper-tooltip';
 
 // TODO: remove
-import 'react-popper-tooltip/dist/styles.css'
-import { KickIcon } from './icons/kick'
-import React from 'react'
+import 'react-popper-tooltip/dist/styles.css';
+import { KickIcon } from './icons/kick';
+import React from 'react';
 
 interface Props {
-  player: Player
-  n: number
-  self_index?: number
-  turn_index: number
-  socket?: WebSocket
-  isSpectator: boolean
+  player: Player;
+  n: number;
+  self_index?: number;
+  turn_index: number;
+  socket?: WebSocket;
+  isSpectator: boolean;
 }
 
-const ADJUST_FOR_STUPID_FONT = -5
+const ADJUST_FOR_STUPID_FONT = -5;
 
 const playerName = css({
   overflow: 'hidden',
@@ -37,7 +37,7 @@ const playerName = css({
   '@bp0': {
     display: 'none',
   },
-})
+});
 
 const playerRow = css({
   display: 'flex',
@@ -60,7 +60,7 @@ const playerRow = css({
     paddingBottom: 2,
   },
   position: 'relative',
-})
+});
 
 const avatarAndName = css({
   display: 'flex',
@@ -68,13 +68,13 @@ const avatarAndName = css({
     maxWidth: '75%',
   },
   alignItems: 'center',
-})
+});
 
 const score = css({
   display: 'flex',
   alignItems: 'center',
   marginBottom: ADJUST_FOR_STUPID_FONT,
-})
+});
 
 const kick = css({
   display: 'flex',
@@ -84,34 +84,34 @@ const kick = css({
   position: 'absolute',
   top: 0,
   left: 5,
-})
+});
 
 const PlayerComponent = (props: Props) => {
   const changeName = () => {
-    const e = window.prompt('Enter a name: ', props.player.name)
-    if (e === null) return
+    const e = window.prompt('Enter a name: ', props.player.name);
+    if (e === null) return;
     if (props.socket) {
-      props.socket.send(JSON.stringify({ type: 'update_name', name: e }))
-      localStorage.setItem('name', e)
+      props.socket.send(JSON.stringify({ type: 'update_name', name: e }));
+      localStorage.setItem('name', e);
     }
-  }
+  };
 
   const onKick = () => {
-    const { player, n } = props
-    const e = window.confirm(`Are you sure you want to kick ${player.name}?`)
+    const { player, n } = props;
+    const e = window.confirm(`Are you sure you want to kick ${player.name}?`);
     if (e && props.socket) {
-      props.socket.send(JSON.stringify({ type: 'kick', id: n }))
+      props.socket.send(JSON.stringify({ type: 'kick', id: n }));
     }
-  }
+  };
 
-  const [tooltipVisible, setTooltipVisible] = React.useState(false)
+  const [tooltipVisible, setTooltipVisible] = React.useState(false);
   const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } =
     usePopperTooltip({
       visible: tooltipVisible,
       onVisibleChange: setTooltipVisible,
       interactive: true,
       trigger: 'click',
-    })
+    });
 
   const overridePosition = (
     { left, top }: { left: number; top: number },
@@ -120,18 +120,18 @@ const PlayerComponent = (props: Props) => {
 
     node: any
   ) => {
-    const d = document.documentElement
-    left = Math.min(d.clientWidth - node.clientWidth, left)
-    top = Math.min(d.clientHeight - node.clientHeight, top)
-    left = Math.max(0, left)
-    top = Math.max(0, top)
-    return { top, left }
-  }
+    const d = document.documentElement;
+    left = Math.min(d.clientWidth - node.clientWidth, left);
+    top = Math.min(d.clientHeight - node.clientHeight, top);
+    left = Math.max(0, left);
+    top = Math.max(0, top);
+    return { top, left };
+  };
 
-  const { n, player, self_index, turn_index } = props
-  const imageUrl = player.userData?.image_url
+  const { n, player, self_index, turn_index } = props;
+  const imageUrl = player.userData?.image_url;
 
-  const turnHighlight = turn_index === n ? ' highlight' : ''
+  const turnHighlight = turn_index === n ? ' highlight' : '';
 
   return (
     <>
@@ -169,26 +169,26 @@ const PlayerComponent = (props: Props) => {
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
 const TooltipContents: typeof PlayerComponent = (props) => {
-  const { n, player } = props
-  const imageUrl = player.userData?.image_url
-  const doubles = player.userData?.stats?.doubles || 0
-  const wins = player.userData?.stats?.wins || 0
-  const games = player.userData?.stats?.games || 0
-  const rolls = player.userData?.stats?.rolls || 0
+  const { n, player } = props;
+  const imageUrl = player.userData?.image_url;
+  const doubles = player.userData?.stats?.doubles || 0;
+  const wins = player.userData?.stats?.wins || 0;
+  const games = player.userData?.stats?.games || 0;
+  const rolls = player.userData?.stats?.rolls || 0;
 
-  const losses = games - wins
+  const losses = games - wins;
 
-  const win_rate = Math.floor((wins / (games || 1)) * 1000) / 10
-  const doubles_rate = Math.floor((doubles / (rolls || 1)) * 1000) / 10
+  const win_rate = Math.floor((wins / (games || 1)) * 1000) / 10;
+  const doubles_rate = Math.floor((doubles / (rolls || 1)) * 1000) / 10;
 
   const join_date = new Date(props.player.userData?.createdDate || 0)
     .toDateString()
-    .split(' ')
-  join_date.shift()
+    .split(' ');
+  join_date.shift();
 
   return React.useMemo(
     () => (
@@ -211,15 +211,15 @@ const TooltipContents: typeof PlayerComponent = (props) => {
             {props.player.userData?.achievements
               ?.filter((ach) => ach.unlocked)
               .map((ach) => {
-                return <AchievementImg {...ach} key={ach.id} />
+                return <AchievementImg {...ach} key={ach.id} />;
               })}
           </HorizontalScroll>
         </div>
       </>
     ),
     []
-  )
-}
+  );
+};
 
 const defaultAchievementData: AchievementData = {
   description: 'unknown',
@@ -227,20 +227,20 @@ const defaultAchievementData: AchievementData = {
   id: 'unknown',
   name: 'Unknown',
   max_progress: null,
-}
+};
 const AImg = styled('img', {
   'image-rendering': 'pixelated',
-})
+});
 const AchievementImg = (props: Achievement) => {
   const achievements =
-    useSelector((state: ReduxState) => state.auth.achievements) || {}
-  const achData = achievements[props.id] || defaultAchievementData
-  const [tooltipVisible, setTooltipVisible] = React.useState(false)
+    useSelector((state: ReduxState) => state.auth.achievements) || {};
+  const achData = achievements[props.id] || defaultAchievementData;
+  const [tooltipVisible, setTooltipVisible] = React.useState(false);
   const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } =
     usePopperTooltip({
       visible: tooltipVisible,
       onVisibleChange: setTooltipVisible,
-    })
+    });
   return React.useMemo(
     () => (
       <>
@@ -264,8 +264,8 @@ const AchievementImg = (props: Achievement) => {
       </>
     ),
     [tooltipVisible, getTooltipProps]
-  )
-}
+  );
+};
 
 const mapStateToProps = (state: ReduxState) => {
   return {
@@ -273,7 +273,7 @@ const mapStateToProps = (state: ReduxState) => {
     turn_index: selectTurnIndex(state),
     socket: state.connection.socket,
     isSpectator: selectIsSpectator(state),
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps)(PlayerComponent)
+export default connect(mapStateToProps)(PlayerComponent);

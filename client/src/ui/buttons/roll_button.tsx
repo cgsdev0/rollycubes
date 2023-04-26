@@ -1,31 +1,31 @@
-import React from "react";
-import { connect } from "react-redux";
-import { styled } from "stitches.config";
+import React from 'react';
+import { connect } from 'react-redux';
+import { styled } from 'stitches.config';
 import {
   selectHasMultiplePlayers,
   selectIsGameOver,
   selectIsMyTurn,
   selectTurnName,
-} from "../../selectors/game_selectors";
-import { ReduxState } from "../../store";
-import "./buttons.css";
+} from '../../selectors/game_selectors';
+import { ReduxState } from '../../store';
+import './buttons.css';
 
 type Props = ReturnType<typeof mapStateToProps>;
 
-const Subtitle = styled("p", {
-  color: "$primaryDimmed",
-  textAlign: "center",
+const Subtitle = styled('p', {
+  color: '$primaryDimmed',
+  textAlign: 'center',
   paddingTop: 12,
   fontSize: 16,
-  width: "100%",
-  display: "flex",
-  justifyContent: "center",
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
 });
 
-const SubtitleName = styled("div", {
-  overflow: "hidden",
+const SubtitleName = styled('div', {
+  overflow: 'hidden',
   maxWidth: 160,
-  textOverflow: "ellipsis",
+  textOverflow: 'ellipsis',
 });
 
 const RollButton: React.FC<Props> = ({
@@ -37,7 +37,7 @@ const RollButton: React.FC<Props> = ({
 }) => {
   const onClick = () => {
     if (socket) {
-      socket.send(JSON.stringify({ type: "roll" }));
+      socket.send(JSON.stringify({ type: 'roll' }));
     }
   };
   if (victory) return null;

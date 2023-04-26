@@ -1,11 +1,11 @@
-import { configureStore, getDefaultMiddleware, Store } from "@reduxjs/toolkit";
-import { authApi } from "api/auth";
-import { authReducer } from "./reducers/auth";
-import { chatReducer } from "./reducers/chat";
-import { connectionReducer } from "./reducers/connection";
-import { gameReducer } from "./reducers/game";
-import { popTextReducer } from "./reducers/pop_text";
-import { settingsReducer } from "./reducers/settings";
+import { configureStore, getDefaultMiddleware, Store } from '@reduxjs/toolkit';
+import { authApi } from 'api/auth';
+import { authReducer } from './reducers/auth';
+import { chatReducer } from './reducers/chat';
+import { connectionReducer } from './reducers/connection';
+import { gameReducer } from './reducers/game';
+import { popTextReducer } from './reducers/pop_text';
+import { settingsReducer } from './reducers/settings';
 
 export const TARGET_SCORES = [33, 66, 67, 98, 99, 100];
 

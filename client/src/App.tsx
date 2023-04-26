@@ -1,20 +1,20 @@
-import { useWindowSize } from 'hooks/window_size'
-import { TabErrorPage } from 'pages/tab_error_page'
-import { AchievementProvider } from 'providers/achievements'
-import { AuthProvider } from 'providers/auth'
-import { StrictMode } from 'react'
-import { Provider } from 'react-redux'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-import { styled, css, globalStyles } from 'stitches.config'
-import { Octocat } from 'ui/buttons/octocat'
-import { v4 as uuidv4 } from 'uuid'
-import GamePage from './pages/game_page'
-import HomePage from './pages/home_page'
-import OnboardPage from './pages/onboard_page'
-import TwitchOAuthPage from './pages/twitch_oauth_page'
-import { store } from './store'
+import { useWindowSize } from 'hooks/window_size';
+import { TabErrorPage } from 'pages/tab_error_page';
+import { AchievementProvider } from 'providers/achievements';
+import { AuthProvider } from 'providers/auth';
+import { StrictMode } from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { styled, css, globalStyles } from 'stitches.config';
+import { Octocat } from 'ui/buttons/octocat';
+import { v4 as uuidv4 } from 'uuid';
+import GamePage from './pages/game_page';
+import HomePage from './pages/home_page';
+import OnboardPage from './pages/onboard_page';
+import TwitchOAuthPage from './pages/twitch_oauth_page';
+import { store } from './store';
 
 const RenderCanvas = styled('canvas', {
   position: 'absolute',
@@ -25,12 +25,12 @@ const RenderCanvas = styled('canvas', {
   zIndex: 500,
   pointerEvents: 'none',
   touchAction: 'none',
-})
+});
 
 const App = () => {
   // make a cookie DONT FORGET TO SET THE PATH AHHHHHHHHHHHHHHHHHHHH
   if (!document.cookie.includes('_session')) {
-    document.cookie = `_session=${uuidv4()}; Path=/; Secure`
+    document.cookie = `_session=${uuidv4()}; Path=/; Secure`;
   }
 
   return (
@@ -44,8 +44,8 @@ const App = () => {
         <AppInner />
       </Provider>
     </StrictMode>
-  )
-}
+  );
+};
 
 const app = css({
   backgroundColor: '#151515',
@@ -56,7 +56,7 @@ const app = css({
     minHeight: 'initial',
     height: 'calc(100vh - 16px)',
   },
-})
+});
 
 const container = css({
   '@bp1': {
@@ -76,7 +76,7 @@ const container = css({
     marginBottom: 32,
     fontSize: 66,
   },
-})
+});
 
 const innerContainer = css({
   '@bp1': {
@@ -102,18 +102,18 @@ const innerContainer = css({
     width: '100%',
     textAlign: 'left',
   },
-})
+});
 
 const AppInner = () => {
-  globalStyles()
-  const size = useWindowSize()
+  globalStyles();
+  const size = useWindowSize();
   const transformString =
     size!.width! >= 480
       ? `scale(${Math.min(
           1,
           Math.min(size!.width! / 1080, size.height! / 740)
         )})`
-      : 'scale(1)'
+      : 'scale(1)';
 
   return (
     <AuthProvider>
@@ -140,7 +140,7 @@ const AppInner = () => {
         </Router>
       </AchievementProvider>
     </AuthProvider>
-  )
-}
+  );
+};
 
-export default App
+export default App;

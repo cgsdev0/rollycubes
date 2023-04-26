@@ -1,16 +1,16 @@
-import { Dispatch } from "@reduxjs/toolkit";
-import { ReduxState } from "store";
+import { Dispatch } from '@reduxjs/toolkit';
+import { ReduxState } from 'store';
 
 export function cheatsAction() {
   return Object.assign(
     (dispatch: Dispatch, getState: () => ReduxState) => {
       const cheats = getState().settings.cheats;
 
-      const action = { type: "CHEATS" as "CHEATS", newState: !cheats };
+      const action = { type: 'CHEATS' as 'CHEATS', newState: !cheats };
       dispatch(action);
       return action;
     },
-    { type: "CHEATS_THUNK" }
+    { type: 'CHEATS_THUNK' }
   );
 }
 

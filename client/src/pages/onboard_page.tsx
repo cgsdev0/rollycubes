@@ -1,16 +1,16 @@
-import React from 'react'
-import { css, styled } from 'stitches.config'
-import { connect, DispatchProp } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { selectAuthService } from '../selectors/game_selectors'
-import { ReduxState } from '../store'
-import { TwitchButton } from '../twitch'
+import React from 'react';
+import { css, styled } from 'stitches.config';
+import { connect, DispatchProp } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { selectAuthService } from '../selectors/game_selectors';
+import { ReduxState } from '../store';
+import { TwitchButton } from '../twitch';
 
 interface Props {
-  intent?: string
-  onBoard?(): void
-  authService: string
-  authToken?: string | null
+  intent?: string;
+  onBoard?(): void;
+  authService: string;
+  authToken?: string | null;
 }
 
 const UsernameInput = styled('input', {
@@ -27,12 +27,12 @@ const UsernameInput = styled('input', {
   border: 0,
   padding: 10,
   paddingLeft: 16,
-})
+});
 const content = css({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
-})
+});
 const verticalDivider = css({
   backgroundColor: '$gray500',
   width: 2,
@@ -41,7 +41,7 @@ const verticalDivider = css({
     width: 64,
     height: 2,
   },
-})
+});
 const divider = css({
   color: '$gray500',
   height: '100%',
@@ -54,7 +54,7 @@ const divider = css({
   justifyContent: 'center',
   alignItems: 'center',
   padding: '0px 64px',
-})
+});
 const InnerSection = styled('div', {
   width: 270,
   position: 'relative',
@@ -69,13 +69,13 @@ const InnerSection = styled('div', {
       marginTop: 20,
     },
   },
-})
+});
 const Section = styled('div', {
   width: '100%',
   justifyContent: 'center',
   alignItems: 'center',
   display: 'flex',
-})
+});
 const buttonContainer = css({
   width: '100%',
   display: 'flex',
@@ -87,7 +87,7 @@ const buttonContainer = css({
     height: '40vh',
     justifyContent: 'space-between',
   },
-})
+});
 
 const guestText = css({
   color: 'white',
@@ -96,44 +96,44 @@ const guestText = css({
     color: '#55dfa0',
     textDecoration: 'underline',
   },
-})
+});
 const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
   const [username, setUsername] = React.useState<string>(
     localStorage.getItem('name') || ''
-  )
+  );
 
-  const navigate = useNavigate()
-  const [pressed, setPressed] = React.useState(false)
+  const navigate = useNavigate();
+  const [pressed, setPressed] = React.useState(false);
 
-  const { authToken, authService, dispatch } = props
+  const { authToken, authService, dispatch } = props;
 
   const onStart = async () => {
-    if (pressed) return
-    localStorage.setItem('name', username)
+    if (pressed) return;
+    localStorage.setItem('name', username);
     if (props.onBoard) {
-      props.onBoard()
-      return
+      props.onBoard();
+      return;
     }
-    setPressed(true)
-    const result = await window.fetch(`/create?public`)
+    setPressed(true);
+    const result = await window.fetch(`/create?public`);
     if (!result.ok) {
-      setPressed(false)
+      setPressed(false);
     } else {
-      const dest = await result.text()
-      navigate(`/room/${dest}`, { replace: true })
+      const dest = await result.text();
+      navigate(`/room/${dest}`, { replace: true });
     }
-  }
+  };
 
   React.useEffect(() => {
-    ;(async function () {
+    (async function () {
       if (authToken) {
-        const result = await window.fetch(`/create?public`)
-        const dest = await result.text()
-        navigate(`/room/${dest}`, { replace: true })
+        const result = await window.fetch(`/create?public`);
+        const dest = await result.text();
+        navigate(`/room/${dest}`, { replace: true });
       }
-    })()
-  }, [])
-  if (authToken) return null
+    })();
+  }, []);
+  if (authToken) return null;
   //   return (
   //     <Navigate to="/home" replace state={{ redirect: location.pathname }} />
   //   );
@@ -159,8 +159,8 @@ const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
               onSubmit={
                 username
                   ? (e) => {
-                      e.preventDefault()
-                      onStart()
+                      e.preventDefault();
+                      onStart();
                     }
                   : undefined
               }
@@ -182,15 +182,15 @@ const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
         </Section>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const mapStateToProps = (state: ReduxState) => {
   return {
     authService: selectAuthService(state),
     authToken: state.auth.authToken,
-  }
-}
+  };
+};
 
-const ConnectedOnboardPage = connect(mapStateToProps)(OnboardPage)
-export default ConnectedOnboardPage
+const ConnectedOnboardPage = connect(mapStateToProps)(OnboardPage);
+export default ConnectedOnboardPage;

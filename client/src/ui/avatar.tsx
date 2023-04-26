@@ -1,16 +1,16 @@
-import React from 'react'
-import { css, styled } from 'stitches.config'
-import defaultIcon from '../../public/default_player.png'
-import crownIcon from '../../public/crown.png'
-import { DisconnectedIcon } from './icons/disconnected'
+import React from 'react';
+import { css, styled } from 'stitches.config';
+import defaultIcon from '../../public/default_player.png';
+import crownIcon from '../../public/crown.png';
+import { DisconnectedIcon } from './icons/disconnected';
 
 interface Props {
-  imageUrl?: string | null
-  n?: number
-  size?: number
-  crown?: boolean
-  disconnected?: boolean
-  isSignedIn?: boolean
+  imageUrl?: string | null;
+  n?: number;
+  size?: number;
+  crown?: boolean;
+  disconnected?: boolean;
+  isSignedIn?: boolean;
 }
 
 const avatarWrapper = (isSignedIn: boolean) =>
@@ -24,7 +24,7 @@ const avatarWrapper = (isSignedIn: boolean) =>
     '& .avatar': {
       borderRadius: '50%',
     },
-  })()
+  })();
 
 const disconnectedWrapper = css({
   position: 'absolute',
@@ -39,20 +39,20 @@ const disconnectedWrapper = css({
   transform: 'scale(80%)',
   backgroundColor: '#000000aa',
   borderRadius: '50%',
-})
+});
 const Crown = styled('img', {
   position: 'absolute',
   top: -6,
   zIndex: 5,
   left: 6,
-})
+});
 
 const Avatar = React.forwardRef<HTMLSpanElement, Props>((props, ref) => {
-  const { size, imageUrl, n, crown, disconnected, isSignedIn } = props
+  const { size, imageUrl, n, crown, disconnected, isSignedIn } = props;
 
-  const forSureImageUrl = imageUrl || defaultIcon
+  const forSureImageUrl = imageUrl || defaultIcon;
 
-  const size2 = size || 36
+  const size2 = size || 36;
 
   return (
     <span className={avatarWrapper(Boolean(isSignedIn))} ref={ref}>
@@ -72,7 +72,7 @@ const Avatar = React.forwardRef<HTMLSpanElement, Props>((props, ref) => {
         </span>
       ) : null}
     </span>
-  )
-})
+  );
+});
 
-export default Avatar
+export default Avatar;

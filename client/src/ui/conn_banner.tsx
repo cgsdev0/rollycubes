@@ -1,7 +1,7 @@
-import React from "react";
-import { Transition } from "react-transition-group";
-import { connect, DispatchProp } from "react-redux";
-import { ReduxState } from "../store";
+import React from 'react';
+import { Transition } from 'react-transition-group';
+import { connect, DispatchProp } from 'react-redux';
+import { ReduxState } from '../store';
 
 interface Props {
   connected: boolean;
