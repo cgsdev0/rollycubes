@@ -1,4 +1,3 @@
-import HorizontalScroll from 'react-horizontal-scrolling';
 import { connect, useSelector } from 'react-redux';
 import { css, styled } from 'stitches.config';
 import {
@@ -222,13 +221,12 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
         </p>
         <h2>Achievements</h2>
         <div className="achievements">
-          <HorizontalScroll>
-            {props.data?.achievements
-              ?.filter((ach) => ach.unlocked)
-              .map((ach) => {
-                return <AchievementImg {...ach} key={ach.id} />;
-              })}
-          </HorizontalScroll>
+          {props.data?.achievements
+            ?.concat(props.data?.achievements)
+            .filter((ach) => ach.unlocked)
+            .map((ach) => {
+              return <AchievementImg {...ach} key={ach.id} />;
+            })}
         </div>
       </>
     ),
