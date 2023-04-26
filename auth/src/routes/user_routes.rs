@@ -326,8 +326,8 @@ WHERE id=$1::UUID",
                             unlocked: r
                                 .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
                                 .map(PrimitiveDateTime::assume_utc),
-                            rd: row.get("rd"),
-                            rn: row.get("rn"),
+                            rd: r.get("rd"),
+                            rn: r.get("rn"),
                             progress: r.get("progress"),
                         })
                         .collect()
