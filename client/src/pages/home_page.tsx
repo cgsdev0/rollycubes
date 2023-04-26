@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { css, styled } from 'stitches.config'
+import { keyframes, css, styled } from 'stitches.config'
 import { Button } from '../ui/buttons/button'
 import itsBoatsLogo from '../../public/itsboats.png'
 
@@ -11,6 +11,30 @@ interface Game {
   player_count: number
 }
 
+type NavFn = ReturnType<typeof useNavigate>
+
+const scaleUp = keyframes({
+  '0%': { height: 0 },
+  '100%': { height: 46 },
+})
+const ButtonRow = styled('div', {
+  display: 'flex',
+  overflow: 'hidden',
+  '& button': {
+    textTransform: 'uppercase',
+    borderRadius: 100,
+    height: 46,
+    letterSpacing: '0.16em',
+    fontSize: 16,
+    fontFamily: 'Amiko',
+  },
+  '& button:first-child': {
+    backgroundColor: '#16B808',
+    color: 'white',
+  },
+  animation: scaleUp(),
+  animationDuration: '0.2s',
+})
 const StartButton = styled('button', {
   backgroundColor: '#16B808',
   flexBasis: 'initial',
@@ -31,9 +55,22 @@ const StartButton = styled('button', {
 })
 
 const content = css({
-  width: 576,
+  '@bp1': {
+    width: 576,
+  },
+  tr: {
+    '@bp0': {
+      '& th:last-child,td:last-child': {
+        textAlign: 'right',
+      },
+    },
+  },
   display: 'flex',
   flexDirection: 'column',
+
+  '@bp0': {
+    overflowY: 'auto',
+  },
 })
 
 const hostNameCol = css({
@@ -45,7 +82,9 @@ const playerCountCol = css({
   width: 120,
 })
 const tableWrapper = css({
-  overflowY: 'auto',
+  '@bp1': {
+    overflowY: 'auto',
+  },
   display: 'flex',
 })
 const gameInfoPanel = css({
@@ -54,9 +93,29 @@ const gameInfoPanel = css({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
-  gap: 115,
-  width: 240,
+  '@bp1': {
+    gap: 115,
+    width: 240,
+  },
   padding: 48,
+})
+
+const LogoImg = styled('img', {
+  '@bp0': {
+    display: 'none',
+  },
+})
+
+const hideMobile = css({
+  '@bp0': {
+    display: 'none',
+  },
+})
+
+const hideDesktop = css({
+  '@bp1': {
+    display: 'none',
+  },
 })
 
 const HomePage = () => {
@@ -110,23 +169,13 @@ const HomePage = () => {
               <tbody>
                 <tr>
                   <th className="host">Host</th>
-                  <th colSpan={3}>Players</th>
+                  <th className={hideMobile()} colSpan={3}>
+                    Players
+                  </th>
+                  <th className={hideDesktop()}>Players</th>
                 </tr>
                 {games.map((game) => (
-                  <tr key={game.code}>
-                    <td className={hostNameCol()}>
-                      {game.host_name || 'unknown'}
-                    </td>
-                    <td className={playerCountCol()}>
-                      {game.player_count} / 8
-                    </td>
-                    <td>
-                      <Link to={`/room/${game.code}`}>Join →</Link>
-                    </td>
-                    <td>
-                      <Link to={`/spectate/${game.code}`}>Watch →</Link>
-                    </td>
-                  </tr>
+                  <TableRow game={game} key={game.code} navigate={navigate} />
                 ))}
               </tbody>
             </table>
@@ -136,7 +185,7 @@ const HomePage = () => {
         )}
       </div>
       <div className={gameInfoPanel()}>
-        <img src={itsBoatsLogo} />
+        <LogoImg src={itsBoatsLogo} />
         <StartButton onClick={onStart(false)} disabled={pressed}>
           New Game
         </StartButton>
@@ -145,4 +194,44 @@ const HomePage = () => {
   )
 }
 
+const TableRow = ({ game, navigate }: { game: Game; navigate: NavFn }) => {
+  const [expanded, setExpanded] = React.useState(false)
+  return (
+    <>
+      <tr
+        className={hideDesktop()}
+        onClick={() => {
+          setExpanded((e) => !e)
+        }}
+      >
+        <td className={hostNameCol()}>{game.host_name || 'unknown'}</td>
+        <td className={playerCountCol()}>{game.player_count} / 8</td>
+      </tr>
+      {expanded ? (
+        <tr>
+          <td colSpan={2}>
+            <ButtonRow>
+              <Button onClick={() => navigate(`/room/${game.code}`)}>
+                Join
+              </Button>
+              <Button onClick={() => navigate(`/spectate/${game.code}`)}>
+                Watch
+              </Button>
+            </ButtonRow>
+          </td>
+        </tr>
+      ) : null}
+      <tr className={hideMobile()}>
+        <td className={hostNameCol()}>{game.host_name || 'unknown'}</td>
+        <td className={playerCountCol()}>{game.player_count} / 8</td>
+        <td>
+          <Link to={`/room/${game.code}`}>Join →</Link>
+        </td>
+        <td>
+          <Link to={`/spectate/${game.code}`}>Watch →</Link>
+        </td>
+      </tr>
+    </>
+  )
+}
 export default HomePage

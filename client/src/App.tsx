@@ -51,16 +51,26 @@ const app = css({
   backgroundColor: '#151515',
   marign: 0,
   minHeight: '100vh',
+  '@bp0': {
+    padding: 8,
+    minHeight: 'initial',
+    height: 'calc(100vh - 16px)',
+  },
 })
 
 const container = css({
-  height: 700,
-  width: 1080,
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  marginLeft: -1080 / 2,
-  marginTop: -700 / 2,
+  '@bp1': {
+    height: 700,
+    width: 1080,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -1080 / 2,
+    marginTop: -700 / 2,
+  },
+  '@bp0': {
+    height: '100%',
+  },
   '& h1': {
     fontFamily: 'Caveat',
     marginBottom: 32,
@@ -69,14 +79,25 @@ const container = css({
 })
 
 const innerContainer = css({
-  backgroundColor: '$gray800',
-  display: 'flex',
-  borderRadius: 16,
-  margin: 24,
-  padding: 48,
-  height: 'calc(100% - 96px - 48px)',
-  justifyContent: 'space-between',
-  gap: 24,
+  '@bp1': {
+    backgroundColor: '$gray800',
+    display: 'flex',
+    borderRadius: 16,
+    margin: 24,
+    padding: 48,
+    height: 'calc(100% - 96px - 48px)',
+    justifyContent: 'space-between',
+    gap: 24,
+  },
+  '@bp0': {
+    '& p,h1': {
+      textAlign: 'center',
+    },
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    justifyContent: 'space-between',
+  },
   '& table': {
     width: '100%',
     textAlign: 'left',
@@ -86,10 +107,13 @@ const innerContainer = css({
 const AppInner = () => {
   globalStyles()
   const size = useWindowSize()
-  const transformString = `scale(${Math.min(
-    1,
-    Math.min(size!.width! / 1080, size.height! / 700)
-  )})`
+  const transformString =
+    size!.width! >= 480
+      ? `scale(${Math.min(
+          1,
+          Math.min(size!.width! / 1080, size.height! / 740)
+        )})`
+      : 'scale(1)'
 
   return (
     <AuthProvider>

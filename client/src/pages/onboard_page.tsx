@@ -37,12 +37,19 @@ const verticalDivider = css({
   backgroundColor: '$gray500',
   width: 2,
   height: 64,
+  '@bp0': {
+    width: 64,
+    height: 2,
+  },
 })
 const divider = css({
   color: '$gray500',
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
+  '@bp0': {
+    flexDirection: 'row',
+  },
   gap: 16,
   justifyContent: 'center',
   alignItems: 'center',
@@ -55,10 +62,12 @@ const InnerSection = styled('div', {
   '& p': {
     fontFamily: 'Caveat',
     fontSize: 28,
-    position: 'absolute',
-    width: '100%',
     textAlign: 'center',
-    marginTop: 20,
+    '@bp1': {
+      position: 'absolute',
+      width: '100%',
+      marginTop: 20,
+    },
   },
 })
 const Section = styled('div', {
@@ -72,6 +81,12 @@ const buttonContainer = css({
   display: 'flex',
   flexDirection: 'row',
   height: '100%',
+  '@bp0': {
+    marginTop: 100,
+    flexDirection: 'column',
+    height: '40vh',
+    justifyContent: 'space-between',
+  },
 })
 
 const guestText = css({

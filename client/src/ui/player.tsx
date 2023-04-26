@@ -1,6 +1,6 @@
 import HorizontalScroll from 'react-horizontal-scrolling'
 import { connect, useSelector } from 'react-redux'
-import { css } from 'stitches.config'
+import { css, styled } from 'stitches.config'
 import {
   selectIsSpectator,
   selectSelfIndex,
@@ -34,26 +34,39 @@ const playerName = css({
   alignItems: 'center',
   display: 'flex',
   marginBottom: ADJUST_FOR_STUPID_FONT,
+  '@bp0': {
+    display: 'none',
+  },
 })
 
 const playerRow = css({
   display: 'flex',
   justifyContent: 'space-between',
-  lineHeight: 0,
   minHeight: 36,
   '&.highlight': {
     backgroundColor: '$brandFaded',
   },
-  paddingLeft: 30,
-  paddingRight: 30,
-  paddingTop: 2,
-  paddingBottom: 2,
+  '@bp0': {
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 16,
+  },
+  '@bp1': {
+    lineHeight: 0,
+    paddingLeft: 30,
+    paddingRight: 30,
+    paddingTop: 2,
+    paddingBottom: 2,
+  },
   position: 'relative',
 })
 
 const avatarAndName = css({
   display: 'flex',
-  maxWidth: '75%',
+  '@bp1': {
+    maxWidth: '75%',
+  },
   alignItems: 'center',
 })
 
@@ -198,7 +211,6 @@ const TooltipContents: typeof PlayerComponent = (props) => {
             {props.player.userData?.achievements
               ?.filter((ach) => ach.unlocked)
               .map((ach) => {
-                console.log(ach)
                 return <AchievementImg {...ach} key={ach.id} />
               })}
           </HorizontalScroll>
@@ -216,6 +228,9 @@ const defaultAchievementData: AchievementData = {
   name: 'Unknown',
   max_progress: null,
 }
+const AImg = styled('img', {
+  'image-rendering': 'pixelated',
+})
 const AchievementImg = (props: Achievement) => {
   const achievements =
     useSelector((state: ReduxState) => state.auth.achievements) || {}
@@ -239,7 +254,7 @@ const AchievementImg = (props: Achievement) => {
             <p>{achData.description}</p>
           </div>
         )}
-        <img
+        <AImg
           ref={setTriggerRef}
           width={48}
           height={48}

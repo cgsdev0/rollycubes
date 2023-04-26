@@ -16,7 +16,9 @@ interface Props {
 const avatarWrapper = (isSignedIn: boolean) =>
   css({
     alignItems: 'center',
-    marginRight: 8,
+    '@bp1': {
+      marginRight: 8,
+    },
     position: 'relative',
     cursor: isSignedIn ? 'pointer' : 'inherit',
     '& .avatar': {
@@ -29,6 +31,11 @@ const disconnectedWrapper = css({
   bottom: -5,
   zIndex: 5,
   left: -3,
+  '@bp0': {
+    bottom: 0,
+    width: 24,
+    height: 24,
+  },
   transform: 'scale(80%)',
   backgroundColor: '#000000aa',
   borderRadius: '50%',

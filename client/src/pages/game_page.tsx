@@ -8,7 +8,7 @@ import {
   useParams,
 } from 'react-router-dom'
 import OnboardPage from './onboard_page'
-import { css } from 'stitches.config'
+import { css, styled } from 'stitches.config'
 import Connection from '../connection'
 import {
   selectIs3d,
@@ -41,6 +41,17 @@ interface Props {
 const flexColumn = css({
   display: 'flex',
   flexDirection: 'column',
+})
+
+const FloatingButtonBar = styled('div', {
+  '@bp1': {
+    position: 'absolute',
+    top: -16,
+    left: 36,
+  },
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
 })
 
 const GamePage: React.FC<Props & DispatchProp> = ({
@@ -95,21 +106,11 @@ const GamePage: React.FC<Props & DispatchProp> = ({
         />
       )}
 
-      <div
-        id="floating-button-bar"
-        style={{
-          position: 'absolute',
-          top: -16,
-          left: 36,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}
-      >
+      <FloatingButtonBar id="floating-button-bar">
         <HelpIcon onClick={() => setShowHelp((help) => !help)} />
         <DiceIcon onClick={() => dispatch({ type: 'TOGGLE_3D' })} />
         <HomeIcon onClick={() => navigate('/')} />
-      </div>
+      </FloatingButtonBar>
       {/* TODO: Refactor all this garbage */}
       {/* {doublesCount ? ( */}
       {/*   <h6 key={doublesCount} id="Doubles"> */}
@@ -134,9 +135,21 @@ const GamePage: React.FC<Props & DispatchProp> = ({
   )
 }
 
+const RulesDiv = styled('div', {
+  '@bp0': {
+    position: 'absolute',
+    height: 'calc(100vh - 40px)',
+    width: '100vw',
+    top: 40,
+    backgroundColor: '#111111ea',
+    padding: 8,
+    left: -8,
+    zIndex: 10,
+  },
+})
 const Rules = () => {
   return (
-    <div>
+    <RulesDiv>
       <h1>Rules</h1>
       <p>
         On your turn:
@@ -165,7 +178,7 @@ const Rules = () => {
           to 0.
         </li>
       </ul>
-    </div>
+    </RulesDiv>
   )
 }
 

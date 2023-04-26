@@ -57,7 +57,6 @@ const UnconnectedPopText: React.FC<Props> = ({
   crownedPlayer,
 }) => {
   const dispatch = useDispatch()
-  console.log({crownedPlayer});
 
   React.useEffect(() => {
     if (latestPopText) {
@@ -72,17 +71,6 @@ const UnconnectedPopText: React.FC<Props> = ({
       {latestPopText && (
         <PopupText text={latestPopText} player={crownedPlayer} />
       )}
-      {/* TODO: Refactor all this garbage */}
-      {/* {doublesCount ? ( */}
-      {/*   <h6 key={doublesCount} id="Doubles"> */}
-      {/*     Doubles! */}
-      {/*   </h6> */}
-      {/* ) : null} */}
-      {/* {somebodyIsNice ? <h6 id="Nice">Nice (ꈍoꈍ)</h6> : null} */}
-      {/* {reset ? <h6 id="Reset">Reset!</h6> : null} */}
-      {/* {winner ? ( */}
-      {/*   <h6 id="Victory">{winner.name || `User${turn + 1}`} Wins!</h6> */}
-      {/* ) : null} */}
 
       {/* <ConnBanner /> */}
     </PopTextContainer>

@@ -1,16 +1,22 @@
-import { css, keyframes } from "stitches.config";
+import { css, keyframes } from 'stitches.config'
 
 const octocatWave = keyframes({
-  "0%,100%": { transform: "rotate(0)" },
-  "20%,60%": { transform: "rotate(-25deg)" },
-  "40%,80%": { transform: "rotate(10deg)" },
-});
+  '0%,100%': { transform: 'rotate(0)' },
+  '20%,60%': { transform: 'rotate(-25deg)' },
+  '40%,80%': { transform: 'rotate(10deg)' },
+})
 
 const octocat = css({
-  "&:hover .octo-arm": {
+  '&:hover .octo-arm': {
     animation: `${octocatWave} 560ms ease-in-out`,
   },
-});
+  '@bp0': {
+    display: 'none',
+  },
+  '@hbp0': {
+    display: 'none',
+  },
+})
 
 export const Octocat = () => {
   return (
@@ -18,16 +24,17 @@ export const Octocat = () => {
       target="_blank"
       href="https://github.com/cgsdev0/rollycubes"
       className={octocat()}
-      aria-label="View source on GitHub" rel="noreferrer"
+      aria-label="View source on GitHub"
+      rel="noreferrer"
     >
       <svg
         width="80"
         height="80"
         viewBox="0 0 250 250"
         style={{
-          fill: "#ffffff55",
-          color: "#151515",
-          position: "absolute",
+          fill: '#ffffff55',
+          color: '#151515',
+          position: 'absolute',
           top: 0,
           border: 0,
           right: 0,
@@ -38,7 +45,7 @@ export const Octocat = () => {
         <path
           d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
           fill="currentColor"
-          style={{ transformOrigin: "130px 106px" }}
+          style={{ transformOrigin: '130px 106px' }}
           className="octo-arm"
         ></path>
         <path
@@ -48,5 +55,5 @@ export const Octocat = () => {
         ></path>
       </svg>
     </a>
-  );
-};
+  )
+}
