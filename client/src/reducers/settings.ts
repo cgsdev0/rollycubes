@@ -14,7 +14,7 @@ export const settingsReducer = createReducer<SettingsState>(
   {
     cheats: true,
     sick3dmode: localStorage.getItem('3d_mode') !== 'false',
-    authServiceOrigin: LOCAL_AUTH_SERVICE,
+    authServiceOrigin: PROD_AUTH_SERVICE,
   },
   (builder) => {
     builder
