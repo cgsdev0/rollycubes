@@ -5,7 +5,6 @@ export interface Player {
   win_count: number;
   user_id?: string;
   crowned?: boolean;
-  userData?: UserData;
 }
 
 export interface AchievementProgress {

@@ -5,11 +5,6 @@ import {
 } from 'reselect';
 import { ReduxState, selectState, TARGET_SCORES } from '../store';
 
-export const selectOtherUsers = createSelector(
-  selectState,
-  (state) => state.auth.otherUsers
-);
-
 export const selectIs3d = createSelector(
   selectState,
   (state) => state.settings.sick3dmode
@@ -73,25 +68,8 @@ export const selectPlayers = createSelector(selectState, (state) =>
     : state.game.players
 );
 
-export const selectPlayersAndUserData = createSelector(
-  selectPlayers,
-  selectOtherUsers,
-  (players, otherUsers) => {
-    const output = players.map((player) => {
-      if (!player.hasOwnProperty('user_id')) {
-        return player;
-      }
-      return {
-        ...player,
-        userData: otherUsers[player.user_id!],
-      };
-    });
-    return output;
-  }
-);
-
 export const selectCrownedPlayer = createSelector(
-  selectPlayersAndUserData,
+  selectPlayers,
   (players) => players.filter((p) => p.crowned)[0]
 );
 // export const selectMaxWincount = createSelector(selectPlayers, (players) =>

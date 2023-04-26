@@ -27,6 +27,7 @@ import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help';
 import { useDispatch } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
+import { useGetUserByIdQuery } from 'api/auth';
 
 interface Props {
   winner?: Player;

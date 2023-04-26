@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { selectPlayersAndUserData } from '../selectors/game_selectors';
+import { selectPlayers } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 import PlayerComponent from './player';
 import { GameState } from '../reducers/game';
@@ -41,7 +41,7 @@ const Players: React.FC<Props> = (props) => {
 
 const mapStateToProps = (state: ReduxState) => {
   return {
-    players: selectPlayersAndUserData(state),
+    players: selectPlayers(state),
   };
 };
 

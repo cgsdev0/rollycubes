@@ -7,7 +7,12 @@ import {
   selectTurnIndex,
 } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
-import { Achievement, AchievementData, Player } from '../types/store_types';
+import {
+  Achievement,
+  AchievementData,
+  Player,
+  UserData,
+} from '../types/store_types';
 import Avatar from './avatar';
 import { usePopperTooltip } from 'react-popper-tooltip';
 
@@ -15,6 +20,7 @@ import { usePopperTooltip } from 'react-popper-tooltip';
 import 'react-popper-tooltip/dist/styles.css';
 import { KickIcon } from './icons/kick';
 import React from 'react';
+import { useGetUserByIdQuery } from 'api/auth';
 
 interface Props {
   player: Player;
@@ -87,6 +93,14 @@ const kick = css({
 });
 
 const PlayerComponent = (props: Props) => {
+  console.warn({ user_id: props.player.user_id });
+  const { data, isLoading, error } = useGetUserByIdQuery(
+    props.player.user_id!,
+    {
+      skip: !Boolean(props.player.user_id),
+    }
+  );
+
   const changeName = () => {
     const e = window.prompt('Enter a name: ', props.player.name);
     if (e === null) return;
@@ -129,7 +143,7 @@ const PlayerComponent = (props: Props) => {
   };
 
   const { n, player, self_index, turn_index } = props;
-  const imageUrl = player.userData?.image_url;
+  const imageUrl = data?.image_url;
 
   const turnHighlight = turn_index === n ? ' highlight' : '';
 
@@ -141,7 +155,7 @@ const PlayerComponent = (props: Props) => {
           {...getTooltipProps({ className: 'tooltip-container' })}
         >
           <div {...getArrowProps({ className: 'tooltip-arrow' })} />
-          <TooltipContents {...props} />
+          <TooltipContents {...props} data={data} />
         </div>
       )}
       <div
@@ -152,8 +166,8 @@ const PlayerComponent = (props: Props) => {
       >
         <span className={avatarAndName()}>
           <Avatar
-            ref={player.userData ? setTriggerRef : undefined}
-            isSignedIn={Boolean(player.userData)}
+            ref={data ? setTriggerRef : undefined}
+            isSignedIn={Boolean(data)}
             disconnected={!player.connected}
             imageUrl={imageUrl}
             n={n}
@@ -172,20 +186,21 @@ const PlayerComponent = (props: Props) => {
   );
 };
 
-const TooltipContents: typeof PlayerComponent = (props) => {
-  const { n, player } = props;
-  const imageUrl = player.userData?.image_url;
-  const doubles = player.userData?.stats?.doubles || 0;
-  const wins = player.userData?.stats?.wins || 0;
-  const games = player.userData?.stats?.games || 0;
-  const rolls = player.userData?.stats?.rolls || 0;
+const TooltipContents = (props: Props & { data?: UserData }) => {
+  const { n, player, data } = props;
+  console.warn(data);
+  const imageUrl = data?.image_url;
+  const doubles = data?.stats?.doubles || 0;
+  const wins = data?.stats?.wins || 0;
+  const games = data?.stats?.games || 0;
+  const rolls = data?.stats?.rolls || 0;
 
   const losses = games - wins;
 
   const win_rate = Math.floor((wins / (games || 1)) * 1000) / 10;
   const doubles_rate = Math.floor((doubles / (rolls || 1)) * 1000) / 10;
 
-  const join_date = new Date(props.player.userData?.createdDate || 0)
+  const join_date = new Date(props.data?.createdDate || 0)
     .toDateString()
     .split(' ');
   join_date.shift();
@@ -208,7 +223,7 @@ const TooltipContents: typeof PlayerComponent = (props) => {
         <h2>Achievements</h2>
         <div className="achievements">
           <HorizontalScroll>
-            {props.player.userData?.achievements
+            {props.data?.achievements
               ?.filter((ach) => ach.unlocked)
               .map((ach) => {
                 return <AchievementImg {...ach} key={ach.id} />;

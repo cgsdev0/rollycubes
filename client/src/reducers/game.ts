@@ -101,6 +101,7 @@ export const gameReducer = createReducer<GameState>(
           name: action.name || '',
           score: 0,
           win_count: 0,
+          user_id: action.user_id,
         });
       })
       .addCase('disconnect', (state, action: DisconnectMsg) => {
