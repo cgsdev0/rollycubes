@@ -16,7 +16,6 @@ import Avatar from './avatar';
 import { usePopperTooltip } from 'react-popper-tooltip';
 
 // TODO: remove
-import 'react-popper-tooltip/dist/styles.css';
 import { KickIcon } from './icons/kick';
 import React from 'react';
 import { useGetUserByIdQuery } from 'api/auth';
@@ -32,6 +31,75 @@ interface Props {
 
 const ADJUST_FOR_STUPID_FONT = -5;
 
+const AchievementTooltip = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  whiteSpace: 'nowrap',
+  backgroundColor: '$gray800',
+  borderWidth: 2,
+  borderStyle: 'solid',
+  borderColor: '$gray900',
+  borderRadius: 8,
+  padding: 12,
+  p: {
+    fontSize: 14,
+    color: '$gray400',
+  },
+  header: {
+    fontWeight: 'bold',
+  },
+});
+const CardBody = styled('div', {});
+const Achievements = styled('div', {
+  display: 'grid',
+  gridTemplateColumns: 'repeat( auto-fill, 50px)',
+  gap: 2,
+  justifyContent: 'center',
+});
+const RecordDiv = styled('div', {
+  fontSize: 16,
+});
+const Records = styled('div', {
+  display: 'flex',
+  justifyContent: 'space-evenly',
+  marginBottom: 20,
+});
+const Good = styled('span', {
+  color: '$good',
+});
+const Bad = styled('span', {
+  color: '$bad',
+});
+const Neutral = styled('span', {
+  letterSpacing: -1,
+  color: '$gray400',
+});
+const StyledTooltip = styled('div', {
+  backgroundColor: '$gray700',
+  padding: 12,
+  maxWidth: 400,
+  minWidth: 310,
+  zIndex: 10,
+  borderRadius: 16,
+  h1: {
+    p: {
+      textAlign: 'left',
+    },
+    '@bp0': {
+      gap: 8,
+    },
+    fontFamily: 'Amiko',
+    marginBottom: 8,
+    fontSize: 32,
+    display: 'flex',
+    alignItems: 'center',
+    'p:last-child': {
+      fontSize: 14,
+      fontWeight: 'normal',
+    },
+  },
+});
 const playerName = css({
   overflow: 'hidden',
   height: '100%',
@@ -149,13 +217,12 @@ const PlayerComponent = (props: Props) => {
   return (
     <>
       {tooltipVisible && (
-        <div
+        <StyledTooltip
           ref={setTooltipRef}
           {...getTooltipProps({ className: 'tooltip-container' })}
         >
-          <div {...getArrowProps({ className: 'tooltip-arrow' })} />
           <TooltipContents {...props} data={data} />
-        </div>
+        </StyledTooltip>
       )}
       <div
         className={playerRow() + turnHighlight}
@@ -208,26 +275,48 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
     () => (
       <>
         <h1>
-          <Avatar imageUrl={imageUrl} size={32} />
-          <span>{player.name || `User${n + 1}`}</span>
+          <Avatar imageUrl={imageUrl} size={80} />
+          <div>
+            <p>{player.name || `User${n + 1}`}</p>
+            <p>Player since {join_date.join(' ')}</p>
+          </div>
         </h1>
-        <p>Player since {join_date.join(' ')}</p>
-        <h2>Stats</h2>
-        <p>
+        <CardBody>
+          {/*<p>
           Doubles: {doubles} / {rolls} rolls ({doubles_rate}%)
-        </p>
-        <p>
-          Games: {wins} W / {losses} L ({win_rate}%)
-        </p>
-        <h2>Achievements</h2>
-        <div className="achievements">
-          {props.data?.achievements
-            ?.concat(props.data?.achievements)
-            .filter((ach) => ach.unlocked)
-            .map((ach) => {
-              return <AchievementImg {...ach} key={ach.id} />;
-            })}
-        </div>
+        </p>*/}
+          <Records>
+            <RecordDiv>
+              <p>
+                <Good>{wins}</Good> - <Bad>{losses}</Bad>
+              </p>
+              <p>
+                <Neutral>RECORD</Neutral>
+              </p>
+            </RecordDiv>
+            <RecordDiv>
+              <p>
+                <Good>{doubles}</Good> - <Bad>{rolls - doubles}</Bad>
+              </p>
+              <p>
+                <Neutral>DOUBLES</Neutral>
+              </p>
+            </RecordDiv>
+            <RecordDiv>
+              <p>{win_rate}%</p>
+              <p>
+                <Neutral>WIN RATE</Neutral>
+              </p>
+            </RecordDiv>
+          </Records>
+          <Achievements>
+            {props.data?.achievements
+              ?.filter((ach) => ach.unlocked)
+              .map((ach) => {
+                return <AchievementImg {...ach} key={ach.id} />;
+              })}
+          </Achievements>
+        </CardBody>
       </>
     ),
     []
@@ -242,7 +331,9 @@ const defaultAchievementData: AchievementData = {
   max_progress: null,
 };
 const AImg = styled('img', {
-  'image-rendering': 'pixelated',
+  imageRendering: 'pixelated',
+  borderRadius: 4,
+  border: '1px solid black',
 });
 const AchievementImg = (props: Achievement) => {
   const achievements =
@@ -254,25 +345,36 @@ const AchievementImg = (props: Achievement) => {
       visible: tooltipVisible,
       onVisibleChange: setTooltipVisible,
     });
+  const img_url = achData.image_url || '//via.placeholder.com/48';
+  const unlock_date = new Date(props.unlocked || 0).toDateString().split(' ');
+  unlock_date.shift();
   return React.useMemo(
     () => (
       <>
         {tooltipVisible && (
-          <div
+          <AchievementTooltip
             ref={setTooltipRef}
             {...getTooltipProps({ className: 'tooltip-container' })}
           >
-            <div {...getArrowProps({ className: 'tooltip-arrow' })} />
-            <header>{achData.name}</header>
-            <p>{achData.description}</p>
-          </div>
+            <AImg
+              src={img_url}
+              alt={achData.description}
+              width={96}
+              height={96}
+            />
+            <div>
+              <header>{achData.name}</header>
+              <p>{achData.description}</p>
+              <p>Unlocked {unlock_date.join(' ')}</p>
+            </div>
+          </AchievementTooltip>
         )}
         <AImg
           ref={setTriggerRef}
           width={48}
           height={48}
           alt={achData.description}
-          src={achData.image_url || '//via.placeholder.com/48'}
+          src={img_url}
         />
       </>
     ),

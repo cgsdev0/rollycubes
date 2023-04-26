@@ -13,6 +13,8 @@ export const {
 } = createStitches({
   theme: {
     colors: {
+      good: '#00ff00',
+      bad: '#ff0000',
       primary: '#fafafb',
       primaryDimmed: '#aaaaab',
       brand: '#3acecd',
