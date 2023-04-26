@@ -30,8 +30,8 @@ pub struct AchievementProgress {
     progress: i32,
     #[serde(with = "time::serde::rfc3339::option")]
     unlocked: Option<OffsetDateTime>,
-    rn: i64,
-    rd: i64,
+    rn: Option<i64>,
+    rd: Option<i64>,
 }
 
 #[derive(Serialize)]

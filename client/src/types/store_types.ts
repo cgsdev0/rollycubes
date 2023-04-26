@@ -48,8 +48,8 @@ export interface Achievement {
   id: string;
   progress: number;
   unlocked: string;
-  rn: number;
-  rd: number;
+  rn: number | null;
+  rd: number | null;
 }
 
 export type AchievementData = {

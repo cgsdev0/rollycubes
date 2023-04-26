@@ -348,7 +348,7 @@ const AchievementImg = (props: Achievement) => {
   const img_url = achData.image_url || '//via.placeholder.com/48';
   const unlock_date = new Date(props.unlocked || 0).toDateString().split(' ');
   unlock_date.shift();
-  const rarity = Math.floor((props.rn / (props.rd || 1)) * 1000) / 10;
+  const rarity = Math.floor(((props.rn || 0) / (props.rd || 1)) * 1000) / 10;
   return React.useMemo(
     () => (
       <>
