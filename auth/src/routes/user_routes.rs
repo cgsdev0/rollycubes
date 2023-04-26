@@ -249,7 +249,8 @@ DELETE FROM anon_identity WHERE user_id = $1::UUID",
                     .execute(
                         "
 INSERT INTO users (username, image_url, id)
-VALUES ($1::TEXT, $2::TEXT, $3::UUID) ON CONFLICT(id) DO NOTHING",
+VALUES ($1::TEXT, $2::TEXT, $3::UUID) ON CONFLICT(id) DO UPDATE
+SET username = $1::TEXT, image_url = $2::TEXT",
                         &[&user.display_name.as_str(), &user.profile_image_url, &id],
                     )
                     .await
