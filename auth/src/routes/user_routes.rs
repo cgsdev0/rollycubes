@@ -41,6 +41,8 @@ pub struct User {
     created_date: OffsetDateTime,
     achievements: Option<Vec<AchievementProgress>>,
     stats: Option<PlayerStats>,
+    rn: i64,
+    rd: i64,
 }
 
 #[derive(Deserialize)]
@@ -266,6 +268,18 @@ pub async fn user_by_id(
     let result = client
         .query(
             "
+WITH total_users AS
+(
+    SELECT COUNT(*) AS user_count from users
+),
+users_ach_totals AS
+(
+    SELECT COUNT(user_id) achievement_count,
+    achievement_id as id
+    FROM user_to_achievement
+    WHERE unlocked IS NOT NULL
+    GROUP BY id
+)
 SELECT
     id,
     username,
@@ -277,7 +291,9 @@ SELECT
     rolls,
     doubles,
     games,
-    wins
+    wins,
+    (SELECT user_count FROM total_users) AS rd,
+    (SELECT achievement_count FROM users_ach_totals z WHERE z.id=user_to_achievement.achievement_id) AS rn
 FROM users
 LEFT JOIN user_to_achievement ON id=user_to_achievement.user_id
 LEFT JOIN player_stats ON id=player_stats.user_id
@@ -294,6 +310,8 @@ WHERE id=$1::UUID",
                 id: row.get("id"),
                 username: row.get("username"),
                 image_url: row.get("image_url"),
+                rd: row.get("rd"),
+                rn: row.get("rn"),
                 created_date: row
                     .get::<'_, _, PrimitiveDateTime>("created_date")
                     .assume_utc(),
