@@ -48,6 +48,7 @@ pub struct User {
 #[derive(Deserialize)]
 pub struct LoginPayload {
     twitch_access_token: String,
+    anon_id: Option<String>,
 }
 
 async fn login_helper(
@@ -209,13 +210,13 @@ WHERE
                 let Ok(transaction) = client.transaction().await else {
                     return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 };
-                let id = if let Some(session) = jar.get("_session") {
+                let id = if let Some(session) = payload.anon_id {
                     println!("GOT SESSION: {}", session);
                     match transaction
                         .query(
                             "
 SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT",
-                            &[&format!("{}{}", "guest:", session.value())],
+                            &[&format!("{}{}", "guest:", session)],
                         )
                         .await
                     {

@@ -25,7 +25,13 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
         {
           mode: 'cors',
           credentials: 'include',
-          body: JSON.stringify({ twitch_access_token }),
+          body: JSON.stringify({
+            twitch_access_token,
+            anon_id: document.cookie
+              ?.split(';')
+              .filter((c) => c.startsWith('_session='))[0]
+              ?.split('=')[1],
+          }),
           headers: {
             'Content-Type': 'application/json',
           },
