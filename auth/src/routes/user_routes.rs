@@ -38,7 +38,7 @@ pub struct AchievementProgress {
 pub struct User {
     id: Uuid,
     username: String,
-    image_url: String,
+    image_url: Option<String>,
     #[serde(rename = "createdDate", with = "time::serde::rfc3339")]
     created_date: OffsetDateTime,
     achievements: Option<Vec<AchievementProgress>>,
