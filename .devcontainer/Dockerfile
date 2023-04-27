@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
 # install gcc 11
 RUN apt update && \
-  apt install -y build-essential manpages-dev software-properties-common inotify-tools && \
+  apt install -y cmake build-essential manpages-dev software-properties-common inotify-tools && \
   add-apt-repository ppa:ubuntu-toolchain-r/test && \
   apt update && \
   sudo apt install -y gcc-11 g++-11 && \
