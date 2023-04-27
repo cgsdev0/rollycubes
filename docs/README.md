@@ -39,7 +39,7 @@ Alternatively, run `make && ./GameServer` in the `game` directory
 The auth server is responsible for managing and authenticating users and user data. It uses a PostgreSQL database to store user data (achievements, stats, etc.)
 
 - `cd auth/devdb; docker-compose up -d` to set up the database
-- `npm i; npm start` to run the service
+- `cargo run` to run the service
 
 ### Client
 
