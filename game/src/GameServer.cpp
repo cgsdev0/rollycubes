@@ -274,7 +274,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     try {
                         auto data = json::parse(message);
                         if (!data["type"].is_string())
-                            throw API::GameError("Type is not specified correctly");
+                            throw API::GameError({.error = "Type is not specified correctly"});
                         auto action_type = data["type"].get<std::string>();
                         if (action_type == "authenticate") {
                             auto token = data["access_token"].get<std::string>();
@@ -312,7 +312,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                   }
                                   }*/
                             } else {
-                                response = API::GameError("Room not found: " + room).toString();
+                                response = API::GameError({.error = "Room not found: " + room}).toString();
                             }
                         }
                     } catch (API::GameError &e) {
@@ -321,12 +321,12 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         std::cout << "RECEIVED BAD JSON (parse_error): " << message
                                   << std::endl
                                   << e.what() << std::endl;
-                        response = API::GameError(e.what()).toString();
+                        response = API::GameError({.error = e.what()}).toString();
                     } catch (nlohmann::detail::type_error &e) {
                         std::cout << "HANDLED BAD JSON (type_error): " << message
                                   << std::endl
                                   << e.what() << std::endl;
-                        response = API::GameError(e.what()).toString();
+                        response = API::GameError({.error = e.what()}).toString();
                     }
                     if (response.length())
                         ws->send(response, uWS::OpCode::TEXT);

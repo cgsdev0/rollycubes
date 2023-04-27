@@ -14,7 +14,7 @@ inline const API::ServerPlayer& getPlayer(const API::GameState &state, const std
       return player;
     }
   }
-  throw API::GameError("unknown player");
+  throw API::GameError({.error = "unknown player"});
 }
 
 class BaseAchievement {
