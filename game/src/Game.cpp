@@ -11,6 +11,9 @@
 Game::Game() {
     // Initialize all achievements
     this->achievements = initAchievements();
+
+    // seed the RNG (one per Game)
+    gen.seed(rd());
 }
 Game::~Game() {
     for (auto &achievement : this->achievements) {
@@ -371,8 +374,6 @@ void Game::roll(HANDLER_ARGS) {
     json resp;
     resp["type"] = "roll";
     for (uint i = 0; i < DICE_COUNT; ++i) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
         state.rolls[i] = dis(gen);
         resp["rolls"].push_back(state.rolls[i]);
     }
