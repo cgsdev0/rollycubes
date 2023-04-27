@@ -10,7 +10,7 @@ npm install
 # Install and build crates for auth server
 pushd auth
 
-if ! grep -q 'source $HOME/.cargo/env'; then
+if ! grep -q '\.cargo' "$HOME/.bashrc"; then
   curl https://sh.rustup.rs -sSf | bash -s -- -y
   source $HOME/.cargo/env
   echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
@@ -40,9 +40,7 @@ git submodule init
 git submodule update
 
 # Check if _build directory exists, create it if not
-if [ ! -d "_build" ]; then
-  mkdir _build
-fi
+mkdir -p _build
 
 # Change to _build directory
 cd _build
