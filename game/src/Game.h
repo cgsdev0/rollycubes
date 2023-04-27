@@ -100,6 +100,9 @@ class Game {
 
     int connectedPlayerCount();
 
+    std::random_device rd;
+    std::mt19937 gen;
+
     API::WelcomeMsg toWelcomeMsg() {
         std::vector<API::Player> players;
         for(const auto& player : this->state.players) {
