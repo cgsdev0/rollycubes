@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+import { Achievement } from '../ui/achievement';
 import {
   BaseQueryFn,
   createApi,
@@ -6,7 +8,13 @@ import {
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
 import { ReduxState } from 'store';
-import { AchievementData, UserData } from 'types/store_types';
+import {
+  AchievementData,
+  AchievementUnlock,
+  UserData,
+} from 'types/store_types';
+import { RollMsg, WinMsg } from 'types/server_messages';
+import { Store } from 'redux';
 
 interface AuthAPIUser {
   id: string;
@@ -64,8 +72,81 @@ export const authApi = createApi({
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const {
+  util,
   useGetRefreshTokenQuery,
   useGetSelfUserDataQuery,
   useGetAchievementListQuery,
   useGetUserByIdQuery,
 } = authApi;
+
+type Action = { type: string } & object;
+function isAction<T extends Action>(
+  action: Action,
+  guard: T['type']
+): action is T {
+  return action.type === guard;
+}
+
+export const optimisticUpdates = (
+  data: Action,
+  store: Store<ReduxState, any>
+) => {
+  const { dispatch, getState } = store;
+  const state = getState();
+  if (isAction<RollMsg>(data, 'roll')) {
+    const user_id = state.game.players[state.game.turn_index].user_id;
+    if (user_id) {
+      dispatch(
+        authApi.util.updateQueryData('getUserById', user_id, (u) => {
+          if (!u.stats) {
+            u.stats = { rolls: 0, doubles: 0, wins: 0, games: 0 };
+          }
+          u.stats!.rolls += 1;
+          if (data.rolls.every((roll) => roll === data.rolls[0])) {
+            u.stats!.doubles += 1;
+          }
+        })
+      );
+    }
+  }
+
+  if (isAction<WinMsg>(data, 'win')) {
+    state.game.players.forEach((player, i) => {
+      if (!player.user_id) return;
+      dispatch(
+        authApi.util.updateQueryData('getUserById', player.user_id, (u) => {
+          if (!u.stats) {
+            u.stats = { rolls: 0, doubles: 0, wins: 0, games: 0 };
+          }
+          u.stats!.games += 1;
+          if (data.id == i) {
+            u.stats!.wins += 1;
+          }
+        })
+      );
+    });
+  }
+
+  if (isAction<AchievementUnlock>(data, 'achievement_unlock')) {
+    if (data.user_index === state.game.self_index) {
+      toast(Achievement(data), { autoClose: 0 });
+    }
+    const { user_id } = data;
+    if (user_id) {
+      dispatch(
+        authApi.util.updateQueryData('getUserById', user_id, (u) => {
+          if (!u.achievements) {
+            u.achievements = [];
+          }
+          u.achievements?.push({
+            id: data.id,
+            rd: 0, // TODO
+            rn: 0, // TODO
+            progress: data.max_progress || 1,
+            unlocked: new Date().toString(),
+          });
+        })
+      );
+    }
+  }
+};

@@ -59,7 +59,7 @@ bool Game::hasPlayer(std::string &id) {
     return false;
 }
 
-int Game::getPlayerId(std::string &id) {
+int Game::getPlayerId(const std::string &id) {
     for (uint i = 0; i < state.players.size(); ++i) {
         if (state.players[i].session == id) {
             return i;
@@ -181,7 +181,7 @@ static const std::unordered_map<
 
 #undef ACTION
 
-void Game::processEvent(const API::ServerPlayer *player, HandlerArgs *server, const json &data, const API::GameState &prev) {
+void Game::processEvent(const API::ServerPlayer *player, SendFunc &broadcast, HandlerArgs *server, const json &data, const API::GameState &prev) {
     API::AchievementProgressUserId user_id({ .id = player->session, .type = API::UserIdType::ANONYMOUS });
 
     if (isSignedIn(*player)) {
@@ -193,13 +193,13 @@ void Game::processEvent(const API::ServerPlayer *player, HandlerArgs *server, co
         API::AchievementProgress ap{
             .achievement_id = achievement->getAchievementID(),
             .progress = progress,
-            .user_id = user_id};
-        auto send = server->send;
-        server->reportStats2("achievement_progress", ap.toString(), [send](auto s) {
+            .user_id = user_id,
+            .user_index = this->getPlayerId(player->session)};
+        server->reportStats2("achievement_progress", ap.toString(), [broadcast](auto s) {
             API::AchievementUnlock a;
             try {
                 a.fromString(s);
-                send(a.toString());
+                broadcast(a.toString());
             } catch (nlohmann::detail::parse_error &e) {
                 // expected
             }
@@ -223,7 +223,7 @@ void Game::handleMessage(HANDLER_ARGS) {
     } else {
         throw API::GameError({.error = "Unknown action type"});
     }
-    processEvent(player, &server, data, prev);
+    processEvent(player, broadcast, &server, data, prev);
     updated = std::chrono::system_clock::now();
 }
 

@@ -1,11 +1,11 @@
 import jwt_decode from 'jwt-decode';
 import React from 'react';
-import { connect, DispatchProp } from 'react-redux';
+import { Store } from 'redux';
+import { connect } from 'react-redux';
 import { NavigateFunction } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { ReduxState } from './store';
-import { Achievement } from './ui/achievement';
 import { Location } from 'react-router-dom';
+import { optimisticUpdates } from 'api/auth';
 
 interface Props {
   room: string;
@@ -22,13 +22,13 @@ export interface DecodedUserJWT {
   user_id: string;
 }
 
-class Connection extends React.Component<Props & DispatchProp> {
+class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
   websocket?: WebSocket;
   timer?: any;
 
   onClose = (_: CloseEvent) => {
     console.error('Socket closed, reconnecting...');
-    this.props.dispatch({ type: 'socket_close' });
+    this.props.store.dispatch({ type: 'socket_close' });
     this.timer = setTimeout(this.openSocket, 5000);
   };
 
@@ -42,7 +42,7 @@ class Connection extends React.Component<Props & DispatchProp> {
     // })
     // );
     console.log('Socket opened to room', this.props.room);
-    this.props.dispatch({ type: 'socket_open' });
+    this.props.store.dispatch({ type: 'socket_open' });
     const name = localStorage.getItem('name');
     if (this.websocket && this.props.authToken && this.props.mode === 'room') {
       // test
@@ -77,11 +77,8 @@ class Connection extends React.Component<Props & DispatchProp> {
       const pathParts = this.props.location.pathname.split('/');
       this.props.navigate(`/${pathParts[1]}/${data.room}`, { replace: true });
     } else {
-      if (data.type === 'achievement_unlock') {
-        toast(Achievement(data), { autoClose: 0 });
-      }
-
-      this.props.dispatch(data);
+      this.props.store.dispatch(data);
+      optimisticUpdates(data, this.props.store);
     }
   };
 
@@ -112,7 +109,7 @@ class Connection extends React.Component<Props & DispatchProp> {
       this.websocket.addEventListener('open', this.onOpen);
       this.websocket.addEventListener('message', this.onMessage);
       this.websocket.addEventListener('error', this.onError);
-      this.props.dispatch({ type: 'WEBSOCKET', socket: this.websocket });
+      this.props.store.dispatch({ type: 'WEBSOCKET', socket: this.websocket });
     }
   };
 
@@ -130,7 +127,7 @@ class Connection extends React.Component<Props & DispatchProp> {
   }
 
   componentWillUnmount() {
-    this.props.dispatch({ type: 'WEBSOCKET', socket: undefined });
+    this.props.store.dispatch({ type: 'WEBSOCKET', socket: undefined });
     if (this.websocket) {
       if (this.timer) {
         clearTimeout(this.timer);

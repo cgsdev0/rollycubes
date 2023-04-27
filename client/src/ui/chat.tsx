@@ -2,7 +2,7 @@ import { cheatsAction } from 'actions/settings';
 import React, { FormEvent } from 'react';
 import Linkify from 'react-linkify';
 import { connect, DispatchProp } from 'react-redux';
-import { css, styled } from 'stitches.config';
+import { styled } from 'stitches.config';
 import { selectIsSpectator } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 
