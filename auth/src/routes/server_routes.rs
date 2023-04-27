@@ -225,6 +225,8 @@ pub async fn achievement_progress(
         if progress >= max_progress {
             unlocked = Some(current_time);
         }
+    } else {
+        unlocked = Some(current_time);
     }
 
     let user_id = match find_user_id(&s, body.user_id).await {
