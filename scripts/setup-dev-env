@@ -9,10 +9,14 @@ npm install
 
 # Install and build crates for auth server
 pushd auth
-source $HOME/.cargo/env
+
 if ! grep -q 'source $HOME/.cargo/env'; then
+  curl https://sh.rustup.rs -sSf | bash -s -- -y
+  source $HOME/.cargo/env
   echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 fi
+source $HOME/.cargo/env
+
 cargo build
 popd
 

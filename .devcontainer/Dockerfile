@@ -17,6 +17,3 @@ RUN apt update && \
 # install node and npm v19
 RUN curl -fsSL https://deb.nodesource.com/setup_19.x | bash - &&\
   apt-get install -y nodejs
-
-# (courtesy of stackoverflow)
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
