@@ -4,8 +4,15 @@ set -eux
 
 cd "${0%/*}/.."
 
+# Install npm packages for main project
 npm install
 
+# Install and build crates for auth server
+pushd auth
+cargo build
+popd
+
+# Install npm packages for client, and terminal-client
 pushd client
 npm install
 popd
@@ -14,22 +21,28 @@ pushd terminal-client
 npm install
 popd
 
-pushd auth
-cargo build
-popd
-
+# Initialize and update git submodules
 git submodule init
 git submodule update
 
+# Build Prometheus C++ client library
 pushd game/prometheus-cpp
 
 git submodule init
 git submodule update
 
-mkdir _build
+# Check if _build directory exists, create it if not
+if [ ! -d "_build" ]; then
+  mkdir _build
+fi
+
+# Change to _build directory
 cd _build
 
+# Build Prometheus C++ client library
 cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF
 cmake --build . --parallel 4
+
+# Install Prometheus C++ client library and update linker cache
 sudo cmake --install .
 sudo ldconfig
