@@ -9,6 +9,10 @@ npm install
 
 # Install and build crates for auth server
 pushd auth
+source $HOME/.cargo/env
+if ! grep -q 'source $HOME/.cargo/env'; then
+  echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+fi
 cargo build
 popd
 
