@@ -2,7 +2,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "devcontainer",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "updateContentCommand": "bash -c '/workspaces/${localWorkspaceFolderBasename}/scripts/setup-dev-env &> /workspaces/${localWorkspaceFolderBasename}/.setup-log.log || cat /workspaces/${localWorkspaceFolderBasename}/.setup-log.log'",
+  "updateContentCommand": "bash -c '/workspaces/${localWorkspaceFolderBasename}/scripts/setup-dev-env 2>&1 | tee /workspaces/${localWorkspaceFolderBasename}/.setup-log.log'",
   "postCreateCommand": "bash -c '/workspaces/${localWorkspaceFolderBasename}/scripts/setup-dev-env &> /workspaces/${localWorkspaceFolderBasename}/.setup-log.log; /workspaces/${localWorkspaceFolderBasename}/scripts/create-dev-keys &>> /workspaces/${localWorkspaceFolderBasename}/.setup-log.log' || exit 0",
   "forwardPorts": [3000]
 }
