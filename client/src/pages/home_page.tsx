@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { keyframes, css, styled } from 'stitches.config';
 import { Button } from '../ui/buttons/button';
-import itsBoatsLogo from '../../public/itsboats.png';
+import itsBoatsLogo from '/itsboats.png';
 
 interface Game {
   last_updated: number;

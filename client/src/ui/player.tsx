@@ -313,7 +313,16 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
             {props.data?.achievements
               ?.filter((ach) => ach.unlocked)
               .map((ach) => {
-                return <AchievementImg {...ach} key={ach.id} />;
+                return (
+                  <AchievementImg
+                    key={ach.id}
+                    unlocked={ach.unlocked}
+                    progress={ach.progress}
+                    rd={ach.rd}
+                    rn={ach.rn}
+                    id={ach.id}
+                  />
+                );
               })}
           </Achievements>
         </CardBody>
