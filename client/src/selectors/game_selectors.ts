@@ -279,11 +279,8 @@ const makeCreateAddSubClassSelector = (n: number | 'add' | 'sub') => {
       }
       const dir = typeof n === 'number' ? Math.sign(n) : n === 'add' ? 1 : -1;
       const computedN = typeof n === 'number' ? Math.abs(n) - 1 : 0;
-      if (isDoubles) {
-        return '';
-      }
       if (typeof n !== 'number') {
-        if (TARGET_SCORES.find((t) => t === self + total * dir)) {
+        if (TARGET_SCORES.find((t) => t === self + total * dir) && !isDoubles) {
           return ' Victory';
         }
         if (reset_targets.find((t) => t === self + total * dir)) {
@@ -308,7 +305,10 @@ const makeCreateAddSubClassSelector = (n: number | 'add' | 'sub') => {
           solutions.push(solution);
         }
         for (const solution of solutions) {
-          if (TARGET_SCORES.find((t) => t === solution + thisRoll * dir)) {
+          if (
+            TARGET_SCORES.find((t) => t === solution + thisRoll * dir) &&
+            !isDoubles
+          ) {
             return ' Victory';
           }
           if (reset_targets.find((t) => t === solution + thisRoll * dir)) {
