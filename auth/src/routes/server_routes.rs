@@ -54,14 +54,6 @@ enum UserId {
 #[derive(Deserialize)]
 pub struct AddStatsPayload {
     user_id: UserId,
-    rolls: f32,
-    doubles: f32,
-    games: f32,
-    wins: f32,
-}
-
-pub struct AddStatsPayloadSomeday {
-    user_id: UserId,
     rolls: i32,
     doubles: i32,
     games: i32,
@@ -122,17 +114,10 @@ SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT
 #[axum::debug_handler]
 pub async fn add_stats(
     State(s): State<RouterState>,
-    Json(body_input): Json<AddStatsPayload>,
+    Json(mut body): Json<AddStatsPayload>,
 ) -> StatusCode {
     let Ok(client) = s.pool.get().await else {
         return StatusCode::INTERNAL_SERVER_ERROR;
-    };
-    let mut body = AddStatsPayloadSomeday {
-        rolls: body_input.rolls.round() as i32,
-        doubles: body_input.doubles.round() as i32,
-        games: body_input.games.round() as i32,
-        wins: body_input.wins.round() as i32,
-        user_id: body_input.user_id,
     };
     let user_id = match find_user_id(&s, body.user_id).await {
         Ok(uid) => uid,
@@ -200,7 +185,7 @@ pub struct AchievementUnlock {
 pub struct AchievementProgressPayload {
     user_id: UserId,
     achievement_id: String,
-    progress: f32,
+    progress: i32,
 }
 
 #[axum::debug_handler]
@@ -208,7 +193,7 @@ pub async fn achievement_progress(
     State(s): State<RouterState>,
     Json(body): Json<AchievementProgressPayload>,
 ) -> Result<Json<AchievementUnlock>, StatusCode> {
-    if body.progress <= 0.0 {
+    if body.progress <= 0 {
         // nothing to do
         return Err(StatusCode::OK);
     }
@@ -218,11 +203,10 @@ pub async fn achievement_progress(
     let Ok(client) = s.pool.get().await else {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };
-    let progress = body.progress.round() as i32;
     let current_time = SystemTime::now();
     let mut unlocked: Option<SystemTime> = None;
     if let Some(max_progress) = a.max_progress {
-        if progress >= max_progress {
+        if body.progress >= max_progress {
             unlocked = Some(current_time);
         }
     } else {
@@ -263,7 +247,7 @@ ON CONFLICT(user_id, achievement_id) DO UPDATE SET
 ",
             &[
                 &unlocked,
-                &progress,
+                &body.progress,
                 &user_id,
                 &a.id,
                 &a.max_progress.unwrap_or(0),

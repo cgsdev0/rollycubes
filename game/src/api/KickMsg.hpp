@@ -11,7 +11,7 @@ namespace API {
     struct KickMsg {
 std::string toString() const;
 void fromString(const std::string &str);
-        double id;
+        int64_t id;
         KickMsgType type = static_cast<KickMsgType>(0);
     };
 }

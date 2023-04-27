@@ -11,7 +11,7 @@ namespace API {
     struct WinMsg {
 std::string toString() const;
 void fromString(const std::string &str);
-        double id;
+        int64_t id;
         WinMsgType type = static_cast<WinMsgType>(0);
     };
 }
