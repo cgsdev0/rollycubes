@@ -6,10 +6,6 @@ cd "${0%/*}/.."
 
 npm install
 
-pushd auth
-npm install
-popd
-
 pushd client
 npm install
 popd
