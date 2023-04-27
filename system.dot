@@ -1,8 +1,9 @@
 digraph {
-  layout="circo"
-  GameServer
-  GameServer -> AuthServer [label="sends stats\n+ achievements"]
-  Client -> AuthServer
-  AuthServer -> Client
-  Client -> GameServer [dir="both",label="WS"]
+  GameServer -> AuthServer [color="#9900aa"]
+  Client -> GameServer [dir="both", color="#44aa44"] 
+  Client -> AuthServer [color="#9900aa"]
+  PostgresDB [shape="cylinder"]
+  AuthServer -> PostgresDB [dir="both"]
+  WebSocket [fontcolor="#44aa44", shape=plain]
+  HTTP [fontcolor="#9900aa", shape=plain]
 }
