@@ -9,7 +9,8 @@
     "nocache": "^3.0.1"
   },
   "scripts": {
-    "start": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm start\" \"cd auth; cargo run\" \"cd game; sleep 10; ./run-server.sh\"",
+    "start": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm run with-ssl\" \"cd auth; cargo run\" \"cd game; sleep 10; ./run-server.sh\"",
+    "local": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm start\" \"cd auth; cargo run\" \"cd game; sleep 10; ./run-server.sh\"",
     "no-auth": "concurrently -c red,blue -n client,gameserver \"cd client; npm start\" \"cd game; NO_AUTH=true ./run-server.sh\""
   },
   "repository": {
