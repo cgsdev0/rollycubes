@@ -26,6 +26,7 @@
   },
   "scripts": {
     "start": "vite --host",
+    "with-ssl": "USE_SSL_HMR=true vite --host",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "docs": "typedoc --plugin typedoc-plugin-markdown src/types/server_messages.ts src/types/store_types.ts --out ../docs/gen --publicPath '/gen/' && rm ../docs/gen/README.md && sed -i 's@\\[client\\](/gen/README.md)@\\[home\\](/)@' $(find ../docs/gen -type f)"
