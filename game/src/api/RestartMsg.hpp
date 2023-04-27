@@ -11,7 +11,7 @@ namespace API {
     struct RestartMsg {
 std::string toString() const;
 void fromString(const std::string &str);
-        double id;
+        int64_t id;
         RestartMsgType type = static_cast<RestartMsgType>(0);
     };
 }

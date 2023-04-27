@@ -55,6 +55,10 @@
 #include "UserId.hpp"
 #include "UserIdType.hpp"
 
+namespace API {
+    using Integer = double;
+}
+
 namespace nlohmann {
     void from_json(const json & j, API::UserId & x);
     void to_json(json & j, const API::UserId & x);
@@ -233,7 +237,7 @@ namespace nlohmann {
 
     inline void from_json(const json & j, API::AchievementProgress& x) {
         x.achievement_id = j.at("achievement_id").get<std::string>();
-        x.progress = j.at("progress").get<double>();
+        x.progress = j.at("progress").get<int64_t>();
         x.type = j.at("type").get<API::AchievementProgressType>();
         x.user_id = j.at("user_id").get<API::AchievementProgressUserId>();
     }
@@ -277,11 +281,11 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::ReportStats& x) {
-        x.doubles = j.at("doubles").get<double>();
-        x.games = j.at("games").get<double>();
-        x.rolls = j.at("rolls").get<double>();
+        x.doubles = j.at("doubles").get<int64_t>();
+        x.games = j.at("games").get<int64_t>();
+        x.rolls = j.at("rolls").get<int64_t>();
         x.user_id = j.at("user_id").get<API::ReportStatsUserId>();
-        x.wins = j.at("wins").get<double>();
+        x.wins = j.at("wins").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::ReportStats & x) {
@@ -312,7 +316,7 @@ namespace nlohmann {
 
     inline void from_json(const json & j, API::Achievement& x) {
         x.id = j.at("id").get<std::string>();
-        x.progress = j.at("progress").get<double>();
+        x.progress = j.at("progress").get<int64_t>();
         x.rd = API::get_optional<double>(j, "rd");
         x.rn = API::get_optional<double>(j, "rn");
         x.unlocked = j.at("unlocked").get<std::string>();
@@ -328,10 +332,10 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::UserStats& x) {
-        x.doubles = j.at("doubles").get<double>();
-        x.games = j.at("games").get<double>();
-        x.rolls = j.at("rolls").get<double>();
-        x.wins = j.at("wins").get<double>();
+        x.doubles = j.at("doubles").get<int64_t>();
+        x.games = j.at("games").get<int64_t>();
+        x.rolls = j.at("rolls").get<int64_t>();
+        x.wins = j.at("wins").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::UserStats & x) {
@@ -363,7 +367,7 @@ namespace nlohmann {
 
     inline void from_json(const json & j, API::DieRoll& x) {
         x.used = j.at("used").get<bool>();
-        x.value = j.at("value").get<double>();
+        x.value = j.at("value").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::DieRoll & x) {
@@ -398,7 +402,7 @@ namespace nlohmann {
         x.code = j.at("code").get<std::string>();
         x.host_name = j.at("host_name").get<std::string>();
         x.last_updated = j.at("last_updated").get<std::string>();
-        x.player_count = j.at("player_count").get<double>();
+        x.player_count = j.at("player_count").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::Room & x) {
@@ -422,9 +426,9 @@ namespace nlohmann {
         x.connected = j.at("connected").get<bool>();
         x.crowned = API::get_optional<bool>(j, "crowned");
         x.name = API::get_optional<std::string>(j, "name");
-        x.score = j.at("score").get<double>();
+        x.score = j.at("score").get<int64_t>();
         x.user_id = API::get_optional<std::string>(j, "user_id");
-        x.win_count = j.at("win_count").get<double>();
+        x.win_count = j.at("win_count").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::Player & x) {
@@ -443,7 +447,7 @@ namespace nlohmann {
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
-        x.turn_index = j.at("turn_index").get<double>();
+        x.turn_index = j.at("turn_index").get<int64_t>();
         x.used = j.at("used").get<std::vector<bool>>();
         x.victory = j.at("victory").get<bool>();
     }
@@ -463,14 +467,14 @@ namespace nlohmann {
     inline void from_json(const json & j, API::ServerPlayer& x) {
         x.connected = j.at("connected").get<bool>();
         x.crowned = API::get_optional<bool>(j, "crowned");
-        x.doubles_count = j.at("doubles_count").get<double>();
+        x.doubles_count = j.at("doubles_count").get<int64_t>();
         x.name = API::get_optional<std::string>(j, "name");
-        x.roll_count = j.at("roll_count").get<double>();
-        x.score = j.at("score").get<double>();
+        x.roll_count = j.at("roll_count").get<int64_t>();
+        x.score = j.at("score").get<int64_t>();
         x.session = j.at("session").get<std::string>();
-        x.turn_count = j.at("turn_count").get<double>();
+        x.turn_count = j.at("turn_count").get<int64_t>();
         x.user_id = API::get_optional<std::string>(j, "user_id");
-        x.win_count = j.at("win_count").get<double>();
+        x.win_count = j.at("win_count").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::ServerPlayer & x) {
@@ -493,7 +497,7 @@ namespace nlohmann {
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
-        x.turn_index = j.at("turn_index").get<double>();
+        x.turn_index = j.at("turn_index").get<int64_t>();
         x.type = j.at("type").get<API::GameStateType>();
         x.used = j.at("used").get<std::vector<bool>>();
         x.victory = j.at("victory").get<bool>();
@@ -514,12 +518,12 @@ namespace nlohmann {
 
     inline void from_json(const json & j, API::WelcomeMsg& x) {
         x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.players = j.at("players").get<std::vector<API::Player>>();
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
-        x.turn_index = j.at("turn_index").get<double>();
+        x.turn_index = j.at("turn_index").get<int64_t>();
         x.type = j.at("type").get<API::WelcomeMsgType>();
         x.used = j.at("used").get<std::vector<bool>>();
         x.victory = j.at("victory").get<bool>();
@@ -540,7 +544,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::RestartMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.type = j.at("type").get<API::RestartMsgType>();
     }
 
@@ -551,7 +555,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::WinMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.type = j.at("type").get<API::WinMsgType>();
     }
 
@@ -582,7 +586,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::JoinMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.name = API::get_optional<std::string>(j, "name");
         x.type = j.at("type").get<API::JoinMsgType>();
         x.user_id = API::get_optional<std::string>(j, "user_id");
@@ -597,7 +601,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::DisconnectMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.type = j.at("type").get<API::DisconnectMsgType>();
     }
 
@@ -608,7 +612,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::ReconnectMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.type = j.at("type").get<API::ReconnectMsgType>();
     }
 
@@ -619,7 +623,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::KickMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.type = j.at("type").get<API::KickMsgType>();
     }
 
@@ -641,7 +645,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::UpdateTurnMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.type = j.at("type").get<API::UpdateTurnMsgType>();
     }
 
@@ -652,7 +656,7 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::UpdateNameMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.name = j.at("name").get<std::string>();
         x.type = j.at("type").get<API::UpdateNameMsgType>();
     }
@@ -665,9 +669,9 @@ namespace nlohmann {
     }
 
     inline void from_json(const json & j, API::UpdateMsg& x) {
-        x.id = j.at("id").get<double>();
+        x.id = j.at("id").get<int64_t>();
         x.reset = API::get_optional<bool>(j, "reset");
-        x.score = j.at("score").get<double>();
+        x.score = j.at("score").get<int64_t>();
         x.type = j.at("type").get<API::UpdateMsgType>();
         x.used = API::get_optional<std::vector<bool>>(j, "used");
     }

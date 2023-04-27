@@ -9,13 +9,13 @@ std::string toString() const;
 void fromString(const std::string &str);
         bool connected;
         std::shared_ptr<bool> crowned;
-        double doubles_count;
+        int64_t doubles_count;
         std::shared_ptr<std::string> name;
-        double roll_count;
-        double score;
+        int64_t roll_count;
+        int64_t score;
         std::string session;
-        double turn_count;
+        int64_t turn_count;
         std::shared_ptr<std::string> user_id;
-        double win_count;
+        int64_t win_count;
     };
 }

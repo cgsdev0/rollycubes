@@ -11,7 +11,7 @@ namespace API {
     struct UpdateTurnMsg {
 std::string toString() const;
 void fromString(const std::string &str);
-        double id;
+        int64_t id;
         UpdateTurnMsgType type = static_cast<UpdateTurnMsgType>(0);
     };
 }
