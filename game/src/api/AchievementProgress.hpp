@@ -17,5 +17,6 @@ void fromString(const std::string &str);
         int64_t progress;
         AchievementProgressType type = static_cast<AchievementProgressType>(0);
         AchievementProgressUserId user_id;
+        int64_t user_index;
     };
 }

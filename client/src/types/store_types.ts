@@ -19,6 +19,7 @@ export type UserId =
 export interface AchievementProgress {
   achievement_id: string;
   user_id: UserId;
+  user_index: integer;
   progress: integer;
   type: 'achievement_progress';
 }
@@ -28,7 +29,9 @@ export interface AchievementUnlock {
   image_url: string | null;
   name: string;
   description: string;
-  max_progress: integer | null;
+  user_index: integer;
+  max_progress: integer;
+  user_id: string;
   type: 'achievement_unlock';
 }
 
@@ -57,8 +60,8 @@ export interface Achievement {
   id: string;
   progress: integer;
   unlocked: string;
-  rn: integer | null;
-  rd: integer | null;
+  rn: number | null;
+  rd: number | null;
 }
 
 export type AchievementData = {
@@ -66,7 +69,7 @@ export type AchievementData = {
   image_url: string | null;
   id: string;
   name: string;
-  max_progress: integer | null;
+  max_progress: integer;
 };
 
 export interface UserData {

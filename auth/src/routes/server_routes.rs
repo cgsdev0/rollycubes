@@ -179,11 +179,14 @@ pub struct AchievementUnlock {
     unlock_type: String,
     #[serde(flatten)]
     achievement: Achievement,
+    user_id: Uuid,
+    user_index: i32,
 }
 
 #[derive(Deserialize)]
 pub struct AchievementProgressPayload {
     user_id: UserId,
+    user_index: i32,
     achievement_id: String,
     progress: i32,
 }
@@ -260,6 +263,8 @@ ON CONFLICT(user_id, achievement_id) DO UPDATE SET
             Ok(..) => Ok(Json(AchievementUnlock {
                 unlock_type: "achievement_unlock".to_string(),
                 achievement: a.clone(),
+                user_id,
+                user_index: body.user_index,
             })),
             Err(..) => Err(StatusCode::OK),
         },

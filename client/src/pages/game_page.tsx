@@ -1,12 +1,6 @@
 import React from 'react';
-import { connect, DispatchProp } from 'react-redux';
-import {
-  Location,
-  NavigateFunction,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { connect } from 'react-redux';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import OnboardPage from './onboard_page';
 import { css, styled } from 'stitches.config';
 import Connection from '../connection';
@@ -24,10 +18,9 @@ import ChatBox from '../ui/chat';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
 import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help';
-import { useDispatch } from 'react-redux';
+import { useStore } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
-import { useGetUserByIdQuery } from 'api/auth';
 
 interface Props {
   winner?: Player;
@@ -55,20 +48,13 @@ const FloatingButtonBar = styled('div', {
   gap: 8,
 });
 
-const GamePage: React.FC<Props & DispatchProp> = ({
-  is3DMode,
-  somebodyIsNice,
-  authToken,
-  winner,
-  reset,
-  turn,
-}) => {
+const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
   const [hasOnboarded, setHasOnboarded] = React.useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { mode, room } = useParams();
 
-  const dispatch = useDispatch();
+  const store = useStore<ReduxState>();
 
   const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room';
 
@@ -104,25 +90,15 @@ const GamePage: React.FC<Props & DispatchProp> = ({
           mode={mode}
           navigate={navigate}
           location={location}
+          store={store}
         />
       )}
 
       <FloatingButtonBar id="floating-button-bar">
         <HelpIcon onClick={() => setShowHelp((help) => !help)} />
-        <DiceIcon onClick={() => dispatch({ type: 'TOGGLE_3D' })} />
+        <DiceIcon onClick={() => store.dispatch({ type: 'TOGGLE_3D' })} />
         <HomeIcon onClick={() => navigate('/')} />
       </FloatingButtonBar>
-      {/* TODO: Refactor all this garbage */}
-      {/* {doublesCount ? ( */}
-      {/*   <h6 key={doublesCount} id="Doubles"> */}
-      {/*     Doubles! */}
-      {/*   </h6> */}
-      {/* ) : null} */}
-      {/* {somebodyIsNice ? <h6 id="Nice">Nice (ꈍoꈍ)</h6> : null} */}
-      {/* {reset ? <h6 id="Reset">Reset!</h6> : null} */}
-      {/* {winner ? ( */}
-      {/*   <h6 id="Victory">{winner.name || `User${turn + 1}`} Wins!</h6> */}
-      {/* ) : null} */}
 
       {/* <ConnBanner /> */}
 

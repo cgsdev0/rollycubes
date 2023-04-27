@@ -240,6 +240,7 @@ namespace nlohmann {
         x.progress = j.at("progress").get<int64_t>();
         x.type = j.at("type").get<API::AchievementProgressType>();
         x.user_id = j.at("user_id").get<API::AchievementProgressUserId>();
+        x.user_index = j.at("user_index").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::AchievementProgress & x) {
@@ -248,15 +249,18 @@ namespace nlohmann {
         j["progress"] = x.progress;
         j["type"] = x.type;
         j["user_id"] = x.user_id;
+        j["user_index"] = x.user_index;
     }
 
     inline void from_json(const json & j, API::AchievementUnlock& x) {
         x.description = j.at("description").get<std::string>();
         x.id = j.at("id").get<std::string>();
         x.image_url = API::get_optional<std::string>(j, "image_url");
-        x.max_progress = API::get_optional<double>(j, "max_progress");
+        x.max_progress = j.at("max_progress").get<int64_t>();
         x.name = j.at("name").get<std::string>();
         x.type = j.at("type").get<API::AchievementUnlockType>();
+        x.user_id = j.at("user_id").get<std::string>();
+        x.user_index = j.at("user_index").get<int64_t>();
     }
 
     inline void to_json(json & j, const API::AchievementUnlock & x) {
@@ -267,6 +271,8 @@ namespace nlohmann {
         j["max_progress"] = x.max_progress;
         j["name"] = x.name;
         j["type"] = x.type;
+        j["user_id"] = x.user_id;
+        j["user_index"] = x.user_index;
     }
 
     inline void from_json(const json & j, API::ReportStatsUserId& x) {
@@ -301,7 +307,7 @@ namespace nlohmann {
         x.description = j.at("description").get<std::string>();
         x.id = j.at("id").get<std::string>();
         x.image_url = API::get_optional<std::string>(j, "image_url");
-        x.max_progress = API::get_optional<double>(j, "max_progress");
+        x.max_progress = j.at("max_progress").get<int64_t>();
         x.name = j.at("name").get<std::string>();
     }
 
