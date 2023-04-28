@@ -25,8 +25,10 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "start": "vite --host",
-    "with-ssl": "USE_SSL_HMR=true vite --host",
+    "start": "VITE_LOCAL_AUTH=true vite --host",
+    "with-ssl": "VITE_LOCAL_AUTH=true USE_SSL_HMR=true vite --host",
+    "with-ssl-no-auth": "VITE_LOCAL_AUTH=true USE_SSL_HMR=true vite --host",
+    "no-auth": "vite --host",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "docs": "typedoc --plugin typedoc-plugin-markdown src/types/server_messages.ts src/types/store_types.ts --out ../docs/gen --publicPath '/gen/' && rm ../docs/gen/README.md && sed -i 's@\\[client\\](/gen/README.md)@\\[home\\](/)@' $(find ../docs/gen -type f)"
