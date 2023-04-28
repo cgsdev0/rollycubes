@@ -45,9 +45,10 @@ Use `./game/run-server.sh` (linux only)
 Alternatively, run `make && ./GameServer` in the `game` directory
 
 Environment variables:
+
 | Variable | Description                                                     |
 | -------- | --------------------------------------------------------------- |
-| NO_AUTH  | set this to `true` to disable the need for a local auth server. |
+| NO\_AUTH  | set this to `true` to disable the need for a local auth server. |
 
 ### Auth Server
 The auth server is responsible for managing and authenticating users and user data. It uses a PostgreSQL database to store user data (achievements, stats, etc.)
