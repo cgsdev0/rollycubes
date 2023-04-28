@@ -8,9 +8,9 @@ And follow development [on Twitch.tv](https://twitch.tv/badcop_)!
 
 In the root directory, run one of these commands to start dev services:
 ```bash
-npm start # run everything
+npm start  # run everything
 
-npm run no-auth # start only client and game server
+npm run no-auth  # start only client and game server
 ```
 
 Then, click this button on the "Ports" tab:
