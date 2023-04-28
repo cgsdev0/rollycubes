@@ -12,10 +12,5 @@ services:
     volumes:
       - postgres-data-auth:/var/lib/postgresql/data
 
-networks:
-  default:
-    name: rollycubes
-    external: true
-
 volumes:
   postgres-data-auth:
