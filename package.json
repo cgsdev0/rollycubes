@@ -2,7 +2,6 @@
   "name": "rollycubes",
   "version": "1.0.0",
   "description": "<h1 align=\"center\">Rolly Cubes</h1>",
-  "main": "index.js",
   "directories": {
     "doc": "docs"
   },
@@ -10,7 +9,9 @@
     "nocache": "^3.0.1"
   },
   "scripts": {
-    "start": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm start\" \"cd auth; npm run start-dev\" \"cd game; sleep 10; ./run-server.sh\""
+    "start": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm run with-ssl\" \"cd auth; cargo run\" \"cd game; sleep 10; ./run-server.sh\"",
+    "local": "concurrently -c red,green,blue -n client,authserver,gameserver \"cd client; npm start\" \"cd auth; cargo run\" \"cd game; sleep 10; ./run-server.sh\"",
+    "no-auth": "concurrently -c red,blue -n client,gameserver \"cd client; npm start\" \"cd game; NO_AUTH=true ./run-server.sh\""
   },
   "repository": {
     "type": "git",

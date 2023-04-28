@@ -7,9 +7,9 @@ namespace API {
     struct UserStats {
 std::string toString() const;
 void fromString(const std::string &str);
-        double doubles;
-        double games;
-        double rolls;
-        double wins;
+        int64_t doubles;
+        int64_t games;
+        int64_t rolls;
+        int64_t wins;
     };
 }

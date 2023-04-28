@@ -9,10 +9,10 @@ namespace API {
     struct ReportStats {
 std::string toString() const;
 void fromString(const std::string &str);
-        double doubles;
-        double games;
-        double rolls;
+        int64_t doubles;
+        int64_t games;
+        int64_t rolls;
         ReportStatsUserId user_id;
-        double wins;
+        int64_t wins;
     };
 }

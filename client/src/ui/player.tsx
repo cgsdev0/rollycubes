@@ -160,22 +160,9 @@ const kick = css({
 });
 
 const PlayerComponent = (props: Props) => {
-  console.warn({ user_id: props.player.user_id });
-  const { data, isLoading, error } = useGetUserByIdQuery(
-    props.player.user_id!,
-    {
-      skip: !Boolean(props.player.user_id),
-    }
-  );
-
-  const changeName = () => {
-    const e = window.prompt('Enter a name: ', props.player.name);
-    if (e === null) return;
-    if (props.socket) {
-      props.socket.send(JSON.stringify({ type: 'update_name', name: e }));
-      localStorage.setItem('name', e);
-    }
-  };
+  const { data } = useGetUserByIdQuery(props.player.user_id!, {
+    skip: !Boolean(props.player.user_id),
+  });
 
   const onKick = () => {
     const { player, n } = props;
@@ -186,30 +173,14 @@ const PlayerComponent = (props: Props) => {
   };
 
   const [tooltipVisible, setTooltipVisible] = React.useState(false);
-  const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } =
-    usePopperTooltip({
-      visible: tooltipVisible,
-      onVisibleChange: setTooltipVisible,
-      interactive: true,
-      trigger: 'click',
-    });
+  const { getTooltipProps, setTooltipRef, setTriggerRef } = usePopperTooltip({
+    visible: tooltipVisible,
+    onVisibleChange: setTooltipVisible,
+    interactive: true,
+    trigger: 'click',
+  });
 
-  const overridePosition = (
-    { left, top }: { left: number; top: number },
-    currentEvent: any,
-    currentTarget: any,
-
-    node: any
-  ) => {
-    const d = document.documentElement;
-    left = Math.min(d.clientWidth - node.clientWidth, left);
-    top = Math.min(d.clientHeight - node.clientHeight, top);
-    left = Math.max(0, left);
-    top = Math.max(0, top);
-    return { top, left };
-  };
-
-  const { n, player, self_index, turn_index } = props;
+  const { n, player, turn_index } = props;
   const imageUrl = data?.image_url;
 
   const turnHighlight = turn_index === n ? ' highlight' : '';
@@ -254,7 +225,6 @@ const PlayerComponent = (props: Props) => {
 
 const TooltipContents = (props: Props & { data?: UserData }) => {
   const { n, player, data } = props;
-  console.warn(data);
   const imageUrl = data?.image_url;
   const doubles = data?.stats?.doubles || 0;
   const wins = data?.stats?.wins || 0;
@@ -264,7 +234,6 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
   const losses = games - wins;
 
   const win_rate = Math.floor((wins / (games || 1)) * 1000) / 10;
-  const doubles_rate = Math.floor((doubles / (rolls || 1)) * 1000) / 10;
 
   const join_date = new Date(props.data?.createdDate || 0)
     .toDateString()
@@ -313,13 +282,22 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
             {props.data?.achievements
               ?.filter((ach) => ach.unlocked)
               .map((ach) => {
-                return <AchievementImg {...ach} key={ach.id} />;
+                return (
+                  <AchievementImg
+                    key={ach.id}
+                    unlocked={ach.unlocked}
+                    progress={ach.progress}
+                    rd={ach.rd}
+                    rn={ach.rn}
+                    id={ach.id}
+                  />
+                );
               })}
           </Achievements>
         </CardBody>
       </>
     ),
-    []
+    [data]
   );
 };
 
@@ -328,7 +306,7 @@ const defaultAchievementData: AchievementData = {
   image_url: '//via.placeholder.com/48',
   id: 'unknown',
   name: 'Unknown',
-  max_progress: null,
+  max_progress: 0,
 };
 const AImg = styled('img', {
   imageRendering: 'pixelated',
@@ -340,11 +318,10 @@ const AchievementImg = (props: Achievement) => {
     useSelector((state: ReduxState) => state.auth.achievements) || {};
   const achData = achievements[props.id] || defaultAchievementData;
   const [tooltipVisible, setTooltipVisible] = React.useState(false);
-  const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } =
-    usePopperTooltip({
-      visible: tooltipVisible,
-      onVisibleChange: setTooltipVisible,
-    });
+  const { getTooltipProps, setTooltipRef, setTriggerRef } = usePopperTooltip({
+    visible: tooltipVisible,
+    onVisibleChange: setTooltipVisible,
+  });
   const img_url = achData.image_url || '//via.placeholder.com/48';
   const unlock_date = new Date(props.unlocked || 0).toDateString().split(' ');
   unlock_date.shift();
@@ -367,7 +344,7 @@ const AchievementImg = (props: Achievement) => {
               <header>{achData.name}</header>
               <p>{achData.description}</p>
               <p>Unlocked {unlock_date.join(' ')}</p>
-              <p>{rarity}% of users have this</p>
+              {rarity > 0 ? <p>{rarity}% of users have this</p> : null}
             </div>
           </AchievementTooltip>
         )}

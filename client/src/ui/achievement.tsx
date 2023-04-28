@@ -1,18 +1,12 @@
-import React from 'react';
+import { AchievementUnlock } from 'types/store_types';
 
-interface Props {
-  achievement_id: string;
-  image_url?: string;
-  description: string;
-  name: string;
-}
-export const Achievement = (props: Props) => {
+export const Achievement = (props: AchievementUnlock) => {
   return (
     <div className="achievement">
       <img
         width={48}
         height={48}
-        src={props.image_url}
+        src={props.image_url || undefined}
         alt={props.description}
       />
       <div>

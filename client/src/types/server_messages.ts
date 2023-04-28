@@ -1,5 +1,7 @@
 import { Player, ServerPlayer } from './store_types';
 
+type integer = number;
+
 export interface GameError {
   type: 'error';
   error: string;
@@ -14,7 +16,7 @@ export interface Room {
   code: string;
   host_name: string;
   last_updated: string;
-  player_count: number;
+  player_count: integer;
 }
 
 export interface RoomList {
@@ -24,8 +26,8 @@ export interface RoomList {
 export interface IGameState {
   players: Player[];
   chatLog: string[];
-  turn_index: number;
-  rolls: number[];
+  turn_index: integer;
+  rolls: integer[];
   used: boolean[];
   rolled: boolean;
   victory: boolean;
@@ -39,22 +41,22 @@ export interface GameState extends IGameState {
 
 export interface WelcomeMsg extends IGameState {
   type: 'welcome';
-  id: number; // self_id; -1 means spectator
+  id: integer; // self_id; -1 means spectator
 }
 
 export interface RestartMsg {
   type: 'restart';
-  id: number; // starting turn index
+  id: integer; // starting turn index
 }
 
 export interface WinMsg {
   type: 'win';
-  id: number; // winner turn index
+  id: integer; // winner turn index
 }
 
 export interface RollMsg {
   type: 'roll';
-  rolls: number[];
+  rolls: integer[];
 }
 
 export interface RollAgainMsg {
@@ -63,7 +65,7 @@ export interface RollAgainMsg {
 
 export interface JoinMsg {
   type: 'join';
-  id: number;
+  id: integer;
   /* only if the user is signed in */
   name?: string;
   user_id?: string;
@@ -71,17 +73,17 @@ export interface JoinMsg {
 
 export interface DisconnectMsg {
   type: 'disconnect';
-  id: number;
+  id: integer;
 }
 
 export interface ReconnectMsg {
   type: 'reconnect';
-  id: number;
+  id: integer;
 }
 
 export interface KickMsg {
   type: 'kick';
-  id: number;
+  id: integer;
 }
 
 export interface ChatMsg {
@@ -91,19 +93,19 @@ export interface ChatMsg {
 
 export interface UpdateTurnMsg {
   type: 'update_turn';
-  id: number; // new turn index
+  id: integer; // new turn index
 }
 
 export interface UpdateNameMsg {
   type: 'update_name';
   name: string;
-  id: number; // new turn index
+  id: integer; // new turn index
 }
 
 export interface UpdateMsg {
   type: 'update';
-  id: number; // new turn index
-  score: number;
+  id: integer; // new turn index
+  score: integer;
   used?: boolean[];
   reset?: boolean;
 }

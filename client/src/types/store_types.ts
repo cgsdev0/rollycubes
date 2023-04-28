@@ -1,8 +1,10 @@
+type integer = number;
+
 export interface Player {
   connected: boolean;
   name?: string;
-  score: number;
-  win_count: number;
+  score: integer;
+  win_count: integer;
   user_id?: string;
   crowned?: boolean;
 }
@@ -17,7 +19,8 @@ export type UserId =
 export interface AchievementProgress {
   achievement_id: string;
   user_id: UserId;
-  progress: number;
+  user_index: integer;
+  progress: integer;
   type: 'achievement_progress';
 }
 
@@ -26,34 +29,36 @@ export interface AchievementUnlock {
   image_url: string | null;
   name: string;
   description: string;
-  max_progress: number | null;
+  user_index: integer;
+  max_progress: integer;
+  user_id: string;
   type: 'achievement_unlock';
 }
 
 export interface ReportStats {
   user_id: UserId;
-  rolls: number;
-  wins: number;
-  games: number;
-  doubles: number;
+  rolls: integer;
+  wins: integer;
+  games: integer;
+  doubles: integer;
 }
 export interface ServerPlayer extends Player {
   session: string;
-  turn_count: number;
-  roll_count: number;
-  doubles_count: number;
+  turn_count: integer;
+  roll_count: integer;
+  doubles_count: integer;
 }
 
 export interface UserStats {
-  rolls: number;
-  doubles: number;
-  games: number;
-  wins: number;
+  rolls: integer;
+  doubles: integer;
+  games: integer;
+  wins: integer;
 }
 
 export interface Achievement {
   id: string;
-  progress: number;
+  progress: integer;
   unlocked: string;
   rn: number | null;
   rd: number | null;
@@ -64,7 +69,7 @@ export type AchievementData = {
   image_url: string | null;
   id: string;
   name: string;
-  max_progress: number | null;
+  max_progress: integer;
 };
 
 export interface UserData {
@@ -78,5 +83,5 @@ export interface UserData {
 
 export interface DieRoll {
   used: boolean;
-  value: number;
+  value: integer;
 }

@@ -64,7 +64,7 @@ class Game {
 
     bool hasPlayer(std::string &id);
     json addPlayer(const PerSocketData &data);
-    int getPlayerId(std::string &id);
+    int getPlayerId(const std::string &id);
 
     json disconnectPlayer(std::string id);
     json reconnectPlayer(std::string id);
@@ -100,6 +100,9 @@ class Game {
 
     int connectedPlayerCount();
 
+    std::random_device rd;
+    std::mt19937 gen;
+
     API::WelcomeMsg toWelcomeMsg() {
         std::vector<API::Player> players;
         for(const auto& player : this->state.players) {
@@ -125,7 +128,7 @@ class Game {
     std::string toString() const {
         return this->state.toString();
     }
-    void processEvent(const API::ServerPlayer *player, HandlerArgs *server, const json &data, const API::GameState &prev);
+    void processEvent(const API::ServerPlayer *player, SendFunc &broadcast, HandlerArgs *server, const json &data, const API::GameState &prev);
 
   private:
     std::uniform_int_distribution<int> dis{1, 6};

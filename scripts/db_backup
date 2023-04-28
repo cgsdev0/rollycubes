@@ -1,0 +1,20 @@
+#!/bin/sh
+
+cd /root
+mkdir -p db_backups
+
+BACKUP_NAME=db_backups/backup-$(date +%d-%m-%y_%H-%M).gz
+PGPASSWORD=test /usr/bin/pg_dump \
+        --column-inserts \
+        --data-only \
+        -h \
+        $(docker inspect auth_postgres_1 \
+        | jq -r '.[0].NetworkSettings.Networks.rollycubes.IPAddress') \
+        -U test \
+        -Z5 \
+        -f "$BACKUP_NAME"
+
+/usr/bin/s3cmd \
+        put \
+        "$BACKUP_NAME" \
+        s3://rollycubes-db-backups/"$(basename $BACKUP_NAME)"

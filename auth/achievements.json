@@ -3,6 +3,7 @@
     "id": "astronaut:1",
     "name": "Astronaut",
     "description": "Win with a score of 100",
+    "max_progress": 1,
     "image_url": "https://rollycubes-static-assets.sfo3.cdn.digitaloceanspaces.com/astronaut.png"
   },
   "getting_started": {

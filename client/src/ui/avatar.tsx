@@ -1,7 +1,7 @@
 import React from 'react';
 import { css, styled } from 'stitches.config';
-import defaultIcon from '../../public/default_player.png';
-import crownIcon from '../../public/crown.png';
+import defaultIcon from '/default_player.png';
+import crownIcon from '/crown.png';
 import { DisconnectedIcon } from './icons/disconnected';
 
 interface Props {

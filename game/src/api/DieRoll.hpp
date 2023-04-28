@@ -8,6 +8,6 @@ namespace API {
 std::string toString() const;
 void fromString(const std::string &str);
         bool used;
-        double value;
+        int64_t value;
     };
 }

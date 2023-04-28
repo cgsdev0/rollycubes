@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE IF NOT EXISTS achievement (
     id character varying NOT NULL PRIMARY KEY,
     name character varying NOT NULL,

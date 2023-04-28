@@ -4,6 +4,12 @@ import svgrPlugin from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import path from 'path';
 
+let hmr_config: any = undefined;
+if (process.env.USE_SSL_HMR) {
+  hmr_config = {
+    clientPort: 443,
+  };
+}
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
@@ -25,9 +31,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    hmr: {
-      clientPort: 443,
-    },
+    hmr: hmr_config,
     proxy: {
       '/cookie': {
         target: 'http://localhost:3001',
