@@ -18,7 +18,7 @@ Then, click this button on the "Ports" tab:
 ![image](https://user-images.githubusercontent.com/4583705/235190987-5bde6b1a-f98c-40b9-a57d-d3b6841a0143.png)
 
 
-## Running locally locally
+## Running locally
 
 To run on your local machine, there are a few requirements:
 * You will need a compiler with C++20 support (g++ preferred)
@@ -35,6 +35,9 @@ scripts/create-dev-keys
 ```
 
 See below for running the services. Generally, you will want to at least run 'client' and 'game server'.
+
+## High-Level Overview
+![Service architecture graph](/system-graph.png?raw=true "Service architecture graph")
 
 ### Game Server
 The game server manages all of the logic for game sessions. Since rooms are ephemeral, it does not use a database. It also sends achievement unlock info to the auth server.
@@ -80,7 +83,3 @@ To run the terminal client locally connecting to a local server run
 cd terminal-client
 node client.js --host localhost --port 3001 --insecure --room wKvsbw
 ```
-
-
-## High-Level Service Overview
-![Service architecture graph](/system-graph.png?raw=true "Service architecture graph")
