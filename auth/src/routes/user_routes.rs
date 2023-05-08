@@ -35,10 +35,17 @@ pub struct AchievementProgress {
 }
 
 #[derive(Serialize)]
+pub struct DiceSettings {
+    #[serde(rename = "type")]
+    dice_type: i32,
+}
+
+#[derive(Serialize)]
 pub struct User {
     id: Uuid,
     username: String,
     image_url: Option<String>,
+    dice: DiceSettings,
     #[serde(rename = "createdDate", with = "time::serde::rfc3339")]
     created_date: OffsetDateTime,
     achievements: Option<Vec<AchievementProgress>>,
@@ -324,6 +331,7 @@ SELECT
     image_url,
     users.created_date as created_date,
     user_to_achievement.achievement_id as achievement_id,
+    user_settings.dice_type as dice_type,
     unlocked,
     progress,
     rolls,
@@ -335,6 +343,7 @@ SELECT
 FROM users
 LEFT JOIN user_to_achievement ON id=user_to_achievement.user_id
 LEFT JOIN player_stats ON id=player_stats.user_id
+LEFT JOIN user_settings ON id=user_settings.user_id
 WHERE id=$1::UUID",
             &[&user_id],
         )
@@ -348,6 +357,9 @@ WHERE id=$1::UUID",
                 id: row.get("id"),
                 username: row.get("username"),
                 image_url: row.get("image_url"),
+                dice: DiceSettings {
+                    dice_type: row.get("dice_type"),
+                },
                 created_date: row
                     .get::<'_, _, PrimitiveDateTime>("created_date")
                     .assume_utc(),
