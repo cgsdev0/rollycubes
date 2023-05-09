@@ -5,7 +5,9 @@ use axum::{
     Json,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
+use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
+use serde_repr::*;
 use time::{Duration, OffsetDateTime, PrimitiveDateTime};
 use twitch_oauth2::{AccessToken, UserToken};
 use uuid::Uuid;
@@ -34,16 +36,23 @@ pub struct AchievementProgress {
     rd: Option<i64>,
 }
 
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, PartialOrd, Eq, IntEnum, Clone, Copy)]
+#[repr(i32)]
+pub enum DiceType {
+    D6 = 0,
+    D20 = 1,
+}
+
 #[derive(Serialize)]
 pub struct DiceSettings {
     #[serde(rename = "type")]
-    dice_type: i32,
+    dice_type: DiceType,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "setting")]
-enum UpdateSettingsPayload {
-    DiceType { dice_type: i32 },
+pub enum UpdateSettingsPayload {
+    DiceType { dice_type: DiceType },
 }
 
 #[derive(Serialize)]
@@ -246,6 +255,46 @@ VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
 }
 
 #[axum::debug_handler]
+pub async fn update_user_setting(
+    headers: HeaderMap,
+    State(s): State<RouterState>,
+    Json(body): Json<UpdateSettingsPayload>,
+) -> Result<(), RouteError> {
+    let access_token = headers.get("x-access-token").ok_or(RouteError::Forbidden)?;
+    let verified_token = s.jwt.verify(access_token.to_str().unwrap())?;
+    let client = s.pool.get().await?;
+
+    match body {
+        UpdateSettingsPayload::DiceType { dice_type } => {
+            let unlocked = match dice_type {
+                DiceType::D6 => true,
+                DiceType::D20 => {
+                    let result = client.query_one(
+"SELECT COUNT(*) FROM user_to_achievement WHERE user_id = $1::UUID AND unlocked IS NOT NULL AND achievement_id = 'astronaut:1'",
+&[&verified_token.claims.user_id]).await?;
+                    result.get::<'_, _, i64>(0) > 0
+                }
+            };
+            if !unlocked {
+                return Err(RouteError::UserError(
+                    "that dice type is not unlocked".to_string(),
+                ));
+            }
+            client
+                .execute(
+                    "UPDATE user_settings SET dice_type = $2::INTEGER WHERE user_id = $1::UUID",
+                    &[
+                        &verified_token.claims.user_id,
+                        &DiceType::int_value(dice_type),
+                    ],
+                )
+                .await?;
+            Ok(())
+        }
+    }
+}
+
+#[axum::debug_handler]
 pub async fn user_self(
     headers: HeaderMap,
     State(s): State<RouterState>,
@@ -313,7 +362,7 @@ WHERE id=$1::UUID",
             username: row.get("username"),
             image_url: row.get("image_url"),
             dice: DiceSettings {
-                dice_type: row.get("dice_type"),
+                dice_type: DiceType::from_int(row.get::<'_, _, i32>("dice_type"))?,
             },
             created_date: row
                 .get::<'_, _, PrimitiveDateTime>("created_date")

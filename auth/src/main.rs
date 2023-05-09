@@ -65,10 +65,10 @@ async fn main() {
         .route("/logout", post(user_routes::logout))
         .route("/refresh_token", get(user_routes::refresh_token))
         .route("/me", get(user_routes::user_self))
-        // .route(
-        //     "/users/update_setting",
-        //     post(user_routes::update_user_setting),
-        // )
+        .route(
+            "/users/update_setting",
+            post(user_routes::update_user_setting),
+        )
         .route("/users/:id", get(user_routes::user_by_id));
 
     let server_routes = Router::new()

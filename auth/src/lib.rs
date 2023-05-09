@@ -4,6 +4,7 @@ extern crate lazy_static;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use bb8_postgres::PostgresConnectionManager;
+use routes::user_routes::DiceType;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
@@ -27,12 +28,14 @@ pub enum RouteError {
     Bb8Error(bb8::RunError<tokio_postgres::Error>),
     #[error("database error")]
     PostgresError(#[from] tokio_postgres::Error),
-    #[error("there was an error with your request: {0}")]
+    #[error("bad request: {0}")]
     UserError(String),
     #[error("twitch validation error")]
     TwitchValidationError(#[from] ValidationError<reqwest::Error>),
     #[error("twitch client error")]
     TwitchError(#[from] ClientRequestError<reqwest::Error>),
+    #[error("invalid type of dice")]
+    DiceTypeError(#[from] int_enum::IntEnumError<DiceType>),
     #[error("")]
     OK,
     #[error("you can't do that")]
