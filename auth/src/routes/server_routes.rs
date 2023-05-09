@@ -60,72 +60,53 @@ pub struct AddStatsPayload {
     wins: i32,
 }
 
-async fn find_user_id(s: &RouterState, user: UserId) -> Result<Uuid, StatusCode> {
-    let Ok(mut client) = s.pool.get().await else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    };
+async fn find_user_id(s: &RouterState, user: UserId) -> Result<Uuid, RouteError> {
+    let mut client = s.pool.get().await?;
     match user {
+        UserId::User(id) => Ok(id),
         UserId::Anonymous(id) => {
             // Find the anonymous user
-            match client
+            let rows = client
                 .query(
                     "
 SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT
 ",
                     &[&id],
                 )
-                .await
-            {
-                Ok(rows) => {
-                    if rows.is_empty() {
-                        // Create a new user
-                        let new_id = Uuid::new_v4();
+                .await?;
+            if rows.is_empty() {
+                // Create a new user
+                let new_id = Uuid::new_v4();
 
-                        let Ok(transaction) = client.transaction().await else {
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                };
-                        transaction
-                            .execute("INSERT INTO users (id) VALUES ($1::UUID)", &[&new_id])
-                            .await
-                            .unwrap();
-                        transaction
-                            .execute("INSERT INTO anon_identity (anon_id, user_id) VALUES ($1::TEXT, $2::UUID)",
-                                &[&id, &new_id],
-                            )
-                            .await
-                            .unwrap();
+                let transaction = client.transaction().await?;
+                transaction
+                    .execute("INSERT INTO users (id) VALUES ($1::UUID)", &[&new_id])
+                    .await
+                    .unwrap();
+                transaction
+                    .execute(
+                        "INSERT INTO anon_identity (anon_id, user_id) VALUES ($1::TEXT, $2::UUID)",
+                        &[&id, &new_id],
+                    )
+                    .await
+                    .unwrap();
 
-                        let Ok(_) = transaction.commit().await else {
-                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                        };
-                        Ok(new_id)
-                    } else {
-                        Ok(rows[0].get::<'_, _, Uuid>("user_id"))
-                    }
-                }
-                Err(..) => {
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                }
+                transaction.commit().await?;
+                Ok(new_id)
+            } else {
+                Ok(rows[0].get::<'_, _, Uuid>("user_id"))
             }
         }
-        UserId::User(id) => Ok(id),
     }
 }
 #[axum::debug_handler]
 pub async fn add_stats(
     State(s): State<RouterState>,
     Json(mut body): Json<AddStatsPayload>,
-) -> StatusCode {
-    let Ok(client) = s.pool.get().await else {
-        return StatusCode::INTERNAL_SERVER_ERROR;
-    };
-    let user_id = match find_user_id(&s, body.user_id).await {
-        Ok(uid) => uid,
-        Err(code) => {
-            return code;
-        }
-    };
-    let result = client
+) -> Result<(), RouteError> {
+    let client = s.pool.get().await?;
+    let user_id = find_user_id(&s, body.user_id).await?;
+    let rows = client
         .query(
             "
 SELECT rolls, doubles, games, wins FROM player_stats
@@ -133,19 +114,17 @@ WHERE user_id = $1::UUID
 ",
             &[&user_id],
         )
-        .await;
-    match result {
-        Ok(rows) => {
-            if rows.len() > 0 {
-                let row = &rows[0];
-                body.rolls += row.get::<_, i32>("rolls");
-                body.doubles += row.get::<_, i32>("doubles");
-                body.games += row.get::<_, i32>("games");
-                body.wins += row.get::<_, i32>("wins");
-            }
-            let insert_result = client
-                .execute(
-                    "
+        .await?;
+    if rows.len() > 0 {
+        let row = &rows[0];
+        body.rolls += row.get::<_, i32>("rolls");
+        body.doubles += row.get::<_, i32>("doubles");
+        body.games += row.get::<_, i32>("games");
+        body.wins += row.get::<_, i32>("wins");
+    }
+    client
+        .execute(
+            "
 INSERT INTO player_stats (rolls, doubles, games, wins, user_id)
 VALUES ($1::INTEGER, $2::INTEGER, $3::INTEGER, $4::INTEGER, $5::UUID)
 ON CONFLICT(user_id) DO UPDATE SET
@@ -153,24 +132,17 @@ ON CONFLICT(user_id) DO UPDATE SET
     doubles = $2::INTEGER,
     games = $3::INTEGER,
     wins = $4::INTEGER
-
 ",
-                    &[
-                        &body.rolls,
-                        &body.doubles,
-                        &body.games,
-                        &body.wins,
-                        &user_id,
-                    ],
-                )
-                .await;
-            match insert_result {
-                Ok(..) => StatusCode::OK,
-                Err(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            }
-        }
-        Err(..) => StatusCode::INTERNAL_SERVER_ERROR,
-    }
+            &[
+                &body.rolls,
+                &body.doubles,
+                &body.games,
+                &body.wins,
+                &user_id,
+            ],
+        )
+        .await?;
+    Ok(())
 }
 
 #[derive(Serialize)]
@@ -195,17 +167,19 @@ pub struct AchievementProgressPayload {
 pub async fn achievement_progress(
     State(s): State<RouterState>,
     Json(body): Json<AchievementProgressPayload>,
-) -> Result<Json<AchievementUnlock>, StatusCode> {
+) -> Result<Json<AchievementUnlock>, RouteError> {
     if body.progress <= 0 {
         // nothing to do
-        return Err(StatusCode::OK);
+        return Err(RouteError::UserError(
+            "progress needs to be a positive int".to_string(),
+        ));
     }
     let Some(a) = ACHIEVEMENTS.get(&body.achievement_id) else {
-        return Err(StatusCode::BAD_REQUEST);
+        return Err(RouteError::UserError(
+            "invalid achievement id".to_string(),
+        ));
     };
-    let Ok(client) = s.pool.get().await else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    };
+    let client = s.pool.get().await?;
     let current_time = SystemTime::now();
     let mut unlocked: Option<SystemTime> = None;
     if let Some(max_progress) = a.max_progress {
@@ -216,14 +190,8 @@ pub async fn achievement_progress(
         unlocked = Some(current_time);
     }
 
-    let user_id = match find_user_id(&s, body.user_id).await {
-        Ok(uid) => uid,
-        Err(code) => {
-            return Err(code);
-        }
-    };
-
-    let result = client
+    let user_id = find_user_id(&s, body.user_id).await?;
+    let row = client
         .query_one(
             "
 INSERT INTO user_to_achievement
@@ -257,18 +225,15 @@ ON CONFLICT(user_id, achievement_id) DO UPDATE SET
                 &current_time,
             ],
         )
-        .await;
-    match result {
-        Ok(row) => match row.try_get::<'_, _, SystemTime>("unlocked") {
-            Ok(..) => Ok(Json(AchievementUnlock {
-                unlock_type: "achievement_unlock".to_string(),
-                achievement: a.clone(),
-                user_id,
-                user_index: body.user_index,
-            })),
-            Err(..) => Err(StatusCode::OK),
-        },
-        Err(..) => Err(StatusCode::OK),
+        .await?;
+    match row.try_get::<'_, _, SystemTime>("unlocked") {
+        Ok(..) => Ok(Json(AchievementUnlock {
+            unlock_type: "achievement_unlock".to_string(),
+            achievement: a.clone(),
+            user_id,
+            user_index: body.user_index,
+        })),
+        Err(..) => Err(RouteError::OK),
     }
 }
 #[derive(Serialize)]

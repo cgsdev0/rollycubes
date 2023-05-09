@@ -1,7 +1,7 @@
 use crate::*;
 use axum::{
     extract::{Path, State},
-    http::{header::HeaderMap, StatusCode},
+    http::header::HeaderMap,
     Json,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
@@ -40,6 +40,12 @@ pub struct DiceSettings {
     dice_type: i32,
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "setting")]
+enum UpdateSettingsPayload {
+    DiceType { dice_type: i32 },
+}
+
 #[derive(Serialize)]
 pub struct User {
     id: Uuid,
@@ -63,62 +69,47 @@ async fn login_helper(
     jar: CookieJar,
     x: &Uuid,
     username: &str,
-) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
+) -> Result<(CookieJar, Json<LoginResponse>), RouteError> {
     // Do the login
-    let Ok(client) = s.pool.get().await else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    };
-    tracing::debug!("we got a client from the pool again");
-    match s.jwt.sign_jwt(Claims::new(*x, username)) {
-        Ok(access_token) => {
-            tracing::debug!("we signed the thing it was good");
-            // Create a refresh token
-            let token_id = Uuid::new_v4();
-            let exp = OffsetDateTime::now_utc()
-                .checked_add(Duration::days(30))
-                .unwrap();
-            tracing::debug!("we made a date");
-            client
-                .execute(
-                    "
+    let client = s.pool.get().await?;
+
+    let access_token = s.jwt.sign_jwt(Claims::new(*x, username))?;
+    // Create a refresh token
+    let token_id = Uuid::new_v4();
+    let exp = OffsetDateTime::now_utc()
+        .checked_add(Duration::days(30))
+        .unwrap();
+    tracing::debug!("we made a date");
+    client
+        .execute(
+            "
 INSERT INTO refresh_token (id, user_id)
 VALUES ($1::UUID, $2::UUID)",
-                    &[&token_id, &x],
-                )
-                .await
-                .unwrap();
-            tracing::debug!("we inserted a refresh token");
-            Ok((
-                jar.add(
-                    Cookie::build("refresh_token", token_id.to_string())
-                        .secure(true)
-                        .http_only(true)
-                        .same_site(axum_extra::extract::cookie::SameSite::None)
-                        .path("/refresh_token")
-                        .expires(exp)
-                        .finish(),
-                ),
-                Json(LoginResponse { access_token }),
-            ))
-        }
-        Err(_e) => Err(StatusCode::FORBIDDEN),
-    }
+            &[&token_id, &x],
+        )
+        .await?;
+    Ok((
+        jar.add(
+            Cookie::build("refresh_token", token_id.to_string())
+                .secure(true)
+                .http_only(true)
+                .same_site(axum_extra::extract::cookie::SameSite::None)
+                .path("/refresh_token")
+                .expires(exp)
+                .finish(),
+        ),
+        Json(LoginResponse { access_token }),
+    ))
 }
 #[axum::debug_handler]
 pub async fn refresh_token(
     State(s): State<RouterState>,
     jar: CookieJar,
-) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
-    let Some(r_token) = jar.get("refresh_token") else {
-        return Err(StatusCode::UNAUTHORIZED);
-    };
-    let Ok(parsed_token) = Uuid::parse_str(r_token.value()) else {
-        return Err(StatusCode::UNAUTHORIZED);
-    };
-    let Ok(client) = s.pool.get().await else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    };
-    let result = client
+) -> Result<(CookieJar, Json<LoginResponse>), RouteError> {
+    let r_token = jar.get("refresh_token").ok_or(RouteError::Forbidden)?;
+    let parsed_token = Uuid::parse_str(r_token.value()).map_err(|_| RouteError::Forbidden)?;
+    let client = s.pool.get().await?;
+    let row = client
         .query_one(
             "
 SELECT username, user_id, issued_at FROM refresh_token
@@ -127,35 +118,31 @@ WHERE refresh_token.id = $1::UUID
 ",
             &[&parsed_token],
         )
-        .await;
-    match result {
-        Ok(row) => {
-            // delete the token, log them in
-            client
-                .execute(
-                    "
+        .await
+        .map_err(|_| RouteError::Forbidden)?;
+    // delete the token, log them in
+    client
+        .execute(
+            "
 DELETE FROM refresh_token
 WHERE id = $1::UUID",
-                    &[&parsed_token],
-                )
-                .await
-                .unwrap();
-            // check expiration
-            let issued_at: PrimitiveDateTime = row.get("issued_at");
-            let dur = OffsetDateTime::now_utc() - issued_at.assume_utc();
-            if dur > Duration::days(30) {
-                return Err(StatusCode::UNAUTHORIZED);
-            }
-            login_helper(
-                &s,
-                jar,
-                &row.get::<_, Uuid>("user_id"),
-                row.get::<_, &str>("username"),
-            )
-            .await
-        }
-        Err(..) => Err(StatusCode::UNAUTHORIZED),
+            &[&parsed_token],
+        )
+        .await
+        .unwrap();
+    // check expiration
+    let issued_at: PrimitiveDateTime = row.get("issued_at");
+    let dur = OffsetDateTime::now_utc() - issued_at.assume_utc();
+    if dur > Duration::days(30) {
+        return Err(RouteError::Forbidden);
     }
+    login_helper(
+        &s,
+        jar,
+        &row.get::<_, Uuid>("user_id"),
+        row.get::<_, &str>("username"),
+    )
+    .await
 }
 
 #[axum::debug_handler]
@@ -163,42 +150,34 @@ pub async fn login(
     State(s): State<RouterState>,
     jar: CookieJar,
     Json(payload): Json<LoginPayload>,
-) -> Result<(CookieJar, Json<LoginResponse>), StatusCode> {
-    tracing::debug!("we are doing the login");
+) -> Result<(CookieJar, Json<LoginResponse>), RouteError> {
     let token = AccessToken::new(payload.twitch_access_token);
-    tracing::debug!("we got the access token");
     let http_client = reqwest::Client::new();
-    tracing::debug!("we made an http client");
     let twitch_client = twitch_api::HelixClient::with_client(http_client.clone());
-    tracing::debug!("we made the twitch client");
-    let Ok(mut client) = s.pool.get().await else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    };
-    tracing::debug!("we got a client from the pool");
+    let mut client = s.pool.get().await?;
 
-    match UserToken::from_existing(&http_client, token, None, None).await {
-        Ok(t) => {
-            tracing::debug!("the user token was ok");
-            // TODO: check this for a match t.client_id().as_str();
-            let twitch_user = twitch_client.get_user_from_id(&t.user_id, &t).await;
-            let Ok(Some(user)) = twitch_user else {
-                return Err(StatusCode::IM_A_TEAPOT);
-            };
-            let result = client
-                .query_one(
-                    "
+    let t = UserToken::from_existing(&http_client, token, None, None).await?;
+    // TODO: check this for a match t.client_id().as_str();
+    let user = twitch_client
+        .get_user_from_id(&t.user_id, &t)
+        .await?
+        .ok_or(RouteError::Forbidden)?;
+
+    let result = client
+        .query_one(
+            "
 SELECT twitch_id, user_id FROM twitch_identity
 WHERE twitch_id = $1::TEXT",
-                    &[&t.user_id.as_str()],
-                )
-                .await;
-            tracing::debug!("we found a twitch identity");
-            let x = if let Ok(row) = result {
-                let id: Uuid = row.get("user_id");
-                // Update the existing user
-                client
-                    .execute(
-                        "
+            &[&t.user_id.as_str()],
+        )
+        .await;
+    tracing::debug!("we found a twitch identity");
+    let x = if let Ok(row) = result {
+        let id: Uuid = row.get("user_id");
+        // Update the existing user
+        client
+            .execute(
+                "
 UPDATE users
 SET
     username = $1::TEXT,
@@ -206,107 +185,83 @@ SET
 WHERE
     id = $3::UUID
 ",
-                        &[&user.display_name.as_str(), &user.profile_image_url, &id],
-                    )
-                    .await
-                    .unwrap();
-                tracing::debug!("we updated the user record");
-                id
-            } else {
-                // Check if we should promote an anonymous user
-                let Ok(transaction) = client.transaction().await else {
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                };
-                let id = if let Some(session) = payload.anon_id {
-                    println!("GOT SESSION: {}", session);
-                    match transaction
-                        .query(
-                            "
+                &[&user.display_name.as_str(), &user.profile_image_url, &id],
+            )
+            .await
+            .unwrap();
+        tracing::debug!("we updated the user record");
+        id
+    } else {
+        // Check if we should promote an anonymous user
+        let transaction = client.transaction().await?;
+        let id = if let Some(session) = payload.anon_id {
+            println!("GOT SESSION: {}", session);
+            let rows = transaction
+                .query(
+                    "
 SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT",
-                            &[&format!("{}{}", "guest:", session)],
-                        )
-                        .await
-                    {
-                        Ok(rows) => {
-                            if rows.is_empty() {
-                                Uuid::new_v4()
-                            } else {
-                                let new_id = rows[0].get::<'_, _, Uuid>("user_id");
-                                println!("GOT ID: {}", new_id);
-                                transaction
-                                    .execute(
-                                        "
-DELETE FROM anon_identity WHERE user_id = $1::UUID",
-                                        &[&new_id],
-                                    )
-                                    .await
-                                    .unwrap();
-                                new_id
-                            }
-                        }
-                        Err(..) => {
-                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                        }
-                    }
-                } else {
-                    Uuid::new_v4()
-                };
-                // Create a brand new user
+                    &[&format!("{}{}", "guest:", session)],
+                )
+                .await?;
+            if rows.is_empty() {
+                Uuid::new_v4()
+            } else {
+                let new_id = rows[0].get::<'_, _, Uuid>("user_id");
+                println!("GOT ID: {}", new_id);
                 transaction
                     .execute(
                         "
+DELETE FROM anon_identity WHERE user_id = $1::UUID",
+                        &[&new_id],
+                    )
+                    .await
+                    .unwrap();
+                new_id
+            }
+        } else {
+            Uuid::new_v4()
+        };
+        // Create a brand new user
+        transaction
+            .execute(
+                "
 INSERT INTO users (username, image_url, id)
 VALUES ($1::TEXT, $2::TEXT, $3::UUID) ON CONFLICT(id) DO UPDATE
 SET username = $1::TEXT, image_url = $2::TEXT",
-                        &[&user.display_name.as_str(), &user.profile_image_url, &id],
-                    )
-                    .await
-                    .unwrap();
-                tracing::debug!("we inserted a new user");
-                transaction
-                    .execute(
-                        "
+                &[&user.display_name.as_str(), &user.profile_image_url, &id],
+            )
+            .await?;
+        transaction
+            .execute(
+                "
 INSERT INTO twitch_identity (twitch_id, twitch_login, user_id)
 VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
-                        &[&t.user_id.as_str(), &t.login.as_str(), &id],
-                    )
-                    .await
-                    .unwrap();
-                tracing::debug!("we inserted a new identity");
-                let Ok(_) = transaction.commit().await else {
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                };
-                tracing::debug!("we committed the transaction");
-                id
-            };
-            login_helper(&s, jar, &x, user.display_name.as_str()).await
-        }
-        Err(..) => Err(StatusCode::IM_A_TEAPOT),
-    }
+                &[&t.user_id.as_str(), &t.login.as_str(), &id],
+            )
+            .await?;
+        transaction.commit().await?;
+        id
+    };
+    login_helper(&s, jar, &x, user.display_name.as_str()).await
 }
 
 #[axum::debug_handler]
 pub async fn user_self(
     headers: HeaderMap,
     State(s): State<RouterState>,
-) -> Result<Json<User>, StatusCode> {
-    let Some(access_token) = headers.get("x-access-token") else {
-        return Err(StatusCode::UNAUTHORIZED);
-    };
-    let Ok(verified_token) = s.jwt.verify(access_token.to_str().unwrap()) else {
-        return Err(StatusCode::UNAUTHORIZED);
-    };
+) -> Result<Json<User>, RouteError> {
+    let access_token = headers.get("x-access-token").ok_or(RouteError::Forbidden)?;
+    let verified_token = s.jwt.verify(access_token.to_str().unwrap())?;
     user_by_id(Path(verified_token.claims.user_id), State(s)).await
 }
+
 #[axum::debug_handler]
 pub async fn user_by_id(
     Path(user_id): Path<Uuid>,
     State(s): State<RouterState>,
-) -> Result<Json<User>, StatusCode> {
-    let Ok(client) = s.pool.get().await else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    };
-    let result = client
+) -> Result<Json<User>, RouteError> {
+    let client = s.pool.get().await?;
+    let rows = client
         .query(
             "
 WITH total_users AS
@@ -347,52 +302,50 @@ LEFT JOIN user_settings ON id=user_settings.user_id
 WHERE id=$1::UUID",
             &[&user_id],
         )
-        .await;
-    match result {
-        Ok(rows) if !rows.is_empty() => {
-            let row = &rows[0];
-            let rolls: Option<i32> = row.get("rolls");
-            let achievement_id: Option<String> = row.get("achievement_id");
-            let user = User {
-                id: row.get("id"),
-                username: row.get("username"),
-                image_url: row.get("image_url"),
-                dice: DiceSettings {
-                    dice_type: row.get("dice_type"),
-                },
-                created_date: row
-                    .get::<'_, _, PrimitiveDateTime>("created_date")
-                    .assume_utc(),
-                stats: rolls.map(|_| PlayerStats {
-                    rolls: row.get("rolls"),
-                    games: row.get("games"),
-                    wins: row.get("wins"),
-                    doubles: row.get("doubles"),
-                }),
-                achievements: achievement_id.map(|_| {
-                    rows.iter()
-                        .map(|r| AchievementProgress {
-                            achievement_id: r.get("achievement_id"),
-                            unlocked: r
-                                .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
-                                .map(PrimitiveDateTime::assume_utc),
-                            rd: r.get("rd"),
-                            rn: r.get("rn"),
-                            progress: r.get("progress"),
-                        })
-                        .collect()
-                }),
-            };
-            Ok(Json(user))
-        }
-        _ => Err(StatusCode::IM_A_TEAPOT),
+        .await?;
+
+    if !rows.is_empty() {
+        let row = &rows[0];
+        let rolls: Option<i32> = row.get("rolls");
+        let achievement_id: Option<String> = row.get("achievement_id");
+        let user = User {
+            id: row.get("id"),
+            username: row.get("username"),
+            image_url: row.get("image_url"),
+            dice: DiceSettings {
+                dice_type: row.get("dice_type"),
+            },
+            created_date: row
+                .get::<'_, _, PrimitiveDateTime>("created_date")
+                .assume_utc(),
+            stats: rolls.map(|_| PlayerStats {
+                rolls: row.get("rolls"),
+                games: row.get("games"),
+                wins: row.get("wins"),
+                doubles: row.get("doubles"),
+            }),
+            achievements: achievement_id.map(|_| {
+                rows.iter()
+                    .map(|r| AchievementProgress {
+                        achievement_id: r.get("achievement_id"),
+                        unlocked: r
+                            .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
+                            .map(PrimitiveDateTime::assume_utc),
+                        rd: r.get("rd"),
+                        rn: r.get("rn"),
+                        progress: r.get("progress"),
+                    })
+                    .collect()
+            }),
+        };
+        Ok(Json(user))
+    } else {
+        Err(RouteError::Forbidden)
     }
 }
 
-pub async fn logout(jar: CookieJar, State(s): State<RouterState>) -> Result<CookieJar, StatusCode> {
-    let Ok(client) = s.pool.get().await else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    };
+pub async fn logout(jar: CookieJar, State(s): State<RouterState>) -> Result<CookieJar, RouteError> {
+    let client = s.pool.get().await?;
     // 1. check for refresh cookie
     if let Some(token) = jar.get("refresh_token") {
         // DELETE FROM refresh_token WHERE id=token.value()
@@ -403,8 +356,7 @@ pub async fn logout(jar: CookieJar, State(s): State<RouterState>) -> Result<Cook
                     "DELETE FROM refresh_token WHERE id=$1::UUID",
                     &[&parsed_uuid],
                 )
-                .await
-                .ok();
+                .await?;
         }
         // 3. clear the refresh cookie in the response
         return Ok(jar.remove(Cookie::named("refresh_token")));

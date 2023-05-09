@@ -1,12 +1,16 @@
 #[macro_use]
 extern crate lazy_static;
 
-use anyhow::Error;
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use bb8_postgres::PostgresConnectionManager;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use thiserror::Error;
 use time::{Duration, OffsetDateTime};
 use tokio_postgres::NoTls;
+use twitch_api::helix::ClientRequestError;
+use twitch_oauth2::tokens::errors::ValidationError;
 use uuid::Uuid;
 
 pub mod migrations;
@@ -15,13 +19,51 @@ pub mod routes {
     pub mod user_routes;
 }
 
+#[derive(Error, Debug)]
+pub enum RouteError {
+    #[error("jwt error")]
+    JwtError(#[from] jsonwebtoken::errors::Error),
+    #[error("bb8 problem")]
+    Bb8Error(bb8::RunError<tokio_postgres::Error>),
+    #[error("database error")]
+    PostgresError(#[from] tokio_postgres::Error),
+    #[error("there was an error with your request: {0}")]
+    UserError(String),
+    #[error("twitch validation error")]
+    TwitchValidationError(#[from] ValidationError<reqwest::Error>),
+    #[error("twitch client error")]
+    TwitchError(#[from] ClientRequestError<reqwest::Error>),
+    #[error("")]
+    OK,
+    #[error("you can't do that")]
+    Forbidden,
+}
+
+impl IntoResponse for RouteError {
+    fn into_response(self) -> axum::response::Response {
+        let status = match self {
+            RouteError::UserError(..) => StatusCode::BAD_REQUEST,
+            RouteError::OK => StatusCode::OK,
+            RouteError::Forbidden => StatusCode::FORBIDDEN,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
+        };
+        (status, self.to_string()).into_response()
+    }
+}
+
+impl From<bb8::RunError<tokio_postgres::Error>> for RouteError {
+    fn from(err: bb8::RunError<tokio_postgres::Error>) -> Self {
+        RouteError::Bb8Error(err)
+    }
+}
+
 pub struct Jwt {
     pub private_key: String,
     pub public_key: String,
 }
 
 impl Jwt {
-    pub fn sign_jwt(&self, claims: Claims) -> Result<String, Error> {
+    pub fn sign_jwt(&self, claims: Claims) -> Result<String, RouteError> {
         let token = jsonwebtoken::encode(
             &jsonwebtoken::Header::new(jsonwebtoken::Algorithm::RS256),
             &claims,
@@ -29,7 +71,7 @@ impl Jwt {
         )?;
         return Ok(token);
     }
-    pub fn verify(&self, token: &str) -> Result<jsonwebtoken::TokenData<Claims>, Error> {
+    pub fn verify(&self, token: &str) -> Result<jsonwebtoken::TokenData<Claims>, RouteError> {
         Ok(jsonwebtoken::decode::<Claims>(
             &token,
             &jsonwebtoken::DecodingKey::from_rsa_pem(self.public_key.as_bytes())?,
