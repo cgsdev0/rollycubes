@@ -331,8 +331,8 @@ int main(int argc, char **argv) {
             "/ws/:mode/:room",
             makeWebsocketBehavior(&app, jwt_verifier, authServer, registry, coordinator))
         .listen(port,
-                [port](auto *token) {
-                    if (token) {
+                [port](auto *socket) {
+                    if (socket) {
                         std::cout << "Listening on port " << port << std::endl;
                     }
                 })
