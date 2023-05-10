@@ -42,7 +42,8 @@ class AuthServerRequestQueue::AuthServerRequestQueueImpl {
 void AuthServerRequestQueue::send(std::string url, std::string json) {
     AuthServerRequest req{
         .url = this->baseUrl + url,
-        .jsonBody = json};
+        .jsonBody = json,
+        .cb = nullptr};
     impl->requestQueue.push(req);
 }
 
