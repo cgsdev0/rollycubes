@@ -105,24 +105,23 @@ class Game {
 
     API::WelcomeMsg toWelcomeMsg() {
         std::vector<API::Player> players;
-        for(const auto& player : this->state.players) {
-          std::string user_id;
-          if (isSignedIn(player)) {
-            user_id = player.session;
-          }
-          players.emplace_back(player.connected, player.crowned, player.name, player.score, std::make_shared<std::string>(user_id), player.win_count);
+        for (const auto &player : this->state.players) {
+            std::string user_id;
+            if (isSignedIn(player)) {
+                user_id = player.session;
+            }
+            players.emplace_back(player.connected, player.crowned, player.name, player.score, std::make_shared<std::string>(user_id), player.win_count);
         }
         return API::WelcomeMsg{
-         .chat_log = this->state.chat_log,
-         .id = -1,
-         .players = players,
-         .private_session = this->state.private_session,
-         .rolled = this->state.rolled,
-         .rolls = this->state.rolls,
-         .turn_index = this->state.turn_index,
-         .used = this->state.used,
-         .victory = this->state.victory
-        };
+            .chat_log = this->state.chat_log,
+            .id = -1,
+            .players = players,
+            .private_session = this->state.private_session,
+            .rolled = this->state.rolled,
+            .rolls = this->state.rolls,
+            .turn_index = this->state.turn_index,
+            .used = this->state.used,
+            .victory = this->state.victory};
     }
 
     std::string toString() const {

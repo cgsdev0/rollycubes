@@ -1,12 +1,12 @@
 #include "GameCoordinator.h"
 #include "Consts.h"
 #include "StringUtils.h"
-#include <json.hpp>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <json.hpp>
 
 #include <regex>
 #include <signal.h>
@@ -15,7 +15,6 @@
 #include <string_view>
 #include <unistd.h>
 
-
 // for convenience
 using json = nlohmann::json;
 using time_point = std::chrono::system_clock::time_point;
@@ -23,9 +22,8 @@ using time_point = std::chrono::system_clock::time_point;
 typedef uWS::HttpResponse<false> HttpResponse;
 typedef uWS::HttpRequest HttpRequest;
 
-
 static std::string serializeTimePoint(const time_point &time,
-                               const std::string &format) {
+                                      const std::string &format) {
     std::time_t tt = std::chrono::system_clock::to_time_t(time);
     std::tm tm = *std::gmtime(&tt); // GMT (UTC)
     std::stringstream ss;
@@ -34,20 +32,20 @@ static std::string serializeTimePoint(const time_point &time,
 }
 
 API::RoomList GameCoordinator::list_rooms() {
-                API::RoomList respList;
-                for (auto const &[code, game] : games) {
-                    if (game->isPrivate()) {
-                        continue;
-                    }
-                    std::string updated = serializeTimePoint(
-                        game->getUpdated(), "UTC: %Y-%m-%d %H:%M:%S");
-                    respList.rooms.push_back(
-                        {.code = code,
-                         .host_name = game->hostName(),
-                         .last_updated = updated,
-                         .player_count = game->connectedPlayerCount()});
-                }
-                return respList;
+    API::RoomList respList;
+    for (auto const &[code, game] : games) {
+        if (game->isPrivate()) {
+            continue;
+        }
+        std::string updated = serializeTimePoint(
+            game->getUpdated(), "UTC: %Y-%m-%d %H:%M:%S");
+        respList.rooms.push_back(
+            {.code = code,
+             .host_name = game->hostName(),
+             .last_updated = updated,
+             .player_count = game->connectedPlayerCount()});
+    }
+    return respList;
 }
 
 void GameCoordinator::load_persistence() {
@@ -141,9 +139,9 @@ std::string GameCoordinator::createRoom(bool isPrivate, std::string seed) {
 }
 
 void GameCoordinator::queue_eviction(std::string room) {
-  if (!eviction_set.count(room)) {
-      eviction_queue.push(
-          {std::chrono::system_clock::now(), room});
-      eviction_set.insert(room);
-  }
+    if (!eviction_set.count(room)) {
+        eviction_queue.push(
+            {std::chrono::system_clock::now(), room});
+        eviction_set.insert(room);
+    }
 }

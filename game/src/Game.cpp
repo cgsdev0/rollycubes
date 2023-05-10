@@ -28,7 +28,7 @@ std::string Game::hostName() const {
     if (state.players.size() < 1)
         return "unknown";
     if (state.players[0].name == nullptr)
-      return "unknown";
+        return "unknown";
     return *state.players[0].name;
 }
 
@@ -182,10 +182,10 @@ static const std::unordered_map<
 #undef ACTION
 
 void Game::processEvent(const API::ServerPlayer *player, SendFunc &broadcast, HandlerArgs *server, const json &data, const API::GameState &prev) {
-    API::AchievementProgressUserId user_id({ .id = player->session, .type = API::UserIdType::ANONYMOUS });
+    API::AchievementProgressUserId user_id({.id = player->session, .type = API::UserIdType::ANONYMOUS});
 
     if (isSignedIn(*player)) {
-      user_id.type = API::UserIdType::USER;
+        user_id.type = API::UserIdType::USER;
     };
     for (auto achievement : this->achievements) {
         auto progress = achievement->processEvent(data, prev, state, player->session);
@@ -237,7 +237,7 @@ void Game::chat(HANDLER_ARGS) {
             auto msg = data["msg"].get<std::string>();
             std::string name;
             if (state.players[i].name)
-              name = *state.players[i].name;
+                name = *state.players[i].name;
             if (name == "") {
                 name = "User" + std::to_string(i + 1);
             }
@@ -340,7 +340,7 @@ void Game::update_name(HANDLER_ARGS) {
             json msg;
             msg["type"] = "update_name";
             if (state.players[i].name != nullptr) {
-              msg["name"] = *state.players[i].name;
+                msg["name"] = *state.players[i].name;
             }
             msg["id"] = i;
             broadcast(msg.dump());
@@ -460,9 +460,9 @@ void Game::update(HANDLER_ARGS) {
                 state.players[winnerId].win_count++;
                 for (uint i = 0; i < state.players.size(); ++i) {
                     state.players[i].crowned = std::make_shared<bool>(false);
-                    API::ReportStatsUserId user_id({ .id = state.players[i].session, .type = API::UserIdType::ANONYMOUS });
+                    API::ReportStatsUserId user_id({.id = state.players[i].session, .type = API::UserIdType::ANONYMOUS});
                     if (isSignedIn(state.players[i])) {
-                      user_id.type = API::UserIdType::USER;
+                        user_id.type = API::UserIdType::USER;
                     }
                     API::ReportStats stats{
                         .doubles = state.players[i].doubles_count,

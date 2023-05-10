@@ -1,20 +1,20 @@
 #ifndef INCLUDE_ACHIEVEMENTS_BASE_H
 #define INCLUDE_ACHIEVEMENTS_BASE_H
 
-#include "../api/API.hpp"
 #include "../Consts.h"
+#include "../api/API.hpp"
 #include <json.hpp>
 #include <string>
 
 using json = nlohmann::json;
 
-inline const API::ServerPlayer& getPlayer(const API::GameState &state, const std::string &session) {
-  for(const auto &player : state.players) {
-    if (player.session == session) {
-      return player;
+inline const API::ServerPlayer &getPlayer(const API::GameState &state, const std::string &session) {
+    for (const auto &player : state.players) {
+        if (player.session == session) {
+            return player;
+        }
     }
-  }
-  throw API::GameError({.error = "unknown player"});
+    throw API::GameError({.error = "unknown player"});
 }
 
 class BaseAchievement {

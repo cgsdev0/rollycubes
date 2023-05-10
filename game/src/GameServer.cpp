@@ -20,11 +20,11 @@
 #include "Game.h"
 #include "StringUtils.h"
 
-#include "api/API.hpp"
 #include "AuthServerRequestQueue.h"
+#include "GameCoordinator.h"
 #include "JWTVerifier.h"
 #include "MoveOnlyFunction.h"
-#include "GameCoordinator.h"
+#include "api/API.hpp"
 
 #include <prometheus/counter.h>
 #include <prometheus/registry.h>
@@ -36,10 +36,9 @@ using json = nlohmann::json;
 typedef uWS::HttpResponse<false> HttpResponse;
 typedef uWS::HttpRequest HttpRequest;
 
-
 std::function<void(void)> signal_handler;
 void signal_callback_handler(int signum) {
-  signal_handler();
+    signal_handler();
 }
 
 std::string getSession(HttpRequest *req) {
@@ -89,10 +88,11 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
 
 uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer, std::shared_ptr<prometheus::Registry> registry, GameCoordinator &coordinator) {
 
-  auto& ws_counter = prometheus::BuildGauge()
-                             .Name("websocket_conn_total")
-                             .Help("Number of websocket connections total")
-                             .Register(*registry).Add({});
+    auto &ws_counter = prometheus::BuildGauge()
+                           .Name("websocket_conn_total")
+                           .Help("Number of websocket connections total")
+                           .Register(*registry)
+                           .Add({});
 
     return {/* Settings */
             .compression = uWS::SHARED_COMPRESSOR,
@@ -254,11 +254,11 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
 int main(int argc, char **argv) {
 
     GameCoordinator coordinator;
-  signal_handler = [&]() {
-    std::cout << "Caught signal, attempting graceful shutdown..." << std::endl;
-    coordinator.save_to_disk();
-    exit(0);
-  };
+    signal_handler = [&]() {
+        std::cout << "Caught signal, attempting graceful shutdown..." << std::endl;
+        coordinator.save_to_disk();
+        exit(0);
+    };
 
     signal(SIGINT, signal_callback_handler);
     signal(SIGTERM, signal_callback_handler);
@@ -304,38 +304,34 @@ int main(int argc, char **argv) {
 
     uWS::App app;
     app.get("/metrics", [&](auto *res, auto *req) {
-            const prometheus::TextSerializer serializer;
-            auto metrics =  registry->Collect();
-            res->write(serializer.Serialize(metrics));
+           const prometheus::TextSerializer serializer;
+           auto metrics = registry->Collect();
+           res->write(serializer.Serialize(metrics));
+           res->end();
+       })
+        .get("/list", [&](auto *res, auto *req) {
+            res->writeHeader("Content-Type", "application/json");
+            res->write(coordinator.list_rooms().toString());
             res->end();
-        }).get("/list",
-            [&](auto *res, auto *req) {
-                res->writeHeader("Content-Type", "application/json");
-                res->write(coordinator.list_rooms().toString());
+        })
+        .get("/create", [&](auto *res, auto *req) {
+            std::string session = getSession(req);
+            bool isPrivate = true;
+            if (req->getQuery().find("public") != std::string::npos) {
+                isPrivate = false;
+            }
+            if (session == "") {
                 res->end();
-            })
-        .get("/create",
-             [&](auto *res, auto *req) {
-                 std::string session = getSession(req);
-                 bool isPrivate = true;
-                 if (req->getQuery().find("public") != std::string::npos) {
-                     isPrivate = false;
-                 }
-                 if (session == "") {
-                     res->end();
-                 } else {
-                     res->end(coordinator.createRoom(isPrivate));
-                 }
-             })
-        .ws<PerSocketData>(
-            "/ws/:mode/:room",
-            makeWebsocketBehavior(&app, jwt_verifier, authServer, registry, coordinator))
-        .listen(port,
-                [port](auto *socket) {
-                    if (socket) {
-                        std::cout << "Listening on port " << port << std::endl;
-                    }
-                })
+            } else {
+                res->end(coordinator.createRoom(isPrivate));
+            }
+        })
+        .ws<PerSocketData>("/ws/:mode/:room", makeWebsocketBehavior(&app, jwt_verifier, authServer, registry, coordinator))
+        .listen(port, [port](auto *socket) {
+            if (socket) {
+                std::cout << "Listening on port " << port << std::endl;
+            }
+        })
         .run();
 
     std::cout << "Failed to listen on port " << port << std::endl;
