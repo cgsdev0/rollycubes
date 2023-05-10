@@ -1,4 +1,3 @@
-
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
@@ -15,8 +14,6 @@
 #include <string>
 #include <string_view>
 #include <unistd.h>
-#include <unordered_map>
-#include <unordered_set>
 
 #include "App.h"
 #include "Consts.h"
@@ -27,6 +24,7 @@
 #include "AuthServerRequestQueue.h"
 #include "JWTVerifier.h"
 #include "MoveOnlyFunction.h"
+#include "GameCoordinator.h"
 
 #include <prometheus/counter.h>
 #include <prometheus/registry.h>
@@ -35,95 +33,13 @@
 // for convenience
 using json = nlohmann::json;
 
-using time_point = std::chrono::system_clock::time_point;
-std::string serializeTimePoint(const time_point &time,
-                               const std::string &format) {
-    std::time_t tt = std::chrono::system_clock::to_time_t(time);
-    std::tm tm = *std::gmtime(&tt); // GMT (UTC)
-    std::stringstream ss;
-    ss << std::put_time(&tm, format.c_str());
-    return ss.str();
-}
-
-std::unordered_map<std::string, Game *> games;
-
-std::unordered_set<std::string>
-    eviction_set;
-std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
-    eviction_queue;
-
 typedef uWS::HttpResponse<false> HttpResponse;
 typedef uWS::HttpRequest HttpRequest;
 
-void load_persistence() {
-    std::ifstream state_file("server_state.json");
-    if (!state_file.is_open()) return;
-    json state;
-    state_file >> state;
-    state_file.close();
-    std::cout << "Successfully parsed state file! Rehydrating..." << std::endl;
-    for (auto &room : state.items()) {
-        std::cout << "Restoring room '" << room.key() << "'" << std::endl;
-        API::GameState state;
-        state.fromString(room.value().dump());
-        Game *g = new Game(state);
-        games.insert({room.key(), g});
 
-        // // All rehydrated games start with 0 players, so we can schedule an eviction.
-        eviction_queue.push({std::chrono::system_clock::now(), room.key()});
-        eviction_set.insert(room.key());
-    }
-}
-
-void runEviction(bool limited = true) {
-    bool popSet = true;
-    uint kills = 0;
-    while (!eviction_queue.empty()) {
-        if (kills >= EVICTION_LIMIT && limited)
-            break;
-        auto i = eviction_queue.front();
-        if (i.first < std::chrono::system_clock::now() - EVICT_AFTER) {
-            auto it = games.find(i.second);
-            if (it != games.end()) {
-                Game *g = it->second;
-                if (!g->connectedPlayerCount()) {
-                    if (g->getUpdated() <= i.first) {
-                        games.erase(it);
-                        delete g;
-                        ++kills;
-                    } else {
-                        eviction_queue.push(
-                            {std::chrono::system_clock::now(), i.second});
-                        popSet = false;
-                    }
-                }
-            }
-            if (popSet) {
-                eviction_set.erase(i.second);
-            }
-            eviction_queue.pop();
-        } else {
-            break;
-        }
-    }
-    std::cout << "Evicted " << kills << " games" << std::endl;
-}
-
+std::function<void(void)> signal_handler;
 void signal_callback_handler(int signum) {
-    std::cout << "Caught signal, attempting graceful shutdown..." << std::endl;
-    runEviction(false);
-    json state;
-    for (const auto &g : games) {
-        state[g.first] = json::parse(g.second->toString());
-    }
-    remove("server_state.json");
-    std::ofstream state_file("server_state.json");
-    if (!state.is_null()) {
-        state_file << state;
-        state_file.close();
-        std::cout << "Successfully persisted state to disk." << std::endl;
-    }
-    exit(0);
+  signal_handler();
 }
 
 std::string getSession(HttpRequest *req) {
@@ -134,30 +50,9 @@ std::string getSession(HttpRequest *req) {
     return "guest:" + std::string(cookies[1].str());
 }
 
-std::string createRoom(bool isPrivate, std::string seed = "") {
-    runEviction();
-    std::string id;
-    do {
-        id = generateCode(ROOM_LEN, seed);
-        if (games.find(id) != games.end() && seed != "") {
-            // Short circuit to prevent infinite loop
-            // in the case of a seeded redirect already
-            // existing
-            return id;
-        }
-    } while (games.find(id) != games.end());
-    Game *g = new Game(isPrivate);
-    games.insert({id, g});
-    if (!eviction_set.count(id)) {
-        eviction_queue.push({std::chrono::system_clock::now(), id});
-        eviction_set.insert(id);
-    }
-    return id;
-}
-
-void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> *ws, PerSocketData *userData) {
-    auto it = games.find(userData->room);
-    if (it != games.end()) {
+void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> *ws, PerSocketData *userData, GameCoordinator &coordinator) {
+    auto it = coordinator.games.find(userData->room);
+    if (it != coordinator.games.end()) {
         // Connecting to a valid game
         Game *g = it->second;
         if (!userData->spectator) {
@@ -185,14 +80,14 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
     } else {
         // Connecting to a non-existant room
         // let's migrate them to a new room
-        userData->room = createRoom(true, userData->room);
+        userData->room = coordinator.createRoom(true, userData->room);
         API::Redirect msg;
         msg.room = userData->room;
         ws->send(msg.toString(), uWS::OpCode::TEXT);
     }
 }
 
-uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer, std::shared_ptr<prometheus::Registry> registry) {
+uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer, std::shared_ptr<prometheus::Registry> registry, GameCoordinator &coordinator) {
 
   auto& ws_counter = prometheus::BuildGauge()
                              .Name("websocket_conn_total")
@@ -215,8 +110,8 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         is_verified = false;
                     }
                     bool dedupe_conns = false;
-                    auto it = games.find(room);
-                    if (it != games.end()) {
+                    auto it = coordinator.games.find(room);
+                    if (it != coordinator.games.end()) {
                         // Connecting to a valid game
                         Game *g = it->second;
                         if (g->isPlayerConnected(session)) {
@@ -258,7 +153,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         // real.
                         return;
                     }
-                    connectNewPlayer(app, ws, userData);
+                    connectNewPlayer(app, ws, userData, coordinator);
                 },
             .message =
                 [&, app](auto *ws, std::string_view message, uWS::OpCode opCode) {
@@ -283,7 +178,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                 userData->is_verified = true;
                                 userData->user_id = claim.user_id;
                                 userData->display_name = claim.display_name;
-                                connectNewPlayer(app, ws, userData);
+                                connectNewPlayer(app, ws, userData, coordinator);
 
                             } catch (const std::runtime_error &e) {
                                 std::cout << "authentication error\n"
@@ -293,8 +188,8 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         } else {
                             // Toss out any messages from unverified connection
                             if (!userData->is_verified) return;
-                            auto it = games.find(room);
-                            if (it != games.end()) {
+                            auto it = coordinator.games.find(room);
+                            if (it != coordinator.games.end()) {
                                 Game *g = it->second;
                                 g->handleMessage(
                                     [ws, room, app](auto s) {
@@ -342,25 +237,29 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
 
                     std::string room = userData->room;
                     std::string session = userData->session;
-                    auto it = games.find(room);
-                    if (it != games.end()) {
+                    auto it = coordinator.games.find(room);
+                    if (it != coordinator.games.end()) {
                         Game *g = it->second;
                         json resp = g->disconnectPlayer(session);
                         if (!resp.is_null()) {
                             app->publish(room, resp.dump(), uWS::OpCode::TEXT);
                         }
                         if (!g->connectedPlayerCount()) {
-                            if (!eviction_set.count(room)) {
-                                eviction_queue.push(
-                                    {std::chrono::system_clock::now(), room});
-                                eviction_set.insert(room);
-                            }
+                            coordinator.queue_eviction(room);
                         }
                     }
                 }};
 }
 
 int main(int argc, char **argv) {
+
+    GameCoordinator coordinator;
+  signal_handler = [&]() {
+    std::cout << "Caught signal, attempting graceful shutdown..." << std::endl;
+    coordinator.save_to_disk();
+    exit(0);
+  };
+
     signal(SIGINT, signal_callback_handler);
     signal(SIGTERM, signal_callback_handler);
 
@@ -370,7 +269,7 @@ int main(int argc, char **argv) {
         port = atoi(argv[1]);
     }
     try {
-        load_persistence();
+        coordinator.load_persistence();
     } catch (const std::exception &e) {
         std::cout << "WARNING: Failed to load server state from persistence!" << std::endl;
         std::cout << e.what() << std::endl;
@@ -412,20 +311,7 @@ int main(int argc, char **argv) {
         }).get("/list",
             [&](auto *res, auto *req) {
                 res->writeHeader("Content-Type", "application/json");
-                API::RoomList respList;
-                for (auto const &[code, game] : games) {
-                    if (game->isPrivate()) {
-                        continue;
-                    }
-                    std::string updated = serializeTimePoint(
-                        game->getUpdated(), "UTC: %Y-%m-%d %H:%M:%S");
-                    respList.rooms.push_back(
-                        {.code = code,
-                         .host_name = game->hostName(),
-                         .last_updated = updated,
-                         .player_count = game->connectedPlayerCount()});
-                }
-                res->write(respList.toString());
+                res->write(coordinator.list_rooms().toString());
                 res->end();
             })
         .get("/create",
@@ -438,12 +324,12 @@ int main(int argc, char **argv) {
                  if (session == "") {
                      res->end();
                  } else {
-                     res->end(createRoom(isPrivate));
+                     res->end(coordinator.createRoom(isPrivate));
                  }
              })
         .ws<PerSocketData>(
             "/ws/:mode/:room",
-            makeWebsocketBehavior(&app, jwt_verifier, authServer, registry))
+            makeWebsocketBehavior(&app, jwt_verifier, authServer, registry, coordinator))
         .listen(port,
                 [port](auto *token) {
                     if (token) {
