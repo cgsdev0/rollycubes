@@ -43,7 +43,7 @@ void AuthServerRequestQueue::send(std::string url, std::string json) {
     AuthServerRequest req{
         .url = this->baseUrl + url,
         .jsonBody = json,
-        .cb = nullptr};
+        .cb = std::nullopt};
     impl->requestQueue.push(req);
 }
 
