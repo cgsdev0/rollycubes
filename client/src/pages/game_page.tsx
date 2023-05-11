@@ -113,6 +113,9 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
 };
 
 const RulesDiv = styled('div', {
+  '& p,h1,li,strong': {
+    color: '$primary',
+  },
   '@bp0': {
     position: 'absolute',
     height: 'calc(100vh - 40px)',

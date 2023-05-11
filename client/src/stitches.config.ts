@@ -13,16 +13,17 @@ export const {
 } = createStitches({
   theme: {
     colors: {
-      good: '#00ff00',
+      good: '#16B808',
       bad: '#ff0000',
-      primary: '#fafafb',
-      primaryDimmed: '#aaaaab',
+      primary: '#f3f3f6',
+      primaryDimmed: '#959597',
       brand: '#3acecd',
       brandFaded: 'rgba(58, 256, 255, 0.4)',
       gray400: 'gainsboro',
       gray500: '#888888',
       gray600: '#555555',
       gray700: '#3E3E3F',
+      gray750: '#232323',
       gray800: '#2A2A2A',
       gray900: '#151515',
     },
@@ -37,11 +38,20 @@ export const {
   },
 });
 
+const hue = 195;
+const saturation = 0;
+
 export const globalStyles = globalCss({
-  '*': { margin: 0, padding: 0 },
+  '*': {
+    margin: 0,
+    padding: 0,
+    transition: 'background-color 0.4s 0s, color 0.4s 0s, border-color 0.4s 0s',
+  },
+  'h1,header,h2,h3,h4,h5,p,td,th,span': {
+    color: '$primary',
+  },
   body: {
     fontFamily: 'Amiko',
-    color: '$primary',
     fontSize: 20,
     overflow: 'hidden',
     userSelect: 'none',
@@ -59,7 +69,7 @@ export const globalStyles = globalCss({
     color: '$primaryDimmed',
   },
   th: {
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '$gray800',
     padding: 4,
     position: 'sticky',
     top: -2,

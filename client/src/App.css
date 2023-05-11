@@ -10,22 +10,16 @@
 :root {
   --toastify-toast-width: 360px;
 }
-body {
-  font-family: 'Roboto', sans-serif;
-  background-color: white;
-  height: 100vh;
-  color: black;
-}
 #renderCanvas {
-    width: 100vw;
-    max-width: 1920px;
-    height: 100vh;
-    touch-action: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 500;
-    pointer-events: none;
+  width: 100vw;
+  max-width: 1920px;
+  height: 100vh;
+  touch-action: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 500;
+  pointer-events: none;
 }
 
 #settings {
@@ -50,25 +44,25 @@ body {
 }
 
 #loginPrompt img {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 div.avatar {
-    border-radius: 50%;
-    background-color: green;
-    color: white;
-    text-align: center;
-    font-size: 14pt;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  border-radius: 50%;
+  background-color: green;
+  color: white;
+  text-align: center;
+  font-size: 14pt;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .avatar-container {
-    display: flex;
-    align-items: center;
-    margin-right: 8px;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+  cursor: pointer;
 }
 
 .achievements {
@@ -265,8 +259,8 @@ h6 {
   min-height: 24px;
 }
 
-.Disconnected .Name::before{
-  content: "(X) ";
+.Disconnected .Name::before {
+  content: '(X) ';
   white-space: pre;
   color: red;
 }
@@ -278,10 +272,10 @@ h6 {
 }
 
 .Crown::before {
-    content: "👑 ";
-    white-space:pre;
-    color:gold;
-    height: 100%;
+  content: '👑 ';
+  white-space: pre;
+  color: gold;
+  height: 100%;
 }
 
 .Player .Name .You {
@@ -346,7 +340,7 @@ h6 {
 
 .Chat form button {
   max-width: 60px;
-  position:relative;
+  position: relative;
 }
 
 .Chat .Messages {
@@ -422,29 +416,29 @@ a {
 }
 
 .connBannerWrapper {
-    position: absolute;
-    z-index: 20;
-    height: 0px;
-    display: flex;
-    width: 100vw;
-    transition: height 500ms ease-out 500ms;
-    overflow: hidden;
+  position: absolute;
+  z-index: 20;
+  height: 0px;
+  display: flex;
+  width: 100vw;
+  transition: height 500ms ease-out 500ms;
+  overflow: hidden;
 }
 .connBanner {
-    width: 100vw;
-    opacity: 100;
-    color: white;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    background-color: #e44c4d;
+  width: 100vw;
+  opacity: 100;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  background-color: #e44c4d;
 }
 
 .connBanner-entered {
-    transition: height 500ms ease-out;
-    height: 30px;
+  transition: height 500ms ease-out;
+  height: 30px;
 }
 .connBannerHidden {
-    opacity: 0;
-    transition: opacity 250ms linear;
+  opacity: 0;
+  transition: opacity 250ms linear;
 }

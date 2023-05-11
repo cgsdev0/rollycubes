@@ -29,14 +29,14 @@ const ButtonRow = styled('div', {
     fontFamily: 'Amiko',
   },
   '& button:first-child': {
-    backgroundColor: '#16B808',
+    backgroundColor: '$good',
     color: 'white',
   },
   animation: scaleUp(),
   animationDuration: '0.2s',
 });
 const StartButton = styled('button', {
-  backgroundColor: '#16B808',
+  backgroundColor: '$good',
   flexBasis: 'initial',
   color: 'white',
   textTransform: 'uppercase',
@@ -46,12 +46,12 @@ const StartButton = styled('button', {
   fontSize: 16,
   paddingTop: 2,
   fontFamily: 'Amiko',
-  '&:hover': {
-    backgroundColor: '#26D828',
-  },
-  '&:active': {
-    backgroundColor: '#107804',
-  },
+  // '&:hover': {
+  //   backgroundColor: 'blue',
+  // },
+  // '&:active': {
+  //   backgroundColor: 'red',
+  // },
 });
 
 const content = css({
@@ -89,7 +89,7 @@ const tableWrapper = css({
 });
 const gameInfoPanel = css({
   borderRadius: 16,
-  backgroundColor: '#151515',
+  backgroundColor: '$gray900',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',

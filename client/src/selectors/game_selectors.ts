@@ -122,6 +122,10 @@ export const selectCheats = createSelector(
   selectState,
   (state) => state.settings.cheats
 );
+export const selectThemes = createSelector(
+  selectState,
+  (state) => state.themes.themes
+);
 
 export const selectLatestPopText = createSelector(
   selectState,
@@ -132,6 +136,13 @@ export const selectTurnName = createSelector(
   selectTurnIndex,
   selectPlayers,
   (turn, players) => players[turn]?.name || `User${turn + 1}`
+);
+
+export const selectCurrentTheme = createSelector(
+  selectThemes,
+  selectTurnIndex,
+  selectPlayers,
+  (themes, turn, players) => themes[players[turn]?.user_id || '']
 );
 
 export const selectSelf = createSelector(

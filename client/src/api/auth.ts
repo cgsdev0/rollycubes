@@ -73,6 +73,7 @@ export const authApi = createApi({
 // auto-generated based on the defined endpoints
 export const {
   util,
+  endpoints,
   useGetRefreshTokenQuery,
   useGetSelfUserDataQuery,
   useGetAchievementListQuery,
