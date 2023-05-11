@@ -13,7 +13,6 @@ const twitchLogin = (authService: string, intent: string) => () => {
     `?client_id=${TWITCH_CLIENT_ID}` +
     `&redirect_uri=${redirect}` +
     `&response_type=token`;
-  `?redirect=`;
 };
 
 const weird = css({

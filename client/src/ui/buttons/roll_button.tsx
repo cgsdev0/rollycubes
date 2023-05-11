@@ -22,7 +22,8 @@ const Subtitle = styled('p', {
   justifyContent: 'center',
 });
 
-const SubtitleName = styled('div', {
+const SubtitleName = styled('span', {
+  color: '$primaryDimmed',
   overflow: 'hidden',
   maxWidth: 160,
   textOverflow: 'ellipsis',

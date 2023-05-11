@@ -7,8 +7,13 @@ import { connectionReducer } from './reducers/connection';
 import { gameReducer } from './reducers/game';
 import { popTextReducer } from './reducers/pop_text';
 import { settingsReducer } from './reducers/settings';
+import { createReduxHistoryContext } from 'redux-first-history';
+import { createBrowserHistory } from 'history';
 
 export const TARGET_SCORES = [33, 66, 67, 98, 99, 100];
+
+const { createReduxHistory, routerMiddleware, routerReducer } =
+  createReduxHistoryContext({ history: createBrowserHistory() });
 
 const customizedMiddleware = getDefaultMiddleware({
   serializableCheck: false,
@@ -16,6 +21,7 @@ const customizedMiddleware = getDefaultMiddleware({
 
 export const store = configureStore({
   reducer: {
+    router: routerReducer,
     game: gameReducer,
     chat: chatReducer,
     connection: connectionReducer,
@@ -25,8 +31,10 @@ export const store = configureStore({
     themes: themesReducer,
     [authApi.reducerPath]: authApi.reducer,
   },
-  middleware: customizedMiddleware.concat(authApi.middleware),
+  middleware: customizedMiddleware.concat(authApi.middleware, routerMiddleware),
 });
+
+export const history = createReduxHistory(store);
 
 type StateFromStore<A> = A extends Store<infer U, any> ? U : never;
 export type ReduxState = StateFromStore<typeof store>;

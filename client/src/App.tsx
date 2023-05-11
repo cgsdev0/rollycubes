@@ -4,7 +4,8 @@ import { AchievementProvider } from 'providers/achievements';
 import { AuthProvider } from 'providers/auth';
 import { StrictMode } from 'react';
 import { Provider, useSelector } from 'react-redux';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import { HistoryRouter as Router } from 'redux-first-history/rr6';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { selectCurrentTheme } from 'selectors/game_selectors';
@@ -15,7 +16,7 @@ import GamePage from './pages/game_page';
 import HomePage from './pages/home_page';
 import OnboardPage from './pages/onboard_page';
 import TwitchOAuthPage from './pages/twitch_oauth_page';
-import { store } from './store';
+import { store, history } from './store';
 
 const RenderCanvas = styled('canvas', {
   position: 'absolute',
@@ -122,7 +123,7 @@ const AppInner = () => {
     <div className={theme}>
       <AuthProvider>
         <AchievementProvider>
-          <Router>
+          <Router history={history}>
             <div className={app()}>
               <Octocat />
               <div
