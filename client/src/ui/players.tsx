@@ -13,7 +13,7 @@ interface Props {
 
 const playerPanel = css({
   borderRadius: 16,
-  backgroundColor: '#151515',
+  backgroundColor: '$gray900',
   display: 'flex',
   flexDirection: 'column',
   '@bp0': {

@@ -22,7 +22,6 @@ export const settingsReducer = createReducer<SettingsState>(
     builder
       .addCase('TOGGLE_3D', (state, action) => {
         state.sick3dmode = !state.sick3dmode;
-        console.warn(import.meta.env.VITE_LOCAL_AUTH);
         // TODO: remove these side effects
         if (!state.sick3dmode) {
           localStorage.setItem('3d_mode', 'false');

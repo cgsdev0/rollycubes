@@ -81,7 +81,6 @@ const makeD20Creator = () => {
       'd20.gltf',
       scene
     );
-    console.log(result);
     const mesh = result.meshes[0].getChildren()[0] as any;
     mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
       mesh,

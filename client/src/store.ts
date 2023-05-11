@@ -1,5 +1,6 @@
 import { configureStore, getDefaultMiddleware, Store } from '@reduxjs/toolkit';
 import { authApi } from 'api/auth';
+import { themesReducer } from 'reducers/themes';
 import { authReducer } from './reducers/auth';
 import { chatReducer } from './reducers/chat';
 import { connectionReducer } from './reducers/connection';
@@ -21,6 +22,7 @@ export const store = configureStore({
     auth: authReducer,
     settings: settingsReducer,
     popText: popTextReducer,
+    themes: themesReducer,
     [authApi.reducerPath]: authApi.reducer,
   },
   middleware: customizedMiddleware.concat(authApi.middleware),

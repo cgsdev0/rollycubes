@@ -27,7 +27,7 @@
   "scripts": {
     "start": "VITE_LOCAL_AUTH=true vite --host",
     "with-ssl": "VITE_LOCAL_AUTH=true USE_SSL_HMR=true vite --host",
-    "with-ssl-no-auth": "VITE_LOCAL_AUTH=true USE_SSL_HMR=true vite --host",
+    "with-ssl-no-auth": "USE_SSL_HMR=true vite --host",
     "no-auth": "vite --host",
     "build": "tsc && vite build",
     "serve": "vite preview",

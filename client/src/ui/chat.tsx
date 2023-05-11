@@ -27,6 +27,9 @@ const ChatBar = styled('input', {
   borderRadius: 6,
   backgroundColor: '$gray700',
   color: '$primary',
+  '&::placeholder': {
+    color: '$primaryDimmed',
+  },
   '&:focus': {
     outline: 'none',
   },
@@ -54,7 +57,6 @@ const ChatWrapper = styled('div', {
   'a:hover': {
     fontSize: 'inherit',
     textDecoration: 'underline',
-    color: '$primaryDimmed',
   },
 });
 
@@ -64,6 +66,7 @@ const MessageBox = styled('div', {
   overflowWrap: 'anywhere',
   overflowY: 'scroll',
   width: 'calc(100% - 16px)',
+  color: '$primary',
   height: '100%',
   paddingRight: 16,
   '&::-webkit-scrollbar': {
@@ -71,7 +74,7 @@ const MessageBox = styled('div', {
   },
 
   '&::-webkit-scrollbar-track': {
-    background: '#232323',
+    background: '$gray750',
     borderRadius: 6,
   },
 

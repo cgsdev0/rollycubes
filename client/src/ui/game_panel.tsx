@@ -129,7 +129,7 @@ const GamePanel: React.FC<Props & DispatchProp> = ({
 };
 
 const ScoreTableContainer = styled('div', {
-  border: '1px dotted $gray600',
+  border: '1px dotted $primaryDimmed',
   borderRadius: 6,
   padding: 6,
   '@bp1': {
@@ -157,17 +157,17 @@ const ScoreTable = styled('table', {
   '& td': {
     textAlign: 'center',
     fontSize: 10,
-    color: '$gray500',
+    color: '$primaryDimmed',
     padding: 0,
-    borderBottom: '1px dotted $gray600',
-    borderRight: '1px dotted $gray600',
+    borderBottom: '1px dotted $primaryDimmed',
+    borderRight: '1px dotted $primaryDimmed',
     '&.blank': {
       border: 0,
     },
   },
 });
 const scoreTableTitle = css({
-  color: '$gray500',
+  color: '$primaryDimmed',
   textAlign: 'center',
   fontSize: 12,
   marginTop: 19,

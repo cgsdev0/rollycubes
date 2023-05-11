@@ -3,10 +3,11 @@ import { TabErrorPage } from 'pages/tab_error_page';
 import { AchievementProvider } from 'providers/achievements';
 import { AuthProvider } from 'providers/auth';
 import { StrictMode } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { selectCurrentTheme } from 'selectors/game_selectors';
 import { styled, css, globalStyles } from 'stitches.config';
 import { Octocat } from 'ui/buttons/octocat';
 import { v4 as uuidv4 } from 'uuid';
@@ -48,7 +49,7 @@ const App = () => {
 };
 
 const app = css({
-  backgroundColor: '#151515',
+  backgroundColor: '$gray900',
   marign: 0,
   minHeight: '100vh',
   '@bp0': {
@@ -115,31 +116,41 @@ const AppInner = () => {
         )})`
       : 'scale(1)';
 
+  const theme = useSelector(selectCurrentTheme);
+
   return (
-    <AuthProvider>
-      <AchievementProvider>
-        <Router>
-          <div className={app()}>
-            <Octocat />
-            <div className={container()} style={{ transform: transformString }}>
-              <div className={innerContainer()}>
-                <Routes>
-                  <Route path="/">
-                    <Route index element={<HomePage />} />
-                    <Route path="home" element={<HomePage />} />
-                    <Route path="twitch_oauth" element={<TwitchOAuthPage />} />
-                    <Route path="onboard" element={<OnboardPage />} />
-                    <Route path="multiple-tabs" element={<TabErrorPage />} />
-                    <Route path=":mode/:room" element={<GamePage />} />
-                  </Route>
-                </Routes>
+    <div className={theme}>
+      <AuthProvider>
+        <AchievementProvider>
+          <Router>
+            <div className={app()}>
+              <Octocat />
+              <div
+                className={container()}
+                style={{ transform: transformString }}
+              >
+                <div className={innerContainer()}>
+                  <Routes>
+                    <Route path="/">
+                      <Route index element={<HomePage />} />
+                      <Route path="home" element={<HomePage />} />
+                      <Route
+                        path="twitch_oauth"
+                        element={<TwitchOAuthPage />}
+                      />
+                      <Route path="onboard" element={<OnboardPage />} />
+                      <Route path="multiple-tabs" element={<TabErrorPage />} />
+                      <Route path=":mode/:room" element={<GamePage />} />
+                    </Route>
+                  </Routes>
+                </div>
               </div>
             </div>
-          </div>
-          <RenderCanvas id="renderCanvas" />
-        </Router>
-      </AchievementProvider>
-    </AuthProvider>
+            <RenderCanvas id="renderCanvas" />
+          </Router>
+        </AchievementProvider>
+      </AuthProvider>
+    </div>
   );
 };
 

@@ -44,7 +44,7 @@ const AchievementTooltip = styled('div', {
   padding: 12,
   p: {
     fontSize: 14,
-    color: '$gray400',
+    color: '$primaryDimmed',
   },
   header: {
     fontWeight: 'bold',
@@ -73,7 +73,7 @@ const Bad = styled('span', {
 });
 const Neutral = styled('span', {
   letterSpacing: -1,
-  color: '$gray400',
+  color: '$primaryDimmed',
 });
 const StyledTooltip = styled('div', {
   backgroundColor: '$gray700',
