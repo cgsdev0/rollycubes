@@ -127,6 +127,11 @@ export const selectThemes = createSelector(
   (state) => state.themes.themes
 );
 
+export const selectLocation = createSelector(
+  selectState,
+  (state) => state.router.location
+);
+
 export const selectLatestPopText = createSelector(
   selectState,
   (state) => state.popText.popText[0]
@@ -139,10 +144,15 @@ export const selectTurnName = createSelector(
 );
 
 export const selectCurrentTheme = createSelector(
+  selectLocation,
   selectThemes,
   selectTurnIndex,
   selectPlayers,
-  (themes, turn, players) => themes[players[turn]?.user_id || '']
+  (location, themes, turn, players) =>
+    location?.pathname.startsWith('/room/') ||
+    location?.pathname.startsWith('/spectate/')
+      ? themes[players[turn]?.user_id || '']
+      : undefined
 );
 
 export const selectSelf = createSelector(
