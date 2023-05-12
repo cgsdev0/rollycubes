@@ -50,9 +50,16 @@ pub struct DiceSettings {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct ColorSettings {
+    hue: f64,
+    sat: f64,
+}
+
+#[derive(Serialize, Deserialize)]
 #[serde(tag = "setting")]
 pub enum UpdateSettingsPayload {
     DiceType { dice_type: DiceType },
+    Color { color: ColorSettings },
 }
 
 #[derive(Serialize)]
@@ -61,6 +68,7 @@ pub struct User {
     username: String,
     image_url: Option<String>,
     dice: DiceSettings,
+    color: ColorSettings,
     #[serde(rename = "createdDate", with = "time::serde::rfc3339")]
     created_date: OffsetDateTime,
     achievements: Option<Vec<AchievementProgress>>,
@@ -273,6 +281,29 @@ pub async fn update_user_setting(
     let client = s.pool.get().await?;
 
     match body {
+        UpdateSettingsPayload::Color { color } => {
+            if !(0.0..=360.0).contains(&color.hue) {
+                return Err(RouteError::UserError(
+                    "invalid hue (valid range: 0.0 to 360.0)".to_string(),
+                ));
+            }
+            if !(0.0..=80.0).contains(&color.sat) {
+                return Err(RouteError::UserError(
+                    "invalid saturation (valid range: 0.0 to 80.0)".to_string(),
+                ));
+            }
+            client
+                .execute(
+                    "UPDATE user_settings SET color_hue = $2::DOUBLE, color_sat = $3::DOUBLE WHERE user_id = $1::UUID",
+                    &[
+                        &verified_token.claims.user_id,
+                        &color.hue,
+                        &color.sat
+                    ],
+                )
+                .await?;
+            Ok(())
+        }
         UpdateSettingsPayload::DiceType { dice_type } => {
             let unlocked = match dice_type {
                 DiceType::D6 => true,
@@ -344,6 +375,8 @@ SELECT
     users.created_date as created_date,
     user_to_achievement.achievement_id as achievement_id,
     user_settings.dice_type as dice_type,
+    user_settings.color_hue as color_hue,
+    user_settings.color_sat as color_sat,
     unlocked,
     progress,
     rolls,
@@ -371,6 +404,10 @@ WHERE id=$1::UUID",
             image_url: row.get("image_url"),
             dice: DiceSettings {
                 dice_type: DiceType::from_int(row.get::<'_, _, i32>("dice_type"))?,
+            },
+            color: ColorSettings {
+                hue: row.get("color_hue"),
+                sat: row.get("color_sat"),
             },
             created_date: row
                 .get::<'_, _, PrimitiveDateTime>("created_date")
