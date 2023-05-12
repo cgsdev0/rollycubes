@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { NavigateFunction } from 'react-router-dom';
 import { ReduxState } from './store';
 import { Location } from 'react-router-dom';
-import { optimisticUpdates } from 'api/auth';
+import { endpoints, optimisticUpdates } from 'api/auth';
 
 interface Props {
   room: string;
@@ -76,6 +76,12 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
     } else if (data.type === 'redirect') {
       const pathParts = this.props.location.pathname.split('/');
       this.props.navigate(`/${pathParts[1]}/${data.room}`, { replace: true });
+    } else if (data.type === 'refetch_player') {
+      this.props.store.dispatch(
+        endpoints.getUserById.initiate(data.user_id, {
+          forceRefetch: true,
+        }) as any
+      );
     } else {
       this.props.store.dispatch(data);
       optimisticUpdates(data, this.props.store);

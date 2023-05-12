@@ -222,6 +222,21 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                   << std::endl
                                   << e.what() << std::endl;
                         response = API::GameError({.error = e.what()}).toString();
+                    } catch (nlohmann::detail::invalid_iterator &e) {
+                        std::cout << "HANDLED BAD JSON (invalid_iterator): " << message
+                                  << std::endl
+                                  << e.what() << std::endl;
+                        response = API::GameError({.error = e.what()}).toString();
+                    } catch (nlohmann::detail::out_of_range &e) {
+                        std::cout << "HANDLED BAD JSON (out_of_range): " << message
+                                  << std::endl
+                                  << e.what() << std::endl;
+                        response = API::GameError({.error = e.what()}).toString();
+                    } catch (nlohmann::detail::other_error &e) {
+                        std::cout << "HANDLED BAD JSON (other_error): " << message
+                                  << std::endl
+                                  << e.what() << std::endl;
+                        response = API::GameError({.error = e.what()}).toString();
                     }
                     if (response.length())
                         ws->send(response, uWS::OpCode::TEXT);

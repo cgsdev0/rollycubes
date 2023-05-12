@@ -177,7 +177,7 @@ static const std::unordered_map<
     action_map = {ACTION(chat), ACTION(leave), ACTION(kick),
                   ACTION(restart), ACTION(update_name), ACTION(roll),
                   ACTION(add), ACTION(sub), ACTION(add_nth),
-                  ACTION(sub_nth)};
+                  ACTION(sub_nth), ACTION(refetch_player)};
 
 #undef ACTION
 
@@ -200,7 +200,8 @@ void Game::processEvent(const API::ServerPlayer *player, SendFunc &broadcast, Ha
             try {
                 a.fromString(s);
                 broadcast(a.toString());
-            } catch (nlohmann::detail::parse_error &e) {
+                // TODO: this sucks, but im lazy
+            } catch (std::exception &e) {
                 // expected
             }
         });
@@ -436,6 +437,12 @@ void Game::sub_nth(HANDLER_ARGS) {
     int n = guardNth(data["n"]);
     json j = json(-state.rolls[n]);
     update(broadcast, server, j, session);
+}
+
+void Game::refetch_player(HANDLER_ARGS) {
+    API::RefetchPlayer msg;
+    msg.fromString(data.dump());
+    broadcast(msg.toString());
 }
 
 void Game::update(HANDLER_ARGS) {

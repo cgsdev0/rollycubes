@@ -3,9 +3,15 @@ import { AchievementList } from 'api/auth';
 import decode from 'jwt-decode';
 import { UserData } from '../types/store_types';
 
+interface TokenUserData {
+  exp: number;
+  user_id: string;
+  display_name: string;
+}
+
 export interface AuthState {
   authToken?: string | null;
-  userData?: UserData;
+  userData?: TokenUserData;
   achievements?: AchievementList;
 }
 
@@ -26,7 +32,7 @@ export const authReducer = createReducer<AuthState>({}, (builder) => {
     })
     .addCase('AUTHENTICATE', (state, action: AuthenticateAction) => {
       try {
-        const decoded = decode<UserData>(action.access_token);
+        const decoded = decode<TokenUserData>(action.access_token);
         state.authToken = action.access_token;
         state.userData = decoded;
       } catch (e) {

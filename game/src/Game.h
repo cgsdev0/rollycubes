@@ -95,6 +95,7 @@ class Game {
     void sub(HANDLER_ARGS);
     void add_nth(HANDLER_ARGS);
     void sub_nth(HANDLER_ARGS);
+    void refetch_player(HANDLER_ARGS);
 
     void update(HANDLER_ARGS);
 

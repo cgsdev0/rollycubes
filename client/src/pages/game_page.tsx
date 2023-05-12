@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import OnboardPage from './onboard_page';
 import { css, styled } from 'stitches.config';
@@ -21,6 +21,8 @@ import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help';
 import { useStore } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
+import { ToggleSwitch } from 'ui/buttons/toggle';
+import { Slider } from 'ui/buttons/slider';
 
 interface Props {
   winner?: Player;
@@ -60,6 +62,10 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
 
   const [showHelp, setShowHelp] = React.useState(false);
 
+  const showSettings = useSelector(
+    (state: ReduxState) => state.settings.showSettings
+  );
+
   React.useEffect(() => {
     if (is3DMode && !needsToOnboard && authToken !== undefined) {
       initScene();
@@ -96,19 +102,79 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
 
       <FloatingButtonBar id="floating-button-bar">
         <HelpIcon onClick={() => setShowHelp((help) => !help)} />
-        <DiceIcon onClick={() => store.dispatch({ type: 'TOGGLE_3D' })} />
+        <DiceIcon
+          onClick={() => store.dispatch({ type: 'TOGGLE_SHOW_SETTINGS' })}
+        />
         <HomeIcon onClick={() => navigate('/')} />
       </FloatingButtonBar>
 
-      {/* <ConnBanner /> */}
+      {showSettings ? (
+        <Settings />
+      ) : (
+        <>
+          {/* <ConnBanner /> */}
 
-      <div className={flexColumn()}>
-        <GamePanel />
-        <Players />
-      </div>
-      {showHelp ? <Rules /> : <ChatBox />}
-      <PopText />
+          <div className={flexColumn()}>
+            <GamePanel />
+            <Players />
+          </div>
+          {showHelp ? <Rules /> : <ChatBox />}
+          <PopText />
+        </>
+      )}
     </React.Fragment>
+  );
+};
+
+const Settings: React.FC<{}> = () => {
+  const dispatch = useDispatch();
+  const dice3d = useSelector((state: ReduxState) => state.settings.sick3dmode);
+  const color = useSelector((state: ReduxState) => state.settings.color);
+  const onHueChange = React.useCallback(
+    (e) =>
+      dispatch({
+        type: 'SET_CUSTOM_HUE',
+        hue: Number.parseInt(e.target.value),
+      }),
+    [dispatch]
+  );
+  const onSatChange = React.useCallback(
+    (e) =>
+      dispatch({
+        type: 'SET_CUSTOM_SAT',
+        sat: Number.parseInt(e.target.value),
+      }),
+    [dispatch]
+  );
+
+  return (
+    <div>
+      <h1>Settings</h1>
+      <ToggleSwitch
+        id="dice3d"
+        desc="3D dice animation"
+        checked={dice3d}
+        onChange={() => {
+          dispatch({ type: 'TOGGLE_3D' });
+        }}
+      />
+      <Slider
+        desc="hue"
+        min={0}
+        max={360}
+        value={color.hue}
+        id="hue"
+        onChange={onHueChange}
+      />
+      <Slider
+        desc="saturation"
+        min={0}
+        max={80}
+        value={color.sat}
+        id="saturation"
+        onChange={onSatChange}
+      />
+    </div>
   );
 };
 

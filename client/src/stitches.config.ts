@@ -38,8 +38,25 @@ export const {
   },
 });
 
-const hue = 195;
-const saturation = 0;
+const hue = 'var(--custom-hue)';
+const sat = 'var(--custom-sat)';
+
+export const customTheme = createTheme({
+  colors: {
+    bad: '#ff0000',
+    primary: `hsl(${hue}, ${sat}, 90%)`,
+    primaryDimmed: `hsl(${hue}, ${sat}, 60%)`,
+    brand: `hsl(${hue}, ${sat}, 50%)`,
+    brandFaded: `hsl(${hue}, ${sat}, 40%)`,
+    gray400: `hsl(${hue}, ${sat}, 40%)`,
+    gray500: `hsl(${hue}, ${sat}, 35%)`,
+    gray600: `hsl(${hue}, ${sat}, 30%)`,
+    gray700: `hsl(${hue}, ${sat}, 25%)`,
+    gray750: `hsl(${hue}, ${sat}, 15%)`,
+    gray800: `hsl(${hue}, ${sat}, 20%)`,
+    gray900: `hsl(${hue}, ${sat}, 12%)`,
+  },
+});
 
 export const globalStyles = globalCss({
   '*': {

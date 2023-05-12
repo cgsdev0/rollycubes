@@ -1,11 +1,12 @@
 import { useSetUserColorMutation } from 'api/auth';
 import React from 'react';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { styled } from 'stitches.config';
 import {
   selectHasMultiplePlayers,
   selectIsGameOver,
   selectIsMyTurn,
+  selectSelfUserId,
   selectTurnName,
 } from '../../selectors/game_selectors';
 import { ReduxState } from '../../store';
@@ -37,13 +38,17 @@ const RollButton: React.FC<Props> = ({
   turnName,
   victory,
 }) => {
+  const user_id = useSelector(selectSelfUserId);
   const [trigger] = useSetUserColorMutation();
+
   const onClick = () => {
     if (socket) {
       trigger({
-        hue: 100.0,
+        hue: 200.0,
         sat: 80.0,
-      });
+      }).then(() =>
+        socket.send(JSON.stringify({ type: 'refetch_player', user_id }))
+      );
       socket.send(JSON.stringify({ type: 'roll' }));
     }
   };

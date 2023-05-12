@@ -15,6 +15,8 @@
 #include "ReportStats.hpp"
 #include "AchievementData.hpp"
 #include "Achievement.hpp"
+#include "Color.hpp"
+#include "Dice.hpp"
 #include "UserStats.hpp"
 #include "UserData.hpp"
 #include "DieRoll.hpp"
@@ -22,6 +24,8 @@
 #include "GameError.hpp"
 #include "RedirectType.hpp"
 #include "Redirect.hpp"
+#include "RefetchPlayerType.hpp"
+#include "RefetchPlayer.hpp"
 #include "Room.hpp"
 #include "RoomList.hpp"
 #include "Player.hpp"
@@ -57,4 +61,5 @@
 #include "UpdateMsg.hpp"
 namespace API {
     using Integer = double;
+    using DiceType = double;
 }
