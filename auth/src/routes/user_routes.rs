@@ -243,8 +243,16 @@ SET username = $1::TEXT, image_url = $2::TEXT",
         transaction
             .execute(
                 "
+INSERT INTO user_settings (user_id)
+VALUES ($1::UUID) ON CONFLICT(user_id) DO NOTHING",
+                &[&id],
+            )
+            .await?;
+        transaction
+            .execute(
+                "
 INSERT INTO twitch_identity (twitch_id, twitch_login, user_id)
-VALUES ($1::TEXT, $2::TEXT, $3::UUID)",
+VALUES ($1::TEXT, $2::TEXT, $3::UUID) ON CONFLICT(twitch_id) DO NOTHING",
                 &[&t.user_id.as_str(), &t.login.as_str(), &id],
             )
             .await?;
