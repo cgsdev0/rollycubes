@@ -12,6 +12,11 @@ export interface Redirect {
   room: string;
 }
 
+export interface RefetchPlayer {
+  type: 'refetch_player';
+  user_id: string;
+}
+
 export interface Room {
   code: string;
   host_name: string;

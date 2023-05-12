@@ -76,6 +76,7 @@ const enum DiceType {
   D6,
   D20,
 }
+
 export interface UserData {
   id: string;
   username: string;

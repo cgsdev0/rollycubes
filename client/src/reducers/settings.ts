@@ -5,6 +5,11 @@ export interface SettingsState {
   cheats: boolean;
   sick3dmode: boolean;
   authServiceOrigin: string;
+  showSettings: boolean;
+  color: {
+    hue: number;
+    sat: number;
+  };
 }
 
 const PROD_AUTH_SERVICE = 'https://auth.rollycubes.com/';
@@ -17,6 +22,11 @@ export const settingsReducer = createReducer<SettingsState>(
     authServiceOrigin: import.meta.env.VITE_LOCAL_AUTH
       ? LOCAL_AUTH_SERVICE
       : PROD_AUTH_SERVICE,
+    showSettings: false,
+    color: {
+      hue: 0,
+      sat: 80,
+    },
   },
   (builder) => {
     builder
@@ -31,6 +41,15 @@ export const settingsReducer = createReducer<SettingsState>(
       })
       .addCase('CHEATS', (state, action: CheatsAction) => {
         state.cheats = action.newState;
+      })
+      .addCase('SET_CUSTOM_HUE', (state, action: any) => {
+        state.color.hue = action.hue;
+      })
+      .addCase('SET_CUSTOM_SAT', (state, action: any) => {
+        state.color.sat = action.sat;
+      })
+      .addCase('TOGGLE_SHOW_SETTINGS', (state, action) => {
+        state.showSettings = !state.showSettings;
       })
       .addCase('DEV_AUTH_SERVICE_TOGGLE', (state, action) => {
         if (state.authServiceOrigin === PROD_AUTH_SERVICE) {
