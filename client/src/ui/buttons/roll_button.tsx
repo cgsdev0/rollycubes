@@ -1,3 +1,4 @@
+import { useSetUserColorMutation } from 'api/auth';
 import React from 'react';
 import { connect } from 'react-redux';
 import { styled } from 'stitches.config';
@@ -36,8 +37,13 @@ const RollButton: React.FC<Props> = ({
   turnName,
   victory,
 }) => {
+  const [trigger] = useSetUserColorMutation();
   const onClick = () => {
     if (socket) {
+      trigger({
+        hue: 100.0,
+        sat: 80.0,
+      });
       socket.send(JSON.stringify({ type: 'roll' }));
     }
   };

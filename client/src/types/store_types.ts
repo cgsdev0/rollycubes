@@ -72,11 +72,22 @@ export type AchievementData = {
   max_progress: integer;
 };
 
+const enum DiceType {
+  D6,
+  D20,
+}
 export interface UserData {
   id: string;
   username: string;
   image_url?: string | null;
   stats?: UserStats | null;
+  dice: {
+    type: DiceType;
+  };
+  color: {
+    hue: number;
+    sat: number;
+  };
   achievements?: Achievement[] | null;
   createdDate: string;
 }

@@ -26,9 +26,9 @@ pub enum RouteError {
     JwtError(#[from] jsonwebtoken::errors::Error),
     #[error("bb8 problem")]
     Bb8Error(bb8::RunError<tokio_postgres::Error>),
-    #[error("database error")]
+    #[error("database error: {0}")]
     PostgresError(#[from] tokio_postgres::Error),
-    #[error("bad request: {0}")]
+    #[error("wait, that's illegal: {0}")]
     UserError(String),
     #[error("twitch validation error")]
     TwitchValidationError(#[from] ValidationError<reqwest::Error>),
