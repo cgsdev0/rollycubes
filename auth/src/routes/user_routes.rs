@@ -292,9 +292,9 @@ pub async fn update_user_setting(
                     "invalid saturation (valid range: 0.0 to 80.0)".to_string(),
                 ));
             }
-            client
+            let rows_updated = client
                 .execute(
-                    "UPDATE user_settings SET color_hue = $2::DOUBLE, color_sat = $3::DOUBLE WHERE user_id = $1::UUID",
+                    "UPDATE user_settings SET color_hue = $2, color_sat = $3 WHERE user_id = $1::UUID",
                     &[
                         &verified_token.claims.user_id,
                         &color.hue,
@@ -302,6 +302,11 @@ pub async fn update_user_setting(
                     ],
                 )
                 .await?;
+            if rows_updated == 0 {
+                return Err(RouteError::UserError(
+                    "AHHHH everybody panic (except rust, pls dont actually panic)".to_string(),
+                ));
+            }
             Ok(())
         }
         UpdateSettingsPayload::DiceType { dice_type } => {

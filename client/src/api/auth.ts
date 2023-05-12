@@ -41,8 +41,23 @@ const dynamicBaseQuery: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   const baseUrl = (api.getState() as ReduxState).settings.authServiceOrigin;
-  const rawBaseQuery = fetchBaseQuery({ baseUrl });
+  const rawBaseQuery = fetchBaseQuery({
+    baseUrl,
+    prepareHeaders: (headers, { getState }) => {
+      // By default, if we have a token in the store, let's use that for authenticated requests
+      const token = (getState() as ReduxState).auth.authToken;
+      if (token) {
+        headers.set('X-Access-Token', `${token}`);
+      }
+      return headers;
+    },
+  });
   return rawBaseQuery(args, api, extraOptions);
+};
+
+type ColorSettings = {
+  hue: number;
+  sat: number;
 };
 
 // Define a service using a base URL and expected endpoints
@@ -66,6 +81,14 @@ export const authApi = createApi({
     getUserById: builder.query<UserData, string>({
       query: (id: string) => ({ url: `users/${id}`, mode: 'cors' }),
     }),
+    setUserColor: builder.mutation<void, ColorSettings>({
+      query: (settings) => ({
+        url: `users/update_setting`,
+        mode: 'cors',
+        method: 'POST',
+        body: { setting: 'Color', color: settings },
+      }),
+    }),
   }),
 });
 
@@ -78,6 +101,7 @@ export const {
   useGetSelfUserDataQuery,
   useGetAchievementListQuery,
   useGetUserByIdQuery,
+  useSetUserColorMutation,
 } = authApi;
 
 type Action = { type: string } & object;
