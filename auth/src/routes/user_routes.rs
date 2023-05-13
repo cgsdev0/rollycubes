@@ -73,6 +73,7 @@ pub struct User {
     created_date: OffsetDateTime,
     achievements: Option<Vec<AchievementProgress>>,
     stats: Option<PlayerStats>,
+    donor: bool,
 }
 
 #[derive(Deserialize)]
@@ -304,7 +305,7 @@ pub async fn update_user_setting(
                 .await?;
             if rows_updated == 0 {
                 return Err(RouteError::UserError(
-                    "AHHHH everybody panic (except rust, pls dont actually panic)".to_string(),
+                    "that user doesn't exist???".to_string(),
                 ));
             }
             Ok(())
@@ -388,6 +389,7 @@ SELECT
     doubles,
     games,
     wins,
+    donor,
     (SELECT user_count FROM total_users) AS rd,
     (SELECT achievement_count FROM users_ach_totals z WHERE z.id=user_to_achievement.achievement_id) AS rn
 FROM users
@@ -407,6 +409,7 @@ WHERE id=$1::UUID",
             id: row.get("id"),
             username: row.get("username"),
             image_url: row.get("image_url"),
+            donor: row.get("donor"),
             dice: DiceSettings {
                 dice_type: DiceType::from_int(row.get::<'_, _, i32>("dice_type"))?,
             },
