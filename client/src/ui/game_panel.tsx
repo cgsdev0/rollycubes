@@ -71,7 +71,7 @@ const GamePanel: React.FC<Props & DispatchProp> = ({
 }) => {
   const [rolling, setRolling] = React.useState<RollingState>('rolled');
 
-  const prevRollCount = React.useRef(0);
+  const prevRollCount = React.useRef(-1);
 
   const stopRolling = React.useCallback(() => {
     setRolling('rolled');
@@ -82,9 +82,11 @@ const GamePanel: React.FC<Props & DispatchProp> = ({
 
   React.useEffect(() => {
     if (prevRollCount.current < rollCount) {
+      if (prevRollCount.current > -1) {
+        setRolling('rolling');
+        setTimeout(stopRolling, 2500);
+      }
       prevRollCount.current = rollCount;
-      setRolling('rolling');
-      setTimeout(stopRolling, 2500);
     }
   }, [rollCount, stopRolling]);
 
