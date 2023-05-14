@@ -91,6 +91,7 @@ export interface UserData {
   };
   achievements?: Achievement[] | null;
   createdDate: string;
+  donor: boolean;
 }
 
 export interface DieRoll {

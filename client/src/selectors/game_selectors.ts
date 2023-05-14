@@ -4,7 +4,11 @@ import {
   createSelectorCreator,
 } from 'reselect';
 import { customTheme } from 'stitches.config';
+import { UserData } from 'types/store_types';
 import { ReduxState, selectState, TARGET_SCORES } from '../store';
+import { QuerySubState } from '@reduxjs/toolkit/dist/query/core/apiState';
+import { authApi, endpoints } from 'api/auth';
+import { ApiEndpointQuery } from '@reduxjs/toolkit/dist/query/core/module';
 
 export const selectIs3d = createSelector(
   selectState,
@@ -19,6 +23,35 @@ export const selectAuthService = createSelector(
 export const selectSelfUserData = createSelector(
   selectState,
   (state) => state.auth.userData
+);
+
+export const selectAuthApiQueries = createSelector(
+  selectState,
+  (state) => state.authApi.queries
+);
+
+type UnwrapApiEndpoint<C> = C extends ApiEndpointQuery<infer T, any>
+  ? T
+  : unknown;
+type UserQueryData = UnwrapApiEndpoint<typeof endpoints.getUserById>;
+
+export const selectUserData = createSelector(
+  selectAuthApiQueries,
+  (queries) => {
+    const result: any = {};
+    Object.entries(queries)
+      .map(([key, value]) => {
+        const match = key.match(/getUserById\("(.*)"\)/);
+        if (match) {
+          return [match[1], value];
+        }
+      })
+      .filter(Boolean)
+      .forEach(([key, value]: any) => {
+        result[key] = value;
+      });
+    return result as Record<string, QuerySubState<UserQueryData>>;
+  }
 );
 
 export const selectSelfUserId = createSelector(
@@ -151,35 +184,35 @@ export const selectSettingsColor = createSelector(
 
 export const selectCurrentTheme = createSelector(
   selectLocation,
-  selectThemes,
   selectTurnIndex,
   selectPlayers,
-  selectSelfUserId,
   selectSettingsShowing,
-  (location, themes, turn, players, self, showing) =>
+  selectUserData,
+  (location, turn, players, showing, userData) =>
     showing
       ? customTheme
-      : // : location?.pathname.startsWith('/room/') ||
-        //   location?.pathname.startsWith('/spectate/')
-        // ? themes[players[turn]?.user_id || '']
-        undefined
+      : location?.pathname.startsWith('/room/') ||
+        location?.pathname.startsWith('/spectate/')
+      ? userData[players[turn]?.user_id || '']?.data?.donor
+        ? customTheme
+        : undefined
+      : undefined
 );
 
 export const selectCurrentColors = createSelector(
   selectLocation,
-  selectThemes,
   selectTurnIndex,
   selectPlayers,
-  selectSelfUserId,
   selectSettingsShowing,
   selectSettingsColor,
-  (location, themes, turn, players, self, showing, color) =>
+  selectUserData,
+  (location, turn, players, showing, color, userData) =>
     showing
       ? color
-      : // : location?.pathname.startsWith('/room/') ||
-        //   location?.pathname.startsWith('/spectate/')
-        // ? themes[players[turn]?.user_id || '']
-        undefined
+      : location?.pathname.startsWith('/room/') ||
+        location?.pathname.startsWith('/spectate/')
+      ? userData[players[turn]?.user_id || '']?.data?.color
+      : undefined
 );
 
 export const selectSelf = createSelector(
