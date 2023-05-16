@@ -8,6 +8,7 @@ import {
   selectIs3d,
   selectIsReset,
   selectIsSpectator,
+  selectSelfUserId,
   selectSomebodyIsNice,
   selectTurnIndex,
   selectWinner,
@@ -17,12 +18,14 @@ import { Player } from '../types/store_types';
 import ChatBox from '../ui/chat';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
-import { HelpIcon, DiceIcon, HomeIcon } from '../ui/icons/help';
+import { HelpIcon, GearIcon, HomeIcon } from '../ui/icons/help';
 import { useStore } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
 import { ToggleSwitch } from 'ui/buttons/toggle';
 import { Slider } from 'ui/buttons/slider';
+import { Button } from 'ui/buttons/button';
+import { useGetUserByIdQuery, useSetUserColorMutation } from 'api/auth';
 
 interface Props {
   winner?: Player;
@@ -39,6 +42,21 @@ const flexColumn = css({
   flexDirection: 'column',
 });
 
+const SettingsContainer = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+});
+
+const SaveButtonWrapper = styled('div', {
+  display: 'flex',
+  height: '100%',
+  alignItems: 'flex-end',
+  justifyContent: 'center',
+  '& button': {
+    maxWidth: '30%',
+  },
+});
 const FloatingButtonBar = styled('div', {
   '@bp1': {
     position: 'absolute',
@@ -48,6 +66,12 @@ const FloatingButtonBar = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: 8,
+});
+const PlsDonate = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  marginTop: 16,
+  gap: 12,
 });
 
 const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
@@ -101,11 +125,11 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
       )}
 
       <FloatingButtonBar id="floating-button-bar">
-        <HelpIcon onClick={() => setShowHelp((help) => !help)} />
-        <DiceIcon
+        <HomeIcon onClick={() => navigate('/')} />
+        <GearIcon
           onClick={() => store.dispatch({ type: 'TOGGLE_SHOW_SETTINGS' })}
         />
-        <HomeIcon onClick={() => navigate('/')} />
+        <HelpIcon onClick={() => setShowHelp((help) => !help)} />
       </FloatingButtonBar>
 
       {showSettings ? (
@@ -127,9 +151,18 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
 };
 
 const Settings: React.FC<{}> = () => {
+  const [trigger] = useSetUserColorMutation();
+  const user_id = useSelector(selectSelfUserId);
+  const { data } = useGetUserByIdQuery(user_id || '');
+  const socket = useSelector((state: ReduxState) => state.connection.socket);
   const dispatch = useDispatch();
   const dice3d = useSelector((state: ReduxState) => state.settings.sick3dmode);
   const color = useSelector((state: ReduxState) => state.settings.color);
+  const onSave = React.useCallback(() => {
+    trigger(color).then(() =>
+      socket?.send(JSON.stringify({ type: 'refetch_player', user_id }))
+    );
+  }, [trigger, color, socket, user_id]);
   const onHueChange = React.useCallback(
     (e) =>
       dispatch({
@@ -148,7 +181,7 @@ const Settings: React.FC<{}> = () => {
   );
 
   return (
-    <div>
+    <SettingsContainer>
       <h1>Settings</h1>
       <ToggleSwitch
         id="dice3d"
@@ -158,23 +191,38 @@ const Settings: React.FC<{}> = () => {
           dispatch({ type: 'TOGGLE_3D' });
         }}
       />
-      <Slider
-        desc="hue"
-        min={0}
-        max={360}
-        value={color.hue}
-        id="hue"
-        onChange={onHueChange}
-      />
-      <Slider
-        desc="saturation"
-        min={0}
-        max={80}
-        value={color.sat}
-        id="saturation"
-        onChange={onSatChange}
-      />
-    </div>
+      {data?.donor ? (
+        <>
+          <Slider
+            desc="hue"
+            min={0}
+            max={360}
+            value={color.hue}
+            id="hue"
+            onChange={onHueChange}
+          />
+          <Slider
+            desc="saturation"
+            min={0}
+            max={80}
+            value={color.sat}
+            id="saturation"
+            onChange={onSatChange}
+          />
+        </>
+      ) : null}
+      <SaveButtonWrapper>
+        <Button onClick={onSave}>Save</Button>
+      </SaveButtonWrapper>
+      {data?.donor && user_id ? (
+        <PlsDonate>
+          <hr />
+          <h2>Enjoying rolly cubes?</h2>
+          <p>Consider donating to unlock additional customization options.</p>
+          <Button>Donate</Button>
+        </PlsDonate>
+      ) : null}
+    </SettingsContainer>
   );
 };
 

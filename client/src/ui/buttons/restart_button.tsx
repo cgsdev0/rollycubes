@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { selectIsSpectator } from 'selectors/game_selectors';
 import { ReduxState } from '../../store';
-import './buttons.css';
+import { Button } from './button';
 
 interface Props {
   socket?: WebSocket;
@@ -15,11 +15,7 @@ const RollButton: React.FC<Props> = ({ socket, isSpectator }) => {
       socket.send(JSON.stringify({ type: 'restart' }));
     }
   };
-  return isSpectator ? null : (
-    <button className="topButton" onClick={onClick}>
-      New Game
-    </button>
-  );
+  return isSpectator ? null : <Button onClick={onClick}>New Game</Button>;
 };
 
 const mapStateToProps = (state: ReduxState) => {

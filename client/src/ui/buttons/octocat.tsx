@@ -7,6 +7,9 @@ const octocatWave = keyframes({
 });
 
 const octocat = css({
+  '& .octo-body,.octo-arm': {
+    fill: '$gray900',
+  },
   '&:hover .octo-arm': {
     animation: `${octocatWave} 560ms ease-in-out`,
   },
