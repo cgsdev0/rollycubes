@@ -62,6 +62,7 @@ export const globalStyles = globalCss({
   '*': {
     margin: 0,
     padding: 0,
+    color: '$primary',
     transition: 'background-color 0.4s 0s, color 0.4s 0s, border-color 0.4s 0s',
   },
   'h1,header,h2,h3,h4,h5,p,td,th,span': {
