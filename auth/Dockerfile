@@ -1,18 +1,25 @@
-FROM rust:1.69-alpine as build
-RUN apk add musl-dev pkgconfig make perl
+FROM lukemathwalker/cargo-chef:latest-rust-alpine as planner
+RUN apk add musl-dev openssl-dev
 
 WORKDIR /usr/build
 
-COPY migrations migrations
-COPY src src
-COPY .cargo .cargo
-COPY Cargo.* .
-COPY achievements.json .
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
+FROM lukemathwalker/cargo-chef:latest-rust-alpine as builder
+RUN apk add musl-dev openssl-dev
+
+WORKDIR /usr/build
+
+COPY --from=planner /usr/build/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+
+COPY . .
 RUN cargo build --release
 
 FROM alpine:edge as prod
+RUN apk add openssl-dev
 
-COPY --from=build /usr/build/target/release/auth .
+COPY --from=builder /usr/build/target/release/auth .
 
 ENTRYPOINT ["./auth"]
