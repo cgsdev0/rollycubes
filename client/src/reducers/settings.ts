@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { CheatsAction } from 'actions/settings';
+import { endpoints } from 'api/auth';
 
 export interface SettingsState {
   cheats: boolean;
@@ -29,14 +30,24 @@ export const settingsReducer = createReducer<SettingsState>(
     },
   },
   (builder) => {
+    builder.addCase('TOGGLE_3D', (state, action) => {
+      state.sick3dmode = !state.sick3dmode;
+      // TODO: remove these side effects
+      if (!state.sick3dmode) {
+        localStorage.setItem('3d_mode', 'false');
+      } else {
+        localStorage.removeItem('3d_mode');
+      }
+    });
     builder
-      .addCase('TOGGLE_3D', (state, action) => {
-        state.sick3dmode = !state.sick3dmode;
-        // TODO: remove these side effects
-        if (!state.sick3dmode) {
-          localStorage.setItem('3d_mode', 'false');
-        } else {
-          localStorage.removeItem('3d_mode');
+      .addCase('authApi/executeQuery/fulfilled', (state, action: any) => {
+        if (endpoints.getUserById.matchFulfilled(action)) {
+          console.log({ action });
+          if (
+            action.payload.id === (action as any).MIDDLEWARE_INJECTED_USER_ID
+          ) {
+            state.color = action.payload.color;
+          }
         }
       })
       .addCase('CHEATS', (state, action: CheatsAction) => {

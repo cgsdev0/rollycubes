@@ -188,8 +188,9 @@ export const selectCurrentTheme = createSelector(
   selectPlayers,
   selectSettingsShowing,
   selectUserData,
-  (location, turn, players, showing, userData) =>
-    showing
+  selectSelfUserId,
+  (location, turn, players, showing, userData, self_id) =>
+    showing && userData[self_id || '']?.data?.donor
       ? customTheme
       : location?.pathname.startsWith('/room/') ||
         location?.pathname.startsWith('/spectate/')

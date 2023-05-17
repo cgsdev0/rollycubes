@@ -1,10 +1,14 @@
 import { useGetRefreshTokenQuery } from 'api/auth';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { ReduxState } from 'store';
 
 export const AuthProvider: React.FC<{}> = ({ children }) => {
   const { isLoading, data, error } = useGetRefreshTokenQuery();
   const dispatch = useDispatch();
+  const loaded = useSelector<ReduxState>(
+    (state) => state.auth.authToken !== undefined
+  );
 
   React.useEffect(() => {
     if (isLoading) return;
@@ -15,6 +19,6 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
     }
   }, [isLoading, data, error]);
 
-  if (isLoading) return null;
+  if (!loaded) return null;
   return <>{children}</>;
 };

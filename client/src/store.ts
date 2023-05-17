@@ -1,4 +1,11 @@
-import { configureStore, getDefaultMiddleware, Store } from '@reduxjs/toolkit';
+import {
+  AnyAction,
+  configureStore,
+  Dispatch,
+  getDefaultMiddleware,
+  Middleware,
+  Store,
+} from '@reduxjs/toolkit';
 import { authApi } from 'api/auth';
 import { themesReducer } from 'reducers/themes';
 import { authReducer } from './reducers/auth';
@@ -19,6 +26,12 @@ const customizedMiddleware = getDefaultMiddleware({
   serializableCheck: false,
 });
 
+const userIdMiddleware: Middleware<{}, any, Dispatch<AnyAction>> =
+  (api) => (next) => (action) => {
+    const user_id = api.getState()?.auth?.userData?.user_id;
+    return next({ ...action, ...{ MIDDLEWARE_INJECTED_USER_ID: user_id } });
+  };
+
 export const store = configureStore({
   reducer: {
     router: routerReducer,
@@ -31,7 +44,11 @@ export const store = configureStore({
     themes: themesReducer,
     [authApi.reducerPath]: authApi.reducer,
   },
-  middleware: customizedMiddleware.concat(authApi.middleware, routerMiddleware),
+  middleware: customizedMiddleware.concat(
+    authApi.middleware,
+    routerMiddleware,
+    userIdMiddleware
+  ),
 });
 
 export const history = createReduxHistory(store);
