@@ -8,6 +8,7 @@ use axum_extra::extract::cookie::{Cookie, CookieJar};
 use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
 use serde_repr::*;
+use std::fs;
 use time::{Duration, OffsetDateTime, PrimitiveDateTime};
 use twitch_oauth2::{AccessToken, UserToken};
 use uuid::Uuid;
@@ -80,6 +81,80 @@ pub struct User {
 pub struct LoginPayload {
     twitch_access_token: String,
     anon_id: Option<String>,
+}
+
+lazy_static! {
+    static ref SQUARE_ACCESS_TOKEN: String = fs::read_to_string("./secrets/.square_access_token")
+        .expect("Should have been able to read the file")
+        .trim()
+        .to_string();
+    static ref SQUARE_API_URL: String = fs::read_to_string("./secrets/.square_api_url")
+        .expect("Should have been able to read the file")
+        .trim()
+        .to_string();
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SquareCheckoutResponse {
+    payment_link: PaymentLink,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PaymentLink {
+    id: String,
+    version: i64,
+    description: String,
+    order_id: String,
+    url: String,
+    long_url: String,
+    created_at: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Order {
+    id: String,
+    location_id: String,
+    source: Source,
+    net_amounts: NetAmounts,
+    created_at: String,
+    updated_at: String,
+    state: String,
+    version: i64,
+    total_money: PriceMoney,
+    total_tax_money: PriceMoney,
+    total_discount_money: PriceMoney,
+    total_tip_money: PriceMoney,
+    total_service_charge_money: PriceMoney,
+    net_amount_due_money: PriceMoney,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LineItem {
+    uid: String,
+    name: String,
+    quantity: String,
+    item_type: String,
+    base_price_money: PriceMoney,
+    variation_total_price_money: PriceMoney,
+    gross_sales_money: PriceMoney,
+    total_tax_money: PriceMoney,
+    total_discount_money: PriceMoney,
+    total_money: PriceMoney,
+    total_service_charge_money: PriceMoney,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct NetAmounts {
+    total_money: PriceMoney,
+    tax_money: PriceMoney,
+    discount_money: PriceMoney,
+    tip_money: PriceMoney,
+    service_charge_money: PriceMoney,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Source {
+    name: String,
 }
 
 async fn login_helper(
@@ -347,6 +422,98 @@ pub async fn user_self(
     let access_token = headers.get("x-access-token").ok_or(RouteError::Forbidden)?;
     let verified_token = s.jwt.verify(access_token.to_str().unwrap())?;
     user_by_id(Path(verified_token.claims.user_id), State(s)).await
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DonateResponse {
+    link: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PriceMoney {
+    currency: String,
+    amount: i64,
+}
+#[derive(Serialize, Deserialize)]
+pub struct QuickPayOptions {
+    location_id: String,
+    name: String,
+    price_money: PriceMoney,
+}
+#[derive(Serialize, Deserialize)]
+pub struct AcceptedPaymentMethods {
+    afterpay_clearpay: Option<bool>,
+    apple_pay: Option<bool>,
+    cash_app_pay: Option<bool>,
+    google_pay: Option<bool>,
+}
+#[derive(Serialize, Deserialize)]
+pub struct CheckoutOptions {
+    accepted_payment_methods: AcceptedPaymentMethods,
+    allow_tipping: Option<bool>,
+}
+#[derive(Serialize, Deserialize)]
+pub struct SquareCheckoutPayload {
+    quick_pay: QuickPayOptions,
+    checkout_options: CheckoutOptions,
+    description: Option<String>,
+}
+#[axum::debug_handler]
+pub async fn donate(
+    headers: HeaderMap,
+    State(s): State<RouterState>,
+) -> Result<Json<DonateResponse>, RouteError> {
+    let db_client = s.pool.get().await?;
+    let access_token = headers.get("x-access-token").ok_or(RouteError::Forbidden)?;
+    let verified_token = s.jwt.verify(access_token.to_str().unwrap())?;
+    let user_id = verified_token.claims.user_id;
+    let client = reqwest::Client::new();
+    let response = client
+        .post(SQUARE_API_URL.to_string() + "/v2/online-checkout/payment-links")
+        .header(
+            "Authorization".to_string(),
+            "Bearer ".to_string() + &SQUARE_ACCESS_TOKEN,
+        )
+        .body(serde_json::to_string(&SquareCheckoutPayload {
+            quick_pay: QuickPayOptions {
+                location_id: "LTB6VVK0S2WNP".to_string(),
+                name: "Rolly Cubes Premium".to_string(),
+                price_money: PriceMoney {
+                    amount: 500,
+                    currency: "USD".to_string(),
+                },
+            },
+            checkout_options: CheckoutOptions {
+                accepted_payment_methods: AcceptedPaymentMethods {
+                    afterpay_clearpay: Some(true),
+                    apple_pay: Some(true),
+                    cash_app_pay: Some(true),
+                    google_pay: Some(true),
+                },
+                allow_tipping: None,
+            },
+            description: Some(
+                "Donation to rolly cubes that provides some additional customization options."
+                    .to_string(),
+            ),
+        })?)
+        .send()
+        .await?
+        .text()
+        .await?;
+    let r: SquareCheckoutResponse = serde_json::from_str(&response)?;
+    // 2. insert user_id + payment_id into payments table
+    db_client
+        .execute(
+            "INSERT INTO payment (user_id, payment_id) VALUES ($1::UUID, $2)",
+            &[&user_id, &r.payment_link.order_id],
+        )
+        .await?;
+
+    // 3. return link
+    Ok(Json(DonateResponse {
+        link: r.payment_link.long_url,
+    }))
 }
 
 #[axum::debug_handler]

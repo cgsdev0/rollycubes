@@ -1,5 +1,5 @@
 use auth::migrations::*;
-use auth::routes::{server_routes, user_routes};
+use auth::routes::{server_routes, user_routes, webhook_routes};
 use auth::{Jwt, RouterState};
 use axum::http::{HeaderName, HeaderValue, Method};
 use axum::{
@@ -65,6 +65,7 @@ async fn main() {
         .route("/logout", post(user_routes::logout))
         .route("/refresh_token", get(user_routes::refresh_token))
         .route("/me", get(user_routes::user_self))
+        .route("/donate", post(user_routes::donate))
         .route(
             "/users/update_setting",
             post(user_routes::update_user_setting),
@@ -81,10 +82,13 @@ async fn main() {
         )
         .layer(axum::middleware::from_fn(server_routes::auth_layer));
 
+    let webhook_routes = Router::new().route("/square", post(webhook_routes::square));
+
     let app = Router::new()
         .nest("/", user_routes)
         .nest("/server", server_routes)
         .layer(cors)
+        .nest("/webhooks", webhook_routes)
         .layer(CatchPanicLayer::new())
         .with_state(router_state);
 

@@ -25,7 +25,11 @@ import { PopText } from '../ui/poptext';
 import { ToggleSwitch } from 'ui/buttons/toggle';
 import { Slider } from 'ui/buttons/slider';
 import { Button } from 'ui/buttons/button';
-import { useGetUserByIdQuery, useSetUserColorMutation } from 'api/auth';
+import {
+  useDonateMutation,
+  useGetUserByIdQuery,
+  useSetUserColorMutation,
+} from 'api/auth';
 
 interface Props {
   winner?: Player;
@@ -152,6 +156,14 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
 
 const Settings: React.FC<{}> = () => {
   const [trigger] = useSetUserColorMutation();
+  const [donate, { data: donateData }] = useDonateMutation();
+
+  React.useEffect(() => {
+    if (donateData) {
+      window.open(donateData.link, '_blank', 'noreferrer');
+    }
+  }, [donateData]);
+
   const user_id = useSelector(selectSelfUserId);
   const { data } = useGetUserByIdQuery(user_id || '');
   const socket = useSelector((state: ReduxState) => state.connection.socket);
@@ -214,12 +226,12 @@ const Settings: React.FC<{}> = () => {
       <SaveButtonWrapper>
         <Button onClick={onSave}>Save</Button>
       </SaveButtonWrapper>
-      {data?.donor && user_id ? (
+      {!data?.donor && user_id ? (
         <PlsDonate>
           <hr />
           <h2>Enjoying rolly cubes?</h2>
           <p>Consider donating to unlock additional customization options.</p>
-          <Button>Donate</Button>
+          <Button onClick={() => donate()}>Donate</Button>
         </PlsDonate>
       ) : null}
     </SettingsContainer>

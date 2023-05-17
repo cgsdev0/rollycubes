@@ -60,6 +60,10 @@ type ColorSettings = {
   sat: number;
 };
 
+type DonateData = {
+  link: string;
+};
+
 // Define a service using a base URL and expected endpoints
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -80,6 +84,13 @@ export const authApi = createApi({
     }),
     getUserById: builder.query<UserData, string>({
       query: (id: string) => ({ url: `users/${id}`, mode: 'cors' }),
+    }),
+    donate: builder.mutation<DonateData, void>({
+      query: () => ({
+        url: `donate`,
+        mode: 'cors',
+        method: 'POST',
+      }),
     }),
     setUserColor: builder.mutation<void, ColorSettings>({
       query: (settings) => ({
@@ -102,6 +113,7 @@ export const {
   useGetAchievementListQuery,
   useGetUserByIdQuery,
   useSetUserColorMutation,
+  useDonateMutation,
 } = authApi;
 
 type Action = { type: string } & object;

@@ -18,6 +18,7 @@ pub mod migrations;
 pub mod routes {
     pub mod server_routes;
     pub mod user_routes;
+    pub mod webhook_routes;
 }
 
 #[derive(Error, Debug)]
@@ -36,6 +37,10 @@ pub enum RouteError {
     TwitchError(#[from] ClientRequestError<reqwest::Error>),
     #[error("invalid type of dice")]
     DiceTypeError(#[from] int_enum::IntEnumError<DiceType>),
+    #[error("some upstream service is broken, sorry")]
+    HttpError(#[from] reqwest::Error),
+    #[error("json serialization error")]
+    SerdeJsonError(#[from] serde_json::Error),
     #[error("")]
     OK,
     #[error("you can't do that")]

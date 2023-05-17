@@ -1,3 +1,4 @@
+import { useDonateMutation } from 'api/auth';
 import React from 'react';
 import { connect, useSelector } from 'react-redux';
 import { styled } from 'stitches.config';
