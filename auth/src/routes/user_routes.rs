@@ -92,6 +92,10 @@ lazy_static! {
         .expect("Should have been able to read the file")
         .trim()
         .to_string();
+    static ref SQUARE_LOCATION_ID: String = fs::read_to_string("./secrets/.square_location_id")
+        .expect("Should have been able to read the file")
+        .trim()
+        .to_string();
 }
 
 #[derive(Serialize, Deserialize)]
@@ -476,7 +480,7 @@ pub async fn donate(
         )
         .body(serde_json::to_string(&SquareCheckoutPayload {
             quick_pay: QuickPayOptions {
-                location_id: "LTB6VVK0S2WNP".to_string(),
+                location_id: SQUARE_LOCATION_ID.to_string(),
                 name: "Rolly Cubes Premium".to_string(),
                 price_money: PriceMoney {
                     amount: 500,
