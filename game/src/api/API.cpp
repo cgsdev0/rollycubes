@@ -394,6 +394,7 @@ namespace nlohmann {
         x.color = j.at("color").get<API::Color>();
         x.created_date = j.at("createdDate").get<std::string>();
         x.dice = j.at("dice").get<API::Dice>();
+        x.donor = j.at("donor").get<bool>();
         x.id = j.at("id").get<std::string>();
         x.image_url = API::get_optional<std::string>(j, "image_url");
         x.stats = API::get_optional<API::UserStats>(j, "stats");
@@ -406,6 +407,7 @@ namespace nlohmann {
         j["color"] = x.color;
         j["createdDate"] = x.created_date;
         j["dice"] = x.dice;
+        j["donor"] = x.donor;
         j["id"] = x.id;
         j["image_url"] = x.image_url;
         j["stats"] = x.stats;

@@ -19,6 +19,7 @@ void fromString(const std::string &str);
         Color color;
         std::string created_date;
         Dice dice;
+        bool donor;
         std::string id;
         std::shared_ptr<std::string> image_url;
         std::shared_ptr<UserStats> stats;
