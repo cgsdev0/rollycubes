@@ -14,7 +14,7 @@ import {
   selectWinner,
 } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
-import { Player } from '../types/store_types';
+import { DiceType, Player } from '../types/store_types';
 import ChatBox from '../ui/chat';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
@@ -22,12 +22,13 @@ import { HelpIcon, GearIcon, HomeIcon } from '../ui/icons/help';
 import { useStore } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
-import { ToggleSwitch } from 'ui/buttons/toggle';
+import { Select, ToggleSwitch } from 'ui/buttons/toggle';
 import { Slider } from 'ui/buttons/slider';
 import { Button } from 'ui/buttons/button';
 import {
   useDonateMutation,
   useGetUserByIdQuery,
+  useSetDiceTypeMutation,
   useSetUserColorMutation,
 } from 'api/auth';
 
@@ -156,6 +157,7 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
 
 const Settings: React.FC<{}> = () => {
   const [trigger] = useSetUserColorMutation();
+  const [setDiceType] = useSetDiceTypeMutation();
   const [donate, { data: donateData }] = useDonateMutation();
 
   React.useEffect(() => {
@@ -170,10 +172,13 @@ const Settings: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const dice3d = useSelector((state: ReduxState) => state.settings.sick3dmode);
   const color = useSelector((state: ReduxState) => state.settings.color);
-  const onSave = React.useCallback(() => {
-    trigger(color).then(() =>
-      socket?.send(JSON.stringify({ type: 'refetch_player', user_id }))
-    );
+  const dice_type = useSelector(
+    (state: ReduxState) => state.settings.dice_type
+  );
+  const onSave = React.useCallback(async () => {
+    await trigger(color);
+    await setDiceType(dice_type);
+    socket?.send(JSON.stringify({ type: 'refetch_player', user_id }));
   }, [trigger, color, socket, user_id]);
   const onHueChange = React.useCallback(
     (e) =>
@@ -191,6 +196,14 @@ const Settings: React.FC<{}> = () => {
       }),
     [dispatch]
   );
+  const onDiceTypeChange = React.useCallback(
+    (e) =>
+      dispatch({
+        type: 'SET_DICE_TYPE',
+        dice_type: Number.parseInt(e.target.value),
+      }),
+    [dispatch]
+  );
 
   return (
     <SettingsContainer>
@@ -203,8 +216,19 @@ const Settings: React.FC<{}> = () => {
           dispatch({ type: 'TOGGLE_3D' });
         }}
       />
+      <Select
+        options={[
+          { value: DiceType.D6, label: 'D6' },
+          { value: DiceType.D20, label: 'D20' },
+        ]}
+        value={dice_type.toString()}
+        id="dice_type"
+        label="Dice shape"
+        onChange={onDiceTypeChange}
+      />
       {data?.donor ? (
         <>
+          <h2>Color Scheme</h2>
           <Slider
             desc="hue"
             min={0}

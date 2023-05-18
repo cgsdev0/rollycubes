@@ -1,6 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { CheatsAction } from 'actions/settings';
 import { endpoints } from 'api/auth';
+import { DiceType } from 'types/store_types';
 
 export interface SettingsState {
   cheats: boolean;
@@ -11,6 +12,7 @@ export interface SettingsState {
     hue: number;
     sat: number;
   };
+  dice_type: DiceType;
 }
 
 const PROD_AUTH_SERVICE = 'https://auth.rollycubes.com/';
@@ -28,6 +30,7 @@ export const settingsReducer = createReducer<SettingsState>(
       hue: 0,
       sat: 80,
     },
+    dice_type: DiceType.D6,
   },
   (builder) => {
     builder.addCase('TOGGLE_3D', (state, action) => {
@@ -47,6 +50,7 @@ export const settingsReducer = createReducer<SettingsState>(
             action.payload.id === (action as any).MIDDLEWARE_INJECTED_USER_ID
           ) {
             state.color = action.payload.color;
+            state.dice_type = action.payload.dice.type;
           }
         }
       })
@@ -58,6 +62,9 @@ export const settingsReducer = createReducer<SettingsState>(
       })
       .addCase('SET_CUSTOM_SAT', (state, action: any) => {
         state.color.sat = action.sat;
+      })
+      .addCase('SET_DICE_TYPE', (state, action: any) => {
+        state.dice_type = action.dice_type;
       })
       .addCase('TOGGLE_SHOW_SETTINGS', (state, action) => {
         state.showSettings = !state.showSettings;

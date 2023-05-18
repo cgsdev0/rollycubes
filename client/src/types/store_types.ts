@@ -72,7 +72,7 @@ export type AchievementData = {
   max_progress: integer;
 };
 
-const enum DiceType {
+export const enum DiceType {
   D6,
   D20,
 }

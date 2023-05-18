@@ -65,6 +65,35 @@ interface Props {
   onChange: React.ChangeEventHandler<HTMLInputElement>;
 }
 
+interface SelectProps {
+  options: Array<{ value: string | number; label: string }>;
+  id: string;
+  label: string;
+  value?: string;
+  onChange: React.ChangeEventHandler<HTMLSelectElement>;
+}
+
+export const Select: React.FC<SelectProps> = ({
+  options,
+  id,
+  label,
+  value,
+  onChange,
+}) => {
+  return (
+    <Fieldset>
+      <select id={id} value={value} onChange={onChange}>
+        {options.map((opt) => (
+          <option value={opt.value} key={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      <label htmlFor={id}>{label}</label>
+    </Fieldset>
+  );
+};
+
 export const ToggleSwitch: React.FC<Props> = ({
   id,
   desc,

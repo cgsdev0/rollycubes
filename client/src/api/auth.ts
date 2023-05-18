@@ -11,6 +11,7 @@ import { ReduxState } from 'store';
 import {
   AchievementData,
   AchievementUnlock,
+  DiceType,
   UserData,
 } from 'types/store_types';
 import { RollMsg, WinMsg } from 'types/server_messages';
@@ -92,6 +93,14 @@ export const authApi = createApi({
         method: 'POST',
       }),
     }),
+    setDiceType: builder.mutation<void, DiceType>({
+      query: (type) => ({
+        url: `users/update_setting`,
+        mode: 'cors',
+        method: 'POST',
+        body: { setting: 'DiceType', dice_type: type },
+      }),
+    }),
     setUserColor: builder.mutation<void, ColorSettings>({
       query: (settings) => ({
         url: `users/update_setting`,
@@ -114,6 +123,7 @@ export const {
   useGetUserByIdQuery,
   useSetUserColorMutation,
   useDonateMutation,
+  useSetDiceTypeMutation,
 } = authApi;
 
 type Action = { type: string } & object;
