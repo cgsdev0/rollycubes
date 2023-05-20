@@ -20,6 +20,6 @@ RUN cargo build
 FROM alpine:edge as prod
 RUN apk add openssl-dev
 
-COPY --from=builder /usr/build/target/release/auth .
+COPY --from=builder /usr/build/target/debug/auth .
 
 ENTRYPOINT ["./auth"]
