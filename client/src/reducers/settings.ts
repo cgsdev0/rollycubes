@@ -16,7 +16,7 @@ export interface SettingsState {
 }
 
 const PROD_AUTH_SERVICE = 'https://auth.rollycubes.com/';
-const LOCAL_AUTH_SERVICE = 'http://localhost:3031/';
+const LOCAL_AUTH_SERVICE = 'https://auth.rollycubes.live/';
 
 export const settingsReducer = createReducer<SettingsState>(
   {
