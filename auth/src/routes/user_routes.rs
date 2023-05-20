@@ -191,7 +191,7 @@ VALUES ($1::UUID, $2::UUID)",
                 .secure(true)
                 .http_only(true)
                 .same_site(axum_extra::extract::cookie::SameSite::None)
-                .path("/refresh_token")
+                .path("/")
                 .expires(exp)
                 .finish(),
         ),
