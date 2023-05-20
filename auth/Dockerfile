@@ -12,10 +12,10 @@ RUN apk add musl-dev openssl-dev
 WORKDIR /usr/build
 
 COPY --from=planner /usr/build/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json
+RUN cargo chef cook --recipe-path recipe.json
 
 COPY . .
-RUN cargo build --release
+RUN cargo build
 
 FROM alpine:edge as prod
 RUN apk add openssl-dev
