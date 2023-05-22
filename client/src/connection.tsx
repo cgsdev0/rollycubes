@@ -5,21 +5,22 @@ import { NavigateFunction } from 'react-router-dom';
 import { ReduxState } from './store';
 import { Location } from 'react-router-dom';
 import { endpoints, optimisticUpdates } from 'api/auth';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import { selectCurrentDiceType } from 'selectors/game_selectors';
 
 interface Props {
-  room: string
-  mode: string
-  navigate: NavigateFunction
-  location: Location
-  authToken?: string | null
+  room: string;
+  mode: string;
+  navigate: NavigateFunction;
+  location: Location;
+  authToken?: string | null;
 }
 
 export interface DecodedUserJWT {
-  display_name: string
-  exp: number
-  iat: number
-  user_id: string
+  display_name: string;
+  exp: number;
+  iat: number;
+  user_id: string;
 }
 
 class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
@@ -51,12 +52,12 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
           type: 'authenticate',
           access_token: this.props.authToken,
         })
-      )
+      );
     } else if (this.websocket && name) {
       this.websocket.send(JSON.stringify({ type: 'update_name', name }));
     }
     //this.websocket!.send(JSON.stringify({ type: "roll", n: 0, msg: "Hello world!" }))
-  }
+  };
 
   onMessage = (e: MessageEvent) => {
     if (e.data === 'cookie') {
@@ -64,7 +65,7 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
       if (this.websocket) this.websocket.close();
       return;
     }
-    const data: any = JSON.parse(e.data)
+    const data: any = JSON.parse(e.data);
     if (!data) {
       console.error('empty action from server');
     } else if ('error' in data) {
@@ -83,10 +84,21 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
         }) as any
       );
     } else {
+      if (data.type === 'roll') {
+        document.dispatchEvent(
+          new CustomEvent<any>('roll', {
+            detail: {
+              rolls: data.rolls,
+              turn_index: this.props.store.getState().game.turn_index,
+              dice_type: selectCurrentDiceType(this.props.store.getState()),
+            },
+          })
+        );
+      }
       this.props.store.dispatch(data);
       optimisticUpdates(data, this.props.store);
     }
-  }
+  };
 
   onError = (e: any) => {
     console.error('oh god why', e);
@@ -117,18 +129,18 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
       this.websocket.addEventListener('error', this.onError);
       this.props.store.dispatch({ type: 'WEBSOCKET', socket: this.websocket });
     }
-  }
+  };
 
   componentDidMount() {
-    this.openSocket()
+    this.openSocket();
   }
 
   componentDidUpdate(prev: Props) {
     if (prev.room !== this.props.room) {
       if (this.websocket) {
-        this.websocket.close()
+        this.websocket.close();
       }
-      this.openSocket()
+      this.openSocket();
     }
   }
 
@@ -136,7 +148,7 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
     this.props.store.dispatch({ type: 'WEBSOCKET', socket: undefined });
     if (this.websocket) {
       if (this.timer) {
-        clearTimeout(this.timer)
+        clearTimeout(this.timer);
       }
       this.websocket.removeEventListener('close', this.onClose);
       this.websocket.removeEventListener('open', this.onOpen);
@@ -146,13 +158,13 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
   }
 
   render() {
-    return null
+    return null;
   }
 }
 
 const mapStateToProps = (state: ReduxState) => {
   return {
     authToken: state.auth.authToken,
-  }
-}
-export default connect(mapStateToProps)(Connection)
+  };
+};
+export default connect(mapStateToProps)(Connection);
