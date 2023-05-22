@@ -4,7 +4,7 @@ import {
   createSelectorCreator,
 } from 'reselect';
 import { customTheme } from 'stitches.config';
-import { UserData } from 'types/store_types';
+import { Achievement, DiceType, UserData } from 'types/store_types';
 import { ReduxState, selectState, TARGET_SCORES } from '../store';
 import { QuerySubState } from '@reduxjs/toolkit/dist/query/core/apiState';
 import { authApi, endpoints } from 'api/auth';
@@ -182,6 +182,22 @@ export const selectSettingsColor = createSelector(
   (state) => state.settings.color
 );
 
+export const selectSelfUserDataFromApi = createSelector(
+  selectUserData,
+  selectSelfUserId,
+  (userData, self_id) => userData[self_id || '']?.data
+);
+
+export const selectHasD20Unlocked = createSelector(
+  selectSelfUserDataFromApi,
+  (data) =>
+    Boolean(
+      data?.achievements?.some(
+        (achievement) => achievement.id === 'astronaut:1'
+      )
+    )
+);
+
 export const selectCurrentTheme = createSelector(
   selectLocation,
   selectTurnIndex,
@@ -198,6 +214,14 @@ export const selectCurrentTheme = createSelector(
         ? customTheme
         : undefined
       : undefined
+);
+
+export const selectCurrentDiceType = createSelector(
+  selectTurnIndex,
+  selectPlayers,
+  selectUserData,
+  (turn, players, userData) =>
+    userData[players[turn]?.user_id || '']?.data?.dice.type || DiceType.D6
 );
 
 export const selectCurrentColors = createSelector(

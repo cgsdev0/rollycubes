@@ -122,16 +122,6 @@ export const gameReducer = createReducer<GameState>(
         state.rolled3d = true;
       })
       .addCase('roll', (state, action: RollMsg) => {
-        // TODO: remove this side effect
-        document.dispatchEvent(
-          new CustomEvent<any>('roll', {
-            detail: {
-              rolls: action.rolls,
-              turn_index: state.turn_index,
-              dice_type: 1,
-            },
-          })
-        );
         state.rolled = true;
         state.rolled3d = false;
         state.rolls = action.rolls.map((value) => ({

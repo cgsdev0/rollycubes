@@ -155,10 +155,12 @@ const makeD20Creator = () => {
       diceMat = new BABYLON.StandardMaterial('d20mat', scene);
       diceMat.diffuseTexture = new BABYLON.Texture('/Icosphere.png', scene);
       diceMat.ambientColor = scene.ambientColor;
+      diceMat.roughness = 1.0;
+      diceMat.specularPower = 100;
     }
     const mesh = BABYLON.MeshBuilder.CreateIcoSphere(
       `d20-${i++}`,
-      { subdivisions: 1, updatable: true, radius: 0.4 },
+      { subdivisions: 1, updatable: true, radius: 0.45 },
       scene
     );
     // const result = await BABYLON.SceneLoader.ImportMeshAsync(
@@ -188,6 +190,8 @@ const makeDieCreator = () => {
       diceMat = new BABYLON.StandardMaterial('diceMat', scene);
       diceMat.diffuseTexture = new BABYLON.Texture('/dice.png', scene);
       diceMat.ambientColor = scene.ambientColor;
+      diceMat.roughness = 1.0;
+      diceMat.specularPower = 5000;
     }
     const diceUV = createDiceUVs(0);
     const die = BABYLON.MeshBuilder.CreateBox(

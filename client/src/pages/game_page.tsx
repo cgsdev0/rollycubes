@@ -5,6 +5,7 @@ import OnboardPage from './onboard_page';
 import { css, styled } from 'stitches.config';
 import Connection from '../connection';
 import {
+  selectHasD20Unlocked,
   selectIs3d,
   selectIsReset,
   selectIsSpectator,
@@ -167,6 +168,7 @@ const Settings: React.FC<{}> = () => {
   }, [donateData]);
 
   const user_id = useSelector(selectSelfUserId);
+  const hasD20Unlocked = useSelector(selectHasD20Unlocked);
   const { data } = useGetUserByIdQuery(user_id || '');
   const socket = useSelector((state: ReduxState) => state.connection.socket);
   const dispatch = useDispatch();
@@ -177,9 +179,10 @@ const Settings: React.FC<{}> = () => {
   );
   const onSave = React.useCallback(async () => {
     await trigger(color);
+    console.log(dice_type);
     await setDiceType(dice_type);
     socket?.send(JSON.stringify({ type: 'refetch_player', user_id }));
-  }, [trigger, color, socket, user_id]);
+  }, [trigger, color, socket, user_id, dice_type, setDiceType]);
   const onHueChange = React.useCallback(
     (e) =>
       dispatch({
@@ -219,7 +222,7 @@ const Settings: React.FC<{}> = () => {
       <Select
         options={[
           { value: DiceType.D6, label: 'D6' },
-          { value: DiceType.D20, label: 'D20' },
+          ...(hasD20Unlocked ? [{ value: DiceType.D20, label: 'D20' }] : []),
         ]}
         value={dice_type.toString()}
         id="dice_type"
