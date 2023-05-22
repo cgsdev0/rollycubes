@@ -125,7 +125,11 @@ export const gameReducer = createReducer<GameState>(
         // TODO: remove this side effect
         document.dispatchEvent(
           new CustomEvent<any>('roll', {
-            detail: { rolls: action.rolls, turn_index: state.turn_index },
+            detail: {
+              rolls: action.rolls,
+              turn_index: state.turn_index,
+              dice_type: 1,
+            },
           })
         );
         state.rolled = true;
