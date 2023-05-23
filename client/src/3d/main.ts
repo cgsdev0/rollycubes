@@ -96,7 +96,7 @@ const diceSize = 0.5;
 var slideIndex = 0;
 var rotIndex = 0;
 
-var d20UVs = [];
+var d20UVs: number[] = [];
 
 const d20UVMap = {
   16: 0,
@@ -138,13 +138,17 @@ const updateUVs = (
   localRoll: number,
   serverRoll: number
 ) => {
-  const index = (20 - localRoll + d20UVMap[serverRoll]) % 20;
-  const newUVs = d20UVs.slice(index * 6).concat(d20UVs.slice(0, index * 6));
-  die.updateVerticesData(BABYLON.VertexBuffer.UVKind, newUVs);
-  // die.updateVerticesData(
-  //   BABYLON.VertexBuffer.UVKind,
-  //   diceUVBuffers[(6 + serverRoll[i] - localRoll) % 6]
-  // )
+  if (die.id.startsWith('d20')) {
+    const index =
+      (20 - localRoll + d20UVMap[serverRoll as keyof typeof d20UVMap]) % 20;
+    const newUVs = d20UVs.slice(index * 6).concat(d20UVs.slice(0, index * 6));
+    die.updateVerticesData(BABYLON.VertexBuffer.UVKind, newUVs);
+  } else {
+    die.updateVerticesData(
+      BABYLON.VertexBuffer.UVKind,
+      diceUVBuffers[(6 + serverRoll - localRoll) % 6]
+    );
+  }
 };
 
 const makeD20Creator = () => {
@@ -278,16 +282,14 @@ export const initScene = async () => {
   if (sceneInit || !window.hasOwnProperty('Ammo')) {
     return;
   }
-  console.warn(typeof (window as any).Ammo);
   if (typeof (window as any).Ammo === 'function') {
-    console.warn('hhello');
     await (window as any).Ammo();
   }
   sceneInit = true;
   // const result = await window.fetch("http://localhost:3000/simulated.txt");
   // const data = await result.text();
   const diceCount = 2;
-  const dice: BABYLON.AbstractMesh[] = [];
+  const dice: BABYLON.Mesh[] = [];
   // let frame: any = {};
   // const splitted = data
   //   .split("\n")
@@ -359,7 +361,6 @@ export const initScene = async () => {
   const initDice = async (type: DiceType, scene: BABYLON.Scene) => {
     for (let i = 0; i < diceCount; ++i) {
       if (dice[i]) {
-        console.log(dice[i]);
         dice[i].dispose();
       }
       dice[i] = await createDie[type](scene);
@@ -562,7 +563,7 @@ export const initScene = async () => {
       scene!
         .getPhysicsEngine()!
         .getPhysicsPlugin()!
-        .executeStep(0.01667, impostors);
+        .executeStep(0.01667, impostors as any);
       if (
         wallIsOpen &&
         dice.every((die) => {
@@ -636,7 +637,6 @@ export const initScene = async () => {
         return;
       }
       const localRoll = quatToRoll(die, die.rotationQuaternion!);
-      console.log('locally rolled: ', localRoll);
       // die.updateVerticesData(
       //   BABYLON.VertexBuffer.UVKind,
       //   diceUVBuffers[(6 + serverRoll[i] - localRoll) % 6]

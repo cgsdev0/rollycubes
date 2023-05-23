@@ -16,13 +16,16 @@ export interface SettingsState {
 }
 
 const PROD_AUTH_SERVICE = 'https://auth.rollycubes.com/';
-const LOCAL_AUTH_SERVICE = 'https://auth.rollycubes.live/';
+const LOCAL_AUTH_SERVICE = 'http://localhost:3031/';
+const FANCY_LOCAL_AUTH_SERVICE = 'https://auth.rollycubes.live/';
 
 export const settingsReducer = createReducer<SettingsState>(
   {
     cheats: true,
     sick3dmode: localStorage.getItem('3d_mode') !== 'false',
-    authServiceOrigin: import.meta.env.VITE_LOCAL_AUTH
+    authServiceOrigin: import.meta.env.VITE_FANCY_LOCAL_AUTH
+      ? FANCY_LOCAL_AUTH_SERVICE
+      : import.meta.env.VITE_LOCAL_AUTH
       ? LOCAL_AUTH_SERVICE
       : PROD_AUTH_SERVICE,
     showSettings: false,
@@ -45,7 +48,6 @@ export const settingsReducer = createReducer<SettingsState>(
     builder
       .addCase('authApi/executeQuery/fulfilled', (state, action: any) => {
         if (endpoints.getUserById.matchFulfilled(action)) {
-          console.log({ action });
           if (
             action.payload.id === (action as any).MIDDLEWARE_INJECTED_USER_ID
           ) {
