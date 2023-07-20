@@ -17,7 +17,7 @@
 [[task]]
   id = "auth-db"
   type = "short"
-  cmd = "cd auth/devdb; docker-compose up -d"
+  cmd = "nc -zv localhost 5432 || (cd auth/devdb; docker-compose up -d)"
 
 [[task]]
   id = "client"
