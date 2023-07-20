@@ -1,0 +1,25 @@
+[[task]]
+  id = "dev"
+  type = "group"
+  dependencies = [ "auth", "game", "client" ]
+
+[[task]]
+  id = "game"
+  type = "long"
+  cmd = "cd game; ./run-server.sh"
+
+[[task]]
+  id = "auth"
+  type = "long"
+  cmd = "cd auth; cargo watch -x run"
+  dependencies = [ "auth-db" ]
+
+[[task]]
+  id = "auth-db"
+  type = "short"
+  cmd = "cd auth/devdb; docker-compose up -d"
+
+[[task]]
+  id = "client"
+  type = "long"
+  cmd = "cd client; npm run start"
