@@ -14,7 +14,7 @@ if ! ls /nix &> /dev/null; then
   echo 'export PATH="${PATH}:/nix/var/nix/profiles/default/bin"' > ~/.bashrc
 fi
 
-sudo -i nix develop -c bash << MEOW 
+sudo -R "$(pwd)" -i nix develop -c bash << MEOW 
 npm install;
 pushd auth;
 cargo build;
