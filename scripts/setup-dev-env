@@ -15,20 +15,20 @@ if ! which nix &> /dev/null; then
 fi
 
 # Install npm packages for main project
-nix develop -c npm install
+sudo -i nix develop -c npm install
 
 # Install and build crates for auth server
 pushd auth
-nix develop -c cargo build
+sudo -i nix develop -c cargo build
 popd
 
 # Install npm packages for client, and terminal-client
 pushd client
-nix develop -c npm install
+sudo -i nix develop -c npm install
 popd
 
 pushd terminal-client
-nix develop -c npm install
+sudo -i nix develop -c npm install
 popd
 
 # Initialize and update git submodules
@@ -48,9 +48,9 @@ mkdir -p _build
 cd _build
 
 # Build Prometheus C++ client library
-nix develop -c cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF
-nix develop -c cmake --build . --parallel 4
+sudo -i nix develop -c cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF
+sudo -i nix develop -c cmake --build . --parallel 4
 
 # Install Prometheus C++ client library and update linker cache
-nix develop -c cmake --install .
-nix develop -c ldconfig
+sudo -i nix develop -c cmake --install .
+sudo -i nix develop -c ldconfig
