@@ -12,7 +12,7 @@
   in rec
   {
     devShells.default = pkgs.mkShell {
-      packages = [ packages.default pkgs.gcc13 pkgs.rust-bin.beta.latest.default pkgs.nodejs_20 pkgs.inotify-tools pkgs.cmake ];
+      packages = [ packages.default pkgs.gcc13 pkgs.rust-bin.beta.latest.default pkgs.nodejs_20 pkgs.inotify-tools pkgs.cmake pkgs.zlib pkgs.openssl pkgs.prometheus-cpp ];
     };
     packages.default = pkgs.stdenv.mkDerivation {
       name = "run";
