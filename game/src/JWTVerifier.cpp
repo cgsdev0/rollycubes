@@ -4,6 +4,7 @@
 #include <memory>
 #define JWT_DISABLE_PICOJSON true
 #include <defaults.h>
+#include <unistd.h>
 
 #include "HTTPClient.h"
 
@@ -21,7 +22,16 @@ JWTVerifier::~JWTVerifier() {
 }
 
 void JWTVerifier::init(const std::string &baseUrl) {
-    auto public_key_resp = http::get(baseUrl + "public_key");
+  std::string public_key_resp;
+    while(true) {
+      try {
+        public_key_resp = http::get(baseUrl + "public_key");
+        break;
+      } catch(std::system_error& e) {
+        std::cout << "Error fetching public key: " << e.what() << std::endl;
+        sleep(5);
+      }
+    }
     auto j = nlohmann::json::parse(public_key_resp);
     auto public_key = j["publicKey"].get<std::string>();
 
