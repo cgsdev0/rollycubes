@@ -14,46 +14,26 @@ if ! ls /nix &> /dev/null; then
   echo 'export PATH="${PATH}:/nix/var/nix/profiles/default/bin"' > ~/.bashrc
 fi
 
-sudo -i nix develop -c $(cat << MEOW 
-# Install npm packages for main project
-npm install
-
-# Install and build crates for auth server
-pushd auth
-sudo -i nix develop -c cargo build
-popd
-
-# Install npm packages for client, and terminal-client
-pushd client
-sudo -i nix develop -c npm install
-popd
-
-pushd terminal-client
-sudo -i nix develop -c npm install
-popd
-
-# Initialize and update git submodules
-git submodule init
-git submodule update
-
-# Build Prometheus C++ client library
-pushd game/prometheus-cpp
-
-git submodule init
-git submodule update
-
-# Check if _build directory exists, create it if not
-mkdir -p _build
-
-# Change to _build directory
-cd _build
-
-# Build Prometheus C++ client library
-sudo -i nix develop -c cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF
-sudo -i nix develop -c cmake --build . --parallel 4
-
-# Install Prometheus C++ client library and update linker cache
-sudo -i nix develop -c cmake --install .
-sudo -i nix develop -c ldconfig
+sudo -i nix develop -c bash << MEOW 
+npm install;
+pushd auth;
+cargo build;
+popd;
+pushd client;
+npm install;
+popd;
+pushd terminal-client;
+npm install;
+popd;
+git submodule init;
+git submodule update;
+pushd game/prometheus-cpp;
+git submodule init;
+git submodule update;
+mkdir -p _build;
+cd _build;
+cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF;
+cmake --build . --parallel 4;
+cmake --install .;
+ldconfig;
 MEOW
-)
