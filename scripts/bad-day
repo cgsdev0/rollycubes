@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -eux
+
+cd "${0%/*}/.."
+
+nix develop -c bash << MEOW 
+npm install;
+pushd auth;
+cargo build;
+popd;
+pushd client;
+npm install;
+popd;
+pushd terminal-client;
+npm install;
+popd;
+git submodule init;
+git submodule update;
+pushd game/prometheus-cpp;
+git submodule init;
+git submodule update;
+mkdir -p _build;
+cd _build;
+cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF;
+cmake --build . --parallel 4;
+cmake --install .;
+ldconfig;
+MEOW
