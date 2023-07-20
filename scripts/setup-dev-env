@@ -14,4 +14,4 @@ if ! ls /nix &> /dev/null; then
   echo 'export PATH="${PATH}:/nix/var/nix/profiles/default/bin"' > ~/.bashrc
 fi
 
-sudo -i ./bad-day
+sudo -i ./scripts/bad-day
