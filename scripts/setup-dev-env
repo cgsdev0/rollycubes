@@ -4,29 +4,24 @@ set -eux
 
 cd "${0%/*}/.."
 
+# Install nix
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+
 # Install npm packages for main project
-npm install
+nix develop -c npm install
 
 # Install and build crates for auth server
 pushd auth
-
-if ! grep -q '\.cargo' "$HOME/.bashrc"; then
-  curl https://sh.rustup.rs -sSf | bash -s -- -y
-  source $HOME/.cargo/env
-  echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
-fi
-source $HOME/.cargo/env
-
-cargo build
+nix develop -c cargo build
 popd
 
 # Install npm packages for client, and terminal-client
 pushd client
-npm install
+nix develop -c npm install
 popd
 
 pushd terminal-client
-npm install
+nix develop -c npm install
 popd
 
 # Initialize and update git submodules
@@ -46,9 +41,9 @@ mkdir -p _build
 cd _build
 
 # Build Prometheus C++ client library
-cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF
-cmake --build . --parallel 4
+nix develop -c cmake .. -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DENABLE_COMPRESSION=OFF
+nix develop -c cmake --build . --parallel 4
 
 # Install Prometheus C++ client library and update linker cache
-sudo cmake --install .
-sudo ldconfig
+nix develop -c cmake --install .
+nix develop -c ldconfig
