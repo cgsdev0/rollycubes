@@ -16,6 +16,9 @@ popd;
 pushd terminal-client;
 npm install;
 popd;
+pushd game;
+make -j2
+popd
 git submodule init;
 git submodule update;
 pushd game/prometheus-cpp;

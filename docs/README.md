@@ -6,11 +6,9 @@ And follow development [on Twitch.tv](https://twitch.tv/badcop_)!
 
 ## Running the project in Codespaces
 
-In the root directory, run one of these commands to start dev services:
+In the root directory, run this command to start dev services:
 ```bash
-npm start  # run everything
-
-npm run no-auth  # start only client and game server
+run dev
 ```
 
 Then, click this button on the "Ports" tab:
@@ -21,20 +19,26 @@ Then, click this button on the "Ports" tab:
 ## Running locally
 
 To run on your local machine, there are a few requirements:
-* You will need a compiler with C++20 support (g++ preferred)
+* You will need nix
 * You will almost certainly want to be on linux
 
 In the root directory:
 
 ```bash
-# runs npm install for each package
-scripts/setup-dev-env
+# installs all of the project's dependencies
+scripts/setup-nix
 
 # creates a fresh set of keys
 scripts/create-dev-keys
+
+# enter the nix shell
+nix develop
+
+# run the project
+run dev
 ```
 
-See below for running the services. Generally, you will want to at least run 'client' and 'game server'.
+See below for running the individual services. Generally, you will want to at least run 'client' and 'game server'.
 
 ## High-Level Overview
 ![Service architecture graph](/system-graph.png?raw=true "Service architecture graph")
@@ -42,10 +46,7 @@ See below for running the services. Generally, you will want to at least run 'cl
 ### Game Server
 The game server manages all of the logic for game sessions. Since rooms are ephemeral, it does not use a database. It also sends achievement unlock info to the auth server.
 
-Use `./game/run-server.sh` (linux only)
-  - This will automatically recompile/restart the server any time you modify a source file
-
-Alternatively, run `make && ./GameServer` in the `game` directory
+Use `run game`
 
 Environment variables:
 
@@ -56,18 +57,17 @@ Environment variables:
 ### Auth Server
 The auth server is responsible for managing and authenticating users and user data. It uses a PostgreSQL database to store user data (achievements, stats, etc.)
 
-- `cd auth/devdb; docker-compose up -d` to set up the database
-- `cargo run` to run the service
+Use `run auth`
 
 ### Client
 
 ```bash
-cd client
-npm i
+run client
 
-npm start # requires local auth server
-npm run no-auth # runs without local auth server
+# alternatively, to run the client against prod:
+run client-only
 ```
+
   - Navigate to `localhost:3000`
   - This will also hot reload any time you modify a file in the client folder
 

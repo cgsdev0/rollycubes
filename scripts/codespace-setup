@@ -14,4 +14,6 @@ if ! ls /nix &> /dev/null; then
   echo 'export PATH="${PATH}:/nix/var/nix/profiles/default/bin"' > ~/.bashrc
 fi
 
-sudo -i /workspaces/rollycubes/scripts/bad-day
+sudo -i /workspaces/rollycubes/scripts/setup-nix
+
+echo 'sudo -i nix develop' > ~/.bashrc
