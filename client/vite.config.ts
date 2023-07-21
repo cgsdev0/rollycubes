@@ -4,6 +4,12 @@ import svgrPlugin from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import path from 'path';
 
+let http_host = 'http://localhost:3001';
+let ws_host = 'ws://localhost:3001';
+if (process.env.VITE_USE_PROD) {
+  http_host = 'https://rollycubes.com';
+  ws_host = 'wss://rollycubes.com';
+}
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
@@ -28,19 +34,22 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/cookie': {
-        target: 'http://localhost:3001',
+        target: http_host,
+        changeOrigin: true,
         secure: false,
       },
       '/list': {
-        target: 'http://localhost:3001',
+        target: http_host,
+        changeOrigin: true,
         secure: false,
       },
       '/create': {
-        target: 'http://localhost:3001',
+        target: http_host,
+        changeOrigin: true,
         secure: false,
       },
       '/ws/': {
-        target: 'ws://localhost:3001',
+        target: ws_host,
         changeOrigin: true,
         ws: true,
         secure: false,

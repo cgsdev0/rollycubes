@@ -179,7 +179,6 @@ const Settings: React.FC<{}> = () => {
   );
   const onSave = React.useCallback(async () => {
     await trigger(color);
-    console.log(dice_type);
     await setDiceType(dice_type);
     socket?.send(JSON.stringify({ type: 'refetch_player', user_id }));
   }, [trigger, color, socket, user_id, dice_type, setDiceType]);

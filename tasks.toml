@@ -23,3 +23,8 @@
   id = "client"
   type = "long"
   cmd = "cd client; npm run start"
+
+[[task]]
+  id = "client-only"
+  type = "long"
+  cmd = "cd client; VITE_USE_PROD=true npm run no-auth"
