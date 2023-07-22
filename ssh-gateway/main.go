@@ -2,31 +2,45 @@ package main
 
 import (
 	"context"
+	b64 "encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	api "github.com/cgsdev0/rollycubes/ssh-gateway/generated"
+	"github.com/cgsdev0/rollycubes/ssh-gateway/user"
+
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/ssh"
+	ssh "github.com/charmbracelet/ssh"
 	wish "github.com/charmbracelet/wish"
 	bm "github.com/charmbracelet/wish/bubbletea"
 	lm "github.com/charmbracelet/wish/logging"
+	gossh "golang.org/x/crypto/ssh"
 )
 
 type model struct {
+	user *user.User
+
 	choices  []string         // items on the to-do list
 	cursor   int              // which to-do list item our cursor is pointing at
 	selected map[int]struct{} // which to-do items are selected
 
 	width  int
 	height int
+
+	stuff    string
+	roomList api.RoomList
+	err      error
 }
 
 func (m model) Init() tea.Cmd {
-	// Just return `nil`, which means "no I/O right now, please."
 	return nil
 }
 
@@ -58,12 +72,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// The "enter" key and the spacebar (a literal space) toggle
 		// the selected state for the item that the cursor is pointing at.
 		case "enter", " ":
-			_, ok := m.selected[m.cursor]
-			if ok {
-				delete(m.selected, m.cursor)
-			} else {
-				m.selected[m.cursor] = struct{}{}
+			log.Printf("making a req\n")
+			resp, err := http.Get("https://rollycubes.com/list")
+
+			if err != nil {
+				m.err = err
+				return nil, nil
 			}
+			defer resp.Body.Close()
+			body, err := io.ReadAll(resp.Body)
+			roomList, err := api.UnmarshalRoomList(body)
+			if err != nil {
+				m.err = err
+				return nil, nil
+			}
+			m.roomList = roomList
 		}
 	}
 
@@ -74,25 +97,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	// The header
-	s := "What should we buy at the market?\n\n"
+	s := "welcome to rolly cubes\n"
 
-	// Iterate over our choices
-	for i, choice := range m.choices {
+	if m.user != nil {
+		s += "logged in as: " + m.user.DisplayName + "\n"
+	}
+	if m.err != nil {
+		s += fmt.Sprintf("error! %s\n", m.err)
+	} else {
+		for _, room := range m.roomList.Rooms {
 
-		// Is the cursor pointing at this choice?
-		cursor := " " // no cursor
-		if m.cursor == i {
-			cursor = ">" // cursor!
+			// Render the row
+			s += fmt.Sprintf("room: %s\n", room.HostName)
 		}
-
-		// Is this choice selected?
-		checked := " " // not selected
-		if _, ok := m.selected[i]; ok {
-			checked = "x" // selected!
-		}
-
-		// Render the row
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
 	}
 
 	// The footer
@@ -103,7 +120,37 @@ func (m model) View() string {
 }
 
 func main() {
-	server, err := wish.NewServer(wish.WithAddress("127.0.0.1:3022"), wish.WithIdleTimeout(30*time.Minute),
+	store := user.NewStore()
+	server, err := wish.NewServer(
+		wish.WithAddress("127.0.0.1:3022"),
+		wish.WithIdleTimeout(30*time.Minute),
+		wish.WithPublicKeyAuth(func(ctx ssh.Context, key ssh.PublicKey) bool {
+			bytes := key.Marshal()
+			based := url.QueryEscape(b64.StdEncoding.EncodeToString(bytes))
+			resp, err := http.Get("http://localhost:3031/pubkey/" + based)
+			if err != nil || resp.StatusCode != 200 {
+				return false
+			}
+			defer resp.Body.Close()
+			bytes, err = io.ReadAll(resp.Body)
+			if err != nil {
+				return false
+			}
+			log.Printf("%s\n", string(bytes))
+			var u user.User
+			if err = json.Unmarshal(bytes, &u); err != nil {
+				return false
+			}
+
+			store.Put(based, u)
+
+			// TODO: issue our own access token because auth is an illusion and reality can be whatever we want
+			return true
+		}),
+		wish.WithKeyboardInteractiveAuth(func(ctx ssh.Context, challenger gossh.KeyboardInteractiveChallenge) bool {
+			// fallback to unauthenticated access
+			return true
+		}),
 		wish.WithMiddleware(
 			bm.Middleware(func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 				pty, _, active := s.Pty()
@@ -111,9 +158,16 @@ func main() {
 					log.Printf("no active terminal, skipping")
 					return nil, nil
 				}
+				key := s.PublicKey()
+				var u *user.User
+				if key != nil {
+					bytes := key.Marshal()
+					based := url.QueryEscape(b64.StdEncoding.EncodeToString(bytes))
+					u = store.Take(based)
+				}
 
 				model := &model{
-					choices: []string{"Buy carrots", "Buy celery", "Buy kohlrabi"},
+					user: u,
 
 					// A map which indicates which choices are selected. We're using
 					// the  map like a mathematical set. The keys refer to the indexes

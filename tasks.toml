@@ -6,5 +6,5 @@
 [[task]]
   id = "gateway"
   type = "long"
-  cmd = "cd ssh_gateway; go run ."
-  watch = [ "./ssh_gateway/**/*.go" ]
+  cmd = "cd ssh-gateway; go run ."
+  watch = [ "./ssh-gateway/**/*.go" ]

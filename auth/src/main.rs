@@ -70,7 +70,8 @@ async fn main() {
             "/users/update_setting",
             post(user_routes::update_user_setting),
         )
-        .route("/users/:id", get(user_routes::user_by_id));
+        .route("/users/:id", get(user_routes::user_by_id))
+        .route("/pubkey/:id", get(user_routes::user_by_pubkey));
 
     let server_routes = Router::new()
         .route("/add_stats", post(server_routes::add_stats))

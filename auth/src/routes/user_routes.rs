@@ -520,6 +520,31 @@ pub async fn donate(
     }))
 }
 
+#[derive(Serialize)]
+pub struct UserIdPayload {
+    id: Uuid,
+    display_name: String,
+}
+
+#[axum::debug_handler]
+pub async fn user_by_pubkey(
+    Path(pubkey): Path<String>,
+    State(s): State<RouterState>,
+) -> Result<Json<UserIdPayload>, RouteError> {
+    let client = s.pool.get().await?;
+    let row = client
+        .query_one(
+            "SELECT user_id, username FROM pubkey_to_user LEFT JOIN users ON id = user_id WHERE pubkey = $1",
+            &[&pubkey],
+        )
+        .await?;
+
+    Ok(Json(UserIdPayload {
+        id: row.get("user_id"),
+        display_name: row.get("username"),
+    }))
+}
+
 #[axum::debug_handler]
 pub async fn user_by_id(
     Path(user_id): Path<Uuid>,
