@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "blessed": "^0.1.81",
-    "prettier": "^1.18.2",
-    "ws": "^7.4.6",
-    "yargs": "^17.5.1"
-  }
-}

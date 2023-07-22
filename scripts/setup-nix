@@ -13,9 +13,6 @@ popd;
 pushd client;
 npm install;
 popd;
-pushd terminal-client;
-npm install;
-popd;
 pushd game;
 make -j2
 popd
