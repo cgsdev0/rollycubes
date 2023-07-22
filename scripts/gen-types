@@ -3,7 +3,9 @@
 cd "${0%/*}/.."
 
 mkdir -p game/src/api
+mkdir -p ssh-gateway/generated
 rm game/src/api/*
+rm ssh-gateway/generated/*
 
 ./node_modules/.bin/quicktype \
   -o game/src/api/API.hpp \
@@ -12,7 +14,12 @@ rm game/src/api/*
   --source-style multi-source \
   --lang c++ \
   --namespace API \
-  client/src/types/*.ts 
+  client/src/types/*.ts
+
+./node_modules/.bin/quicktype \
+  -o ssh-gateway/generated/api.go \
+  --lang golang \
+  client/src/types/*.ts
 
 # avert your eyes, this next part is a crime
 
@@ -55,5 +62,5 @@ for struct in $structs; do
 done
 echo "}" >> API.cpp
 
-sed -i '1s/^/#include <vector>\n/' API.hpp 
+sed -i '1s/^/#include <vector>\n/' API.hpp
 sed -i '1s/^/#include <memory>\n/' API.hpp

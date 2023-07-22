@@ -2,3 +2,9 @@
   id = "dev"
   type = "group"
   dependencies = [ "auth/run", "game/run", "client/run" ]
+
+[[task]]
+  id = "gateway"
+  type = "long"
+  cmd = "cd ssh_gateway; go run ."
+  watch = [ "./ssh_gateway/**/*.go" ]
