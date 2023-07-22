@@ -19,18 +19,91 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	ssh "github.com/charmbracelet/ssh"
 	wish "github.com/charmbracelet/wish"
 	bm "github.com/charmbracelet/wish/bubbletea"
 	lm "github.com/charmbracelet/wish/logging"
 	gossh "golang.org/x/crypto/ssh"
+	"nhooyr.io/websocket"
 )
+
+type LobbyScene struct {
+	list list.Model
+}
+
+type GameScene struct {
+	roomCode string
+}
+
+type SwitchSceneMsg struct {
+	scene tea.Model
+}
+
+func (m LobbyScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+
+	case tea.WindowSizeMsg:
+		m.list.SetHeight(msg.Height - 2)
+		m.list.SetWidth(msg.Width - 4)
+
+	// Is it a key press?
+	case tea.KeyMsg:
+
+		// Cool, what was the actual key pressed?
+		switch msg.String() {
+
+		case "r":
+			resp, err := http.Get("https://rollycubes.com/list")
+
+			if err != nil {
+				log.Println(err)
+				return m, nil
+			}
+			defer resp.Body.Close()
+			body, err := io.ReadAll(resp.Body)
+			roomList, err := api.UnmarshalRoomList(body)
+			if err != nil {
+				log.Println(err)
+				return m, nil
+			}
+			m.list.SetItems(nil)
+			var cmd tea.Cmd
+			// TODO: sort and filter room list
+			for i, v := range roomList.Rooms {
+				cmd = m.list.InsertItem(i, v)
+			}
+			return m, cmd
+		}
+	}
+
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
+}
+
+func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	return m, nil
+}
+
+func (m GameScene) Init() tea.Cmd {
+	return nil
+}
+
+func (m LobbyScene) Init() tea.Cmd {
+	return nil
+}
+
+func (m GameScene) View() string {
+	return m.roomCode
+}
+
+func (m LobbyScene) View() string {
+	return m.list.View()
+}
 
 type model struct {
 	user *user.User
 
-	list     list.Model
 	choices  []string         // items on the to-do list
 	cursor   int              // which to-do list item our cursor is pointing at
 	selected map[int]struct{} // which to-do items are selected
@@ -41,8 +114,41 @@ type model struct {
 	stuff    string
 	roomList api.RoomList
 	err      error
+
+	scene tea.Model
 }
 
+func startWebsocket(m model, s GameScene) {
+	serverURL := "wss://rollycubes.com/ws/room/" + s.roomCode
+	ctx := context.Background()
+	c, _, err := websocket.Dial(ctx, serverURL, &websocket.DialOptions{HTTPHeader: http.Header{"Cookie": {"_session=awefo34irj2r04"}}})
+	if err != nil {
+		// ...
+		panic(err)
+	}
+	// Create a channel to signal when to close the connection
+	done := make(chan struct{})
+
+	readMessages := func(ctx context.Context, conn *websocket.Conn, done chan struct{}) {
+		for {
+			select {
+			case <-done:
+				conn.Close(websocket.StatusInternalError, "all done")
+				return
+			default:
+				messageType, message, err := conn.Read(ctx)
+				if err != nil {
+					log.Printf("Error reading message: %v", err)
+					// TODO: retry connection?
+					return
+				}
+				fmt.Printf("Received message: %s\t%s\n", message, messageType)
+			}
+		}
+	}
+	// Start a goroutine to read messages from the server
+	go readMessages(ctx, c, done)
+}
 func (m model) Init() tea.Cmd {
 	return nil
 }
@@ -64,42 +170,33 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 
-		// The "up" and "k" keys move the cursor up
-		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
+			// The "enter" key and the spacebar (a literal space) toggle
+			// the selected state for the item that the cursor is pointing at.
+		case "enter":
+			lobbyScene, ok := m.scene.(LobbyScene)
+			if !ok {
+				log.Println("not lobby")
+				return m, nil
 			}
-
-		// The "down" and "j" keys move the cursor down
-		case "down", "j":
-			if m.cursor < len(m.choices)-1 {
-				m.cursor++
+			if lobbyScene.list.SettingFilter() {
+				log.Println("filtering")
+				break
 			}
-
-		// The "enter" key and the spacebar (a literal space) toggle
-		// the selected state for the item that the cursor is pointing at.
-		case "enter", " ":
-			log.Printf("making a req\n")
-			resp, err := http.Get("https://rollycubes.com/list")
-
-			if err != nil {
-				m.err = err
-				return nil, nil
+			var room api.Room
+			if room, ok = lobbyScene.list.SelectedItem().(api.Room); !ok {
+				log.Println("not selected")
+				return m, nil
 			}
-			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
-			roomList, err := api.UnmarshalRoomList(body)
-			if err != nil {
-				m.err = err
-				return nil, nil
-			}
-			m.roomList = roomList
-			return m, m.list.SetItems(m.roomList.Rooms)
+			newScene := GameScene{roomCode: room.Code}
+			log.Println("new scene")
+			m.scene = newScene
+			go startWebsocket(m, newScene)
+			return m, nil
 		}
 	}
 
 	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
+	m.scene, cmd = m.scene.Update(msg)
 	return m, cmd
 }
 
@@ -108,31 +205,10 @@ func (m model) View() string {
 	s := "Welcome to Rolly Cubes!\n"
 
 	if m.user != nil {
-		s = "Welcome back, " + m.user.DisplayName + "!\n"
+		s += "Welcome back, " + m.user.DisplayName + "!\n"
 	}
 
-	var page = lipgloss.NewStyle().
-		BorderStyle(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("228")).
-		Width(m.width - 2).
-		Height(m.height - 2).Padding(1).PaddingTop(0).PaddingBottom(0)
-
-	if m.err != nil {
-		s += fmt.Sprintf("error! %s\n", m.err)
-	} else {
-		for _, room := range m.roomList.Rooms {
-
-			// Render the row
-			s += fmt.Sprintf("room: %s\n", room.HostName)
-		}
-	}
-
-	// The footer
-	s += "\nPress q to quit.\n"
-
-	// Send the UI for rendering
-	// Set a rounded, yellow-on-purple border to the top and left
-	return page.Render(m.list.View())
+	return m.scene.View()
 }
 
 func main() {
@@ -181,17 +257,20 @@ func main() {
 					based := url.QueryEscape(b64.StdEncoding.EncodeToString(bytes))
 					u = store.Take(based)
 				}
-
+				lobbyScene := LobbyScene{
+					list: list.New([]list.Item{}, list.NewDefaultDelegate(), pty.Window.Width-6, pty.Window.Height-2),
+				}
+				lobbyScene.list.Title = "Active Rooms"
 				model := &model{
 					user: u,
 
-					list: list.New(nil, list.NewDefaultDelegate(), 0, 0),
 					// A map which indicates which choices are selected. We're using
 					// the  map like a mathematical set. The keys refer to the indexes
 					// of the `choices` slice, above.
 					selected: make(map[int]struct{}),
 					width:    pty.Window.Width,
 					height:   pty.Window.Height,
+					scene:    lobbyScene,
 				}
 				return model, []tea.ProgramOption{tea.WithAltScreen()}
 			}),
