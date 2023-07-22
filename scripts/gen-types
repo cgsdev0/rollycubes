@@ -3,9 +3,9 @@
 cd "${0%/*}/.."
 
 mkdir -p game/src/api
-mkdir -p ssh-gateway/generated
+mkdir -p ssh-gateway/api
 rm game/src/api/*
-rm ssh-gateway/generated/*
+rm ssh-gateway/api/generated.go
 
 ./node_modules/.bin/quicktype \
   -o game/src/api/API.hpp \
@@ -17,7 +17,7 @@ rm ssh-gateway/generated/*
   client/src/types/*.ts
 
 ./node_modules/.bin/quicktype \
-  -o ssh-gateway/generated/api.go \
+  -o ssh-gateway/api/generated.go \
   --lang golang \
   client/src/types/*.ts
 

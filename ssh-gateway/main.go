@@ -14,10 +14,12 @@ import (
 	"syscall"
 	"time"
 
-	api "github.com/cgsdev0/rollycubes/ssh-gateway/generated"
+	"github.com/cgsdev0/rollycubes/ssh-gateway/api"
 	"github.com/cgsdev0/rollycubes/ssh-gateway/user"
 
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	ssh "github.com/charmbracelet/ssh"
 	wish "github.com/charmbracelet/wish"
 	bm "github.com/charmbracelet/wish/bubbletea"
@@ -28,6 +30,7 @@ import (
 type model struct {
 	user *user.User
 
+	list     list.Model
 	choices  []string         // items on the to-do list
 	cursor   int              // which to-do list item our cursor is pointing at
 	selected map[int]struct{} // which to-do items are selected
@@ -46,6 +49,10 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
 
 	// Is it a key press?
 	case tea.KeyMsg:
@@ -87,21 +94,29 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return nil, nil
 			}
 			m.roomList = roomList
+			return m, m.list.SetItems(m.roomList.Rooms)
 		}
 	}
 
-	// Return the updated model to the Bubble Tea runtime for processing.
-	// Note that we're not returning a command.
-	return m, nil
+	var cmd tea.Cmd
+	m.list, cmd = m.list.Update(msg)
+	return m, cmd
 }
 
 func (m model) View() string {
 	// The header
-	s := "welcome to rolly cubes\n"
+	s := "Welcome to Rolly Cubes!\n"
 
 	if m.user != nil {
-		s += "logged in as: " + m.user.DisplayName + "\n"
+		s = "Welcome back, " + m.user.DisplayName + "!\n"
 	}
+
+	var page = lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("228")).
+		Width(m.width - 2).
+		Height(m.height - 2).Padding(1).PaddingTop(0).PaddingBottom(0)
+
 	if m.err != nil {
 		s += fmt.Sprintf("error! %s\n", m.err)
 	} else {
@@ -116,7 +131,8 @@ func (m model) View() string {
 	s += "\nPress q to quit.\n"
 
 	// Send the UI for rendering
-	return s
+	// Set a rounded, yellow-on-purple border to the top and left
+	return page.Render(m.list.View())
 }
 
 func main() {
@@ -169,6 +185,7 @@ func main() {
 				model := &model{
 					user: u,
 
+					list: list.New(nil, list.NewDefaultDelegate(), 0, 0),
 					// A map which indicates which choices are selected. We're using
 					// the  map like a mathematical set. The keys refer to the indexes
 					// of the `choices` slice, above.
@@ -176,7 +193,7 @@ func main() {
 					width:    pty.Window.Width,
 					height:   pty.Window.Height,
 				}
-				return model, nil
+				return model, []tea.ProgramOption{tea.WithAltScreen()}
 			}),
 			lm.Middleware(),
 		))
