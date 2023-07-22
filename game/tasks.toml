@@ -1,0 +1,11 @@
+[[task]]
+  id = "build"
+  type = "short"
+  cmd = "make"
+  watch = [ "./game/**/*.cpp",  "./game/**/*.h" ]
+
+[[task]]
+  id = "run"
+  type = "long"
+  cmd = "DEV=true ./GameServer"
+  triggers = [ "build" ]
