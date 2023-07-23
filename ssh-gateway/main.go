@@ -32,7 +32,8 @@ type LobbyScene struct {
 }
 
 type GameScene struct {
-	roomCode string
+	roomCode   string
+	disconnect chan struct{}
 }
 
 type SwitchSceneMsg struct {
@@ -104,6 +105,8 @@ func (m LobbyScene) View() string {
 type model struct {
 	user *user.User
 
+	session ssh.Session
+
 	choices  []string         // items on the to-do list
 	cursor   int              // which to-do list item our cursor is pointing at
 	selected map[int]struct{} // which to-do items are selected
@@ -118,36 +121,35 @@ type model struct {
 	scene tea.Model
 }
 
-func startWebsocket(m model, s GameScene) {
+func startWebsocket(ctx ssh.Context, m model, s GameScene) {
 	serverURL := "wss://rollycubes.com/ws/room/" + s.roomCode
-	ctx := context.Background()
 	c, _, err := websocket.Dial(ctx, serverURL, &websocket.DialOptions{HTTPHeader: http.Header{"Cookie": {"_session=awefo34irj2r04"}}})
 	if err != nil {
 		// ...
 		panic(err)
 	}
 	// Create a channel to signal when to close the connection
-	done := make(chan struct{})
 
-	readMessages := func(ctx context.Context, conn *websocket.Conn, done chan struct{}) {
+	waitForClose := func(ctx context.Context, conn *websocket.Conn, done chan struct{}) {
+		defer close(done)
+		<-done
+		log.Println("recv")
+		conn.Close(websocket.StatusInternalError, "goodbye")
+	}
+	readMessages := func(ctx context.Context, conn *websocket.Conn) {
 		for {
-			select {
-			case <-done:
-				conn.Close(websocket.StatusInternalError, "all done")
+			messageType, message, err := conn.Read(ctx)
+			if err != nil {
+				log.Printf("Error reading message: %v", err)
+				// TODO: retry connection?
 				return
-			default:
-				messageType, message, err := conn.Read(ctx)
-				if err != nil {
-					log.Printf("Error reading message: %v", err)
-					// TODO: retry connection?
-					return
-				}
-				fmt.Printf("Received message: %s\t%s\n", message, messageType)
 			}
+			fmt.Printf("Received message: %s\t%s\n", message, messageType)
 		}
 	}
 	// Start a goroutine to read messages from the server
-	go readMessages(ctx, c, done)
+	go waitForClose(ctx, c, s.disconnect)
+	go readMessages(ctx, c)
 }
 func (m model) Init() tea.Cmd {
 	return nil
@@ -187,10 +189,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				log.Println("not selected")
 				return m, nil
 			}
-			newScene := GameScene{roomCode: room.Code}
+			ch := make(chan struct{})
+			newScene := GameScene{roomCode: room.Code, disconnect: ch}
 			log.Println("new scene")
 			m.scene = newScene
-			go startWebsocket(m, newScene)
+			go startWebsocket(m.session.Context(), m, newScene)
 			return m, nil
 		}
 	}
@@ -264,6 +267,7 @@ func main() {
 				model := &model{
 					user: u,
 
+					session: s,
 					// A map which indicates which choices are selected. We're using
 					// the  map like a mathematical set. The keys refer to the indexes
 					// of the `choices` slice, above.
