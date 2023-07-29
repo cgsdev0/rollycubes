@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/muesli/termenv"
 
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -28,15 +30,20 @@ import (
 	wish "github.com/charmbracelet/wish"
 	"github.com/charmbracelet/wish/bubbletea"
 	lm "github.com/charmbracelet/wish/logging"
+	zone "github.com/lrstanley/bubblezone"
+	"github.com/muesli/reflow/wrap"
 	gossh "golang.org/x/crypto/ssh"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
 
 type CommonModel struct {
-	ctx     ssh.Context
-	ws      *websocket.Conn
-	program *tea.Program
+	mu         *sync.Mutex
+	ctx        ssh.Context
+	ws         *websocket.Conn
+	program    *tea.Program
+	disconnect chan struct{}
+	zone       *zone.Manager
 }
 
 type LobbyScene struct {
@@ -49,11 +56,12 @@ type GameScene struct {
 	State  *api.GameState
 	Width  int
 	Height int
+	SelfID int
 
-	viewport   viewport.Model
-	textInput  textinput.Model
-	roomCode   string
-	disconnect chan struct{}
+	viewport  viewport.Model
+	textInput textinput.Model
+	roomCode  string
+	players   table.Model
 }
 
 type SwitchSceneMsg struct {
@@ -63,6 +71,13 @@ type SwitchSceneMsg struct {
 type WebsocketMsg struct {
 	Msg  []byte
 	Type string
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func reverse[S ~[]E, E any](s S) {
@@ -113,11 +128,189 @@ func (m LobbyScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+func (m GameScene) columns() (int, int) {
+	// sidebar := int(float64(m.Width) * 0.3)
+	// return sidebar, m.Width - sidebar
+	sidebar := 25
+	return sidebar, m.Width - sidebar
+}
+
+func (m *GameScene) ConstrainSize() {
+	m.Width = min(80, m.Width-2)
+	m.Height = min(20, m.Height-2)
+	m.viewport.Width = m.Width
+	m.viewport.Height = m.Height - 1
+}
+
 func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+	var cmds []tea.Cmd
+
+	_, chatWidth := m.columns()
+
 	switch msg := msg.(type) {
+	case tea.MouseMsg:
+		if msg.Type != tea.MouseLeft {
+			return m, nil
+		}
+
+		if m.Common.zone.Get("add").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.SimpleMsg{Type: "add"}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
+		if m.Common.zone.Get("sub").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.SimpleMsg{Type: "sub"}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
+		if m.Common.zone.Get("sub1").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.AddSubNMsg{Type: "sub_nth", Idx: 0}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
+		if m.Common.zone.Get("sub2").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.AddSubNMsg{Type: "sub_nth", Idx: 1}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
+		if m.Common.zone.Get("add1").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.AddSubNMsg{Type: "add_nth", Idx: 0}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
+		if m.Common.zone.Get("add2").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.AddSubNMsg{Type: "add_nth", Idx: 1}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
+		if m.Common.zone.Get("roll").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.RollMsg{Type: api.Roll}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
+		if m.Common.zone.Get("newGame").InBounds(msg) {
+			if m.Common.ws != nil {
+				msg := api.SimpleMsg{Type: "restart"}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}
 	case WebsocketMsg:
 		switch msg.Type {
+		case "restart":
+			restart, err := api.UnmarshalRestartMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			m.State.TurnIndex = restart.ID
+			m.State.Used[0] = false
+			m.State.Used[1] = false
+			var rows []table.Row
+			for i := range m.State.Players {
+				m.State.Players[i].Score = 0
+				var name string
+				if m.State.Players[i].Name == nil {
+					name = "User" + fmt.Sprint(i+1)
+				} else {
+					name = *m.State.Players[i].Name
+				}
+				rows = append(rows, table.Row{name, fmt.Sprint(m.State.Players[i].Score)})
+			}
+			m.State.Victory = false
+			m.State.Rolled = false
+			m.players.SetCursor(int(m.State.TurnIndex))
+		case "win":
+			m.State.Victory = true
+		case "update":
+			update, err := api.UnmarshalUpdateMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			if len(update.Used) > 0 {
+				m.State.Used = update.Used
+			}
+			m.State.Players[update.ID].Score = update.Score
+			var rows []table.Row
+			for i, player := range m.State.Players {
+				var name string
+				if player.Name == nil {
+					name = "User" + fmt.Sprint(i+1)
+				} else {
+					name = *player.Name
+				}
+				row := table.Row{name, fmt.Sprint(player.Score)}
+				rows = append(rows, row)
+			}
+			m.players.SetRows(rows)
+			m.players.SetCursor(int(m.State.TurnIndex))
+		case "roll":
+			roll, err := api.UnmarshalRollMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			m.State.Rolled = true
+			m.State.Rolls = roll.Rolls
+			m.State.Used[0] = false
+			m.State.Used[1] = false
+		case "roll_again":
+			_, err := api.UnmarshalRollAgainMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			m.State.Rolled = false
+		case "update_turn":
+			update, err := api.UnmarshalUpdateTurnMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			m.State.TurnIndex = update.ID
+			m.State.Rolled = false
+			m.players.SetCursor(int(m.State.TurnIndex))
+
 		case "welcome":
 			welcome, err := api.UnmarshalWelcomeMsg(msg.Msg)
 			if err != nil {
@@ -129,10 +322,26 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				log.Printf("idfk it broke %v+\n", err)
 				break
 			}
-			fmt.Printf("Your index is %d\n", welcome.ID)
+			m.SelfID = int(welcome.ID)
+			// Put the players into the table
+			var rows []table.Row
+			for i, player := range state.Players {
+				var name string
+				if player.Name == nil {
+					name = "User" + fmt.Sprint(i+1)
+				} else {
+					name = *player.Name
+				}
+				row := table.Row{name, fmt.Sprint(player.Score)}
+				rows = append(rows, row)
+			}
+			m.players.SetRows(rows)
+			m.players.SetCursor(int(state.TurnIndex))
+			// Put the chat into the pager
 			reverse(state.ChatLog)
 			m.State = &state
-			m.viewport.SetContent(strings.Join(m.State.ChatLog, "\n"))
+			wrapped := wrap.String(strings.Join(m.State.ChatLog, "\n"), chatWidth-1)
+			m.viewport.SetContent(wrapped)
 			m.viewport.SetYOffset(m.viewport.YOffset + 100000000) // lol
 		case "chat":
 			chat, err := api.UnmarshalChatMsg(msg.Msg)
@@ -141,12 +350,19 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				break
 			}
 			m.State.ChatLog = append(m.State.ChatLog, chat.Msg)
-			m.viewport.SetContent(strings.Join(m.State.ChatLog, "\n"))
+			wrapped := wrap.String(strings.Join(m.State.ChatLog, "\n"), chatWidth)
+			m.viewport.SetContent(wrapped)
 			m.viewport.SetYOffset(m.viewport.YOffset + 100000000) // lol
 		}
 	case tea.WindowSizeMsg:
 		m.Height = msg.Height
 		m.Width = msg.Width
+		m.ConstrainSize()
+		_, chatWidth := m.columns()
+		wrapped := wrap.String(strings.Join(m.State.ChatLog, "\n"), chatWidth)
+		m.viewport.SetContent(wrapped)
+		m.viewport.SetYOffset(m.viewport.YOffset + 100000000) // lol
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
@@ -173,13 +389,15 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	}
-	var cmd2 tea.Cmd
-	m.textInput, cmd2 = m.textInput.Update(msg)
-	var cmd3 tea.Cmd
+	m.textInput, cmd = m.textInput.Update(msg)
+	cmds = append(cmds, cmd)
+	m.players, cmd = m.players.Update(msg)
+	cmds = append(cmds, cmd)
 	if !m.textInput.Focused() {
-		m.viewport, cmd3 = m.viewport.Update(msg)
+		m.viewport, cmd = m.viewport.Update(msg)
+		cmds = append(cmds, cmd)
 	}
-	return m, tea.Batch(cmd, cmd2, cmd3)
+	return m, tea.Batch(cmds...)
 }
 
 func (m GameScene) Init() tea.Cmd {
@@ -190,19 +408,192 @@ func (m LobbyScene) Init() tea.Cmd {
 	return nil
 }
 
+var Dice = [][]string{
+	{},
+	{
+		"       ",
+		"   ●   ",
+		"       ",
+	},
+	{
+		" ●     ",
+		"       ",
+		"     ● ",
+	},
+	{
+		" ●     ",
+		"   ●   ",
+		"     ● ",
+	},
+	{
+		" ●   ● ",
+		"       ",
+		" ●   ● ",
+	},
+	{
+		" ●   ● ",
+		"   ●   ",
+		" ●   ● ",
+	},
+	{
+		" ●   ● ",
+		" ●   ● ",
+		" ●   ● ",
+	},
+}
+
 func (m GameScene) View() string {
-	// var chat = lipgloss.NewStyle().
-	// 	BorderStyle(lipgloss.RoundedBorder()).
-	// 	BorderForeground(lipgloss.Color("228")).
-	// 	BorderBackground(lipgloss.Color("63"))
+	sidebarWidth, _ := m.columns()
+	playerPanel := lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		Width(sidebarWidth - 4).
+		MarginRight(1).
+		MarginLeft(1).
+		Height(m.Height - 2 - 5 - 3)
 
 	// var chatStr string
 	// if m.State != nil {
 	// 	chatStr = strings.Join(m.State.ChatLog, "\n")
 	// }
-	return lipgloss.JoinVertical(lipgloss.Left,
+	chat := lipgloss.JoinVertical(lipgloss.Left,
 		m.viewport.View(),
 		m.textInput.View())
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("57")).
+		Bold(false)
+	m.players.SetStyles(s)
+
+	die1s := lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		Width(7).
+		Height(3).MarginLeft(3).MarginRight(1)
+
+	die2s := lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		Width(7).
+		Height(3)
+
+	var die1v = 1
+	var die2v = 1
+	if m.State != nil {
+		die1v = int(m.State.Rolls[0])
+		die2v = int(m.State.Rolls[1])
+	}
+	die1 := m.Common.zone.Mark("die1", die1s.Render(strings.Join(Dice[die1v], "\n")))
+	die2 := m.Common.zone.Mark("die2", die2s.Render(strings.Join(Dice[die2v], "\n")))
+	dice := lipgloss.JoinHorizontal(lipgloss.Bottom, die1, die2)
+
+	var rollButton string
+	var addButton string
+	var subButton string
+
+	var add1Button string
+	var sub1Button string
+	var add2Button string
+	var sub2Button string
+
+	var newGame string
+
+	var addColor = lipgloss.Color("#007bff")
+	var subColor = lipgloss.Color("240")
+
+	if m.State != nil {
+		is7 := int(m.State.Rolls[0]+m.State.Rolls[1]) == 7
+		if !m.State.Victory {
+			if m.State.Rolled && m.SelfID == int(m.State.TurnIndex) && is7 {
+				if !m.State.Used[0] {
+					add1Button = m.Common.zone.Mark("add1", lipgloss.NewStyle().
+						Foreground(lipgloss.Color(addColor)).
+						BorderForeground(lipgloss.Color(addColor)).
+						Width(2).
+						MarginLeft(3).
+						AlignHorizontal(lipgloss.Center).
+						BorderStyle(lipgloss.RoundedBorder()).Render("+"))
+					sub1Button = m.Common.zone.Mark("sub1", lipgloss.NewStyle().
+						Foreground(lipgloss.Color(subColor)).
+						BorderForeground(lipgloss.Color(subColor)).
+						Width(2).
+						MarginLeft(1).
+						AlignHorizontal(lipgloss.Center).
+						BorderStyle(lipgloss.RoundedBorder()).Render("-"))
+				} else {
+					add1Button = "            "
+				}
+				if !m.State.Used[1] {
+					add2Button = m.Common.zone.Mark("add2", lipgloss.NewStyle().
+						Foreground(lipgloss.Color(addColor)).
+						BorderForeground(lipgloss.Color(addColor)).
+						Width(2).
+						MarginLeft(1).
+						AlignHorizontal(lipgloss.Center).
+						BorderStyle(lipgloss.RoundedBorder()).Render("+"))
+					sub2Button = m.Common.zone.Mark("sub2", lipgloss.NewStyle().
+						Foreground(lipgloss.Color(subColor)).
+						BorderForeground(lipgloss.Color(subColor)).
+						Width(2).
+						MarginLeft(1).
+						AlignHorizontal(lipgloss.Center).
+						BorderStyle(lipgloss.RoundedBorder()).Render("-"))
+				}
+			}
+
+			if m.State.Rolled && m.SelfID == int(m.State.TurnIndex) && !is7 {
+				addButton = m.Common.zone.Mark("add", lipgloss.NewStyle().
+					Foreground(lipgloss.Color(addColor)).
+					BorderForeground(lipgloss.Color(addColor)).
+					Width(7).
+					MarginLeft(3).
+					AlignHorizontal(lipgloss.Center).
+					BorderStyle(lipgloss.RoundedBorder()).Render("+"))
+				subButton = m.Common.zone.Mark("sub", lipgloss.NewStyle().
+					Foreground(lipgloss.Color(subColor)).
+					BorderForeground(lipgloss.Color(subColor)).
+					Width(7).
+					MarginLeft(1).
+					AlignHorizontal(lipgloss.Center).
+					BorderStyle(lipgloss.RoundedBorder()).Render("-"))
+			}
+
+			if !m.State.Rolled && m.SelfID == int(m.State.TurnIndex) {
+				rollButton = m.Common.zone.Mark("roll", lipgloss.NewStyle().
+					Foreground(lipgloss.Color("#00ff00")).
+					BorderForeground(lipgloss.Color("#00ff00")).
+					Width(sidebarWidth-8).
+					MarginLeft(3).
+					AlignHorizontal(lipgloss.Center).
+					BorderStyle(lipgloss.RoundedBorder()).Render("Roll"))
+			}
+		}
+
+		if m.State.Victory {
+			newGame = m.Common.zone.Mark("newGame", lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#00ff00")).
+				BorderForeground(lipgloss.Color("#00ff00")).
+				Width(sidebarWidth-8).
+				MarginLeft(3).
+				AlignHorizontal(lipgloss.Center).
+				BorderStyle(lipgloss.RoundedBorder()).Render("New Game"))
+		}
+	}
+
+	underDice := lipgloss.JoinHorizontal(lipgloss.Bottom, addButton, subButton, add1Button, sub1Button, add2Button, sub2Button)
+	if m.State != nil && !m.State.Victory {
+		newGame = rollButton
+	}
+	bar := lipgloss.JoinVertical(lipgloss.Left, newGame, dice, underDice, playerPanel.Render(m.players.View()))
+
+	scene := lipgloss.JoinHorizontal(lipgloss.Bottom, bar, chat)
+	return lipgloss.NewStyle().
+		BorderStyle(lipgloss.RoundedBorder()).
+		Width(m.Width).
+		Render(scene)
 }
 
 func (m LobbyScene) View() string {
@@ -218,7 +609,6 @@ type model struct {
 	Width  int
 	Height int
 
-	stuff    string
 	roomList api.RoomList
 	err      error
 
@@ -226,19 +616,23 @@ type model struct {
 }
 
 func startWebsocket(m model, s GameScene) {
+	m.Common.mu.Lock()
+	defer m.Common.mu.Unlock()
 	ctx := m.Common.ctx
 	serverURL := "wss://rollycubes.com/ws/room/" + s.roomCode
 	c, _, err := websocket.Dial(ctx, serverURL, &websocket.DialOptions{HTTPHeader: http.Header{"Cookie": {"_session=awefo34irj2r04"}}})
 	if err != nil {
 		// ...
-		panic(err)
+		go startWebsocket(m, s)
+		return
 	}
 	m.Common.ws = c
 	// Create a channel to signal when to close the connection
 
 	waitForClose := func(ctx context.Context, conn *websocket.Conn, done chan struct{}) {
-		defer close(done)
 		<-done
+		m.Common.mu.Lock()
+		defer m.Common.mu.Unlock()
 		log.Println("recv")
 		m.Common.ws = nil
 		conn.Close(websocket.StatusInternalError, "goodbye")
@@ -248,7 +642,8 @@ func startWebsocket(m model, s GameScene) {
 			messageType, message, err := conn.Read(ctx)
 			if err != nil {
 				log.Printf("Error reading message: %v", err)
-				// TODO: retry connection?
+				s.Common.disconnect <- struct{}{}
+				go startWebsocket(m, s)
 				return
 			}
 			fmt.Printf("Received message: %s\t%s\n", message, messageType)
@@ -265,7 +660,7 @@ func startWebsocket(m model, s GameScene) {
 		}
 	}
 	// Start a goroutine to read messages from the server
-	go waitForClose(ctx, c, s.disconnect)
+	go waitForClose(ctx, c, s.Common.disconnect)
 	go readMessages(ctx, c)
 }
 func (m model) Init() tea.Cmd {
@@ -273,6 +668,8 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	m.Common.mu.Lock()
+	defer m.Common.mu.Unlock()
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
@@ -305,16 +702,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				log.Println("not selected")
 				return m, nil
 			}
-			ch := make(chan struct{})
-			newScene := GameScene{
-				viewport:   viewport.New(m.Width, m.Height-1),
-				Common:     m.Common,
-				roomCode:   room.Code,
-				disconnect: ch,
-				Width:      m.Width,
-				Height:     m.Height,
-				textInput:  textinput.New(),
+			columns := []table.Column{
+				{Title: "Player", Width: 14},
+				{Title: "Pts", Width: 3},
 			}
+			newScene := GameScene{
+				viewport:  viewport.New(m.Width, m.Height-1),
+				Common:    m.Common,
+				roomCode:  room.Code,
+				Width:     m.Width,
+				Height:    m.Height,
+				textInput: textinput.New(),
+				players:   table.New(table.WithColumns(columns), table.WithHeight(8)),
+			}
+			newScene.ConstrainSize()
 			log.Println("new scene")
 			m.scene = newScene
 			go startWebsocket(m, newScene)
@@ -334,7 +735,7 @@ func (m model) View() string {
 		s += "Welcome back, " + m.user.DisplayName + "!\n"
 	}
 
-	return m.scene.View()
+	return m.Common.zone.Scan(lipgloss.Place(m.Width, m.Height, lipgloss.Center, lipgloss.Center, m.scene.View()))
 }
 
 func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
@@ -352,7 +753,13 @@ func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
 			based := url.QueryEscape(b64.StdEncoding.EncodeToString(bytes))
 			u = store.Take(based)
 		}
-		commonModel := &CommonModel{ctx: s.Context()}
+		ch := make(chan struct{})
+		commonModel := &CommonModel{
+			ctx:        s.Context(),
+			mu:         &sync.Mutex{},
+			disconnect: ch,
+			zone:       zone.New(),
+		}
 		lobbyScene := LobbyScene{
 			Common: commonModel,
 			list:   list.New([]list.Item{}, list.NewDefaultDelegate(), pty.Window.Width-6, pty.Window.Height-2),
@@ -372,7 +779,7 @@ func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
 			Height: pty.Window.Height,
 			scene:  lobbyScene,
 		}
-		opts := []tea.ProgramOption{tea.WithAltScreen()}
+		opts := []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellMotion()}
 		opts = append(opts, tea.WithInput(s), tea.WithOutput(s))
 		p := tea.NewProgram(model, opts...)
 		commonModel.program = p
