@@ -791,7 +791,7 @@ func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
 func main() {
 	store := user.NewStore()
 	server, err := wish.NewServer(
-		wish.WithAddress("127.0.0.1:3022"),
+		wish.WithAddress("0.0.0.0:3022"),
 		wish.WithIdleTimeout(30*time.Minute),
 		wish.WithPublicKeyAuth(func(ctx ssh.Context, key ssh.PublicKey) bool {
 			bytes := key.Marshal()
