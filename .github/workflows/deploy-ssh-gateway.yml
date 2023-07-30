@@ -42,4 +42,4 @@ jobs:
 
     - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} mkdir -p /root/ssh-gateway"
     - run: "scp -P 22222 ssh-gateway/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/ssh-gateway/."
-    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c 'cd /root/ssh-gateway && docker-compose --pull && docker-compose --env-file ../secrets/.env up -d'"
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c 'cd /root/ssh-gateway && docker-compose pull && docker-compose --env-file ../secrets/.env up -d'"
