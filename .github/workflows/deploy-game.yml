@@ -6,7 +6,7 @@ on:
       channel:
         description: 'Channel'
         required: true
-        default: 'beta' 
+        default: 'beta'
         type: choice
         options:
         - prod
@@ -15,14 +15,14 @@ on:
 defaults:
   run:
     shell: bash
-    
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
-    environment: 
+    environment:
       name: ${{ github.event.inputs.channel }}
       url: ${{ fromJson('{"prod":"https://rollycubes.com","beta":"https://beta.rollycubes.com"}')[github.event.inputs.channel] }}
     runs-on: ubuntu-latest
@@ -49,15 +49,16 @@ jobs:
         context: game
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.channel }}
-        
+
     - name: Build client
       run: npm install && npm run build
       working-directory: client
-      
+
     # Deploy it
     - name: ssh-scp-ssh-pipelines
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
       with:
+        port: 22222
         host: ${{ secrets.DO_SERVER_IP }}
         user: root
         key: ${{ secrets.DO_SSH_KEY }}

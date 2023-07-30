@@ -11,7 +11,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: auth
       url: https://auth.rollycubes.com
     permissions:
@@ -36,12 +36,13 @@ jobs:
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-auth:${{ env.CHANNEL }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        
+
 
     - name: Deploy
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
       with:
         host: ${{ secrets.DO_SERVER_IP }}
+        port: 22222
         user: root
         key: ${{ secrets.DO_SSH_KEY }}
         first_ssh: |

@@ -1,4 +1,4 @@
-name: Deploy SSH Gateway 
+name: Deploy SSH Gateway
 
 on:
   workflow_dispatch
@@ -33,11 +33,12 @@ jobs:
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-ssh-gateway:${{ env.CHANNEL }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        
+
 
     - name: Deploy
       uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
       with:
+        port: 22222
         host: ${{ secrets.DO_SERVER_IP }}
         user: root
         key: ${{ secrets.DO_SSH_KEY }}
