@@ -106,6 +106,7 @@ export const authApi = createApi({
         url: `logout`,
         mode: 'cors',
         method: 'POST',
+        credentials: 'include',
       }),
     }),
     setUserColor: builder.mutation<void, ColorSettings>({
