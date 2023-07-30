@@ -101,6 +101,13 @@ export const authApi = createApi({
         body: { setting: 'DiceType', dice_type: type },
       }),
     }),
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: `logout`,
+        mode: 'cors',
+        method: 'POST',
+      }),
+    }),
     setUserColor: builder.mutation<void, ColorSettings>({
       query: (settings) => ({
         url: `users/update_setting`,
@@ -124,6 +131,7 @@ export const {
   useSetUserColorMutation,
   useDonateMutation,
   useSetDiceTypeMutation,
+  useLogoutMutation,
 } = authApi;
 
 type Action = { type: string } & object;

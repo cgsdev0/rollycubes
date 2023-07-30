@@ -19,7 +19,7 @@ import { DiceType, Player } from '../types/store_types';
 import ChatBox from '../ui/chat';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
-import { HelpIcon, GearIcon, HomeIcon } from '../ui/icons/help';
+import { HelpIcon, GearIcon, HomeIcon, LogoutIcon } from '../ui/icons/help';
 import { useStore } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
@@ -29,6 +29,7 @@ import { Button } from 'ui/buttons/button';
 import {
   useDonateMutation,
   useGetUserByIdQuery,
+  useLogoutMutation,
   useSetDiceTypeMutation,
   useSetUserColorMutation,
 } from 'api/auth';
@@ -86,6 +87,7 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
   const location = useLocation();
   const { mode, room } = useParams();
 
+  const [triggerLogout] = useLogoutMutation();
   const store = useStore<ReduxState>();
 
   const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room';
@@ -136,6 +138,14 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
           onClick={() => store.dispatch({ type: 'TOGGLE_SHOW_SETTINGS' })}
         />
         <HelpIcon onClick={() => setShowHelp((help) => !help)} />
+        {authToken ? (
+          <LogoutIcon
+            onClick={async () => {
+              await triggerLogout();
+              window.location.reload();
+            }}
+          />
+        ) : null}
       </FloatingButtonBar>
 
       {showSettings ? (
