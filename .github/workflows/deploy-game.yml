@@ -54,24 +54,19 @@ jobs:
       run: npm install && npm run build
       working-directory: client
 
+
     # Deploy it
-    - name: ssh-scp-ssh-pipelines
-      uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
       with:
-        port: 22222
-        host: ${{ secrets.DO_SERVER_IP }}
-        user: root
         key: ${{ secrets.DO_SSH_KEY }}
-        first_ssh: |
-          cd /root/game/${{ github.event.inputs.channel }}
-          CHANNEL=${{ github.event.inputs.channel }} docker-compose down || true
-          rm -rf /root/client/${{ github.event.inputs.channel }}/*
-        # scp from local to remote
-        scp: |
-          game/docker-compose.yml => '/root/game/${{ github.event.inputs.channel }}'
-          'client/build/*' => '/root/client/${{ github.event.inputs.channel }}/'
-        # execute post-commands after scp
-        last_ssh: |
-          cd /root/game/${{ github.event.inputs.channel }}
-          CHANNEL=${{ github.event.inputs.channel }} docker-compose pull
-          CHANNEL=${{ github.event.inputs.channel }} docker-compose up -d
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - name: remove the existing client
+      run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} rm -rf /root/client/${{ github.event.inputs.channel }}/*"
+    - name: copy the new client
+      run: "scp -P 22222 client/build/* root@${{ secrets.DO_SERVER_IP }}:/root/client/${{ github.event.inputs.channel }}/"
+    - name: copy the game server
+      run: "scp -P 22222 game/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/game/${{ github.event.inputs.channel }}"
+    - name: start the new server
+      run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'export CHANNEL=${{ github.event.inputs.channel }}; docker-compose -f game/$CHANNEL/docker-compose.yml pull && docker-compose -f game/$CHANNEL/docker-compose.yml -d'\""

@@ -13,21 +13,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Deploy
-      uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
       with:
-        port: 22222
-        host: ${{ secrets.DO_SERVER_IP }}
-        user: root
         key: ${{ secrets.DO_SSH_KEY }}
-        first_ssh: |
-          mkdir -p /root/nginx
-          cd /root/nginx
-          docker-compose down || true
-          rm -rf config
-          mkdir -p config
-        scp: |
-          nginx => '/root'
-        last_ssh: |
-          cd /root/nginx
-          docker-compose up -d
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'rm -rf /root/nginx; mkdir -p /root/nginx'\""
+    - run: "scp -P 22222 -r nginx/* root@${{ secrets.DO_SERVER_IP }}:/root/nginx/."
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} docker-compose -f nginx/docker-compose.yml up -d"

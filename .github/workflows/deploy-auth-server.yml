@@ -38,19 +38,12 @@ jobs:
         cache-to: type=gha,mode=max
 
 
-    - name: Deploy
-      uses: cross-the-world/ssh-scp-ssh-pipelines@78e864b4890087a58248ff39320406971ca88b89
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
       with:
-        host: ${{ secrets.DO_SERVER_IP }}
-        port: 22222
-        user: root
         key: ${{ secrets.DO_SSH_KEY }}
-        first_ssh: |
-          cd /root/auth
-          docker-compose down || true
-        scp: |
-          auth/docker-compose.yml => '/root/auth'
-        last_ssh: |
-          cd /root/auth
-          docker-compose pull
-          docker-compose --env-file ../secrets/.env up -d
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} mkdir -p /root/auth"
+    - run: "scp -P 22222 auth/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/auth/."
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'docker-compose -f auth/docker-compose.yml pull && docker-compose -f auth/docker-compose.yml --env-file secrets/.env up -d'\""
