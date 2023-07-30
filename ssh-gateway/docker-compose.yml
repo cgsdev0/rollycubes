@@ -6,7 +6,7 @@ services:
     environment:
       - PROD_WS_URL=ws://game-server-prod:3001
     volumes:
-      - ../secrets/:/secrets
+      - ../secrets/:/go/secrets
     ports:
       - "22:3022"
     external_links:
