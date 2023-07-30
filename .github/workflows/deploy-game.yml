@@ -69,4 +69,4 @@ jobs:
     - name: copy the game server
       run: "scp -P 22222 game/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/game/${{ github.event.inputs.channel }}"
     - name: start the new server
-      run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} CHANNEL=${{ github.event.inputs.channel }} bash -c '\"docker-compose -f game/$CHANNEL/docker-compose.yml pull && docker-compose -f game/$CHANNEL/docker-compose.yml -d\"'"
+      run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'CHANNEL=${{ github.event.inputs.channel }} docker-compose -f game/${{ github.event.inputs.channel }}/docker-compose.yml pull && CHANNEL=${{ github.event.inputs.channel }} docker-compose -f game/{{ github.event.inputs.channel }}/docker-compose.yml -d'\""
