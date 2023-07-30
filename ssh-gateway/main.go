@@ -844,6 +844,7 @@ func main() {
 	server, err := wish.NewServer(
 		wish.WithAddress("0.0.0.0:3022"),
 		wish.WithIdleTimeout(30*time.Minute),
+		wish.WithHostKeyPath("secrets/ssh_host_key"),
 		wish.WithPublicKeyAuth(func(ctx ssh.Context, key ssh.PublicKey) bool {
 			bytes := key.Marshal()
 			based := url.QueryEscape(b64.StdEncoding.EncodeToString(bytes))
