@@ -117,6 +117,9 @@ export const gameReducer = createReducer<GameState>(
             state.self_index--;
           }
         }
+        if (action.id < state.turn_index) {
+          state.turn_index--;
+        }
       })
       .addCase('FINISH_3D_ROLL', (state, action) => {
         state.rolled3d = true;
