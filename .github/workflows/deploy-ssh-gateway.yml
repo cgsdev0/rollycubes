@@ -28,7 +28,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
-        context: auth
+        context: ssh-gateway
         push: true
         tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-ssh-gateway:${{ env.CHANNEL }}
         cache-from: type=gha
