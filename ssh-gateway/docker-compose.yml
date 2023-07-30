@@ -4,7 +4,7 @@ services:
     image: ghcr.io/cgsdev0/rollycubes-ssh-gateway
     restart: always
     environment:
-      - PROD_WS_URL="ws://game-server-prod"
+      - PROD_WS_URL=ws://game-server-prod:3001
     volumes:
       - ../secrets/:/secrets
     ports:
