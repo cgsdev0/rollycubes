@@ -53,7 +53,7 @@ type LobbyScene struct {
 
 type GameScene struct {
 	Common *CommonModel
-	State  *api.GameState
+	State  *api.IGameState
 	Width  int
 	Height int
 	SelfID int
@@ -236,6 +236,42 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case WebsocketMsg:
 		switch msg.Type {
+		case "kick":
+			kick, err := api.UnmarshalKickMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			m.State.Players = append(m.State.Players[:kick.ID], m.State.Players[kick.ID+1:]...)
+			if int(kick.ID) < m.SelfID {
+				m.SelfID -= 1
+			}
+			if kick.ID < m.State.TurnIndex {
+				m.State.TurnIndex -= 1
+			}
+			var rows []table.Row
+			for i, player := range m.State.Players {
+				var name string
+				if player.Name == nil {
+					name = "User" + fmt.Sprint(i+1)
+				} else {
+					name = *player.Name
+				}
+				row := table.Row{name, fmt.Sprint(player.Score)}
+				rows = append(rows, row)
+			}
+			m.players.SetRows(rows)
+			m.players.SetCursor(int(m.State.TurnIndex))
+		case "join":
+			join, err := api.UnmarshalJoinMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			newPlayer := api.Player{
+				Name: join.Name,
+			}
+			m.State.Players = append(m.State.Players, newPlayer)
 		case "restart":
 			restart, err := api.UnmarshalRestartMsg(msg.Msg)
 			if err != nil {
@@ -256,6 +292,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				rows = append(rows, table.Row{name, fmt.Sprint(m.State.Players[i].Score)})
 			}
+			m.players.SetRows(rows)
 			m.State.Victory = false
 			m.State.Rolled = false
 			m.players.SetCursor(int(m.State.TurnIndex))
@@ -317,7 +354,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				log.Printf("idfk it broke %v+\n", err)
 				break
 			}
-			state, err := api.UnmarshalGameState(msg.Msg)
+			state, err := api.UnmarshalIGameState(msg.Msg)
 			if err != nil {
 				log.Printf("idfk it broke %v+\n", err)
 				break
@@ -619,31 +656,44 @@ func startWebsocket(m model, s GameScene) {
 	m.Common.mu.Lock()
 	defer m.Common.mu.Unlock()
 	ctx := m.Common.ctx
-	serverURL := "wss://rollycubes.com/ws/room/" + s.roomCode
+	prodWsUrl := os.Getenv("PROD_WS_URL")
+	if len(prodWsUrl) == 0 {
+		prodWsUrl = "wss://rollycubes.com"
+	}
+	serverURL := prodWsUrl + "/ws/room/" + s.roomCode
 	c, _, err := websocket.Dial(ctx, serverURL, &websocket.DialOptions{HTTPHeader: http.Header{"Cookie": {"_session=awefo34irj2r04"}}})
 	if err != nil {
-		// ...
-		go startWebsocket(m, s)
+		fmt.Printf("Error connecting to websocket: %v+\n", err)
 		return
 	}
 	m.Common.ws = c
 	// Create a channel to signal when to close the connection
 
 	waitForClose := func(ctx context.Context, conn *websocket.Conn, done chan struct{}) {
-		<-done
+		select {
+		case <-done:
+			log.Println("Done signal")
+		case <-ctx.Done():
+			log.Println("Context canceled")
+		}
 		m.Common.mu.Lock()
 		defer m.Common.mu.Unlock()
-		log.Println("recv")
 		m.Common.ws = nil
 		conn.Close(websocket.StatusInternalError, "goodbye")
+	}
+	sendPings := func(ctx context.Context, conn *websocket.Conn) {
+		for {
+			if err = conn.Ping(ctx); err != nil {
+				return
+			}
+			time.Sleep(time.Second * 30)
+		}
 	}
 	readMessages := func(ctx context.Context, conn *websocket.Conn) {
 		for {
 			messageType, message, err := conn.Read(ctx)
 			if err != nil {
-				log.Printf("Error reading message: %v", err)
-				s.Common.disconnect <- struct{}{}
-				go startWebsocket(m, s)
+				ctx.Done()
 				return
 			}
 			fmt.Printf("Received message: %s\t%s\n", message, messageType)
@@ -660,6 +710,7 @@ func startWebsocket(m model, s GameScene) {
 		}
 	}
 	// Start a goroutine to read messages from the server
+	go sendPings(ctx, c)
 	go waitForClose(ctx, c, s.Common.disconnect)
 	go readMessages(ctx, c)
 }
