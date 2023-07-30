@@ -9,7 +9,7 @@ services:
       - ../secrets/:/secrets
     ports:
       - "22:3022"
-    external-links:
+    external_links:
       - "game-server-prod:game-server-prod"
 
 networks:
