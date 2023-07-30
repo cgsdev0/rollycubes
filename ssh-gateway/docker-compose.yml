@@ -6,7 +6,7 @@ services:
     volumes:
       - ../secrets/:/secrets
     ports:
-      - 3022:22
+      - "3022:22"
 
 networks:
   default:
