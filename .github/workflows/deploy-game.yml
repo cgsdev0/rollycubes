@@ -65,7 +65,7 @@ jobs:
     - name: remove the existing client
       run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} rm -rf /root/client/${{ github.event.inputs.channel }}/*"
     - name: copy the new client
-      run: "scp -P 22222 client/build/* root@${{ secrets.DO_SERVER_IP }}:/root/client/${{ github.event.inputs.channel }}/"
+      run: "scp -P 22222 -r client/build/* root@${{ secrets.DO_SERVER_IP }}:/root/client/${{ github.event.inputs.channel }}/"
     - name: copy the game server
       run: "scp -P 22222 game/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/game/${{ github.event.inputs.channel }}"
     - name: start the new server
