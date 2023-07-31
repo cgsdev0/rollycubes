@@ -5,6 +5,11 @@ use axum::{
     Json,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
+use base64::{
+    alphabet,
+    engine::{self, general_purpose},
+    Engine as _,
+};
 use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
 use serde_repr::*;
@@ -61,6 +66,7 @@ pub struct ColorSettings {
 pub enum UpdateSettingsPayload {
     DiceType { dice_type: DiceType },
     Color { color: ColorSettings },
+    Pubkey { text: String },
 }
 
 #[derive(Serialize)]
@@ -361,6 +367,27 @@ pub async fn update_user_setting(
     let client = s.pool.get().await?;
 
     match body {
+        UpdateSettingsPayload::Pubkey { text } => {
+            let keys = text.lines().map(|line| {
+                let key = openssh_keys::PublicKey::parse(line).unwrap();
+                general_purpose::STANDARD.encode(key.data())
+            });
+            client
+                .execute(
+                    "DELETE FROM pubkey_to_user WHERE user_id = $2::UUID",
+                    &[&verified_token.claims.user_id],
+                )
+                .await?;
+            for key in keys {
+                client
+                    .execute(
+                        "INSERT INTO pubkey_to_user (pubkey, user_id) VALUES ($1, $2::UUID)",
+                        &[&key, &verified_token.claims.user_id],
+                    )
+                    .await?;
+            }
+            Ok(())
+        }
         UpdateSettingsPayload::Color { color } => {
             if !(0.0..=360.0).contains(&color.hue) {
                 return Err(RouteError::UserError(
