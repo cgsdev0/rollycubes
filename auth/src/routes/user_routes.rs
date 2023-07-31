@@ -5,11 +5,7 @@ use axum::{
     Json,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
-use base64::{
-    alphabet,
-    engine::{self, general_purpose},
-    Engine as _,
-};
+use base64::{engine::general_purpose, Engine as _};
 use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
 use serde_repr::*;
@@ -81,6 +77,7 @@ pub struct User {
     achievements: Option<Vec<AchievementProgress>>,
     stats: Option<PlayerStats>,
     donor: bool,
+    pubkey_text: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -452,7 +449,7 @@ pub async fn user_self(
 ) -> Result<Json<User>, RouteError> {
     let access_token = headers.get("x-access-token").ok_or(RouteError::Forbidden)?;
     let verified_token = s.jwt.verify(access_token.to_str().unwrap())?;
-    user_by_id(Path(verified_token.claims.user_id), State(s)).await
+    user_by_id(headers, Path(verified_token.claims.user_id), State(s)).await
 }
 
 #[derive(Serialize, Deserialize)]
@@ -574,10 +571,19 @@ pub async fn user_by_pubkey(
 
 #[axum::debug_handler]
 pub async fn user_by_id(
+    headers: HeaderMap,
     Path(user_id): Path<Uuid>,
     State(s): State<RouterState>,
 ) -> Result<Json<User>, RouteError> {
     let client = s.pool.get().await?;
+    let mut self_id: Option<Uuid> = None;
+    if let Some(access_token) = headers.get("x-access-token") {
+        if let Ok(token_string) = access_token.to_str() {
+            if let Ok(verified_token) = s.jwt.verify(token_string) {
+                self_id = Some(verified_token.claims.user_id);
+            }
+        }
+    }
     let rows = client
         .query(
             "
@@ -606,6 +612,7 @@ SELECT
     user_settings.dice_type as dice_type,
     user_settings.color_hue as color_hue,
     user_settings.color_sat as color_sat,
+    user_settings.pubkey_text as pubkey_text,
     unlocked,
     progress,
     rolls,
@@ -629,6 +636,11 @@ WHERE id=$1::UUID",
         let rolls: Option<i32> = row.get("rolls");
         let achievement_id: Option<String> = row.get("achievement_id");
         let user = User {
+            pubkey_text: if self_id == Some(user_id) {
+                Some(row.get("pubkey_text"))
+            } else {
+                None
+            },
             id: row.get("id"),
             username: row.get("username"),
             image_url: row.get("image_url"),
