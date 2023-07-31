@@ -14,3 +14,8 @@ type AddSubNMsg struct {
 	Type string `json:"type"`
 	Idx  int    `json:"n"`
 }
+
+type AuthenticateMsg struct {
+	Type        string `json:"type"`
+	AccessToken string `json:"access_token"`
+}

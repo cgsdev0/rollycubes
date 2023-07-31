@@ -1,0 +1,5 @@
+- help menu at the bottom
+- keyboard shortcuts for actions
+- tab on the menu for beta server list
+- animations
+- kick people / see disconnected

@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/charmbracelet/ssh v0.0.0-20221117183211-483d43d97103
 	github.com/charmbracelet/wish v1.1.1
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/lrstanley/bubblezone v0.0.0-20230728130532-d9338f0c568d
 	github.com/muesli/reflow v0.3.0
 	github.com/muesli/termenv v0.15.1

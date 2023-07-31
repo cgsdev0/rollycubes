@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"crypto/sha1"
+	"crypto/x509"
 	b64 "encoding/base64"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -30,6 +34,7 @@ import (
 	wish "github.com/charmbracelet/wish"
 	"github.com/charmbracelet/wish/bubbletea"
 	lm "github.com/charmbracelet/wish/logging"
+	"github.com/golang-jwt/jwt/v5"
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/muesli/reflow/wrap"
 	gossh "golang.org/x/crypto/ssh"
@@ -38,12 +43,15 @@ import (
 )
 
 type CommonModel struct {
-	mu         *sync.Mutex
-	ctx        ssh.Context
-	ws         *websocket.Conn
-	program    *tea.Program
-	disconnect chan struct{}
-	zone       *zone.Manager
+	mu          *sync.Mutex
+	ctx         ssh.Context
+	ws          *websocket.Conn
+	program     *tea.Program
+	disconnect  chan struct{}
+	zone        *zone.Manager
+	session     ssh.Session
+	AccessToken string
+	User        *user.User
 }
 
 type LobbyScene struct {
@@ -272,6 +280,19 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Name: join.Name,
 			}
 			m.State.Players = append(m.State.Players, newPlayer)
+			var rows []table.Row
+			for i, player := range m.State.Players {
+				var name string
+				if player.Name == nil {
+					name = "User" + fmt.Sprint(i+1)
+				} else {
+					name = *player.Name
+				}
+				row := table.Row{name, fmt.Sprint(player.Score)}
+				rows = append(rows, row)
+			}
+			m.players.SetRows(rows)
+			m.players.SetCursor(int(m.State.TurnIndex))
 		case "restart":
 			restart, err := api.UnmarshalRestartMsg(msg.Msg)
 			if err != nil {
@@ -380,6 +401,37 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			wrapped := wrap.String(strings.Join(m.State.ChatLog, "\n"), chatWidth-1)
 			m.viewport.SetContent(wrapped)
 			m.viewport.SetYOffset(m.viewport.YOffset + 100000000) // lol
+
+			// Update our name
+			if m.Common.ws != nil {
+				log.Printf("HELLO HELLO %v+\n", m.Common.session.Environ())
+				msg := api.UpdateNameMsg{Type: api.UpdateName, Name: m.Common.session.User()}
+				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		case "update_name":
+			updateName, err := api.UnmarshalUpdateNameMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			m.State.Players[updateName.ID].Name = &updateName.Name
+			var rows []table.Row
+			for i, player := range m.State.Players {
+				var name string
+				if player.Name == nil {
+					name = "User" + fmt.Sprint(i+1)
+				} else {
+					name = *player.Name
+				}
+				row := table.Row{name, fmt.Sprint(player.Score)}
+				rows = append(rows, row)
+			}
+			m.players.SetRows(rows)
+			m.players.SetCursor(int(m.State.TurnIndex))
 		case "chat":
 			chat, err := api.UnmarshalChatMsg(msg.Msg)
 			if err != nil {
@@ -641,8 +693,6 @@ type model struct {
 	Common *CommonModel
 	user   *user.User
 
-	session ssh.Session
-
 	Width  int
 	Height int
 
@@ -660,11 +710,32 @@ func startWebsocket(m model, s GameScene) {
 	if len(prodWsUrl) == 0 {
 		prodWsUrl = "wss://rollycubes.com"
 	}
-	serverURL := prodWsUrl + "/ws/room/" + s.roomCode
-	c, _, err := websocket.Dial(ctx, serverURL, &websocket.DialOptions{HTTPHeader: http.Header{"Cookie": {"_session=awefo34irj2r04"}}})
+	betaWsUrl := os.Getenv("BETA_WS_URL")
+	if len(betaWsUrl) == 0 {
+		betaWsUrl = "wss://beta.rollycubes.com"
+	}
+	var userIdStr string
+
+	if m.Common.User != nil && len(m.Common.AccessToken) > 0 {
+		userIdStr = "?userId=" + m.Common.User.Id
+	}
+	serverURL := prodWsUrl + "/ws/room/" + s.roomCode + userIdStr
+	ipstr, _, _ := net.SplitHostPort(m.Common.ctx.RemoteAddr().String())
+	fingstring := ipstr + m.Common.ctx.ClientVersion() + m.Common.ctx.User()
+	fingerprint := fmt.Sprintf("gateway:%x", sha1.Sum([]byte(fingstring)))
+	c, _, err := websocket.Dial(ctx, serverURL, &websocket.DialOptions{HTTPHeader: http.Header{"Cookie": {"_session=" + fingerprint}}})
 	if err != nil {
 		fmt.Printf("Error connecting to websocket: %v+\n", err)
 		return
+	}
+
+	if len(userIdStr) > 0 {
+		if err = wsjson.Write(ctx, c, api.AuthenticateMsg{
+			Type:        "authenticate",
+			AccessToken: m.Common.AccessToken,
+		}); err != nil {
+			panic(err)
+		}
 	}
 	m.Common.ws = c
 	// Create a channel to signal when to close the connection
@@ -789,7 +860,33 @@ func (m model) View() string {
 	return m.Common.zone.Scan(lipgloss.Place(m.Width, m.Height, lipgloss.Center, lipgloss.Center, m.scene.View()))
 }
 
-func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
+// Create that fkin goooooooooooooooood token that lasts a whole ass year.
+func signTheyJWT(u user.User, jwt_signing_key any) string {
+	type MyCustomClaims struct {
+		UserID      string `json:"user_id"`
+		DisplayName string `json:"display_name"`
+		jwt.RegisteredClaims
+	}
+
+	// Create the Claims
+	claims := MyCustomClaims{
+		u.Id,
+		u.DisplayName,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 365 * time.Hour)),
+			Issuer:    "gateway",
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	ss, err := token.SignedString(jwt_signing_key)
+	if err != nil {
+		return ""
+	}
+	return ss
+}
+
+func bubbleTeaMiddleware(store *user.Store, jwt_signing_key any) wish.Middleware {
 	cp := termenv.ANSI256
 	h := func(s ssh.Session) *tea.Program {
 		pty, _, active := s.Pty()
@@ -799,17 +896,26 @@ func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
 		}
 		key := s.PublicKey()
 		var u *user.User
+		var theyJWT string
 		if key != nil {
 			bytes := key.Marshal()
 			based := url.QueryEscape(b64.StdEncoding.EncodeToString(bytes))
 			u = store.Take(based)
+			if u != nil {
+				log.Println("WE SIGNING A JWT")
+				theyJWT = signTheyJWT(*u, jwt_signing_key)
+				log.Print(len(theyJWT))
+			}
 		}
 		ch := make(chan struct{})
 		commonModel := &CommonModel{
-			ctx:        s.Context(),
-			mu:         &sync.Mutex{},
-			disconnect: ch,
-			zone:       zone.New(),
+			ctx:         s.Context(),
+			mu:          &sync.Mutex{},
+			disconnect:  ch,
+			zone:        zone.New(),
+			session:     s,
+			AccessToken: theyJWT,
+			User:        u,
 		}
 		lobbyScene := LobbyScene{
 			Common: commonModel,
@@ -822,7 +928,6 @@ func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
 
 			user: u,
 
-			session: s,
 			// A map which indicates which choices are selected. We're using
 			// the  map like a mathematical set. The keys refer to the indexes
 			// of the `choices` slice, above.
@@ -840,6 +945,20 @@ func bubbleTeaMiddleware(store *user.Store) wish.Middleware {
 }
 
 func main() {
+	dat, err := os.ReadFile("secrets/.id")
+	if err != nil {
+		panic(err)
+	}
+	block, _ := pem.Decode(dat)
+	jwt_signing_key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		panic(err)
+	}
+
+	authUrl := os.Getenv("AUTH_URL")
+	if len(authUrl) == 0 {
+		authUrl = "https://auth.rollycubes.com"
+	}
 	store := user.NewStore()
 	server, err := wish.NewServer(
 		wish.WithAddress("0.0.0.0:3022"),
@@ -848,7 +967,7 @@ func main() {
 		wish.WithPublicKeyAuth(func(ctx ssh.Context, key ssh.PublicKey) bool {
 			bytes := key.Marshal()
 			based := url.QueryEscape(b64.StdEncoding.EncodeToString(bytes))
-			resp, err := http.Get("http://localhost:3031/pubkey/" + based)
+			resp, err := http.Get(authUrl + "/pubkey/" + based)
 			if err != nil || resp.StatusCode != 200 {
 				return false
 			}
@@ -857,7 +976,6 @@ func main() {
 			if err != nil {
 				return false
 			}
-			log.Printf("%s\n", string(bytes))
 			var u user.User
 			if err = json.Unmarshal(bytes, &u); err != nil {
 				return false
@@ -873,7 +991,7 @@ func main() {
 			return true
 		}),
 		wish.WithMiddleware(
-			bubbleTeaMiddleware(&store),
+			bubbleTeaMiddleware(&store, jwt_signing_key),
 			lm.Middleware(),
 		))
 	if err != nil {
