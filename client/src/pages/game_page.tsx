@@ -31,6 +31,7 @@ import {
   useGetUserByIdQuery,
   useLogoutMutation,
   useSetDiceTypeMutation,
+  useSetPubkeyTextMutation,
   useSetUserColorMutation,
 } from 'api/auth';
 
@@ -169,6 +170,7 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
 const Settings: React.FC<{}> = () => {
   const [trigger] = useSetUserColorMutation();
   const [setDiceType] = useSetDiceTypeMutation();
+  const [setPubkeyText] = useSetPubkeyTextMutation();
   const [donate, { data: donateData }] = useDonateMutation();
 
   React.useEffect(() => {
@@ -184,12 +186,14 @@ const Settings: React.FC<{}> = () => {
   const dispatch = useDispatch();
   const dice3d = useSelector((state: ReduxState) => state.settings.sick3dmode);
   const color = useSelector((state: ReduxState) => state.settings.color);
+  const pubkey = useSelector((state: ReduxState) => state.settings.pubkey);
   const dice_type = useSelector(
     (state: ReduxState) => state.settings.dice_type
   );
   const onSave = React.useCallback(async () => {
     await trigger(color);
     await setDiceType(dice_type);
+    await setPubkeyText(pubkey);
     socket?.send(JSON.stringify({ type: 'refetch_player', user_id }));
   }, [trigger, color, socket, user_id, dice_type, setDiceType]);
   const onHueChange = React.useCallback(
@@ -213,6 +217,14 @@ const Settings: React.FC<{}> = () => {
       dispatch({
         type: 'SET_DICE_TYPE',
         dice_type: Number.parseInt(e.target.value),
+      }),
+    [dispatch]
+  );
+  const onPubkeyChange = React.useCallback(
+    (e) =>
+      dispatch({
+        type: 'SET_PUBKEY_TEXT',
+        pubkey_text: e.target.value,
       }),
     [dispatch]
   );
@@ -257,6 +269,7 @@ const Settings: React.FC<{}> = () => {
             id="saturation"
             onChange={onSatChange}
           />
+          <textarea rows={50} value={pubkey} onChange={onPubkeyChange} />
         </>
       ) : null}
       <SaveButtonWrapper>

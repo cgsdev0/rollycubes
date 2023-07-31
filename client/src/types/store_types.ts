@@ -89,6 +89,7 @@ export interface UserData {
     hue: number;
     sat: number;
   };
+  pubkey_text?: string | null;
   achievements?: Achievement[] | null;
   createdDate: string;
   donor: boolean;

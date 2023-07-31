@@ -93,6 +93,14 @@ export const authApi = createApi({
         method: 'POST',
       }),
     }),
+    setPubkeyText: builder.mutation<void, string>({
+      query: (text) => ({
+        url: `users/update_setting`,
+        mode: 'cors',
+        method: 'POST',
+        body: { setting: 'Pubkey', text },
+      }),
+    }),
     setDiceType: builder.mutation<void, DiceType>({
       query: (type) => ({
         url: `users/update_setting`,
@@ -133,6 +141,7 @@ export const {
   useDonateMutation,
   useSetDiceTypeMutation,
   useLogoutMutation,
+  useSetPubkeyTextMutation,
 } = authApi;
 
 type Action = { type: string } & object;

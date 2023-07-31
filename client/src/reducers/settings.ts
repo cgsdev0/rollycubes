@@ -12,6 +12,7 @@ export interface SettingsState {
     hue: number;
     sat: number;
   };
+  pubkey: string;
   dice_type: DiceType;
 }
 
@@ -29,6 +30,7 @@ export const settingsReducer = createReducer<SettingsState>(
       ? LOCAL_AUTH_SERVICE
       : PROD_AUTH_SERVICE,
     showSettings: false,
+    pubkey: '',
     color: {
       hue: 0,
       sat: 80,
@@ -53,6 +55,7 @@ export const settingsReducer = createReducer<SettingsState>(
           ) {
             state.color = action.payload.color;
             state.dice_type = action.payload.dice.type;
+            state.pubkey = action.payload.pubkey_text || '';
           }
         }
       })
@@ -67,6 +70,9 @@ export const settingsReducer = createReducer<SettingsState>(
       })
       .addCase('SET_DICE_TYPE', (state, action: any) => {
         state.dice_type = action.dice_type;
+      })
+      .addCase('SET_PUBKEY_TEXT', (state, action: any) => {
+        state.pubkey = action.pubkey_text;
       })
       .addCase('TOGGLE_SHOW_SETTINGS', (state, action) => {
         state.showSettings = !state.showSettings;
