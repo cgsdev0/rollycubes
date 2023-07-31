@@ -371,14 +371,14 @@ pub async fn update_user_setting(
             });
             client
                 .execute(
-                    "DELETE FROM pubkey_to_user WHERE user_id = $2::UUID",
+                    "DELETE FROM pubkey_to_user WHERE user_id = $1::UUID",
                     &[&verified_token.claims.user_id],
                 )
                 .await?;
             for key in keys {
                 client
                     .execute(
-                        "INSERT INTO pubkey_to_user (pubkey, user_id) VALUES ($1, $2::UUID)",
+                        "INSERT INTO pubkey_to_user (pubkey, user_id) VALUES ($1::TEXT, $2::UUID)",
                         &[&key, &verified_token.claims.user_id],
                     )
                     .await?;
@@ -558,7 +558,7 @@ pub async fn user_by_pubkey(
     let client = s.pool.get().await?;
     let row = client
         .query_one(
-            "SELECT user_id, username FROM pubkey_to_user LEFT JOIN users ON id = user_id WHERE pubkey = $1",
+            "SELECT user_id, username FROM pubkey_to_user LEFT JOIN users ON id = user_id WHERE pubkey = $1::TEXT",
             &[&pubkey],
         )
         .await?;
