@@ -383,6 +383,12 @@ pub async fn update_user_setting(
                     )
                     .await?;
             }
+            client
+                .execute(
+                    "UPDATE user_settings SET pubkey_text = $2::TEXT WHERE user_id = $1::UUID",
+                    &[&verified_token.claims.user_id, &text],
+                )
+                .await?;
             Ok(())
         }
         UpdateSettingsPayload::Color { color } => {
