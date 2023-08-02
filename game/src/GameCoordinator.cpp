@@ -108,8 +108,8 @@ void GameCoordinator::save_to_disk() {
     for (const auto &g : games) {
         state[g.first] = json::parse(g.second->toString());
     }
-    remove("server_state.json");
-    std::ofstream state_file("server_state.json");
+    remove("data/server_state.json");
+    std::ofstream state_file("data/server_state.json");
     if (!state.is_null()) {
         state_file << state;
         state_file.close();

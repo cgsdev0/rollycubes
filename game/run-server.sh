@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 mkdir -p ./secrets
+mkdir -p ./data
 touch ./secrets/.pre-shared-key
 
 while true;

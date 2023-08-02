@@ -6,6 +6,7 @@ services:
     image: "ghcr.io/cgsdev0/rollycubes:${CHANNEL}"
     volumes:
       - ../../secrets:/secrets
+      - "./data:/data"
     environment:
       - CHANNEL
     external_links:
@@ -14,4 +15,3 @@ networks:
   default:
     name: rollycubes
     external: true
-
