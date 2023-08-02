@@ -6,7 +6,7 @@ services:
     image: "ghcr.io/cgsdev0/rollycubes:${CHANNEL}"
     volumes:
       - ../../secrets:/secrets
-      - ${CHANNEL}gamedata:/data
+      - data:/data
     environment:
       - CHANNEL
     external_links:
