@@ -193,8 +193,10 @@ export const optimisticUpdates = (
   }
 
   if (isAction<AchievementUnlock>(data, 'achievement_unlock')) {
-    if (data.user_index === state.game.self_index) {
-      toast(Achievement(data), { autoClose: 0 });
+    if (state.game.self_index !== undefined) {
+      if (data.user_index === state.game.self_index) {
+        toast(Achievement(data), { autoClose: 0 });
+      }
     }
     const { user_id } = data;
     if (user_id) {
