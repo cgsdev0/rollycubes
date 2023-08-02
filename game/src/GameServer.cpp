@@ -55,7 +55,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
         // Connecting to a valid game
         Game *g = it->second;
         if (!userData->spectator) {
-            if (!g->hasPlayer(userData->session)) {
+            if (!(g->hasPlayer(userData->session) || g->hasPlayer(userData->session_from_cookie))) {
                 json resp = g->addPlayer(*userData);
                 if (resp.is_null()) {
                     // room is full
@@ -64,7 +64,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
                 }
                 app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
             } else {
-                json resp = g->reconnectPlayer(userData->session);
+                json resp = g->reconnectPlayer(userData->session, userData->session_from_cookie, *userData);
                 app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
             }
         }
@@ -101,6 +101,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
             .upgrade =
                 [&, app](auto *res, auto *req, auto *context) {
                     std::string session = getSession(req);
+                    std::string session_from_cookie = session;
                     bool is_verified = true;
                     std::string mode = std::string(req->getParameter(0));
                     std::string room = std::string(req->getParameter(1));
@@ -117,9 +118,13 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         if (g->isPlayerConnected(session)) {
                             dedupe_conns = true;
                         }
+                        if (g->isPlayerConnected(session_from_cookie)) {
+                            dedupe_conns = true;
+                        }
                     }
                     res->template upgrade<PerSocketData>(
                         {.session = session,
+                         .session_from_cookie = session_from_cookie,
                          .room = room,
                          .display_name = "",
                          .user_id = "",

@@ -20,6 +20,7 @@ import HomePage from './pages/home_page';
 import OnboardPage from './pages/onboard_page';
 import TwitchOAuthPage from './pages/twitch_oauth_page';
 import { store, history } from './store';
+import { FloatingButtonBar } from 'ui/floating_bar';
 
 const RenderCanvas = styled('canvas', {
   position: 'absolute',
@@ -143,6 +144,7 @@ const AppInner = () => {
                   style={{ transform: transformString }}
                 >
                   <div className={innerContainer()}>
+                    <FloatingButtonBar />
                     <Routes>
                       <Route path="/">
                         <Route index element={<HomePage />} />
@@ -151,7 +153,6 @@ const AppInner = () => {
                           path="twitch_oauth"
                           element={<TwitchOAuthPage />}
                         />
-                        <Route path="onboard" element={<OnboardPage />} />
                         <Route
                           path="multiple-tabs"
                           element={<TabErrorPage />}

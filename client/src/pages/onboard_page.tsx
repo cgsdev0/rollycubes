@@ -32,6 +32,7 @@ const content = css({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
+  height: '100%',
 });
 const verticalDivider = css({
   backgroundColor: '$gray500',
@@ -103,24 +104,14 @@ const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
   );
 
   const navigate = useNavigate();
-  const [pressed, setPressed] = React.useState(false);
 
   const { authToken, authService, dispatch } = props;
 
   const onStart = async () => {
-    if (pressed) return;
     localStorage.setItem('name', username);
     if (props.onBoard) {
       props.onBoard();
       return;
-    }
-    setPressed(true);
-    const result = await window.fetch(`/create?public`);
-    if (!result.ok) {
-      setPressed(false);
-    } else {
-      const dest = await result.text();
-      navigate(`/room/${dest}`, { replace: true });
     }
   };
 
@@ -144,7 +135,7 @@ const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
       <div className={buttonContainer()}>
         <Section>
           <InnerSection>
-            <TwitchButton intent={props.intent || 'start'} />
+            <TwitchButton intent={props.intent || ''} />
             <p>Earn achievements</p>
           </InnerSection>
         </Section>

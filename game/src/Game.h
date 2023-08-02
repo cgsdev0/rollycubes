@@ -67,7 +67,7 @@ class Game {
     int getPlayerId(const std::string &id);
 
     json disconnectPlayer(std::string id);
-    json reconnectPlayer(std::string id);
+    json reconnectPlayer(std::string id, std::string old_id, const PerSocketData& data);
     bool isPlayerConnected(std::string id) const;
 
     void advanceTurn();

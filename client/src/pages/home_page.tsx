@@ -1,7 +1,10 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { keyframes, css, styled } from 'stitches.config';
+import { ReduxState } from 'store';
 import { Button } from '../ui/buttons/button';
+import OnboardPage from './onboard_page';
 import itsBoatsLogo from '/itsboats.png';
 
 interface Game {
@@ -151,6 +154,15 @@ const HomePage = () => {
   };
   const onStart = (priv: boolean) => async () => {
     navigate(`/onboard`);
+    if (pressed) return;
+    setPressed(true);
+    const result = await window.fetch(`/create?public`);
+    if (!result.ok) {
+      setPressed(false);
+    } else {
+      const dest = await result.text();
+      navigate(`/room/${dest}`, { replace: true });
+    }
   };
 
   React.useEffect(() => {
@@ -159,6 +171,21 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const dispatch = useDispatch();
+
+  const setShowLogin = React.useCallback(
+    (show: boolean) => {
+      dispatch({ type: 'SET_SHOW_LOGIN', show });
+    },
+    [dispatch]
+  );
+  const showLogin = useSelector(
+    (state: ReduxState) => state.settings.showLogin
+  );
+
+  if (showLogin) {
+    return <OnboardPage onBoard={() => setShowLogin(false)} />;
+  }
   return (
     <>
       <div className={content()}>

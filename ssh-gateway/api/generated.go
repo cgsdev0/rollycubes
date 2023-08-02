@@ -496,6 +496,7 @@ type UserData struct {
 	Donor        bool          `json:"donor"`
 	ID           string        `json:"id"`
 	ImageURL     *string       `json:"image_url"`
+	PubkeyText   *string       `json:"pubkey_text"`
 	Stats        *UserStats    `json:"stats"`
 	Username     string        `json:"username"`
 }
@@ -645,8 +646,10 @@ type DisconnectMsg struct {
 }
 
 type ReconnectMsg struct {
-	ID   int64            `json:"id"`
-	Type ReconnectMsgType `json:"type"`
+	ID     int64            `json:"id"`
+	Name   *string          `json:"name,omitempty"`
+	Type   ReconnectMsgType `json:"type"`
+	UserID *string          `json:"user_id,omitempty"`
 }
 
 type KickMsg struct {

@@ -22,6 +22,7 @@ void fromString(const std::string &str);
         bool donor;
         std::string id;
         std::shared_ptr<std::string> image_url;
+        std::shared_ptr<std::string> pubkey_text;
         std::shared_ptr<UserStats> stats;
         std::string username;
     };

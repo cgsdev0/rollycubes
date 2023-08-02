@@ -109,6 +109,11 @@ export const gameReducer = createReducer<GameState>(
       })
       .addCase('reconnect', (state, action: ReconnectMsg) => {
         state.players[action.id].connected = true;
+        // Promotion flow
+        if (action.user_id) {
+          state.players[action.id].user_id = action.user_id;
+          state.players[action.id].name = action.name;
+        }
       })
       .addCase('kick', (state, action: KickMsg) => {
         state.players.splice(action.id, 1);

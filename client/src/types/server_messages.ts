@@ -84,6 +84,9 @@ export interface DisconnectMsg {
 export interface ReconnectMsg {
   type: 'reconnect';
   id: integer;
+  /* only if the user is signed in */
+  name?: string;
+  user_id?: string;
 }
 
 export interface KickMsg {

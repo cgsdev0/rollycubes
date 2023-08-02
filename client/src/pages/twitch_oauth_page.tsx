@@ -19,7 +19,6 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
       const hash = window.location.hash.replace('#', '');
       const params = new URLSearchParams(hash);
       const twitch_access_token = params.get('access_token');
-      console.log({ twitch_access_token });
       const resp = await window.fetch(
         authService + 'twitch_login_or_register',
         {
@@ -52,7 +51,7 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
       if (authToken) {
         const intent = localStorage.getItem('intent');
         if (intent) localStorage.removeItem('intent');
-        if (intent == 'start') {
+        if (intent === 'start') {
           const result = await window.fetch(`/create?public`);
           if (!result.ok) {
             navigate('/home', { replace: true });

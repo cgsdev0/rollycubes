@@ -270,6 +270,29 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.players.SetRows(rows)
 			m.players.SetCursor(int(m.State.TurnIndex))
+		case "reconnect":
+			reconnect, err := api.UnmarshalReconnectMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			if reconnect.UserID != nil {
+				m.State.Players[reconnect.ID].UserID = reconnect.UserID
+				m.State.Players[reconnect.ID].Name = reconnect.Name
+			}
+			var rows []table.Row
+			for i, player := range m.State.Players {
+				var name string
+				if player.Name == nil {
+					name = "User" + fmt.Sprint(i+1)
+				} else {
+					name = *player.Name
+				}
+				row := table.Row{name, fmt.Sprint(player.Score)}
+				rows = append(rows, row)
+			}
+			m.players.SetRows(rows)
+			m.players.SetCursor(int(m.State.TurnIndex))
 		case "join":
 			join, err := api.UnmarshalJoinMsg(msg.Msg)
 			if err != nil {

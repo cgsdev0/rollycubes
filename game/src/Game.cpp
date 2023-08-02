@@ -144,9 +144,19 @@ bool Game::isPlayerConnected(std::string id) const {
     return false;
 }
 
-json Game::reconnectPlayer(std::string id) {
+json Game::reconnectPlayer(std::string id, std::string old_id, const PerSocketData& data) {
     json result;
+    bool has_old_id = (id != old_id);
     for (uint i = 0; i < state.players.size(); ++i) {
+        if (has_old_id && state.players[i].session == old_id) {
+            // Update our session to the new id
+            state.players[i].session = id;
+            if (isSignedIn(state.players[i])) {
+                state.players[i].name = std::make_shared<std::string>(data.display_name);
+                result["name"] = *state.players[i].name;
+                result["user_id"] = state.players[i].session;
+            }
+        }
         if (state.players[i].session == id) {
             state.players[i].connected = true;
             result["type"] = "reconnect";

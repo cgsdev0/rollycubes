@@ -19,7 +19,13 @@ import { DiceType, Player } from '../types/store_types';
 import ChatBox from '../ui/chat';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
-import { HelpIcon, GearIcon, HomeIcon, LogoutIcon } from '../ui/icons/help';
+import {
+  HelpIcon,
+  GearIcon,
+  HomeIcon,
+  LogoutIcon,
+  LoginIcon,
+} from '../ui/icons/help';
 import { useStore } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
@@ -65,16 +71,6 @@ const SaveButtonWrapper = styled('div', {
     maxWidth: '30%',
   },
 });
-const FloatingButtonBar = styled('div', {
-  '@bp1': {
-    position: 'absolute',
-    top: -16,
-    left: 36,
-  },
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-});
 const PlsDonate = styled('div', {
   display: 'flex',
   flexDirection: 'column',
@@ -83,20 +79,34 @@ const PlsDonate = styled('div', {
 });
 
 const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
-  const [hasOnboarded, setHasOnboarded] = React.useState(false);
+  const showLogin = useSelector(
+    (state: ReduxState) => state.settings.showLogin
+  );
   const navigate = useNavigate();
   const location = useLocation();
   const { mode, room } = useParams();
 
-  const [triggerLogout] = useLogoutMutation();
   const store = useStore<ReduxState>();
 
-  const needsToOnboard = authToken === null && !hasOnboarded && mode === 'room';
+  const [localOnboarded, setLocalOnboarded] = React.useState(false);
 
-  const [showHelp, setShowHelp] = React.useState(false);
+  const needsToOnboard =
+    authToken === null && (showLogin || !localOnboarded) && mode === 'room';
+
+  const showHelp = useSelector((state: ReduxState) => state.settings.showHelp);
 
   const showSettings = useSelector(
     (state: ReduxState) => state.settings.showSettings
+  );
+
+  const dispatch = useDispatch();
+
+  const setShowLogin = React.useCallback(
+    (show: boolean) => {
+      dispatch({ type: 'SET_SHOW_LOGIN', show });
+      setLocalOnboarded(true);
+    },
+    [dispatch]
   );
 
   React.useEffect(() => {
@@ -116,7 +126,7 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
     return (
       <OnboardPage
         intent={`${mode}/${room}`}
-        onBoard={() => setHasOnboarded(true)}
+        onBoard={() => setShowLogin(false)}
       />
     );
   }
@@ -132,22 +142,6 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
           store={store}
         />
       )}
-
-      <FloatingButtonBar id="floating-button-bar">
-        <HomeIcon onClick={() => navigate('/')} />
-        <GearIcon
-          onClick={() => store.dispatch({ type: 'TOGGLE_SHOW_SETTINGS' })}
-        />
-        <HelpIcon onClick={() => setShowHelp((help) => !help)} />
-        {authToken ? (
-          <LogoutIcon
-            onClick={async () => {
-              await triggerLogout();
-              window.location.reload();
-            }}
-          />
-        ) : null}
-      </FloatingButtonBar>
 
       {showSettings ? (
         <Settings />

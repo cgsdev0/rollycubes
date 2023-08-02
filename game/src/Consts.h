@@ -34,6 +34,7 @@ const string PLAYER_COLORS[] = {
 /* ws->getUserData returns one of these */
 struct PerSocketData {
     string session;
+    string session_from_cookie;
     string room;
     string display_name;
     string user_id;

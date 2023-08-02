@@ -5,7 +5,11 @@ import { selectAuthService } from './selectors/game_selectors';
 import { ReduxState } from './store';
 
 const twitchLogin = (authService: string, intent: string) => () => {
-  localStorage.setItem('intent', intent);
+  if (!intent) {
+    localStorage.removeItem('intent');
+  } else {
+    localStorage.setItem('intent', intent);
+  }
   const redirect = `${document.location.origin}/twitch_oauth`;
   const TWITCH_CLIENT_ID = '6n8p1p8sg3shbg0mwcfrmgzrwmcwh1';
   document.location =

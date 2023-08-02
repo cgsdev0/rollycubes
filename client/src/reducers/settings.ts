@@ -8,6 +8,8 @@ export interface SettingsState {
   sick3dmode: boolean;
   authServiceOrigin: string;
   showSettings: boolean;
+  showHelp: boolean;
+  showLogin: boolean;
   color: {
     hue: number;
     sat: number;
@@ -30,6 +32,8 @@ export const settingsReducer = createReducer<SettingsState>(
       ? LOCAL_AUTH_SERVICE
       : PROD_AUTH_SERVICE,
     showSettings: false,
+    showLogin: false,
+    showHelp: false,
     pubkey: '',
     color: {
       hue: 0,
@@ -68,6 +72,9 @@ export const settingsReducer = createReducer<SettingsState>(
       .addCase('SET_CUSTOM_SAT', (state, action: any) => {
         state.color.sat = action.sat;
       })
+      .addCase('SET_SHOW_LOGIN', (state, action: any) => {
+        state.showLogin = action.show;
+      })
       .addCase('SET_DICE_TYPE', (state, action: any) => {
         state.dice_type = action.dice_type;
       })
@@ -76,6 +83,9 @@ export const settingsReducer = createReducer<SettingsState>(
       })
       .addCase('TOGGLE_SHOW_SETTINGS', (state, action) => {
         state.showSettings = !state.showSettings;
+      })
+      .addCase('TOGGLE_SHOW_HELP', (state, action) => {
+        state.showHelp = !state.showHelp;
       })
       .addCase('DEV_AUTH_SERVICE_TOGGLE', (state, action) => {
         if (state.authServiceOrigin === PROD_AUTH_SERVICE) {

@@ -1,11 +1,11 @@
-[[task]]
-  id = "build"
-  type = "short"
-  cmd = "make"
-  watch = [ "./game/**/*.cpp",  "./game/**/*.h" ]
+# [[task]]
+#   id = "build"
+#   type = "short"
+#   cmd = "make || echo 'it didnt build haha'"
+#   watch = [ "./game/**/*.cpp",  "./game/**/*.h" ]
 
 [[task]]
   id = "run"
   type = "long"
-  cmd = "DEV=true ./GameServer"
-  triggers = [ "build" ]
+  cmd = "DEV=true ./run-server.sh"
+  # triggers = [ "build" ]

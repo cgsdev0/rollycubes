@@ -397,6 +397,7 @@ namespace nlohmann {
         x.donor = j.at("donor").get<bool>();
         x.id = j.at("id").get<std::string>();
         x.image_url = API::get_optional<std::string>(j, "image_url");
+        x.pubkey_text = API::get_optional<std::string>(j, "pubkey_text");
         x.stats = API::get_optional<API::UserStats>(j, "stats");
         x.username = j.at("username").get<std::string>();
     }
@@ -410,6 +411,7 @@ namespace nlohmann {
         j["donor"] = x.donor;
         j["id"] = x.id;
         j["image_url"] = x.image_url;
+        j["pubkey_text"] = x.pubkey_text;
         j["stats"] = x.stats;
         j["username"] = x.username;
     }
@@ -673,13 +675,17 @@ namespace nlohmann {
 
     inline void from_json(const json & j, API::ReconnectMsg& x) {
         x.id = j.at("id").get<int64_t>();
+        x.name = API::get_optional<std::string>(j, "name");
         x.type = j.at("type").get<API::ReconnectMsgType>();
+        x.user_id = API::get_optional<std::string>(j, "user_id");
     }
 
     inline void to_json(json & j, const API::ReconnectMsg & x) {
         j = json::object();
         j["id"] = x.id;
+        j["name"] = x.name;
         j["type"] = x.type;
+        j["user_id"] = x.user_id;
     }
 
     inline void from_json(const json & j, API::KickMsg& x) {
