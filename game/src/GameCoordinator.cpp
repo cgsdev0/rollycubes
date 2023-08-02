@@ -49,7 +49,7 @@ API::RoomList GameCoordinator::list_rooms() {
 }
 
 void GameCoordinator::load_persistence() {
-    std::ifstream state_file("server_state.json");
+    std::ifstream state_file("data/server_state.json");
     if (!state_file.is_open()) return;
     json state;
     state_file >> state;

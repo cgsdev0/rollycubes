@@ -27,6 +27,5 @@ RUN cd /build; ls -la .; make -j4 release
 FROM alpine:edge as prod
 RUN apk add libstdc++ libgcc openssl-dev
 COPY --from=build /build/GameServer .
-COPY entry.sh .
 
-ENTRYPOINT ["./entry.sh"]
+ENTRYPOINT ["./GameServer"]
