@@ -75,7 +75,6 @@ json Game::addPlayer(const PerSocketData &data) {
     }
     auto &player = state.players.emplace_back();
     player.crowned = std::make_shared<bool>(false);
-    player.win_count = 0;
     player.connected = true;
     player.session = data.session;
     if (isSignedIn(player)) {
@@ -299,6 +298,7 @@ void Game::skip(HANDLER_ARGS) {
         throw API::GameError({.error = "can only skip player if it's their turn"});
     // TODO: check if enough time has passed
 
+    state.players[id].skip_count++;
     advanceTurn();
     json turn;
     turn["type"] = "update_turn";
@@ -316,6 +316,8 @@ void Game::kick(HANDLER_ARGS) {
         throw API::GameError({.error = "out of bounds"});
     if (state.players[id].connected)
         throw API::GameError({.error = "dont kick people who are connected, jerk" });
+    if (state.players[id].skip_count < 2)
+        throw API::GameError({.error = "cmon give them a chance at least" });
 
     json res;
     res["type"] = "kick";
@@ -538,6 +540,7 @@ void Game::update(HANDLER_ARGS) {
                         break;
                     }
                 }
+                state.players[state.turn_index].skip_count = 0;
                 advanceTurn();
                 json turn;
                 turn["type"] = "update_turn";
