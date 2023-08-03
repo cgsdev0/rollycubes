@@ -341,7 +341,7 @@ void Game::restart(HANDLER_ARGS) {
 void Game::update_name(HANDLER_ARGS) {
     if (!data["name"].is_string())
         throw API::GameError({.error = "name must be a string"});
-    std::string name = trimString(data["name"].get<std::string>(), 20);
+    std::string name = trimString(data["name"].get<std::string>(), MAX_PLAYER_NAME);
     for (uint i = 0; i < state.players.size(); ++i) {
         if (state.players[i].session == session) {
             if (isSignedIn(state.players[i])) {

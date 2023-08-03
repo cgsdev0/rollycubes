@@ -17,7 +17,7 @@ static const uint DEFAULT_PORT = 3001;
 static const auto EVICT_AFTER = std::chrono::minutes(10);
 static const uint EVICTION_LIMIT = 10;
 static const std::unordered_set<int> TARGET_SCORES = {33, 66, 67, 98, 99, 100};
-static const uint MAX_PLAYER_NAME = 24;
+static const uint MAX_PLAYER_NAME = 25;
 static const uint MAX_CHAT_LEN = 402 + MAX_PLAYER_NAME;
 
 const string PLAYER_COLORS[] = {
