@@ -184,7 +184,7 @@ int Game::connectedPlayerCount() {
 static const std::unordered_map<
     std::string, std::function<void(Game *, SendFunc, HandlerArgs, json &,
                                     const std::string &)>>
-    action_map = {ACTION(chat), ACTION(leave), ACTION(kick),
+    action_map = {ACTION(chat), ACTION(leave), ACTION(kick), ACTION(skip),
                   ACTION(restart), ACTION(update_name), ACTION(roll),
                   ACTION(add), ACTION(sub), ACTION(add_nth),
                   ACTION(sub_nth), ACTION(refetch_player)};
@@ -285,6 +285,25 @@ void Game::leave(HANDLER_ARGS) {
             break;
         }
     }
+}
+
+void Game::skip(HANDLER_ARGS) {
+    if (!data["id"].is_number())
+        throw API::GameError({.error = "pass a number please"});
+    uint id = data["id"].get<uint>();
+    if (state.players.empty())
+        throw API::GameError({.error = "uhhh this should never happen"});
+    if (id >= state.players.size())
+        throw API::GameError({.error = "out of bounds"});
+    if (state.turn_index != id)
+        throw API::GameError({.error = "can only skip player if it's their turn"});
+    // TODO: check if enough time has passed
+
+    advanceTurn();
+    json turn;
+    turn["type"] = "update_turn";
+    turn["id"] = state.turn_index;
+    broadcast(turn.dump());
 }
 
 void Game::kick(HANDLER_ARGS) {

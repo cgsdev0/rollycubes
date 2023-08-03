@@ -23,7 +23,7 @@ rm ssh-gateway/api/generated.go
 
 # avert your eyes, this next part is a crime
 
-cd game/src/api
+pushd game/src/api &> /dev/null
 
 find . -type f \
   | grep -v Generators.hpp \
@@ -64,3 +64,6 @@ echo "}" >> API.cpp
 
 sed -i '1s/^/#include <vector>\n/' API.hpp
 sed -i '1s/^/#include <memory>\n/' API.hpp
+
+popd &> /dev/null
+sed -i '1s/^/package main\n/' ssh-gateway/api/generated.go

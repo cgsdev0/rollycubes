@@ -14,6 +14,7 @@ void fromString(const std::string &str);
         int64_t roll_count;
         int64_t score;
         std::string session;
+        int64_t skip_count;
         int64_t turn_count;
         std::shared_ptr<std::string> user_id;
         int64_t win_count;

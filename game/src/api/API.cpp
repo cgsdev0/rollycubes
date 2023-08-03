@@ -534,6 +534,7 @@ namespace nlohmann {
         x.roll_count = j.at("roll_count").get<int64_t>();
         x.score = j.at("score").get<int64_t>();
         x.session = j.at("session").get<std::string>();
+        x.skip_count = j.at("skip_count").get<int64_t>();
         x.turn_count = j.at("turn_count").get<int64_t>();
         x.user_id = API::get_optional<std::string>(j, "user_id");
         x.win_count = j.at("win_count").get<int64_t>();
@@ -548,6 +549,7 @@ namespace nlohmann {
         j["roll_count"] = x.roll_count;
         j["score"] = x.score;
         j["session"] = x.session;
+        j["skip_count"] = x.skip_count;
         j["turn_count"] = x.turn_count;
         j["user_id"] = x.user_id;
         j["win_count"] = x.win_count;

@@ -47,6 +47,7 @@ export interface ServerPlayer extends Player {
   turn_count: integer;
   roll_count: integer;
   doubles_count: integer;
+  skip_count: integer;
 }
 
 export interface UserStats {

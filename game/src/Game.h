@@ -88,6 +88,7 @@ class Game {
     void chat(HANDLER_ARGS);
     void leave(HANDLER_ARGS);
     void kick(HANDLER_ARGS);
+    void skip(HANDLER_ARGS);
     void restart(HANDLER_ARGS);
     void update_name(HANDLER_ARGS);
     void roll(HANDLER_ARGS);
