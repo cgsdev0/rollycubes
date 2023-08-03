@@ -17,9 +17,7 @@ export const AuthProvider: React.FC<{}> = ({ children }) => {
     } else if (data) {
       dispatch({ type: 'AUTHENTICATE', access_token: data.access_token });
       // refetch the access token after 45 minutes
-      const interval = setInterval(() => {
-        refetch();
-      }, 1000 * 60 * 45);
+      const interval = setInterval(refetch, 1000 * 60 * 45);
       return () => clearInterval(interval);
     }
   }, [isLoading, data, error]);
