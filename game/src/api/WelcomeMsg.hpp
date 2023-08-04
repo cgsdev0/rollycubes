@@ -11,6 +11,8 @@ namespace API {
 namespace API {
 
     struct WelcomeMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         std::vector<std::string> chat_log;
         int64_t id;
         std::vector<Player> players;

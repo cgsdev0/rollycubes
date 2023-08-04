@@ -14,6 +14,8 @@ namespace API {
 namespace API {
 
     struct UserData {
+std::string toString() const;
+void fromString(const std::string &str);
         std::optional<std::vector<Achievement>> achievements;
         Color color;
         std::string created_date;

@@ -10,6 +10,8 @@ namespace API {
 namespace API {
 
     struct UpdateMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         int64_t id;
         std::optional<bool> reset;
         int64_t score;

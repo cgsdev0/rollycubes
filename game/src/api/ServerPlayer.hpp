@@ -6,6 +6,8 @@
 namespace API {
 
     struct ServerPlayer {
+std::string toString() const;
+void fromString(const std::string &str);
         bool connected;
         std::optional<bool> crowned;
         int64_t doubles_count;

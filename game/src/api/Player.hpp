@@ -6,6 +6,8 @@
 namespace API {
 
     struct Player {
+std::string toString() const;
+void fromString(const std::string &str);
         bool connected;
         std::optional<bool> crowned;
         std::optional<std::string> name;
