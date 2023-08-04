@@ -1,7 +1,7 @@
 import { useLogoutMutation } from 'api/auth';
 import { useSelector, useStore } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { styled, css } from 'stitches.config';
+import { styled } from 'stitches.config';
 import { ReduxState } from 'store';
 import {
   CloseIcon,
@@ -89,21 +89,25 @@ export const FloatingButtonBar = () => {
                     }}
                   />
                 </>
-              ) : authToken ? (
-                <LogoutIcon
-                  onClick={async () => {
-                    await triggerLogout();
-                    window.location.reload();
-                  }}
-                />
-              ) : null}
-              {authToken === null ? (
-                <LoginIcon
-                  onClick={() => {
-                    store.dispatch({ type: 'SET_SHOW_LOGIN', show: true });
-                  }}
-                />
-              ) : null}
+              ) : (
+                <>
+                  {authToken ? (
+                    <LogoutIcon
+                      onClick={async () => {
+                        await triggerLogout();
+                        window.location.reload();
+                      }}
+                    />
+                  ) : null}
+                  {authToken === null ? (
+                    <LoginIcon
+                      onClick={() => {
+                        store.dispatch({ type: 'SET_SHOW_LOGIN', show: true });
+                      }}
+                    />
+                  ) : null}
+                </>
+              )}
             </RightAlign>
           </>
         )}
