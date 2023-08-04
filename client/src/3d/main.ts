@@ -1,9 +1,10 @@
 /* eslint no-loop-func: "off" */
-import * as BABYLON from 'babylonjs';
-import 'babylonjs-loaders';
 import { DiceType } from 'types/store_types';
 import { store } from '../store';
 
+/// <reference path="babylonjs" />
+
+var BABYLON: any;
 const frameRate = 60;
 
 // var cannonPlugin = new CannonJSPlugin(true, 10, cannon)
@@ -19,7 +20,7 @@ const signalRolled3D = (doubles: boolean) => {
   }, 0);
 };
 
-const gravityVector = new BABYLON.Vector3(0, -9.81, 0);
+var gravityVector: any;
 
 const lookupTable: Record<string, number> = {
   '00': 1,
@@ -282,6 +283,8 @@ export const initScene = async () => {
   if (sceneInit || !window.hasOwnProperty('Ammo')) {
     return;
   }
+  BABYLON = await import('babylonjs');
+  gravityVector = new BABYLON.Vector3(0, -9.81, 0);
   if (typeof (window as any).Ammo === 'function') {
     await (window as any).Ammo();
   }
@@ -346,9 +349,9 @@ export const initScene = async () => {
   // light.intensity = 0.5
 
   try {
-    scene.enablePhysics(gravityVector, new BABYLON.AmmoJSPlugin());
+    scene!.enablePhysics(gravityVector, new BABYLON.AmmoJSPlugin());
   } catch (e) {
-    scene.enablePhysics(gravityVector, new BABYLON.AmmoJSPlugin());
+    scene!.enablePhysics(gravityVector, new BABYLON.AmmoJSPlugin());
   }
 
   // make some dice
@@ -368,7 +371,7 @@ export const initScene = async () => {
       //dice[i].position = new BABYLON.Vector3(1000 + i, 1000, 1000);
     }
   };
-  initDice(DiceType.D6, scene);
+  initDice(DiceType.D6, scene!);
 
   var greenMat = new BABYLON.StandardMaterial('GREENmat', scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 0.35, 0);
@@ -397,7 +400,7 @@ export const initScene = async () => {
     };
   };
 
-  const picker = makePicker(scene, camera, ground);
+  const picker = makePicker(scene!, camera, ground);
 
   var northWall = BABYLON.MeshBuilder.CreateBox(
     'northWall',
@@ -492,7 +495,7 @@ export const initScene = async () => {
   // TRANSPARENT BG
   // if you're on acid
   //scene.autoClear = false;
-  scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+  scene!.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 
   const directions = [
     { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
@@ -798,7 +801,7 @@ export const initScene = async () => {
   (window as any).roll_func = roll;
   document.addEventListener('roll', rollListener, false);
   document.addEventListener('snapDice', snapListener, false);
-  scene.onKeyboardObservable.add((kbInfo) => {
+  scene!.onKeyboardObservable.add((kbInfo) => {
     switch (kbInfo.type) {
       case BABYLON.KeyboardEventTypes.KEYDOWN:
         // if (kbInfo.event.key === "r") {
@@ -809,7 +812,7 @@ export const initScene = async () => {
         break;
     }
   });
-  scene.registerBeforeRender(() => {
+  scene!.registerBeforeRender(() => {
     // scene!
     //   .getPhysicsEngine()!
     //   .getPhysicsPlugin()!
@@ -821,7 +824,7 @@ export const initScene = async () => {
   //   scene,
   //   function(scene) {}
   // );
-  engine.runRenderLoop(function () {
+  engine!.runRenderLoop(function () {
     if (scene) {
       scene.render();
     }
