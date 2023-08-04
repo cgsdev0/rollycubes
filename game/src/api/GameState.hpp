@@ -1,7 +1,16 @@
+//  To parse this JSON data, first install
+//
+//      json.hpp  https://github.com/nlohmann/json
+//
+//  Then include this file, and then do
+//
+//     GameState.hpp data = nlohmann::json::parse(jsonString);
 
 #pragma once
 
 #include <optional>
+#include "json.hpp"
+#include "helper.hpp"
 
 namespace API {
     struct ServerPlayer;
@@ -9,10 +18,9 @@ namespace API {
 }
 
 namespace API {
+    using nlohmann::json;
 
     struct GameState {
-std::string toString() const;
-void fromString(const std::string &str);
         std::vector<std::string> chat_log;
         std::vector<ServerPlayer> players;
         bool private_session;
@@ -20,7 +28,7 @@ void fromString(const std::string &str);
         std::vector<double> rolls;
         int64_t spectators;
         int64_t turn_index;
-        GameStateType type = static_cast<GameStateType>(0);
+        GameStateType type;
         std::vector<bool> used;
         bool victory;
     };

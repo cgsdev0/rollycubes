@@ -14,56 +14,56 @@ rm ssh-gateway/api/generated.go
   --source-style multi-source \
   --lang c++ \
   --namespace API \
-  client/src/types/*.ts
+  --src-lang schema "./schema.json#/definitions/"
 
-./node_modules/.bin/quicktype \
-  -o ssh-gateway/api/generated.go \
-  --lang golang \
-  client/src/types/*.ts
+# ./node_modules/.bin/quicktype \
+#   -o ssh-gateway/api/generated.go \
+#   --lang golang \
+#   client/src/types/*.ts
 
 # avert your eyes, this next part is a crime
 
 pushd game/src/api &> /dev/null
 
-find . -type f \
-  | grep -v Generators.hpp \
-  | grep -v helper.hpp \
-  | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
+# find . -type f \
+#   | grep -v Generators.hpp \
+#   | grep -v helper.hpp \
+#   | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
 
-sed -i -E '/pragma|^\/\//d' Generators.hpp
+# sed -i -E '/pragma|^\/\//d' Generators.hpp
 
-find . -type f \
-  | xargs -L1 basename \
-  | cut -d'.' -f1 \
-  | xargs -I {} sed -i 's/{}Type type;/{}Type type = static_cast<{}Type>(0);/g' {}.hpp
+# find . -type f \
+#   | xargs -L1 basename \
+#   | cut -d'.' -f1 \
+#   | xargs -I {} sed -i 's/{}Type type;/{}Type type = static_cast<{}Type>(0);/g' {}.hpp
 
 mv Generators.hpp API.cpp
 
-grep "struct.*{" * -l \
-  | grep -vE 'helper\.hpp|API\.cpp' \
-  | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
+# grep "struct.*{" * -l \
+#   | grep -vE 'helper\.hpp|API\.cpp' \
+#   | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
 
-structs=$(grep "struct.*{" * \
-  | grep -v "^helper.hpp" \
-  | cut -d':' -f2 \
-  | sed 's/.*struct \(.*\) {/\1/')
+# structs=$(grep "struct.*{" * \
+#   | grep -v "^helper.hpp" \
+#   | cut -d':' -f2 \
+#   | sed 's/.*struct \(.*\) {/\1/')
 
-echo "namespace API {" >> API.cpp
-for struct in $structs; do
-  echo "std::string $struct::toString() const {" >> API.cpp
-  echo "json j;" >> API.cpp
-  echo "to_json(j, *this);" >> API.cpp
-  echo "return j.dump();" >> API.cpp
-  echo "}" >> API.cpp
-  echo "void $struct::fromString(const std::string &s) {" >> API.cpp
-  echo "auto j = json::parse(s);" >> API.cpp
-  echo "from_json(j, *this);" >> API.cpp
-  echo "}" >> API.cpp
-done
-echo "}" >> API.cpp
+# echo "namespace API {" >> API.cpp
+# for struct in $structs; do
+#   echo "std::string $struct::toString() const {" >> API.cpp
+#   echo "json j;" >> API.cpp
+#   echo "to_json(j, *this);" >> API.cpp
+#   echo "return j.dump();" >> API.cpp
+#   echo "}" >> API.cpp
+#   echo "void $struct::fromString(const std::string &s) {" >> API.cpp
+#   echo "auto j = json::parse(s);" >> API.cpp
+#   echo "from_json(j, *this);" >> API.cpp
+#   echo "}" >> API.cpp
+# done
+# echo "}" >> API.cpp
 
-sed -i '1s/^/#include <vector>\n/' API.hpp
-sed -i '1s/^/#include <memory>\n/' API.hpp
+# sed -i '1s/^/#include <vector>\n/' API.hpp
+# sed -i '1s/^/#include <memory>\n/' API.hpp
 
-popd &> /dev/null
-sed -i '1s/^/package main\n/' ssh-gateway/api/generated.go
+# popd &> /dev/null
+# sed -i '1s/^/package main\n/' ssh-gateway/api/generated.go

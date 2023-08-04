@@ -1,13 +1,21 @@
+//  To parse this JSON data, first install
+//
+//      json.hpp  https://github.com/nlohmann/json
+//
+//  Then include this file, and then do
+//
+//     ServerPlayer.hpp data = nlohmann::json::parse(jsonString);
 
 #pragma once
 
 #include <optional>
+#include "json.hpp"
+#include "helper.hpp"
 
 namespace API {
+    using nlohmann::json;
 
     struct ServerPlayer {
-std::string toString() const;
-void fromString(const std::string &str);
         bool connected;
         std::optional<bool> crowned;
         int64_t doubles_count;
