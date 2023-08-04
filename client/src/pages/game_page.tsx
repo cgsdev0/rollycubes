@@ -49,6 +49,7 @@ interface Props {
   is3DMode: boolean;
   somebodyIsNice: boolean;
   authToken?: string | null;
+  mode: 'room' | 'spectate';
 }
 
 const flexColumn = css({
@@ -78,13 +79,13 @@ const PlsDonate = styled('div', {
   gap: 12,
 });
 
-const GamePage: React.FC<Props> = ({ is3DMode, authToken }) => {
+const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
   const showLogin = useSelector(
     (state: ReduxState) => state.settings.showLogin
   );
   const navigate = useNavigate();
   const location = useLocation();
-  const { mode, room } = useParams();
+  const { room } = useParams();
 
   const store = useStore<ReduxState>();
 

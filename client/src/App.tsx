@@ -157,7 +157,14 @@ const AppInner = () => {
                           path="multiple-tabs"
                           element={<TabErrorPage />}
                         />
-                        <Route path=":mode/:room" element={<GamePage />} />
+                        <Route
+                          path="room/:room"
+                          element={<GamePage mode={'room'} />}
+                        />
+                        <Route
+                          path="spectate/:room"
+                          element={<GamePage mode={'spectate'} />}
+                        />
                       </Route>
                     </Routes>
                   </div>
