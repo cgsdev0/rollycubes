@@ -10,6 +10,8 @@ namespace API {
 namespace API {
 
     struct JoinMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         int64_t id;
         std::optional<std::string> name;
         JoinMsgType type = static_cast<JoinMsgType>(0);

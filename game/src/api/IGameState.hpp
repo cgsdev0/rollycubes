@@ -10,6 +10,8 @@ namespace API {
 namespace API {
 
     struct IGameState {
+std::string toString() const;
+void fromString(const std::string &str);
         std::vector<std::string> chat_log;
         std::vector<Player> players;
         bool private_session;

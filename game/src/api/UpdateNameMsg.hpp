@@ -10,6 +10,8 @@ namespace API {
 namespace API {
 
     struct UpdateNameMsg {
+std::string toString() const;
+void fromString(const std::string &str);
         int64_t id;
         std::string name;
         UpdateNameMsgType type = static_cast<UpdateNameMsgType>(0);

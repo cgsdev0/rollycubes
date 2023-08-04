@@ -10,6 +10,8 @@ namespace API {
 namespace API {
 
     struct AchievementUnlock {
+std::string toString() const;
+void fromString(const std::string &str);
         std::string description;
         std::string id;
         std::optional<std::string> image_url;
