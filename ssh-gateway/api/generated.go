@@ -573,6 +573,7 @@ type Player struct {
 	Crowned   *bool   `json:"crowned,omitempty"`
 	Name      *string `json:"name,omitempty"`   
 	Score     int64   `json:"score"`            
+	SkipCount int64   `json:"skip_count"`       
 	UserID    *string `json:"user_id,omitempty"`
 	WinCount  int64   `json:"win_count"`        
 }
@@ -665,8 +666,9 @@ type ChatMsg struct {
 }
 
 type UpdateTurnMsg struct {
-	ID   int64             `json:"id"`  
-	Type UpdateTurnMsgType `json:"type"`
+	ID   int64             `json:"id"`            
+	Skip *bool             `json:"skip,omitempty"`
+	Type UpdateTurnMsgType `json:"type"`          
 }
 
 type UpdateNameMsg struct {

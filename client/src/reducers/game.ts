@@ -73,6 +73,12 @@ export const gameReducer = createReducer<GameState>(
         state.victory = true;
       })
       .addCase('update_turn', (state, action: UpdateTurnMsg) => {
+        if (action.skip) {
+          state.players[state.turn_index].skip_count += 1;
+        }
+        if (action.skip === false) {
+          state.players[state.turn_index].skip_count = 0;
+        }
         state.turn_index = action.id;
         state.rolled = false;
         state.rolled3d = false;

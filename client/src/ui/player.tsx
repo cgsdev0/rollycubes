@@ -165,9 +165,8 @@ const PlayerComponent = (props: Props) => {
   });
 
   const onKick = () => {
-    const { player, n } = props;
-    const e = window.confirm(`Are you sure you want to kick ${player.name}?`);
-    if (e && props.socket) {
+    const { n } = props;
+    if (props.socket) {
       props.socket.send(JSON.stringify({ type: 'kick', id: n }));
     }
   };
@@ -213,7 +212,9 @@ const PlayerComponent = (props: Props) => {
           <span className={playerName()}>{player.name || `User${n + 1}`}</span>
         </span>
         <span className={score()}>{JSON.stringify(player.score)}</span>
-        {player.connected || props.isSpectator ? null : (
+        {player.connected ||
+        player.skip_count < 2 ||
+        props.isSpectator ? null : (
           <span className={kick()} onClick={onKick}>
             <KickIcon />
           </span>

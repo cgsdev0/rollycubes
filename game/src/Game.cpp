@@ -303,6 +303,7 @@ void Game::skip(HANDLER_ARGS) {
     json turn;
     turn["type"] = "update_turn";
     turn["id"] = state.turn_index;
+    turn["skip"] = true;
     broadcast(turn.dump());
 }
 
@@ -545,6 +546,7 @@ void Game::update(HANDLER_ARGS) {
                 json turn;
                 turn["type"] = "update_turn";
                 turn["id"] = state.turn_index;
+                turn["skip"] = false;
                 broadcast(turn.dump());
             }
         } else {

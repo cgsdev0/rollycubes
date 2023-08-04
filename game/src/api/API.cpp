@@ -489,6 +489,7 @@ namespace nlohmann {
         x.crowned = API::get_optional<bool>(j, "crowned");
         x.name = API::get_optional<std::string>(j, "name");
         x.score = j.at("score").get<int64_t>();
+        x.skip_count = j.at("skip_count").get<int64_t>();
         x.user_id = API::get_optional<std::string>(j, "user_id");
         x.win_count = j.at("win_count").get<int64_t>();
     }
@@ -499,6 +500,7 @@ namespace nlohmann {
         j["crowned"] = x.crowned;
         j["name"] = x.name;
         j["score"] = x.score;
+        j["skip_count"] = x.skip_count;
         j["user_id"] = x.user_id;
         j["win_count"] = x.win_count;
     }
@@ -714,12 +716,14 @@ namespace nlohmann {
 
     inline void from_json(const json & j, API::UpdateTurnMsg& x) {
         x.id = j.at("id").get<int64_t>();
+        x.skip = API::get_optional<bool>(j, "skip");
         x.type = j.at("type").get<API::UpdateTurnMsgType>();
     }
 
     inline void to_json(json & j, const API::UpdateTurnMsg & x) {
         j = json::object();
         j["id"] = x.id;
+        j["skip"] = x.skip;
         j["type"] = x.type;
     }
 

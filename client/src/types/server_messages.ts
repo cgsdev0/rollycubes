@@ -102,6 +102,7 @@ export interface ChatMsg {
 export interface UpdateTurnMsg {
   type: 'update_turn';
   id: integer; // new turn index
+  skip?: boolean;
 }
 
 export interface UpdateNameMsg {
