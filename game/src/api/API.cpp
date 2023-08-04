@@ -1,72 +1,10 @@
-//  To parse this JSON data, first install
-//
-//      json.hpp  https://github.com/nlohmann/json
-//
-//  Then include this file, and then do
-//
-//     Generators.hpp data = nlohmann::json::parse(jsonString);
-
-#pragma once
-
 #include <optional>
 #include "json.hpp"
 #include "helper.hpp"
+#include "API.hpp"
 
-#include "UpdateMsg.hpp"
-#include "UpdateMsgType.hpp"
-#include "UpdateNameMsg.hpp"
-#include "UpdateNameMsgType.hpp"
-#include "UpdateTurnMsg.hpp"
-#include "UpdateTurnMsgType.hpp"
-#include "ChatMsg.hpp"
-#include "ChatMsgType.hpp"
-#include "KickMsg.hpp"
-#include "KickMsgType.hpp"
-#include "ReconnectMsg.hpp"
-#include "ReconnectMsgType.hpp"
-#include "DisconnectMsg.hpp"
-#include "DisconnectMsgType.hpp"
-#include "JoinMsg.hpp"
-#include "JoinMsgType.hpp"
-#include "RollAgainMsg.hpp"
-#include "RollAgainMsgType.hpp"
-#include "RollMsg.hpp"
-#include "RollMsgType.hpp"
-#include "WinMsg.hpp"
-#include "WinMsgType.hpp"
-#include "SpectatorsMsg.hpp"
-#include "SpectatorsMsgType.hpp"
-#include "RestartMsg.hpp"
-#include "RestartMsgType.hpp"
-#include "WelcomeMsg.hpp"
-#include "WelcomeMsgType.hpp"
-#include "GameState.hpp"
-#include "GameStateType.hpp"
-#include "ServerPlayer.hpp"
-#include "IGameState.hpp"
-#include "Player.hpp"
-#include "RoomList.hpp"
-#include "Room.hpp"
-#include "RefetchPlayer.hpp"
-#include "RefetchPlayerType.hpp"
-#include "Redirect.hpp"
-#include "RedirectType.hpp"
-#include "GameError.hpp"
-#include "GameErrorType.hpp"
-#include "DieRoll.hpp"
-#include "UserData.hpp"
-#include "UserStats.hpp"
-#include "Dice.hpp"
-#include "Color.hpp"
-#include "Achievement.hpp"
-#include "AchievementData.hpp"
-#include "ReportStats.hpp"
-#include "AchievementUnlock.hpp"
-#include "AchievementUnlockType.hpp"
-#include "AchievementProgress.hpp"
-#include "UserId.hpp"
-#include "UserIdType.hpp"
-#include "AchievementProgressType.hpp"
+
+
 
 namespace API {
     void from_json(const json & j, UserId & x);
