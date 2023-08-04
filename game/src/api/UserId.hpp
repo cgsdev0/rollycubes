@@ -11,6 +11,6 @@ namespace API {
 
     struct UserId {
         std::string id;
-        UserIdType type;
+        UserIdType type = static_cast<UserIdType>(0);
     };
 }

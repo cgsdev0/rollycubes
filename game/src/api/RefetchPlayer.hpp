@@ -10,7 +10,7 @@ namespace API {
 namespace API {
 
     struct RefetchPlayer {
-        RefetchPlayerType type;
+        RefetchPlayerType type = static_cast<RefetchPlayerType>(0);
         std::string user_id;
     };
 }

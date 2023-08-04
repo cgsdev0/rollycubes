@@ -15,7 +15,7 @@ namespace API {
         std::optional<std::string> image_url;
         int64_t max_progress;
         std::string name;
-        AchievementUnlockType type;
+        AchievementUnlockType type = static_cast<AchievementUnlockType>(0);
         std::string user_id;
         int64_t user_index;
     };

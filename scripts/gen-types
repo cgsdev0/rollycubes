@@ -25,29 +25,33 @@ rm ssh-gateway/api/generated.go
 
 pushd game/src/api &> /dev/null
 
+# remove refs to json and helper; we want these contained to the .cpp file
 find . -type f \
   | grep -v Generators.hpp \
   | grep -v helper.hpp \
   | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
 
+# delete the pragma once in Generators.hpp
 sed -i -E '/pragma|^\/\//d' Generators.hpp
 
-# find . -type f \
-#   | xargs -L1 basename \
-#   | cut -d'.' -f1 \
-#   | xargs -I {} sed -i 's/{}Type type;/{}Type type = static_cast<{}Type>(0);/g' {}.hpp
+# HACK: auto initialize type fields
+find . -type f \
+  | xargs -L1 basename \
+  | cut -d'.' -f1 \
+  | xargs -I {} sed -i 's/{}Type type;/{}Type type = static_cast<{}Type>(0);/g' {}.hpp
 
 mv Generators.hpp API.cpp
-sed -i '/#include/d' API.cpp
 
+# Replace all of the imports
+sed -i '/#include/d' API.cpp
 sed -i '1s/^/#include "API.hpp"\n/' API.cpp
 sed -i '1s/^/#include "helper.hpp"\n/' API.cpp
 sed -i '1s/^/#include "json.hpp"\n/' API.cpp
 sed -i '1s/^/#include <optional>\n/' API.cpp
 
-# grep "struct.*{" * -l \
-#   | grep -vE 'helper\.hpp|API\.cpp' \
-#   | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
+grep "struct.*{" * -l \
+  | grep -vE 'helper\.hpp|API\.cpp' \
+  | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
 
 # structs=$(grep "struct.*{" * \
 #   | grep -v "^helper.hpp" \

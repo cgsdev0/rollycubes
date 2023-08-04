@@ -12,7 +12,7 @@ namespace API {
     struct ReconnectMsg {
         int64_t id;
         std::optional<std::string> name;
-        ReconnectMsgType type;
+        ReconnectMsgType type = static_cast<ReconnectMsgType>(0);
         std::optional<std::string> user_id;
     };
 }

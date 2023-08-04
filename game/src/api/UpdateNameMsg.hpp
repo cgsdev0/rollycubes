@@ -12,6 +12,6 @@ namespace API {
     struct UpdateNameMsg {
         int64_t id;
         std::string name;
-        UpdateNameMsgType type;
+        UpdateNameMsgType type = static_cast<UpdateNameMsgType>(0);
     };
 }

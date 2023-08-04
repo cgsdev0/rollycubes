@@ -11,6 +11,6 @@ namespace API {
 
     struct ChatMsg {
         std::string msg;
-        ChatMsgType type;
+        ChatMsgType type = static_cast<ChatMsgType>(0);
     };
 }

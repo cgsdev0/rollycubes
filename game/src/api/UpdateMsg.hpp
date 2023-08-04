@@ -13,7 +13,7 @@ namespace API {
         int64_t id;
         std::optional<bool> reset;
         int64_t score;
-        UpdateMsgType type;
+        UpdateMsgType type = static_cast<UpdateMsgType>(0);
         std::optional<std::vector<bool>> used;
     };
 }

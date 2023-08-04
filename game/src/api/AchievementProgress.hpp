@@ -14,7 +14,7 @@ namespace API {
     struct AchievementProgress {
         std::string achievement_id;
         int64_t progress;
-        AchievementProgressType type;
+        AchievementProgressType type = static_cast<AchievementProgressType>(0);
         UserId user_id;
         int64_t user_index;
     };

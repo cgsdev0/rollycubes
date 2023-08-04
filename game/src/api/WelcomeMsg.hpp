@@ -19,7 +19,7 @@ namespace API {
         std::vector<double> rolls;
         int64_t spectators;
         int64_t turn_index;
-        WelcomeMsgType type;
+        WelcomeMsgType type = static_cast<WelcomeMsgType>(0);
         std::vector<bool> used;
         bool victory;
     };
