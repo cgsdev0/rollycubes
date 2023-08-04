@@ -11,6 +11,6 @@ namespace API {
 
     struct DisconnectMsg {
         int64_t id;
-        DisconnectMsgType type;
+        DisconnectMsgType type = static_cast<DisconnectMsgType>(0);
     };
 }

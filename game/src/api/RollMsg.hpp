@@ -11,6 +11,6 @@ namespace API {
 
     struct RollMsg {
         std::vector<double> rolls;
-        RollMsgType type;
+        RollMsgType type = static_cast<RollMsgType>(0);
     };
 }

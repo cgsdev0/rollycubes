@@ -10,6 +10,6 @@ namespace API {
 namespace API {
 
     struct RollAgainMsg {
-        RollAgainMsgType type;
+        RollAgainMsgType type = static_cast<RollAgainMsgType>(0);
     };
 }

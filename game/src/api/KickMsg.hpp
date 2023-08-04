@@ -11,6 +11,6 @@ namespace API {
 
     struct KickMsg {
         int64_t id;
-        KickMsgType type;
+        KickMsgType type = static_cast<KickMsgType>(0);
     };
 }

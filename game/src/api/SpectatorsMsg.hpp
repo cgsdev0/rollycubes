@@ -11,6 +11,6 @@ namespace API {
 
     struct SpectatorsMsg {
         int64_t count;
-        SpectatorsMsgType type;
+        SpectatorsMsgType type = static_cast<SpectatorsMsgType>(0);
     };
 }

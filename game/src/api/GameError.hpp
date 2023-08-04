@@ -11,6 +11,6 @@ namespace API {
 
     struct GameError {
         std::string error;
-        GameErrorType type;
+        GameErrorType type = static_cast<GameErrorType>(0);
     };
 }

@@ -11,6 +11,6 @@ namespace API {
 
     struct Redirect {
         std::string room;
-        RedirectType type;
+        RedirectType type = static_cast<RedirectType>(0);
     };
 }

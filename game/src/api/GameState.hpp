@@ -18,7 +18,7 @@ namespace API {
         std::vector<double> rolls;
         int64_t spectators;
         int64_t turn_index;
-        GameStateType type;
+        GameStateType type = static_cast<GameStateType>(0);
         std::vector<bool> used;
         bool victory;
     };

@@ -11,6 +11,6 @@ namespace API {
 
     struct WinMsg {
         int64_t id;
-        WinMsgType type;
+        WinMsgType type = static_cast<WinMsgType>(0);
     };
 }

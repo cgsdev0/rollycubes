@@ -11,6 +11,6 @@ namespace API {
 
     struct RestartMsg {
         int64_t id;
-        RestartMsgType type;
+        RestartMsgType type = static_cast<RestartMsgType>(0);
     };
 }
