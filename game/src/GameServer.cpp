@@ -54,6 +54,13 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
     if (it != coordinator.games.end()) {
         // Connecting to a valid game
         Game *g = it->second;
+
+        auto welcome = [g, userData, ws](){
+          auto msg = g->toWelcomeMsg();
+          msg.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
+          ws->send(msg.toString(), uWS::OpCode::TEXT);
+          ws->subscribe(userData->room);
+        };
         if (!userData->spectator) {
             if (!(g->hasPlayer(userData->session) || g->hasPlayer(userData->session_from_cookie))) {
                 json resp = g->addPlayer(*userData);
@@ -62,7 +69,8 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
                     std::string err = API::GameError({.error = "room full" }).toString();
                     ws->send(err, uWS::OpCode::TEXT);
                     userData->spectator = true;
-                    goto welcome;
+                    welcome();
+                    return;
                 }
                 app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
             } else {
@@ -70,12 +78,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
                 app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
             }
         }
-
-      welcome:
-        auto welcome = g->toWelcomeMsg();
-        welcome.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
-        ws->send(welcome.toString(), uWS::OpCode::TEXT);
-        ws->subscribe(userData->room);
+        welcome();
     } else if (userData->spectator) {
         ws->close();
         return;
@@ -83,8 +86,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
         // Connecting to a non-existant room
         // let's migrate them to a new room
         userData->room = coordinator.createRoom(true, userData->room);
-        API::Redirect msg;
-        msg.room = userData->room;
+        API::Redirect msg{.room = userData->room};
         ws->send(msg.toString(), uWS::OpCode::TEXT);
     }
 }
