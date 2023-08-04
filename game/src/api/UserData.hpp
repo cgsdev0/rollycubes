@@ -1,7 +1,16 @@
+//  To parse this JSON data, first install
+//
+//      json.hpp  https://github.com/nlohmann/json
+//
+//  Then include this file, and then do
+//
+//     UserData.hpp data = nlohmann::json::parse(jsonString);
 
 #pragma once
 
 #include <optional>
+#include "json.hpp"
+#include "helper.hpp"
 
 #include "Color.hpp"
 #include "Dice.hpp"
@@ -12,10 +21,9 @@ namespace API {
 }
 
 namespace API {
+    using nlohmann::json;
 
     struct UserData {
-std::string toString() const;
-void fromString(const std::string &str);
         std::optional<std::vector<Achievement>> achievements;
         Color color;
         std::string created_date;
