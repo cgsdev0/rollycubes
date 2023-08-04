@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/cgsdev0/rollycubes#readme",
   "devDependencies": {
-    "quicktype": "15.1.0"
+    "quicktype": "23.0.64"
   }
 }

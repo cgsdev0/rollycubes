@@ -1,5 +1,6 @@
 
 
+#include <optional>
 #include "json.hpp"
 #include "helper.hpp"
 
@@ -52,223 +53,199 @@
 #include "Achievement.hpp"
 #include "AchievementData.hpp"
 #include "ReportStats.hpp"
-#include "ReportStatsUserId.hpp"
 #include "AchievementUnlock.hpp"
 #include "AchievementUnlockType.hpp"
 #include "AchievementProgress.hpp"
-#include "AchievementProgressUserId.hpp"
-#include "AchievementProgressType.hpp"
 #include "UserId.hpp"
 #include "UserIdType.hpp"
+#include "AchievementProgressType.hpp"
 
 namespace API {
-    using Integer = double;
-    using DiceType = double;
-}
+    void from_json(const json & j, UserId & x);
+    void to_json(json & j, const UserId & x);
 
-namespace nlohmann {
-    void from_json(const json & j, API::UserId & x);
-    void to_json(json & j, const API::UserId & x);
+    void from_json(const json & j, AchievementProgress & x);
+    void to_json(json & j, const AchievementProgress & x);
 
-    void from_json(const json & j, API::AchievementProgressUserId & x);
-    void to_json(json & j, const API::AchievementProgressUserId & x);
+    void from_json(const json & j, AchievementUnlock & x);
+    void to_json(json & j, const AchievementUnlock & x);
 
-    void from_json(const json & j, API::AchievementProgress & x);
-    void to_json(json & j, const API::AchievementProgress & x);
+    void from_json(const json & j, ReportStats & x);
+    void to_json(json & j, const ReportStats & x);
 
-    void from_json(const json & j, API::AchievementUnlock & x);
-    void to_json(json & j, const API::AchievementUnlock & x);
+    void from_json(const json & j, AchievementData & x);
+    void to_json(json & j, const AchievementData & x);
 
-    void from_json(const json & j, API::ReportStatsUserId & x);
-    void to_json(json & j, const API::ReportStatsUserId & x);
+    void from_json(const json & j, Achievement & x);
+    void to_json(json & j, const Achievement & x);
 
-    void from_json(const json & j, API::ReportStats & x);
-    void to_json(json & j, const API::ReportStats & x);
+    void from_json(const json & j, Color & x);
+    void to_json(json & j, const Color & x);
 
-    void from_json(const json & j, API::AchievementData & x);
-    void to_json(json & j, const API::AchievementData & x);
+    void from_json(const json & j, Dice & x);
+    void to_json(json & j, const Dice & x);
 
-    void from_json(const json & j, API::Achievement & x);
-    void to_json(json & j, const API::Achievement & x);
+    void from_json(const json & j, UserStats & x);
+    void to_json(json & j, const UserStats & x);
 
-    void from_json(const json & j, API::Color & x);
-    void to_json(json & j, const API::Color & x);
+    void from_json(const json & j, UserData & x);
+    void to_json(json & j, const UserData & x);
 
-    void from_json(const json & j, API::Dice & x);
-    void to_json(json & j, const API::Dice & x);
+    void from_json(const json & j, DieRoll & x);
+    void to_json(json & j, const DieRoll & x);
 
-    void from_json(const json & j, API::UserStats & x);
-    void to_json(json & j, const API::UserStats & x);
+    void from_json(const json & j, GameError & x);
+    void to_json(json & j, const GameError & x);
 
-    void from_json(const json & j, API::UserData & x);
-    void to_json(json & j, const API::UserData & x);
+    void from_json(const json & j, Redirect & x);
+    void to_json(json & j, const Redirect & x);
 
-    void from_json(const json & j, API::DieRoll & x);
-    void to_json(json & j, const API::DieRoll & x);
+    void from_json(const json & j, RefetchPlayer & x);
+    void to_json(json & j, const RefetchPlayer & x);
 
-    void from_json(const json & j, API::GameError & x);
-    void to_json(json & j, const API::GameError & x);
+    void from_json(const json & j, Room & x);
+    void to_json(json & j, const Room & x);
 
-    void from_json(const json & j, API::Redirect & x);
-    void to_json(json & j, const API::Redirect & x);
+    void from_json(const json & j, RoomList & x);
+    void to_json(json & j, const RoomList & x);
 
-    void from_json(const json & j, API::RefetchPlayer & x);
-    void to_json(json & j, const API::RefetchPlayer & x);
+    void from_json(const json & j, Player & x);
+    void to_json(json & j, const Player & x);
 
-    void from_json(const json & j, API::Room & x);
-    void to_json(json & j, const API::Room & x);
+    void from_json(const json & j, IGameState & x);
+    void to_json(json & j, const IGameState & x);
 
-    void from_json(const json & j, API::RoomList & x);
-    void to_json(json & j, const API::RoomList & x);
+    void from_json(const json & j, ServerPlayer & x);
+    void to_json(json & j, const ServerPlayer & x);
 
-    void from_json(const json & j, API::Player & x);
-    void to_json(json & j, const API::Player & x);
+    void from_json(const json & j, GameState & x);
+    void to_json(json & j, const GameState & x);
 
-    void from_json(const json & j, API::IGameState & x);
-    void to_json(json & j, const API::IGameState & x);
+    void from_json(const json & j, WelcomeMsg & x);
+    void to_json(json & j, const WelcomeMsg & x);
 
-    void from_json(const json & j, API::ServerPlayer & x);
-    void to_json(json & j, const API::ServerPlayer & x);
+    void from_json(const json & j, RestartMsg & x);
+    void to_json(json & j, const RestartMsg & x);
 
-    void from_json(const json & j, API::GameState & x);
-    void to_json(json & j, const API::GameState & x);
+    void from_json(const json & j, SpectatorsMsg & x);
+    void to_json(json & j, const SpectatorsMsg & x);
 
-    void from_json(const json & j, API::WelcomeMsg & x);
-    void to_json(json & j, const API::WelcomeMsg & x);
+    void from_json(const json & j, WinMsg & x);
+    void to_json(json & j, const WinMsg & x);
 
-    void from_json(const json & j, API::RestartMsg & x);
-    void to_json(json & j, const API::RestartMsg & x);
+    void from_json(const json & j, RollMsg & x);
+    void to_json(json & j, const RollMsg & x);
 
-    void from_json(const json & j, API::SpectatorsMsg & x);
-    void to_json(json & j, const API::SpectatorsMsg & x);
+    void from_json(const json & j, RollAgainMsg & x);
+    void to_json(json & j, const RollAgainMsg & x);
 
-    void from_json(const json & j, API::WinMsg & x);
-    void to_json(json & j, const API::WinMsg & x);
+    void from_json(const json & j, JoinMsg & x);
+    void to_json(json & j, const JoinMsg & x);
 
-    void from_json(const json & j, API::RollMsg & x);
-    void to_json(json & j, const API::RollMsg & x);
+    void from_json(const json & j, DisconnectMsg & x);
+    void to_json(json & j, const DisconnectMsg & x);
 
-    void from_json(const json & j, API::RollAgainMsg & x);
-    void to_json(json & j, const API::RollAgainMsg & x);
+    void from_json(const json & j, ReconnectMsg & x);
+    void to_json(json & j, const ReconnectMsg & x);
 
-    void from_json(const json & j, API::JoinMsg & x);
-    void to_json(json & j, const API::JoinMsg & x);
+    void from_json(const json & j, KickMsg & x);
+    void to_json(json & j, const KickMsg & x);
 
-    void from_json(const json & j, API::DisconnectMsg & x);
-    void to_json(json & j, const API::DisconnectMsg & x);
+    void from_json(const json & j, ChatMsg & x);
+    void to_json(json & j, const ChatMsg & x);
 
-    void from_json(const json & j, API::ReconnectMsg & x);
-    void to_json(json & j, const API::ReconnectMsg & x);
+    void from_json(const json & j, UpdateTurnMsg & x);
+    void to_json(json & j, const UpdateTurnMsg & x);
 
-    void from_json(const json & j, API::KickMsg & x);
-    void to_json(json & j, const API::KickMsg & x);
+    void from_json(const json & j, UpdateNameMsg & x);
+    void to_json(json & j, const UpdateNameMsg & x);
 
-    void from_json(const json & j, API::ChatMsg & x);
-    void to_json(json & j, const API::ChatMsg & x);
+    void from_json(const json & j, UpdateMsg & x);
+    void to_json(json & j, const UpdateMsg & x);
 
-    void from_json(const json & j, API::UpdateTurnMsg & x);
-    void to_json(json & j, const API::UpdateTurnMsg & x);
+    void from_json(const json & j, AchievementProgressType & x);
+    void to_json(json & j, const AchievementProgressType & x);
 
-    void from_json(const json & j, API::UpdateNameMsg & x);
-    void to_json(json & j, const API::UpdateNameMsg & x);
+    void from_json(const json & j, UserIdType & x);
+    void to_json(json & j, const UserIdType & x);
 
-    void from_json(const json & j, API::UpdateMsg & x);
-    void to_json(json & j, const API::UpdateMsg & x);
+    void from_json(const json & j, AchievementUnlockType & x);
+    void to_json(json & j, const AchievementUnlockType & x);
 
-    void from_json(const json & j, API::UserIdType & x);
-    void to_json(json & j, const API::UserIdType & x);
+    void from_json(const json & j, GameErrorType & x);
+    void to_json(json & j, const GameErrorType & x);
 
-    void from_json(const json & j, API::AchievementProgressType & x);
-    void to_json(json & j, const API::AchievementProgressType & x);
+    void from_json(const json & j, RedirectType & x);
+    void to_json(json & j, const RedirectType & x);
 
-    void from_json(const json & j, API::AchievementUnlockType & x);
-    void to_json(json & j, const API::AchievementUnlockType & x);
+    void from_json(const json & j, RefetchPlayerType & x);
+    void to_json(json & j, const RefetchPlayerType & x);
 
-    void from_json(const json & j, API::GameErrorType & x);
-    void to_json(json & j, const API::GameErrorType & x);
+    void from_json(const json & j, GameStateType & x);
+    void to_json(json & j, const GameStateType & x);
 
-    void from_json(const json & j, API::RedirectType & x);
-    void to_json(json & j, const API::RedirectType & x);
+    void from_json(const json & j, WelcomeMsgType & x);
+    void to_json(json & j, const WelcomeMsgType & x);
 
-    void from_json(const json & j, API::RefetchPlayerType & x);
-    void to_json(json & j, const API::RefetchPlayerType & x);
+    void from_json(const json & j, RestartMsgType & x);
+    void to_json(json & j, const RestartMsgType & x);
 
-    void from_json(const json & j, API::GameStateType & x);
-    void to_json(json & j, const API::GameStateType & x);
+    void from_json(const json & j, SpectatorsMsgType & x);
+    void to_json(json & j, const SpectatorsMsgType & x);
 
-    void from_json(const json & j, API::WelcomeMsgType & x);
-    void to_json(json & j, const API::WelcomeMsgType & x);
+    void from_json(const json & j, WinMsgType & x);
+    void to_json(json & j, const WinMsgType & x);
 
-    void from_json(const json & j, API::RestartMsgType & x);
-    void to_json(json & j, const API::RestartMsgType & x);
+    void from_json(const json & j, RollMsgType & x);
+    void to_json(json & j, const RollMsgType & x);
 
-    void from_json(const json & j, API::SpectatorsMsgType & x);
-    void to_json(json & j, const API::SpectatorsMsgType & x);
+    void from_json(const json & j, RollAgainMsgType & x);
+    void to_json(json & j, const RollAgainMsgType & x);
 
-    void from_json(const json & j, API::WinMsgType & x);
-    void to_json(json & j, const API::WinMsgType & x);
+    void from_json(const json & j, JoinMsgType & x);
+    void to_json(json & j, const JoinMsgType & x);
 
-    void from_json(const json & j, API::RollMsgType & x);
-    void to_json(json & j, const API::RollMsgType & x);
+    void from_json(const json & j, DisconnectMsgType & x);
+    void to_json(json & j, const DisconnectMsgType & x);
 
-    void from_json(const json & j, API::RollAgainMsgType & x);
-    void to_json(json & j, const API::RollAgainMsgType & x);
+    void from_json(const json & j, ReconnectMsgType & x);
+    void to_json(json & j, const ReconnectMsgType & x);
 
-    void from_json(const json & j, API::JoinMsgType & x);
-    void to_json(json & j, const API::JoinMsgType & x);
+    void from_json(const json & j, KickMsgType & x);
+    void to_json(json & j, const KickMsgType & x);
 
-    void from_json(const json & j, API::DisconnectMsgType & x);
-    void to_json(json & j, const API::DisconnectMsgType & x);
+    void from_json(const json & j, ChatMsgType & x);
+    void to_json(json & j, const ChatMsgType & x);
 
-    void from_json(const json & j, API::ReconnectMsgType & x);
-    void to_json(json & j, const API::ReconnectMsgType & x);
+    void from_json(const json & j, UpdateTurnMsgType & x);
+    void to_json(json & j, const UpdateTurnMsgType & x);
 
-    void from_json(const json & j, API::KickMsgType & x);
-    void to_json(json & j, const API::KickMsgType & x);
+    void from_json(const json & j, UpdateNameMsgType & x);
+    void to_json(json & j, const UpdateNameMsgType & x);
 
-    void from_json(const json & j, API::ChatMsgType & x);
-    void to_json(json & j, const API::ChatMsgType & x);
+    void from_json(const json & j, UpdateMsgType & x);
+    void to_json(json & j, const UpdateMsgType & x);
 
-    void from_json(const json & j, API::UpdateTurnMsgType & x);
-    void to_json(json & j, const API::UpdateTurnMsgType & x);
-
-    void from_json(const json & j, API::UpdateNameMsgType & x);
-    void to_json(json & j, const API::UpdateNameMsgType & x);
-
-    void from_json(const json & j, API::UpdateMsgType & x);
-    void to_json(json & j, const API::UpdateMsgType & x);
-
-    inline void from_json(const json & j, API::UserId& x) {
+    inline void from_json(const json & j, UserId& x) {
         x.id = j.at("id").get<std::string>();
-        x.type = j.at("type").get<API::UserIdType>();
+        x.type = j.at("type").get<UserIdType>();
     }
 
-    inline void to_json(json & j, const API::UserId & x) {
+    inline void to_json(json & j, const UserId & x) {
         j = json::object();
         j["id"] = x.id;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::AchievementProgressUserId& x) {
-        x.id = j.at("id").get<std::string>();
-        x.type = j.at("type").get<API::UserIdType>();
-    }
-
-    inline void to_json(json & j, const API::AchievementProgressUserId & x) {
-        j = json::object();
-        j["id"] = x.id;
-        j["type"] = x.type;
-    }
-
-    inline void from_json(const json & j, API::AchievementProgress& x) {
+    inline void from_json(const json & j, AchievementProgress& x) {
         x.achievement_id = j.at("achievement_id").get<std::string>();
         x.progress = j.at("progress").get<int64_t>();
-        x.type = j.at("type").get<API::AchievementProgressType>();
-        x.user_id = j.at("user_id").get<API::AchievementProgressUserId>();
+        x.type = j.at("type").get<AchievementProgressType>();
+        x.user_id = j.at("user_id").get<UserId>();
         x.user_index = j.at("user_index").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::AchievementProgress & x) {
+    inline void to_json(json & j, const AchievementProgress & x) {
         j = json::object();
         j["achievement_id"] = x.achievement_id;
         j["progress"] = x.progress;
@@ -277,18 +254,18 @@ namespace nlohmann {
         j["user_index"] = x.user_index;
     }
 
-    inline void from_json(const json & j, API::AchievementUnlock& x) {
+    inline void from_json(const json & j, AchievementUnlock& x) {
         x.description = j.at("description").get<std::string>();
         x.id = j.at("id").get<std::string>();
-        x.image_url = API::get_optional<std::string>(j, "image_url");
+        x.image_url = get_stack_optional<std::string>(j, "image_url");
         x.max_progress = j.at("max_progress").get<int64_t>();
         x.name = j.at("name").get<std::string>();
-        x.type = j.at("type").get<API::AchievementUnlockType>();
+        x.type = j.at("type").get<AchievementUnlockType>();
         x.user_id = j.at("user_id").get<std::string>();
         x.user_index = j.at("user_index").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::AchievementUnlock & x) {
+    inline void to_json(json & j, const AchievementUnlock & x) {
         j = json::object();
         j["description"] = x.description;
         j["id"] = x.id;
@@ -300,26 +277,15 @@ namespace nlohmann {
         j["user_index"] = x.user_index;
     }
 
-    inline void from_json(const json & j, API::ReportStatsUserId& x) {
-        x.id = j.at("id").get<std::string>();
-        x.type = j.at("type").get<API::UserIdType>();
-    }
-
-    inline void to_json(json & j, const API::ReportStatsUserId & x) {
-        j = json::object();
-        j["id"] = x.id;
-        j["type"] = x.type;
-    }
-
-    inline void from_json(const json & j, API::ReportStats& x) {
+    inline void from_json(const json & j, ReportStats& x) {
         x.doubles = j.at("doubles").get<int64_t>();
         x.games = j.at("games").get<int64_t>();
         x.rolls = j.at("rolls").get<int64_t>();
-        x.user_id = j.at("user_id").get<API::ReportStatsUserId>();
+        x.user_id = j.at("user_id").get<UserId>();
         x.wins = j.at("wins").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::ReportStats & x) {
+    inline void to_json(json & j, const ReportStats & x) {
         j = json::object();
         j["doubles"] = x.doubles;
         j["games"] = x.games;
@@ -328,15 +294,15 @@ namespace nlohmann {
         j["wins"] = x.wins;
     }
 
-    inline void from_json(const json & j, API::AchievementData& x) {
+    inline void from_json(const json & j, AchievementData& x) {
         x.description = j.at("description").get<std::string>();
         x.id = j.at("id").get<std::string>();
-        x.image_url = API::get_optional<std::string>(j, "image_url");
+        x.image_url = get_stack_optional<std::string>(j, "image_url");
         x.max_progress = j.at("max_progress").get<int64_t>();
         x.name = j.at("name").get<std::string>();
     }
 
-    inline void to_json(json & j, const API::AchievementData & x) {
+    inline void to_json(json & j, const AchievementData & x) {
         j = json::object();
         j["description"] = x.description;
         j["id"] = x.id;
@@ -345,15 +311,15 @@ namespace nlohmann {
         j["name"] = x.name;
     }
 
-    inline void from_json(const json & j, API::Achievement& x) {
+    inline void from_json(const json & j, Achievement& x) {
         x.id = j.at("id").get<std::string>();
         x.progress = j.at("progress").get<int64_t>();
-        x.rd = API::get_optional<double>(j, "rd");
-        x.rn = API::get_optional<double>(j, "rn");
+        x.rd = get_stack_optional<double>(j, "rd");
+        x.rn = get_stack_optional<double>(j, "rn");
         x.unlocked = j.at("unlocked").get<std::string>();
     }
 
-    inline void to_json(json & j, const API::Achievement & x) {
+    inline void to_json(json & j, const Achievement & x) {
         j = json::object();
         j["id"] = x.id;
         j["progress"] = x.progress;
@@ -362,34 +328,34 @@ namespace nlohmann {
         j["unlocked"] = x.unlocked;
     }
 
-    inline void from_json(const json & j, API::Color& x) {
+    inline void from_json(const json & j, Color& x) {
         x.hue = j.at("hue").get<double>();
         x.sat = j.at("sat").get<double>();
     }
 
-    inline void to_json(json & j, const API::Color & x) {
+    inline void to_json(json & j, const Color & x) {
         j = json::object();
         j["hue"] = x.hue;
         j["sat"] = x.sat;
     }
 
-    inline void from_json(const json & j, API::Dice& x) {
+    inline void from_json(const json & j, Dice& x) {
         x.type = j.at("type").get<double>();
     }
 
-    inline void to_json(json & j, const API::Dice & x) {
+    inline void to_json(json & j, const Dice & x) {
         j = json::object();
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::UserStats& x) {
+    inline void from_json(const json & j, UserStats& x) {
         x.doubles = j.at("doubles").get<int64_t>();
         x.games = j.at("games").get<int64_t>();
         x.rolls = j.at("rolls").get<int64_t>();
         x.wins = j.at("wins").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::UserStats & x) {
+    inline void to_json(json & j, const UserStats & x) {
         j = json::object();
         j["doubles"] = x.doubles;
         j["games"] = x.games;
@@ -397,20 +363,20 @@ namespace nlohmann {
         j["wins"] = x.wins;
     }
 
-    inline void from_json(const json & j, API::UserData& x) {
-        x.achievements = API::get_optional<std::vector<API::Achievement>>(j, "achievements");
-        x.color = j.at("color").get<API::Color>();
+    inline void from_json(const json & j, UserData& x) {
+        x.achievements = get_stack_optional<std::vector<Achievement>>(j, "achievements");
+        x.color = j.at("color").get<Color>();
         x.created_date = j.at("createdDate").get<std::string>();
-        x.dice = j.at("dice").get<API::Dice>();
+        x.dice = j.at("dice").get<Dice>();
         x.donor = j.at("donor").get<bool>();
         x.id = j.at("id").get<std::string>();
-        x.image_url = API::get_optional<std::string>(j, "image_url");
-        x.pubkey_text = API::get_optional<std::string>(j, "pubkey_text");
-        x.stats = API::get_optional<API::UserStats>(j, "stats");
+        x.image_url = get_stack_optional<std::string>(j, "image_url");
+        x.pubkey_text = get_stack_optional<std::string>(j, "pubkey_text");
+        x.stats = get_stack_optional<UserStats>(j, "stats");
         x.username = j.at("username").get<std::string>();
     }
 
-    inline void to_json(json & j, const API::UserData & x) {
+    inline void to_json(json & j, const UserData & x) {
         j = json::object();
         j["achievements"] = x.achievements;
         j["color"] = x.color;
@@ -424,58 +390,58 @@ namespace nlohmann {
         j["username"] = x.username;
     }
 
-    inline void from_json(const json & j, API::DieRoll& x) {
+    inline void from_json(const json & j, DieRoll& x) {
         x.used = j.at("used").get<bool>();
         x.value = j.at("value").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::DieRoll & x) {
+    inline void to_json(json & j, const DieRoll & x) {
         j = json::object();
         j["used"] = x.used;
         j["value"] = x.value;
     }
 
-    inline void from_json(const json & j, API::GameError& x) {
+    inline void from_json(const json & j, GameError& x) {
         x.error = j.at("error").get<std::string>();
-        x.type = j.at("type").get<API::GameErrorType>();
+        x.type = j.at("type").get<GameErrorType>();
     }
 
-    inline void to_json(json & j, const API::GameError & x) {
+    inline void to_json(json & j, const GameError & x) {
         j = json::object();
         j["error"] = x.error;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::Redirect& x) {
+    inline void from_json(const json & j, Redirect& x) {
         x.room = j.at("room").get<std::string>();
-        x.type = j.at("type").get<API::RedirectType>();
+        x.type = j.at("type").get<RedirectType>();
     }
 
-    inline void to_json(json & j, const API::Redirect & x) {
+    inline void to_json(json & j, const Redirect & x) {
         j = json::object();
         j["room"] = x.room;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::RefetchPlayer& x) {
-        x.type = j.at("type").get<API::RefetchPlayerType>();
+    inline void from_json(const json & j, RefetchPlayer& x) {
+        x.type = j.at("type").get<RefetchPlayerType>();
         x.user_id = j.at("user_id").get<std::string>();
     }
 
-    inline void to_json(json & j, const API::RefetchPlayer & x) {
+    inline void to_json(json & j, const RefetchPlayer & x) {
         j = json::object();
         j["type"] = x.type;
         j["user_id"] = x.user_id;
     }
 
-    inline void from_json(const json & j, API::Room& x) {
+    inline void from_json(const json & j, Room& x) {
         x.code = j.at("code").get<std::string>();
         x.host_name = j.at("host_name").get<std::string>();
         x.last_updated = j.at("last_updated").get<std::string>();
         x.player_count = j.at("player_count").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::Room & x) {
+    inline void to_json(json & j, const Room & x) {
         j = json::object();
         j["code"] = x.code;
         j["host_name"] = x.host_name;
@@ -483,26 +449,26 @@ namespace nlohmann {
         j["player_count"] = x.player_count;
     }
 
-    inline void from_json(const json & j, API::RoomList& x) {
-        x.rooms = j.at("rooms").get<std::vector<API::Room>>();
+    inline void from_json(const json & j, RoomList& x) {
+        x.rooms = j.at("rooms").get<std::vector<Room>>();
     }
 
-    inline void to_json(json & j, const API::RoomList & x) {
+    inline void to_json(json & j, const RoomList & x) {
         j = json::object();
         j["rooms"] = x.rooms;
     }
 
-    inline void from_json(const json & j, API::Player& x) {
+    inline void from_json(const json & j, Player& x) {
         x.connected = j.at("connected").get<bool>();
-        x.crowned = API::get_optional<bool>(j, "crowned");
-        x.name = API::get_optional<std::string>(j, "name");
+        x.crowned = get_stack_optional<bool>(j, "crowned");
+        x.name = get_stack_optional<std::string>(j, "name");
         x.score = j.at("score").get<int64_t>();
         x.skip_count = j.at("skip_count").get<int64_t>();
-        x.user_id = API::get_optional<std::string>(j, "user_id");
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
         x.win_count = j.at("win_count").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::Player & x) {
+    inline void to_json(json & j, const Player & x) {
         j = json::object();
         j["connected"] = x.connected;
         j["crowned"] = x.crowned;
@@ -513,9 +479,9 @@ namespace nlohmann {
         j["win_count"] = x.win_count;
     }
 
-    inline void from_json(const json & j, API::IGameState& x) {
+    inline void from_json(const json & j, IGameState& x) {
         x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
-        x.players = j.at("players").get<std::vector<API::Player>>();
+        x.players = j.at("players").get<std::vector<Player>>();
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
@@ -525,7 +491,7 @@ namespace nlohmann {
         x.victory = j.at("victory").get<bool>();
     }
 
-    inline void to_json(json & j, const API::IGameState & x) {
+    inline void to_json(json & j, const IGameState & x) {
         j = json::object();
         j["chatLog"] = x.chat_log;
         j["players"] = x.players;
@@ -538,21 +504,21 @@ namespace nlohmann {
         j["victory"] = x.victory;
     }
 
-    inline void from_json(const json & j, API::ServerPlayer& x) {
+    inline void from_json(const json & j, ServerPlayer& x) {
         x.connected = j.at("connected").get<bool>();
-        x.crowned = API::get_optional<bool>(j, "crowned");
+        x.crowned = get_stack_optional<bool>(j, "crowned");
         x.doubles_count = j.at("doubles_count").get<int64_t>();
-        x.name = API::get_optional<std::string>(j, "name");
+        x.name = get_stack_optional<std::string>(j, "name");
         x.roll_count = j.at("roll_count").get<int64_t>();
         x.score = j.at("score").get<int64_t>();
         x.session = j.at("session").get<std::string>();
         x.skip_count = j.at("skip_count").get<int64_t>();
         x.turn_count = j.at("turn_count").get<int64_t>();
-        x.user_id = API::get_optional<std::string>(j, "user_id");
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
         x.win_count = j.at("win_count").get<int64_t>();
     }
 
-    inline void to_json(json & j, const API::ServerPlayer & x) {
+    inline void to_json(json & j, const ServerPlayer & x) {
         j = json::object();
         j["connected"] = x.connected;
         j["crowned"] = x.crowned;
@@ -567,20 +533,20 @@ namespace nlohmann {
         j["win_count"] = x.win_count;
     }
 
-    inline void from_json(const json & j, API::GameState& x) {
+    inline void from_json(const json & j, GameState& x) {
         x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
-        x.players = j.at("players").get<std::vector<API::ServerPlayer>>();
+        x.players = j.at("players").get<std::vector<ServerPlayer>>();
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
         x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
-        x.type = j.at("type").get<API::GameStateType>();
+        x.type = j.at("type").get<GameStateType>();
         x.used = j.at("used").get<std::vector<bool>>();
         x.victory = j.at("victory").get<bool>();
     }
 
-    inline void to_json(json & j, const API::GameState & x) {
+    inline void to_json(json & j, const GameState & x) {
         j = json::object();
         j["chatLog"] = x.chat_log;
         j["players"] = x.players;
@@ -594,21 +560,21 @@ namespace nlohmann {
         j["victory"] = x.victory;
     }
 
-    inline void from_json(const json & j, API::WelcomeMsg& x) {
+    inline void from_json(const json & j, WelcomeMsg& x) {
         x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
         x.id = j.at("id").get<int64_t>();
-        x.players = j.at("players").get<std::vector<API::Player>>();
+        x.players = j.at("players").get<std::vector<Player>>();
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
         x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
-        x.type = j.at("type").get<API::WelcomeMsgType>();
+        x.type = j.at("type").get<WelcomeMsgType>();
         x.used = j.at("used").get<std::vector<bool>>();
         x.victory = j.at("victory").get<bool>();
     }
 
-    inline void to_json(json & j, const API::WelcomeMsg & x) {
+    inline void to_json(json & j, const WelcomeMsg & x) {
         j = json::object();
         j["chatLog"] = x.chat_log;
         j["id"] = x.id;
@@ -623,67 +589,67 @@ namespace nlohmann {
         j["victory"] = x.victory;
     }
 
-    inline void from_json(const json & j, API::RestartMsg& x) {
+    inline void from_json(const json & j, RestartMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.type = j.at("type").get<API::RestartMsgType>();
+        x.type = j.at("type").get<RestartMsgType>();
     }
 
-    inline void to_json(json & j, const API::RestartMsg & x) {
+    inline void to_json(json & j, const RestartMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::SpectatorsMsg& x) {
+    inline void from_json(const json & j, SpectatorsMsg& x) {
         x.count = j.at("count").get<int64_t>();
-        x.type = j.at("type").get<API::SpectatorsMsgType>();
+        x.type = j.at("type").get<SpectatorsMsgType>();
     }
 
-    inline void to_json(json & j, const API::SpectatorsMsg & x) {
+    inline void to_json(json & j, const SpectatorsMsg & x) {
         j = json::object();
         j["count"] = x.count;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::WinMsg& x) {
+    inline void from_json(const json & j, WinMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.type = j.at("type").get<API::WinMsgType>();
+        x.type = j.at("type").get<WinMsgType>();
     }
 
-    inline void to_json(json & j, const API::WinMsg & x) {
+    inline void to_json(json & j, const WinMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::RollMsg& x) {
+    inline void from_json(const json & j, RollMsg& x) {
         x.rolls = j.at("rolls").get<std::vector<double>>();
-        x.type = j.at("type").get<API::RollMsgType>();
+        x.type = j.at("type").get<RollMsgType>();
     }
 
-    inline void to_json(json & j, const API::RollMsg & x) {
+    inline void to_json(json & j, const RollMsg & x) {
         j = json::object();
         j["rolls"] = x.rolls;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::RollAgainMsg& x) {
-        x.type = j.at("type").get<API::RollAgainMsgType>();
+    inline void from_json(const json & j, RollAgainMsg& x) {
+        x.type = j.at("type").get<RollAgainMsgType>();
     }
 
-    inline void to_json(json & j, const API::RollAgainMsg & x) {
+    inline void to_json(json & j, const RollAgainMsg & x) {
         j = json::object();
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::JoinMsg& x) {
+    inline void from_json(const json & j, JoinMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.name = API::get_optional<std::string>(j, "name");
-        x.type = j.at("type").get<API::JoinMsgType>();
-        x.user_id = API::get_optional<std::string>(j, "user_id");
+        x.name = get_stack_optional<std::string>(j, "name");
+        x.type = j.at("type").get<JoinMsgType>();
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
     }
 
-    inline void to_json(json & j, const API::JoinMsg & x) {
+    inline void to_json(json & j, const JoinMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["name"] = x.name;
@@ -691,25 +657,25 @@ namespace nlohmann {
         j["user_id"] = x.user_id;
     }
 
-    inline void from_json(const json & j, API::DisconnectMsg& x) {
+    inline void from_json(const json & j, DisconnectMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.type = j.at("type").get<API::DisconnectMsgType>();
+        x.type = j.at("type").get<DisconnectMsgType>();
     }
 
-    inline void to_json(json & j, const API::DisconnectMsg & x) {
+    inline void to_json(json & j, const DisconnectMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::ReconnectMsg& x) {
+    inline void from_json(const json & j, ReconnectMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.name = API::get_optional<std::string>(j, "name");
-        x.type = j.at("type").get<API::ReconnectMsgType>();
-        x.user_id = API::get_optional<std::string>(j, "user_id");
+        x.name = get_stack_optional<std::string>(j, "name");
+        x.type = j.at("type").get<ReconnectMsgType>();
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
     }
 
-    inline void to_json(json & j, const API::ReconnectMsg & x) {
+    inline void to_json(json & j, const ReconnectMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["name"] = x.name;
@@ -717,63 +683,63 @@ namespace nlohmann {
         j["user_id"] = x.user_id;
     }
 
-    inline void from_json(const json & j, API::KickMsg& x) {
+    inline void from_json(const json & j, KickMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.type = j.at("type").get<API::KickMsgType>();
+        x.type = j.at("type").get<KickMsgType>();
     }
 
-    inline void to_json(json & j, const API::KickMsg & x) {
+    inline void to_json(json & j, const KickMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::ChatMsg& x) {
+    inline void from_json(const json & j, ChatMsg& x) {
         x.msg = j.at("msg").get<std::string>();
-        x.type = j.at("type").get<API::ChatMsgType>();
+        x.type = j.at("type").get<ChatMsgType>();
     }
 
-    inline void to_json(json & j, const API::ChatMsg & x) {
+    inline void to_json(json & j, const ChatMsg & x) {
         j = json::object();
         j["msg"] = x.msg;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::UpdateTurnMsg& x) {
+    inline void from_json(const json & j, UpdateTurnMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.skip = API::get_optional<bool>(j, "skip");
-        x.type = j.at("type").get<API::UpdateTurnMsgType>();
+        x.skip = get_stack_optional<bool>(j, "skip");
+        x.type = j.at("type").get<UpdateTurnMsgType>();
     }
 
-    inline void to_json(json & j, const API::UpdateTurnMsg & x) {
+    inline void to_json(json & j, const UpdateTurnMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["skip"] = x.skip;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::UpdateNameMsg& x) {
+    inline void from_json(const json & j, UpdateNameMsg& x) {
         x.id = j.at("id").get<int64_t>();
         x.name = j.at("name").get<std::string>();
-        x.type = j.at("type").get<API::UpdateNameMsgType>();
+        x.type = j.at("type").get<UpdateNameMsgType>();
     }
 
-    inline void to_json(json & j, const API::UpdateNameMsg & x) {
+    inline void to_json(json & j, const UpdateNameMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["name"] = x.name;
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, API::UpdateMsg& x) {
+    inline void from_json(const json & j, UpdateMsg& x) {
         x.id = j.at("id").get<int64_t>();
-        x.reset = API::get_optional<bool>(j, "reset");
+        x.reset = get_stack_optional<bool>(j, "reset");
         x.score = j.at("score").get<int64_t>();
-        x.type = j.at("type").get<API::UpdateMsgType>();
-        x.used = API::get_optional<std::vector<bool>>(j, "used");
+        x.type = j.at("type").get<UpdateMsgType>();
+        x.used = get_stack_optional<std::vector<bool>>(j, "used");
     }
 
-    inline void to_json(json & j, const API::UpdateMsg & x) {
+    inline void to_json(json & j, const UpdateMsg & x) {
         j = json::object();
         j["id"] = x.id;
         j["reset"] = x.reset;
@@ -782,257 +748,257 @@ namespace nlohmann {
         j["used"] = x.used;
     }
 
-    inline void from_json(const json & j, API::UserIdType & x) {
-        if (j == "Anonymous") x = API::UserIdType::ANONYMOUS;
-        else if (j == "User") x = API::UserIdType::USER;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, AchievementProgressType & x) {
+        if (j == "achievement_progress") x = AchievementProgressType::ACHIEVEMENT_PROGRESS;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::UserIdType & x) {
+    inline void to_json(json & j, const AchievementProgressType & x) {
         switch (x) {
-            case API::UserIdType::ANONYMOUS: j = "Anonymous"; break;
-            case API::UserIdType::USER: j = "User"; break;
-            default: throw "This should not happen";
+            case AchievementProgressType::ACHIEVEMENT_PROGRESS: j = "achievement_progress"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::AchievementProgressType & x) {
-        if (j == "achievement_progress") x = API::AchievementProgressType::ACHIEVEMENT_PROGRESS;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, UserIdType & x) {
+        if (j == "Anonymous") x = UserIdType::ANONYMOUS;
+        else if (j == "User") x = UserIdType::USER;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::AchievementProgressType & x) {
+    inline void to_json(json & j, const UserIdType & x) {
         switch (x) {
-            case API::AchievementProgressType::ACHIEVEMENT_PROGRESS: j = "achievement_progress"; break;
-            default: throw "This should not happen";
+            case UserIdType::ANONYMOUS: j = "Anonymous"; break;
+            case UserIdType::USER: j = "User"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::AchievementUnlockType & x) {
-        if (j == "achievement_unlock") x = API::AchievementUnlockType::ACHIEVEMENT_UNLOCK;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, AchievementUnlockType & x) {
+        if (j == "achievement_unlock") x = AchievementUnlockType::ACHIEVEMENT_UNLOCK;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::AchievementUnlockType & x) {
+    inline void to_json(json & j, const AchievementUnlockType & x) {
         switch (x) {
-            case API::AchievementUnlockType::ACHIEVEMENT_UNLOCK: j = "achievement_unlock"; break;
-            default: throw "This should not happen";
+            case AchievementUnlockType::ACHIEVEMENT_UNLOCK: j = "achievement_unlock"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::GameErrorType & x) {
-        if (j == "error") x = API::GameErrorType::ERROR;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, GameErrorType & x) {
+        if (j == "error") x = GameErrorType::ERROR;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::GameErrorType & x) {
+    inline void to_json(json & j, const GameErrorType & x) {
         switch (x) {
-            case API::GameErrorType::ERROR: j = "error"; break;
-            default: throw "This should not happen";
+            case GameErrorType::ERROR: j = "error"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::RedirectType & x) {
-        if (j == "redirect") x = API::RedirectType::REDIRECT;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, RedirectType & x) {
+        if (j == "redirect") x = RedirectType::REDIRECT;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::RedirectType & x) {
+    inline void to_json(json & j, const RedirectType & x) {
         switch (x) {
-            case API::RedirectType::REDIRECT: j = "redirect"; break;
-            default: throw "This should not happen";
+            case RedirectType::REDIRECT: j = "redirect"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::RefetchPlayerType & x) {
-        if (j == "refetch_player") x = API::RefetchPlayerType::REFETCH_PLAYER;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, RefetchPlayerType & x) {
+        if (j == "refetch_player") x = RefetchPlayerType::REFETCH_PLAYER;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::RefetchPlayerType & x) {
+    inline void to_json(json & j, const RefetchPlayerType & x) {
         switch (x) {
-            case API::RefetchPlayerType::REFETCH_PLAYER: j = "refetch_player"; break;
-            default: throw "This should not happen";
+            case RefetchPlayerType::REFETCH_PLAYER: j = "refetch_player"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::GameStateType & x) {
-        if (j == "game_state") x = API::GameStateType::GAME_STATE;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, GameStateType & x) {
+        if (j == "game_state") x = GameStateType::GAME_STATE;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::GameStateType & x) {
+    inline void to_json(json & j, const GameStateType & x) {
         switch (x) {
-            case API::GameStateType::GAME_STATE: j = "game_state"; break;
-            default: throw "This should not happen";
+            case GameStateType::GAME_STATE: j = "game_state"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::WelcomeMsgType & x) {
-        if (j == "welcome") x = API::WelcomeMsgType::WELCOME;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, WelcomeMsgType & x) {
+        if (j == "welcome") x = WelcomeMsgType::WELCOME;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::WelcomeMsgType & x) {
+    inline void to_json(json & j, const WelcomeMsgType & x) {
         switch (x) {
-            case API::WelcomeMsgType::WELCOME: j = "welcome"; break;
-            default: throw "This should not happen";
+            case WelcomeMsgType::WELCOME: j = "welcome"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::RestartMsgType & x) {
-        if (j == "restart") x = API::RestartMsgType::RESTART;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, RestartMsgType & x) {
+        if (j == "restart") x = RestartMsgType::RESTART;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::RestartMsgType & x) {
+    inline void to_json(json & j, const RestartMsgType & x) {
         switch (x) {
-            case API::RestartMsgType::RESTART: j = "restart"; break;
-            default: throw "This should not happen";
+            case RestartMsgType::RESTART: j = "restart"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::SpectatorsMsgType & x) {
-        if (j == "spectators") x = API::SpectatorsMsgType::SPECTATORS;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, SpectatorsMsgType & x) {
+        if (j == "spectators") x = SpectatorsMsgType::SPECTATORS;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::SpectatorsMsgType & x) {
+    inline void to_json(json & j, const SpectatorsMsgType & x) {
         switch (x) {
-            case API::SpectatorsMsgType::SPECTATORS: j = "spectators"; break;
-            default: throw "This should not happen";
+            case SpectatorsMsgType::SPECTATORS: j = "spectators"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::WinMsgType & x) {
-        if (j == "win") x = API::WinMsgType::WIN;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, WinMsgType & x) {
+        if (j == "win") x = WinMsgType::WIN;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::WinMsgType & x) {
+    inline void to_json(json & j, const WinMsgType & x) {
         switch (x) {
-            case API::WinMsgType::WIN: j = "win"; break;
-            default: throw "This should not happen";
+            case WinMsgType::WIN: j = "win"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::RollMsgType & x) {
-        if (j == "roll") x = API::RollMsgType::ROLL;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, RollMsgType & x) {
+        if (j == "roll") x = RollMsgType::ROLL;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::RollMsgType & x) {
+    inline void to_json(json & j, const RollMsgType & x) {
         switch (x) {
-            case API::RollMsgType::ROLL: j = "roll"; break;
-            default: throw "This should not happen";
+            case RollMsgType::ROLL: j = "roll"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::RollAgainMsgType & x) {
-        if (j == "roll_again") x = API::RollAgainMsgType::ROLL_AGAIN;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, RollAgainMsgType & x) {
+        if (j == "roll_again") x = RollAgainMsgType::ROLL_AGAIN;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::RollAgainMsgType & x) {
+    inline void to_json(json & j, const RollAgainMsgType & x) {
         switch (x) {
-            case API::RollAgainMsgType::ROLL_AGAIN: j = "roll_again"; break;
-            default: throw "This should not happen";
+            case RollAgainMsgType::ROLL_AGAIN: j = "roll_again"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::JoinMsgType & x) {
-        if (j == "join") x = API::JoinMsgType::JOIN;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, JoinMsgType & x) {
+        if (j == "join") x = JoinMsgType::JOIN;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::JoinMsgType & x) {
+    inline void to_json(json & j, const JoinMsgType & x) {
         switch (x) {
-            case API::JoinMsgType::JOIN: j = "join"; break;
-            default: throw "This should not happen";
+            case JoinMsgType::JOIN: j = "join"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::DisconnectMsgType & x) {
-        if (j == "disconnect") x = API::DisconnectMsgType::DISCONNECT;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, DisconnectMsgType & x) {
+        if (j == "disconnect") x = DisconnectMsgType::DISCONNECT;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::DisconnectMsgType & x) {
+    inline void to_json(json & j, const DisconnectMsgType & x) {
         switch (x) {
-            case API::DisconnectMsgType::DISCONNECT: j = "disconnect"; break;
-            default: throw "This should not happen";
+            case DisconnectMsgType::DISCONNECT: j = "disconnect"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::ReconnectMsgType & x) {
-        if (j == "reconnect") x = API::ReconnectMsgType::RECONNECT;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, ReconnectMsgType & x) {
+        if (j == "reconnect") x = ReconnectMsgType::RECONNECT;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::ReconnectMsgType & x) {
+    inline void to_json(json & j, const ReconnectMsgType & x) {
         switch (x) {
-            case API::ReconnectMsgType::RECONNECT: j = "reconnect"; break;
-            default: throw "This should not happen";
+            case ReconnectMsgType::RECONNECT: j = "reconnect"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::KickMsgType & x) {
-        if (j == "kick") x = API::KickMsgType::KICK;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, KickMsgType & x) {
+        if (j == "kick") x = KickMsgType::KICK;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::KickMsgType & x) {
+    inline void to_json(json & j, const KickMsgType & x) {
         switch (x) {
-            case API::KickMsgType::KICK: j = "kick"; break;
-            default: throw "This should not happen";
+            case KickMsgType::KICK: j = "kick"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::ChatMsgType & x) {
-        if (j == "chat") x = API::ChatMsgType::CHAT;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, ChatMsgType & x) {
+        if (j == "chat") x = ChatMsgType::CHAT;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::ChatMsgType & x) {
+    inline void to_json(json & j, const ChatMsgType & x) {
         switch (x) {
-            case API::ChatMsgType::CHAT: j = "chat"; break;
-            default: throw "This should not happen";
+            case ChatMsgType::CHAT: j = "chat"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::UpdateTurnMsgType & x) {
-        if (j == "update_turn") x = API::UpdateTurnMsgType::UPDATE_TURN;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, UpdateTurnMsgType & x) {
+        if (j == "update_turn") x = UpdateTurnMsgType::UPDATE_TURN;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::UpdateTurnMsgType & x) {
+    inline void to_json(json & j, const UpdateTurnMsgType & x) {
         switch (x) {
-            case API::UpdateTurnMsgType::UPDATE_TURN: j = "update_turn"; break;
-            default: throw "This should not happen";
+            case UpdateTurnMsgType::UPDATE_TURN: j = "update_turn"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::UpdateNameMsgType & x) {
-        if (j == "update_name") x = API::UpdateNameMsgType::UPDATE_NAME;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, UpdateNameMsgType & x) {
+        if (j == "update_name") x = UpdateNameMsgType::UPDATE_NAME;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::UpdateNameMsgType & x) {
+    inline void to_json(json & j, const UpdateNameMsgType & x) {
         switch (x) {
-            case API::UpdateNameMsgType::UPDATE_NAME: j = "update_name"; break;
-            default: throw "This should not happen";
+            case UpdateNameMsgType::UPDATE_NAME: j = "update_name"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 
-    inline void from_json(const json & j, API::UpdateMsgType & x) {
-        if (j == "update") x = API::UpdateMsgType::UPDATE;
-        else throw "Input JSON does not conform to schema";
+    inline void from_json(const json & j, UpdateMsgType & x) {
+        if (j == "update") x = UpdateMsgType::UPDATE;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const API::UpdateMsgType & x) {
+    inline void to_json(json & j, const UpdateMsgType & x) {
         switch (x) {
-            case API::UpdateMsgType::UPDATE: j = "update"; break;
-            default: throw "This should not happen";
+            case UpdateMsgType::UPDATE: j = "update"; break;
+            default: throw std::runtime_error("This should not happen");
         }
     }
 }
@@ -1061,15 +1027,6 @@ to_json(j, *this);
 return j.dump();
 }
 void AchievementProgress::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
-std::string AchievementProgressUserId::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void AchievementProgressUserId::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -1214,15 +1171,6 @@ to_json(j, *this);
 return j.dump();
 }
 void ReportStats::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
-std::string ReportStatsUserId::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void ReportStatsUserId::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

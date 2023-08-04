@@ -3,15 +3,14 @@
 
 #pragma once
 
+#include <optional>
 
+#include "AchievementProgressType.hpp"
 #include "UserIdType.hpp"
 #include "UserId.hpp"
-#include "AchievementProgressType.hpp"
-#include "AchievementProgressUserId.hpp"
 #include "AchievementProgress.hpp"
 #include "AchievementUnlockType.hpp"
 #include "AchievementUnlock.hpp"
-#include "ReportStatsUserId.hpp"
 #include "ReportStats.hpp"
 #include "AchievementData.hpp"
 #include "Achievement.hpp"

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <optional>
 #include "json.hpp"
 
 #include <sstream>
@@ -15,6 +16,8 @@
 namespace API {
     using nlohmann::json;
 
+    #ifndef NLOHMANN_UNTYPED_API_HELPER
+    #define NLOHMANN_UNTYPED_API_HELPER
     inline json get_untyped(const json & j, const char * property) {
         if (j.find(property) != j.end()) {
             return j.at(property).get<json>();
@@ -25,19 +28,37 @@ namespace API {
     inline json get_untyped(const json & j, std::string property) {
         return get_untyped(j, property.data());
     }
+    #endif
 
+    #ifndef NLOHMANN_OPTIONAL_API_HELPER
+    #define NLOHMANN_OPTIONAL_API_HELPER
     template <typename T>
-    inline std::shared_ptr<T> get_optional(const json & j, const char * property) {
-        if (j.find(property) != j.end()) {
+    inline std::shared_ptr<T> get_heap_optional(const json & j, const char * property) {
+        auto it = j.find(property);
+        if (it != j.end() && !it->is_null()) {
             return j.at(property).get<std::shared_ptr<T>>();
         }
         return std::shared_ptr<T>();
     }
 
     template <typename T>
-    inline std::shared_ptr<T> get_optional(const json & j, std::string property) {
-        return get_optional<T>(j, property.data());
+    inline std::shared_ptr<T> get_heap_optional(const json & j, std::string property) {
+        return get_heap_optional<T>(j, property.data());
     }
+    template <typename T>
+    inline std::optional<T> get_stack_optional(const json & j, const char * property) {
+        auto it = j.find(property);
+        if (it != j.end() && !it->is_null()) {
+            return j.at(property).get<std::optional<T>>();
+        }
+        return std::optional<T>();
+    }
+
+    template <typename T>
+    inline std::optional<T> get_stack_optional(const json & j, std::string property) {
+        return get_stack_optional<T>(j, property.data());
+    }
+    #endif
 }
 
 #ifndef NLOHMANN_OPT_HELPER
@@ -50,7 +71,17 @@ namespace nlohmann {
         }
 
         static std::shared_ptr<T> from_json(const json & j) {
-            if (j.is_null()) return std::unique_ptr<T>(); else return std::unique_ptr<T>(new T(j.get<T>()));
+            if (j.is_null()) return std::make_shared<T>(); else return std::make_shared<T>(j.get<T>());
+        }
+    };
+    template <typename T>
+    struct adl_serializer<std::optional<T>> {
+        static void to_json(json & j, const std::optional<T> & opt) {
+            if (!opt) j = nullptr; else j = *opt;
+        }
+
+        static std::optional<T> from_json(const json & j) {
+            if (j.is_null()) return std::make_optional<T>(); else return std::make_optional<T>(j.get<T>());
         }
     };
 }

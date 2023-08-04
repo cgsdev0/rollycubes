@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <optional>
 
 namespace API {
     enum class UpdateTurnMsgType : int;
@@ -12,7 +13,7 @@ namespace API {
 std::string toString() const;
 void fromString(const std::string &str);
         int64_t id;
-        std::shared_ptr<bool> skip;
+        std::optional<bool> skip;
         UpdateTurnMsgType type = static_cast<UpdateTurnMsgType>(0);
     };
 }
