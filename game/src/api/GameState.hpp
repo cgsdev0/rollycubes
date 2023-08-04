@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <optional>
 
 namespace API {
     struct ServerPlayer;

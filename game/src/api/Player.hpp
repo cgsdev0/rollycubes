@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <optional>
 
 namespace API {
 
@@ -8,11 +9,11 @@ namespace API {
 std::string toString() const;
 void fromString(const std::string &str);
         bool connected;
-        std::shared_ptr<bool> crowned;
-        std::shared_ptr<std::string> name;
+        std::optional<bool> crowned;
+        std::optional<std::string> name;
         int64_t score;
         int64_t skip_count;
-        std::shared_ptr<std::string> user_id;
+        std::optional<std::string> user_id;
         int64_t win_count;
     };
 }

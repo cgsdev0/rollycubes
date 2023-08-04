@@ -1,8 +1,9 @@
 
 #pragma once
 
+#include <optional>
 
-#include "ReportStatsUserId.hpp"
+#include "UserId.hpp"
 
 namespace API {
 
@@ -12,7 +13,7 @@ void fromString(const std::string &str);
         int64_t doubles;
         int64_t games;
         int64_t rolls;
-        ReportStatsUserId user_id;
+        UserId user_id;
         int64_t wins;
     };
 }
