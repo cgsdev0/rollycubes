@@ -1,72 +1,101 @@
 button {
-    flex-basis: 100%;
-    background-color: lightgray;
-    border: 0;
-    margin: 0px 5px;
-    border-radius: 8px;
-      font-family: "Montserrat";
-    font-size: 20px;
-    font-weight: bold;
+  flex-basis: 100%;
+  background-color: lightgray;
+  border: 0;
+  margin: 0px 5px;
+  border-radius: 8px;
+  font-family: 'Montserrat';
+  font-size: 20px;
+  font-weight: bold;
 }
 
 button:focus {
-    outline: 0;
+  outline: 0;
 }
 
 button:active {
-    background-color: lightslategray;
+  background-color: lightslategray;
 }
 
 .buttonColumn {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    justify-content: space-between;
-    flex-grow: 1;
-    align-content: stretch;
-    flex-basis: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  flex-grow: 1;
+  align-content: stretch;
+  flex-basis: 100%;
 }
 
 .topButton {
-    min-height: 40px;
-    max-height: 40px;
-    z-index: 40;
+  min-height: 40px;
+  max-height: 40px;
+  z-index: 40;
 }
 
 button.Add {
-    background-color: #007bff;
-    color: white;
-    font-size: 18pt;
-    font-weight: bold;
+  background-color: #007bff;
+  color: white;
+  font-size: 18pt;
+  font-weight: bold;
 }
 
 button.Add:active {
-    background-color: lightskyblue;
+  background-color: lightskyblue;
 }
 
 button.Subtract {
-    background-color: #6c757d;
-    color: white;
-    font-size: 18pt;
-    font-weight: bold;
+  background-color: #6c757d;
+  color: white;
+  font-size: 18pt;
+  font-weight: bold;
 }
 
 button.Subtract:active {
-    background-color: #cccccc;
+  background-color: #cccccc;
 }
 
 button.Reset {
-    background-color: #dc3545;
+  background-color: #dc3545;
 }
 
 button.Reset:active {
-    background-color: #eecccc;
+  background-color: #eecccc;
 }
 
 button.Victory {
-    background-color: #ffc107;
+  background-color: #ffc107;
+  position: relative;
+  overflow: hidden;
 }
 
 button.Victory:active {
-    background-color: #ffee77;
+  background-color: #ffee77;
+}
+
+button.Victory::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background: white;
+  opacity: 0.3;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, white, white 70%, transparent 20px);
+  transform-origin: left bottom;
+  animation: shine 2s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% {
+    transform: skewX(-45deg) translateX(-150%);
+  }
+  80% {
+    transform: skewX(-45deg) translateX(150%);
+  }
+  100% {
+    transform: skewX(-45deg) translateX(150%);
+  }
 }
