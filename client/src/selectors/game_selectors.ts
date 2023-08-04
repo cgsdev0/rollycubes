@@ -87,12 +87,48 @@ export const selectPlayers = createSelector(selectState, (state) =>
   DEBUG_PLAYERS
     ? [
         ...state.game.players,
-        { connected: true, name: 'test', score: 10, win_count: 0 },
-        { connected: false, name: 'test2', score: 10, win_count: 0 },
-        { connected: true, name: 'test3', score: 10, win_count: 0 },
-        { connected: false, name: 'test4', score: 10, win_count: 0 },
-        { connected: true, name: 'test0', score: 10, win_count: 0 },
-        { connected: true, name: 'test6', score: 10, win_count: 5 },
+        {
+          skip_count: 0,
+          connected: true,
+          name: 'test',
+          score: 10,
+          win_count: 0,
+        },
+        {
+          skip_count: 0,
+          connected: false,
+          name: 'test2',
+          score: 10,
+          win_count: 0,
+        },
+        {
+          skip_count: 2,
+          connected: true,
+          name: 'test3',
+          score: 10,
+          win_count: 0,
+        },
+        {
+          skip_count: 2,
+          connected: false,
+          name: 'test4',
+          score: 10,
+          win_count: 0,
+        },
+        {
+          skip_count: 0,
+          connected: true,
+          name: 'test0',
+          score: 10,
+          win_count: 0,
+        },
+        {
+          skip_count: 0,
+          connected: true,
+          name: 'test6',
+          score: 10,
+          win_count: 5,
+        },
       ]
     : state.game.players
 );
