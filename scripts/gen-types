@@ -16,10 +16,10 @@ rm ssh-gateway/api/generated.go
   --namespace API \
   --src-lang schema "./schema.json#/definitions/"
 
-# ./node_modules/.bin/quicktype \
-#   -o ssh-gateway/api/generated.go \
-#   --lang golang \
-#   client/src/types/*.ts
+./node_modules/.bin/quicktype \
+  -o ssh-gateway/api/generated.go \
+  --lang golang \
+  --src-lang schema "./schema.json#/definitions/"
 
 # avert your eyes, this next part is a crime
 
@@ -76,5 +76,5 @@ echo "}" >> API.cpp
 sed -i '1s/^/#include <vector>\n/' API.hpp
 sed -i '1s/^/#include <memory>\n/' API.hpp
 
-# popd &> /dev/null
-# sed -i '1s/^/package main\n/' ssh-gateway/api/generated.go
+popd &> /dev/null
+sed -i '1s/^/package main\n/' ssh-gateway/api/generated.go
