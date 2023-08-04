@@ -27,7 +27,7 @@ bool Game::isPrivate() const { return state.private_session; }
 std::string Game::hostName() const {
     if (state.players.size() < 1)
         return "unknown";
-    if (state.players[0].name == nullptr)
+    if (state.players[0].name == std::nullopt)
         return "unknown";
     return *state.players[0].name;
 }
@@ -74,11 +74,11 @@ json Game::addPlayer(const PerSocketData &data) {
         return result;
     }
     auto &player = state.players.emplace_back();
-    player.crowned = std::make_shared<bool>(false);
+    player.crowned = std::optional<bool>(false);
     player.connected = true;
     player.session = data.session;
     if (isSignedIn(player)) {
-        player.name = std::make_shared<std::string>(data.display_name);
+        player.name = std::optional<std::string>(data.display_name);
         result["name"] = *player.name;
         result["user_id"] = player.session;
     }
@@ -151,7 +151,7 @@ json Game::reconnectPlayer(std::string id, std::string old_id, const PerSocketDa
             // Update our session to the new id
             state.players[i].session = id;
             if (isSignedIn(state.players[i])) {
-                state.players[i].name = std::make_shared<std::string>(data.display_name);
+                state.players[i].name = std::optional<std::string>(data.display_name);
                 result["name"] = *state.players[i].name;
                 result["user_id"] = state.players[i].session;
             }
@@ -191,7 +191,7 @@ static const std::unordered_map<
 #undef ACTION
 
 void Game::processEvent(const API::ServerPlayer *player, SendFunc &broadcast, HandlerArgs *server, const json &data, const API::GameState &prev) {
-    API::AchievementProgressUserId user_id({.id = player->session, .type = API::UserIdType::ANONYMOUS});
+    API::UserId user_id({.id = player->session, .type = API::UserIdType::ANONYMOUS});
 
     if (isSignedIn(*player)) {
         user_id.type = API::UserIdType::USER;
@@ -371,10 +371,10 @@ void Game::update_name(HANDLER_ARGS) {
             if (isSignedIn(state.players[i])) {
                 throw API::GameError({.error = "signed in players can't change names that way"});
             }
-            state.players[i].name = std::make_shared<std::string>(name);
+            state.players[i].name = std::optional<std::string>(name);
             json msg;
             msg["type"] = "update_name";
-            if (state.players[i].name != nullptr) {
+            if (state.players[i].name != std::nullopt) {
                 msg["name"] = *state.players[i].name;
             }
             msg["id"] = i;
@@ -500,8 +500,8 @@ void Game::update(HANDLER_ARGS) {
                 json win;
                 state.players[winnerId].win_count++;
                 for (uint i = 0; i < state.players.size(); ++i) {
-                    state.players[i].crowned = std::make_shared<bool>(false);
-                    API::ReportStatsUserId user_id({.id = state.players[i].session, .type = API::UserIdType::ANONYMOUS});
+                    state.players[i].crowned = std::optional<bool>(false);
+                    API::UserId user_id({.id = state.players[i].session, .type = API::UserIdType::ANONYMOUS});
                     if (isSignedIn(state.players[i])) {
                         user_id.type = API::UserIdType::USER;
                     }
@@ -519,7 +519,7 @@ void Game::update(HANDLER_ARGS) {
                     });
                 }
 
-                state.players[winnerId].crowned = std::make_shared<bool>(true);
+                state.players[winnerId].crowned = std::optional<bool>(true);
 
                 win["type"] = "win";
                 win["id"] = winnerId;

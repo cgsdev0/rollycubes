@@ -73,8 +73,8 @@ for struct in $structs; do
 done
 echo "}" >> API.cpp
 
-# sed -i '1s/^/#include <vector>\n/' API.hpp
-# sed -i '1s/^/#include <memory>\n/' API.hpp
+sed -i '1s/^/#include <vector>\n/' API.hpp
+sed -i '1s/^/#include <memory>\n/' API.hpp
 
 # popd &> /dev/null
 # sed -i '1s/^/package main\n/' ssh-gateway/api/generated.go
