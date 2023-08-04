@@ -1,16 +1,7 @@
-//  To parse this JSON data, first install
-//
-//      json.hpp  https://github.com/nlohmann/json
-//
-//  Then include this file, and then do
-//
-//     GameState.hpp data = nlohmann::json::parse(jsonString);
 
 #pragma once
 
 #include <optional>
-#include "json.hpp"
-#include "helper.hpp"
 
 namespace API {
     struct ServerPlayer;
@@ -18,7 +9,6 @@ namespace API {
 }
 
 namespace API {
-    using nlohmann::json;
 
     struct GameState {
         std::vector<std::string> chat_log;

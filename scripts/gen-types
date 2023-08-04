@@ -25,12 +25,12 @@ rm ssh-gateway/api/generated.go
 
 pushd game/src/api &> /dev/null
 
-# find . -type f \
-#   | grep -v Generators.hpp \
-#   | grep -v helper.hpp \
-#   | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
+find . -type f \
+  | grep -v Generators.hpp \
+  | grep -v helper.hpp \
+  | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
 
-# sed -i -E '/pragma|^\/\//d' Generators.hpp
+sed -i -E '/pragma|^\/\//d' Generators.hpp
 
 # find . -type f \
 #   | xargs -L1 basename \
@@ -38,6 +38,12 @@ pushd game/src/api &> /dev/null
 #   | xargs -I {} sed -i 's/{}Type type;/{}Type type = static_cast<{}Type>(0);/g' {}.hpp
 
 mv Generators.hpp API.cpp
+sed -i '/#include/d' API.cpp
+
+sed -i '1s/^/#include "API.hpp"\n/' API.cpp
+sed -i '1s/^/#include "helper.hpp"\n/' API.cpp
+sed -i '1s/^/#include "json.hpp"\n/' API.cpp
+sed -i '1s/^/#include <optional>\n/' API.cpp
 
 # grep "struct.*{" * -l \
 #   | grep -vE 'helper\.hpp|API\.cpp' \
