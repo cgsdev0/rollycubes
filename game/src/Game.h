@@ -53,6 +53,7 @@ class Game {
         for (auto &player : this->state.players) {
             player.connected = false;
         }
+        this->state.spectators = 0;
         if (this->state.players.size()) {
             turn_token = g.players[g.turn_index].session;
         }
