@@ -43,15 +43,18 @@ const RollButton: React.FC<Props> = ({
   };
 
   const [canSkip, setCanSkip] = React.useState(false);
+  const roll_count = useSelector(
+    (state: ReduxState) => state.popText.rollCount
+  );
   const turn_index = useSelector((state: ReduxState) => state.game.turn_index);
   React.useLayoutEffect(() => {
     setCanSkip(false);
-    const interval = setTimeout(() => setCanSkip(true), 15 * 1000);
+    const interval = setTimeout(() => setCanSkip(true), 20 * 1000);
     return () => {
       clearInterval(interval);
       setCanSkip(false);
     };
-  }, [turn_index, setCanSkip]);
+  }, [roll_count, setCanSkip, turn_index]);
   const connected = useSelector(
     (state: ReduxState) =>
       state.game.players.at(state.game.turn_index)?.connected
