@@ -72,6 +72,11 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
       if (data.error === 'already connected') {
         if (this.websocket) this.websocket.close();
         this.props.navigate(`/multiple-tabs`, { replace: true });
+      } else if (data.error === 'room full') {
+        this.props.navigate(
+          this.props.location.pathname.replace('room/', 'spectate/'),
+          { replace: true }
+        );
       }
       console.error(data || data.error);
     } else if (data.type === 'redirect') {

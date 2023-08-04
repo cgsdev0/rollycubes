@@ -68,6 +68,9 @@ package main
 //    restartMsg, err := UnmarshalRestartMsg(bytes)
 //    bytes, err = restartMsg.Marshal()
 //
+//    spectatorsMsg, err := UnmarshalSpectatorsMsg(bytes)
+//    bytes, err = spectatorsMsg.Marshal()
+//
 //    winMsg, err := UnmarshalWinMsg(bytes)
 //    bytes, err = winMsg.Marshal()
 //
@@ -329,6 +332,16 @@ func (r *RestartMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
+func UnmarshalSpectatorsMsg(data []byte) (SpectatorsMsg, error) {
+	var r SpectatorsMsg
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *SpectatorsMsg) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
 func UnmarshalWinMsg(data []byte) (WinMsg, error) {
 	var r WinMsg
 	err := json.Unmarshal(data, &r)
@@ -563,6 +576,7 @@ type IGameState struct {
 	PrivateSession bool      `json:"privateSession"`
 	Rolled         bool      `json:"rolled"`        
 	Rolls          []float64 `json:"rolls"`         
+	Spectators     int64     `json:"spectators"`    
 	TurnIndex      int64     `json:"turn_index"`    
 	Used           []bool    `json:"used"`          
 	Victory        bool      `json:"victory"`       
@@ -584,6 +598,7 @@ type GameState struct {
 	PrivateSession bool           `json:"privateSession"`
 	Rolled         bool           `json:"rolled"`        
 	Rolls          []float64      `json:"rolls"`         
+	Spectators     int64          `json:"spectators"`    
 	TurnIndex      int64          `json:"turn_index"`    
 	Type           GameStateType  `json:"type"`          
 	Used           []bool         `json:"used"`          
@@ -611,6 +626,7 @@ type WelcomeMsg struct {
 	PrivateSession bool           `json:"privateSession"`
 	Rolled         bool           `json:"rolled"`        
 	Rolls          []float64      `json:"rolls"`         
+	Spectators     int64          `json:"spectators"`    
 	TurnIndex      int64          `json:"turn_index"`    
 	Type           WelcomeMsgType `json:"type"`          
 	Used           []bool         `json:"used"`          
@@ -620,6 +636,11 @@ type WelcomeMsg struct {
 type RestartMsg struct {
 	ID   int64          `json:"id"`  
 	Type RestartMsgType `json:"type"`
+}
+
+type SpectatorsMsg struct {
+	Count int64             `json:"count"`
+	Type  SpectatorsMsgType `json:"type"` 
 }
 
 type WinMsg struct {
@@ -729,6 +750,11 @@ const (
 type RestartMsgType string
 const (
 	Restart RestartMsgType = "restart"
+)
+
+type SpectatorsMsgType string
+const (
+	Spectators SpectatorsMsgType = "spectators"
 )
 
 type WinMsgType string

@@ -35,7 +35,6 @@ import { Button } from 'ui/buttons/button';
 import {
   useDonateMutation,
   useGetUserByIdQuery,
-  useLogoutMutation,
   useSetDiceTypeMutation,
   useSetPubkeyTextMutation,
   useSetUserColorMutation,
@@ -52,6 +51,15 @@ interface Props {
   mode: 'room' | 'spectate';
 }
 
+const SpectatorTitle = styled('p', {
+  position: 'absolute',
+  width: '100%',
+  textAlign: 'center',
+  left: 0,
+  top: -8,
+  color: '$gray500',
+  pointerEvents: 'none',
+});
 const flexColumn = css({
   display: 'flex',
   flexDirection: 'column',
@@ -110,6 +118,16 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
     [dispatch]
   );
 
+  const spectators = useSelector((state: ReduxState) => state.game.spectators);
+  const spectating = useSelector(
+    (state: ReduxState) => state.game.self_index === undefined
+  );
+  // Change to spectator view if lobby is full
+  // React.useEffect(() => {
+  //   if (mode !== 'spectate' && spectating && !needsToOnboard) {
+  //     navigate(`/spectate/${room}`, { replace: true });
+  //   }
+  // }, [mode, spectating, needsToOnboard]);
   React.useEffect(() => {
     if (is3DMode && !needsToOnboard && authToken !== undefined) {
       initScene();
@@ -150,6 +168,11 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
         <>
           {/* <ConnBanner /> */}
 
+          {spectating ? (
+            <SpectatorTitle>You are spectating</SpectatorTitle>
+          ) : spectators ? (
+            <SpectatorTitle>{spectators} spectating</SpectatorTitle>
+          ) : null}
           <div className={flexColumn()}>
             <GamePanel />
             <Players />

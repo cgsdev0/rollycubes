@@ -121,6 +121,7 @@ class Game {
             .private_session = this->state.private_session,
             .rolled = this->state.rolled,
             .rolls = this->state.rolls,
+            .spectators = this->state.spectators,
             .turn_index = this->state.turn_index,
             .used = this->state.used,
             .victory = this->state.victory};
@@ -129,6 +130,15 @@ class Game {
     std::string toString() const {
         return this->state.toString();
     }
+
+    int64_t incrSpectators() {
+      return ++this->state.spectators;
+    }
+
+    int64_t decrSpectators() {
+      return --this->state.spectators;
+    }
+
     void processEvent(const API::ServerPlayer *player, SendFunc &broadcast, HandlerArgs *server, const json &data, const API::GameState &prev);
 
   private:

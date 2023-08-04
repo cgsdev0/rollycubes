@@ -25,6 +25,8 @@
 #include "RollMsgType.hpp"
 #include "WinMsg.hpp"
 #include "WinMsgType.hpp"
+#include "SpectatorsMsg.hpp"
+#include "SpectatorsMsgType.hpp"
 #include "RestartMsg.hpp"
 #include "RestartMsgType.hpp"
 #include "WelcomeMsg.hpp"
@@ -137,6 +139,9 @@ namespace nlohmann {
     void from_json(const json & j, API::RestartMsg & x);
     void to_json(json & j, const API::RestartMsg & x);
 
+    void from_json(const json & j, API::SpectatorsMsg & x);
+    void to_json(json & j, const API::SpectatorsMsg & x);
+
     void from_json(const json & j, API::WinMsg & x);
     void to_json(json & j, const API::WinMsg & x);
 
@@ -196,6 +201,9 @@ namespace nlohmann {
 
     void from_json(const json & j, API::RestartMsgType & x);
     void to_json(json & j, const API::RestartMsgType & x);
+
+    void from_json(const json & j, API::SpectatorsMsgType & x);
+    void to_json(json & j, const API::SpectatorsMsgType & x);
 
     void from_json(const json & j, API::WinMsgType & x);
     void to_json(json & j, const API::WinMsgType & x);
@@ -511,6 +519,7 @@ namespace nlohmann {
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
         x.used = j.at("used").get<std::vector<bool>>();
         x.victory = j.at("victory").get<bool>();
@@ -523,6 +532,7 @@ namespace nlohmann {
         j["privateSession"] = x.private_session;
         j["rolled"] = x.rolled;
         j["rolls"] = x.rolls;
+        j["spectators"] = x.spectators;
         j["turn_index"] = x.turn_index;
         j["used"] = x.used;
         j["victory"] = x.victory;
@@ -563,6 +573,7 @@ namespace nlohmann {
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
         x.type = j.at("type").get<API::GameStateType>();
         x.used = j.at("used").get<std::vector<bool>>();
@@ -576,6 +587,7 @@ namespace nlohmann {
         j["privateSession"] = x.private_session;
         j["rolled"] = x.rolled;
         j["rolls"] = x.rolls;
+        j["spectators"] = x.spectators;
         j["turn_index"] = x.turn_index;
         j["type"] = x.type;
         j["used"] = x.used;
@@ -589,6 +601,7 @@ namespace nlohmann {
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
         x.type = j.at("type").get<API::WelcomeMsgType>();
         x.used = j.at("used").get<std::vector<bool>>();
@@ -603,6 +616,7 @@ namespace nlohmann {
         j["privateSession"] = x.private_session;
         j["rolled"] = x.rolled;
         j["rolls"] = x.rolls;
+        j["spectators"] = x.spectators;
         j["turn_index"] = x.turn_index;
         j["type"] = x.type;
         j["used"] = x.used;
@@ -617,6 +631,17 @@ namespace nlohmann {
     inline void to_json(json & j, const API::RestartMsg & x) {
         j = json::object();
         j["id"] = x.id;
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, API::SpectatorsMsg& x) {
+        x.count = j.at("count").get<int64_t>();
+        x.type = j.at("type").get<API::SpectatorsMsgType>();
+    }
+
+    inline void to_json(json & j, const API::SpectatorsMsg & x) {
+        j = json::object();
+        j["count"] = x.count;
         j["type"] = x.type;
     }
 
@@ -863,6 +888,18 @@ namespace nlohmann {
     inline void to_json(json & j, const API::RestartMsgType & x) {
         switch (x) {
             case API::RestartMsgType::RESTART: j = "restart"; break;
+            default: throw "This should not happen";
+        }
+    }
+
+    inline void from_json(const json & j, API::SpectatorsMsgType & x) {
+        if (j == "spectators") x = API::SpectatorsMsgType::SPECTATORS;
+        else throw "Input JSON does not conform to schema";
+    }
+
+    inline void to_json(json & j, const API::SpectatorsMsgType & x) {
+        switch (x) {
+            case API::SpectatorsMsgType::SPECTATORS: j = "spectators"; break;
             default: throw "This should not happen";
         }
     }
@@ -1240,6 +1277,15 @@ to_json(j, *this);
 return j.dump();
 }
 void ServerPlayer::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string SpectatorsMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void SpectatorsMsg::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

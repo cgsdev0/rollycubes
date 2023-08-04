@@ -37,6 +37,7 @@ export interface IGameState {
   rolled: boolean;
   victory: boolean;
   privateSession: boolean;
+  spectators: integer;
 }
 
 export interface GameState extends IGameState {
@@ -52,6 +53,11 @@ export interface WelcomeMsg extends IGameState {
 export interface RestartMsg {
   type: 'restart';
   id: integer; // starting turn index
+}
+
+export interface SpectatorsMsg {
+  type: 'spectators';
+  count: integer;
 }
 
 export interface WinMsg {

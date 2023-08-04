@@ -7,6 +7,7 @@ import {
   RestartMsg,
   RollAgainMsg,
   RollMsg,
+  SpectatorsMsg,
   UpdateMsg,
   UpdateNameMsg,
   UpdateTurnMsg,
@@ -23,6 +24,7 @@ export interface GameState {
   turn_index: number;
   self_index?: number;
   victory: boolean;
+  spectators: number;
 }
 const initialGameState: GameState = {
   players: [],
@@ -33,6 +35,7 @@ const initialGameState: GameState = {
   turn_index: 0,
   self_index: undefined,
   victory: false,
+  spectators: 0,
 };
 
 export const gameReducer = createReducer<GameState>(
@@ -46,6 +49,7 @@ export const gameReducer = createReducer<GameState>(
         }));
         state.players = action.players;
         state.victory = action.victory;
+        state.spectators = action.spectators;
         state.rolled = action.rolled;
         state.turn_index = action.turn_index;
 
@@ -53,6 +57,9 @@ export const gameReducer = createReducer<GameState>(
           // server returns -1 if we are a spectator
           state.self_index = action.id;
         }
+      })
+      .addCase('spectators', (state, action: SpectatorsMsg) => {
+        state.spectators = action.count;
       })
       .addCase('restart', (state, action: RestartMsg) => {
         state.players = state.players.map((player) => {

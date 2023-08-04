@@ -16,6 +16,7 @@ void fromString(const std::string &str);
         bool private_session;
         bool rolled;
         std::vector<double> rolls;
+        int64_t spectators;
         int64_t turn_index;
         std::vector<bool> used;
         bool victory;

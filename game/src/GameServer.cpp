@@ -60,6 +60,11 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
           msg.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
           ws->send(msg.toString(), uWS::OpCode::TEXT);
           ws->subscribe(userData->room);
+          if (userData->spectator) {
+            API::SpectatorsMsg spec;
+            spec.count = g->incrSpectators();
+            ws->publish(userData->room, spec.toString(), uWS::OpCode::TEXT);
+          }
         };
         if (!userData->spectator) {
             if (!(g->hasPlayer(userData->session) || g->hasPlayer(userData->session_from_cookie))) {
@@ -257,7 +262,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         (PerSocketData *)ws->getUserData();
                     ws_counter.Decrement();
 
-                    if (userData->spectator) return;
+
                     if (userData->dedupe_conns) return;
 
                     std::string room = userData->room;
@@ -265,6 +270,12 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     auto it = coordinator.games.find(room);
                     if (it != coordinator.games.end()) {
                         Game *g = it->second;
+                        if (userData->spectator) {
+                          API::SpectatorsMsg spec;
+                          spec.count = g->decrSpectators();
+                          ws->publish(userData->room, spec.toString(), uWS::OpCode::TEXT);
+                          return;
+                        }
                         json resp = g->disconnectPlayer(session);
                         if (!resp.is_null()) {
                             app->publish(room, resp.dump(), uWS::OpCode::TEXT);

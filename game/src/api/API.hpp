@@ -37,6 +37,8 @@
 #include "WelcomeMsg.hpp"
 #include "RestartMsgType.hpp"
 #include "RestartMsg.hpp"
+#include "SpectatorsMsgType.hpp"
+#include "SpectatorsMsg.hpp"
 #include "WinMsgType.hpp"
 #include "WinMsg.hpp"
 #include "RollMsgType.hpp"
