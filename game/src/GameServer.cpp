@@ -59,8 +59,10 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
                 json resp = g->addPlayer(*userData);
                 if (resp.is_null()) {
                     // room is full
-                    ws->close();
-                    return;
+                    std::string err = API::GameError({.error = "room full" }).toString();
+                    ws->send(err, uWS::OpCode::TEXT);
+                    userData->spectator = true;
+                    goto welcome;
                 }
                 app->publish(userData->room, resp.dump(), uWS::OpCode::TEXT);
             } else {
@@ -69,6 +71,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
             }
         }
 
+      welcome:
         auto welcome = g->toWelcomeMsg();
         welcome.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
         ws->send(welcome.toString(), uWS::OpCode::TEXT);
