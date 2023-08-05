@@ -6,4 +6,6 @@ digraph {
   AuthServer -> PostgresDB [dir="both"]
   WebSocket [fontcolor="#44aa44", shape=plain]
   HTTP [fontcolor="#9900aa", shape=plain]
+  sshGateway -> GameServer [dir="both", color="#44aa44"]
+  sshGateway -> AuthServer [color="#9900aa"]
 }
