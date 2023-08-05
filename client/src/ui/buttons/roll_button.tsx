@@ -20,10 +20,12 @@ const Subtitle = styled('p', {
   width: '100%',
   display: 'flex',
   justifyContent: 'center',
+  textWrap: 'nowrap',
 });
 
 const SubtitleName = styled('span', {
   color: '$primaryDimmed',
+  textWrap: 'nowrap',
   overflow: 'hidden',
   maxWidth: 160,
   textOverflow: 'ellipsis',
