@@ -71,15 +71,9 @@ run client-only
   - Navigate to `localhost:3000`
   - This will also hot reload any time you modify a file in the client folder
 
-### Terminal Client
-To run the terminal client locally run
+### SSH Gateway
+To run the SSH gateway, do:
 ```bash
-cd terminal-client
-node client.js [--room wKvsbw]
-```
-
-To run the terminal client locally connecting to a local server run
-```bash
-cd terminal-client
-node client.js --host localhost --port 3001 --insecure --room wKvsbw
+cd ssh-gateway
+go run .
 ```
