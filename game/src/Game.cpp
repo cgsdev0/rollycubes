@@ -315,8 +315,6 @@ void Game::kick(HANDLER_ARGS) {
         throw API::GameError({.error = "uhhh this should never happen"});
     if (id >= state.players.size())
         throw API::GameError({.error = "out of bounds"});
-    if (state.players[id].connected)
-        throw API::GameError({.error = "dont kick people who are connected, jerk" });
     if (state.players[id].skip_count < 2)
         throw API::GameError({.error = "cmon give them a chance at least" });
 

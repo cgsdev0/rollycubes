@@ -1,15 +1,33 @@
 import { styled } from 'stitches.config';
 
-const SliderContainer = styled('div', {});
+const SliderContainer = styled('div', {
+  '& input': {
+    appearance: 'none',
+    background: '$gray500',
+    height: 16,
+    borderRadius: 16,
+    display: 'flex',
+    '&::-webkit-slider-thumb': {
+      appearance: 'none',
+      background: '$primary',
+      width: 26,
+      height: 26,
+      borderRadius: '50%',
+    },
+  },
+});
 
 const Fieldset = styled('fieldset', {
   border: 0,
   display: 'flex',
   alignItems: 'center',
   gap: 8,
+  flex: 1,
+  maxHeight: 34,
   transition: 'none',
   '& label': {
     color: '$primary',
+    display: 'flex',
   },
   '&:has(:focus-visible)': {
     border: '2px solid $primary',

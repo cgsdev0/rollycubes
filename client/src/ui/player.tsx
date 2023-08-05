@@ -101,6 +101,7 @@ const StyledTooltip = styled('div', {
   },
 });
 const playerName = css({
+  textWrap: 'nowrap',
   overflow: 'hidden',
   height: '100%',
   width: '100%',
@@ -212,9 +213,7 @@ const PlayerComponent = (props: Props) => {
           <span className={playerName()}>{player.name || `User${n + 1}`}</span>
         </span>
         <span className={score()}>{JSON.stringify(player.score)}</span>
-        {player.connected ||
-        player.skip_count < 2 ||
-        props.isSpectator ? null : (
+        {player.skip_count < 2 || props.isSpectator ? null : (
           <span className={kick()} onClick={onKick}>
             <KickIcon />
           </span>

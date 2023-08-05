@@ -80,6 +80,7 @@ export const settingsReducer = createReducer<SettingsState>(
       })
       .addCase('SET_PUBKEY_TEXT', (state, action: any) => {
         state.pubkey = action.pubkey_text;
+        console.warn('hi');
       })
       .addCase('TOGGLE_SHOW_SETTINGS', (state, action) => {
         state.showSettings = !state.showSettings;

@@ -39,6 +39,7 @@ import {
   useSetPubkeyTextMutation,
   useSetUserColorMutation,
 } from 'api/auth';
+import { TextArea } from 'ui/buttons/textarea';
 
 interface Props {
   winner?: Player;
@@ -65,26 +66,52 @@ const flexColumn = css({
   flexDirection: 'column',
 });
 
+const TwoColumns = styled('div', {
+  '@bp1': {
+    flex: 1,
+    display: 'flex',
+    gap: '3rem',
+    flexDirection: 'row',
+  },
+  '@bp0': {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2rem',
+  },
+});
+const Column = styled('div', {
+  gap: 8,
+  display: 'flex',
+  flexDirection: 'column',
+});
+
 const SettingsContainer = styled('div', {
+  gap: 8,
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
+  flex: 1,
 });
 
 const SaveButtonWrapper = styled('div', {
   display: 'flex',
-  height: '100%',
   alignItems: 'flex-end',
   justifyContent: 'center',
   '& button': {
-    maxWidth: '30%',
+    '@bp1': {
+      maxWidth: '30%',
+    },
   },
 });
 const PlsDonate = styled('div', {
   display: 'flex',
   flexDirection: 'column',
-  marginTop: 16,
-  gap: 12,
+  maxWidth: 400,
+  marginLeft: 80,
+  gap: 8,
+  '@bp0': {
+    display: 'none',
+  },
 });
 
 const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
@@ -213,7 +240,8 @@ const Settings: React.FC<{}> = () => {
     await setDiceType(dice_type);
     await setPubkeyText(pubkey);
     socket?.send(JSON.stringify({ type: 'refetch_player', user_id }));
-  }, [trigger, color, socket, user_id, dice_type, setDiceType]);
+  }, [trigger, color, socket, user_id, dice_type, setDiceType, pubkey]);
+
   const onHueChange = React.useCallback(
     (e) =>
       dispatch({
@@ -250,57 +278,68 @@ const Settings: React.FC<{}> = () => {
   return (
     <SettingsContainer>
       <h1>Settings</h1>
-      <ToggleSwitch
-        id="dice3d"
-        desc="3D dice animation"
-        checked={dice3d}
-        onChange={() => {
-          dispatch({ type: 'TOGGLE_3D' });
-        }}
-      />
-      <Select
-        options={[
-          { value: DiceType.D6, label: 'D6' },
-          ...(hasD20Unlocked ? [{ value: DiceType.D20, label: 'D20' }] : []),
-        ]}
-        value={dice_type.toString()}
-        id="dice_type"
-        label="Dice shape"
-        onChange={onDiceTypeChange}
-      />
-      {data?.donor ? (
-        <>
-          <h2>Color Scheme</h2>
-          <Slider
-            desc="hue"
-            min={0}
-            max={360}
-            value={color.hue}
-            id="hue"
-            onChange={onHueChange}
+      <TwoColumns>
+        <Column>
+          <h2>Dice</h2>
+          <ToggleSwitch
+            id="dice3d"
+            desc="3D dice animation"
+            checked={dice3d}
+            onChange={() => {
+              dispatch({ type: 'TOGGLE_3D' });
+            }}
           />
-          <Slider
-            desc="saturation"
-            min={0}
-            max={80}
-            value={color.sat}
-            id="saturation"
-            onChange={onSatChange}
+          <Select
+            options={[
+              { value: DiceType.D6, label: 'D6' },
+              ...(hasD20Unlocked
+                ? [{ value: DiceType.D20, label: 'D20' }]
+                : []),
+            ]}
+            value={dice_type.toString()}
+            id="dice_type"
+            label="Dice shape"
+            onChange={onDiceTypeChange}
           />
-          <textarea rows={50} value={pubkey} onChange={onPubkeyChange} />
-        </>
-      ) : null}
+        </Column>
+        {data?.donor ? (
+          <Column>
+            <h2>Color Scheme</h2>
+            <Slider
+              desc="hue"
+              min={0}
+              max={360}
+              value={color.hue}
+              id="hue"
+              onChange={onHueChange}
+            />
+            <Slider
+              desc="saturation"
+              min={0}
+              max={80}
+              value={color.sat}
+              id="saturation"
+              onChange={onSatChange}
+            />
+          </Column>
+        ) : user_id ? (
+          <PlsDonate>
+            <h2>Enjoying rolly cubes?</h2>
+            <p>Consider donating to unlock additional customization options.</p>
+            <Button onClick={() => donate()}>Donate</Button>
+          </PlsDonate>
+        ) : null}
+      </TwoColumns>
+      <TextArea
+        id="pubkey"
+        desc="SSH Public Keys"
+        value={pubkey}
+        placeholder={'ssh-rsa ...'}
+        onChange={onPubkeyChange}
+      />
       <SaveButtonWrapper>
         <Button onClick={onSave}>Save</Button>
       </SaveButtonWrapper>
-      {!data?.donor && user_id ? (
-        <PlsDonate>
-          <hr />
-          <h2>Enjoying rolly cubes?</h2>
-          <p>Consider donating to unlock additional customization options.</p>
-          <Button onClick={() => donate()}>Donate</Button>
-        </PlsDonate>
-      ) : null}
     </SettingsContainer>
   );
 };

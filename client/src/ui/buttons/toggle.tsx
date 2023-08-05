@@ -49,6 +49,17 @@ const Fieldset = styled('fieldset', {
   alignItems: 'center',
   gap: 8,
   transition: 'none',
+  '& select': {
+    height: 34,
+    minWidth: 60,
+    borderRadius: 8,
+    fontSize: 20,
+    fontFamily: 'Amiko',
+    backgroundColor: '$gray900',
+    '@bp0': {
+      backgroundColor: '$gray800',
+    },
+  },
   '& label': {
     color: '$primary',
   },
