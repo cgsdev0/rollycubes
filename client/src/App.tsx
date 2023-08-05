@@ -20,6 +20,7 @@ import HomePage from './pages/home_page';
 import TwitchOAuthPage from './pages/twitch_oauth_page';
 import { store, history } from './store';
 import { FloatingButtonBar } from 'ui/floating_bar';
+import 'toastify.css';
 
 const RenderCanvas = styled('canvas', {
   position: 'absolute',
@@ -40,11 +41,6 @@ const App = () => {
 
   return (
     <StrictMode>
-      <ToastContainer
-        theme={'dark'}
-        closeButton={false}
-        position={'bottom-center'}
-      />
       <Provider store={store}>
         <AppInner />
       </Provider>
@@ -132,6 +128,14 @@ const AppInner = () => {
         } as any
       }
     >
+      <ToastContainer
+        containerId="toastcontainer"
+        theme={'dark'}
+        // toastClassName={toastStyle}
+        // progressClassName={toastProgress}
+        closeButton={false}
+        position={'bottom-center'}
+      />
       <div className={theme}>
         <AuthProvider>
           <AchievementProvider>

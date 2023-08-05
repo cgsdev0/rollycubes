@@ -7,6 +7,8 @@ import { Location } from 'react-router-dom';
 import { endpoints, optimisticUpdates } from 'api/auth';
 import { connect } from 'react-redux';
 import { selectCurrentDiceType } from 'selectors/game_selectors';
+import { toast } from 'react-toastify';
+import { Achievement } from 'ui/achievement';
 
 interface Props {
   room: string;
@@ -36,12 +38,17 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
 
   onOpen = (_: Event) => {
     // toast(
-    // Achievement({
-    // description: "hey there's some text about the achievement",
-    // name: "Getting Started",
-    // image_url: "https://via.placeholder.com/64/0000FF/808080",
-    // achievement_id: "fake_test"
-    // })
+    //   Achievement({
+    //     description: "hey there's some text about the achievement",
+    //     name: 'Getting Started',
+    //     image_url: 'https://via.placeholder.com/48/0000FF/808080',
+    //     id: 'fake_test',
+    //     user_index: 0,
+    //     max_progress: 1,
+    //     user_id: 'asdf',
+    //     type: 'achievement_unlock',
+    //   }),
+    //   { autoClose: 50000 }
     // );
     console.log('Socket opened to room', this.props.room);
     this.props.store.dispatch({ type: 'socket_open' });
