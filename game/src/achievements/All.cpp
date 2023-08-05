@@ -7,6 +7,7 @@
 #include "Perfect.h"
 #include "Rude.h"
 #include "WinGames.h"
+#include "Thief.h"
 
 std::vector<BaseAchievement *> initAchievements() {
     std::vector<BaseAchievement *> achievements{
@@ -22,6 +23,7 @@ std::vector<BaseAchievement *> initAchievements() {
         new Oops(),
         new Perfect(),
         new Astronaut(),
+        new Thief(),
     };
     return achievements;
 }
