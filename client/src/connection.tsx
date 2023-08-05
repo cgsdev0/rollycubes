@@ -14,6 +14,7 @@ interface Props {
   navigate: NavigateFunction;
   location: Location;
   authToken?: string | null;
+  selfId?: number;
 }
 
 export interface DecodedUserJWT {
@@ -89,6 +90,11 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
         }) as any
       );
     } else {
+      if (data.type === 'kick') {
+        if (data.id === this.props.selfId && data.id !== undefined) {
+          this.props.navigate('/kicked', { replace: true });
+        }
+      }
       if (data.type === 'roll') {
         document.dispatchEvent(
           new CustomEvent<any>('roll', {
@@ -170,6 +176,7 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
 const mapStateToProps = (state: ReduxState) => {
   return {
     authToken: state.auth.authToken,
+    selfId: state.game.self_index,
   };
 };
 export default connect(mapStateToProps)(Connection);

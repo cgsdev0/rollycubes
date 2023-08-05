@@ -9,11 +9,14 @@ const centered = css({
   alignItems: 'flex-end',
 });
 
-export const TabErrorPage = () => {
+interface Props {
+  error: string;
+}
+export const GenericErrorPage: React.FC<Props> = ({ error }) => {
   return (
     <div className="flex flex-col">
       <h1>Error</h1>
-      <p>You already have that room open in another tab.</p>
+      <p>{error}</p>
       <div className={centered()}>
         <Link to="/">Back to Home</Link>
       </div>

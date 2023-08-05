@@ -1,5 +1,5 @@
 import { useWindowSize } from 'hooks/window_size';
-import { TabErrorPage } from 'pages/tab_error_page';
+import { GenericErrorPage } from 'pages/tab_error_page';
 import { AchievementProvider } from 'providers/achievements';
 import { AuthProvider } from 'providers/auth';
 import { StrictMode } from 'react';
@@ -154,7 +154,23 @@ const AppInner = () => {
                         />
                         <Route
                           path="multiple-tabs"
-                          element={<TabErrorPage />}
+                          element={
+                            <GenericErrorPage
+                              error={
+                                'You already have that room open in another tab.'
+                              }
+                            />
+                          }
+                        />
+                        <Route
+                          path="kicked"
+                          element={
+                            <GenericErrorPage
+                              error={
+                                'You have been kicked from the session for inactivity.'
+                              }
+                            />
+                          }
                         />
                         <Route
                           path="room/:room"
