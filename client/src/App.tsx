@@ -17,7 +17,6 @@ import { Octocat } from 'ui/buttons/octocat';
 import { v4 as uuidv4 } from 'uuid';
 import GamePage from './pages/game_page';
 import HomePage from './pages/home_page';
-import OnboardPage from './pages/onboard_page';
 import TwitchOAuthPage from './pages/twitch_oauth_page';
 import { store, history } from './store';
 import { FloatingButtonBar } from 'ui/floating_bar';
@@ -27,7 +26,7 @@ const RenderCanvas = styled('canvas', {
   top: 0,
   left: 0,
   width: '100vw',
-  height: '100vh',
+  height: '100dvh',
   zIndex: 500,
   pointerEvents: 'none',
   touchAction: 'none',
@@ -60,7 +59,7 @@ const app = css({
   '@bp0': {
     padding: 8,
     minHeight: 'initial',
-    height: 'calc(100vh - 16px)',
+    height: 'calc(100dvh - 16px)',
   },
 });
 
