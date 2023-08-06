@@ -55,7 +55,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
         // Connecting to a valid game
         Game *g = it->second;
 
-        auto welcome = [g, userData, ws](){
+        auto welcome = [g, userData, ws, app, &coordinator](){
           auto msg = g->toWelcomeMsg();
           msg.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
           ws->send(msg.toString(), uWS::OpCode::TEXT);
@@ -64,6 +64,8 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
             API::SpectatorsMsg spec;
             spec.count = g->incrSpectators();
             ws->publish(userData->room, spec.toString(), uWS::OpCode::TEXT);
+          } else {
+            app->publish("home/list", coordinator.list_rooms().toString(), uWS::OpCode::TEXT);
           }
         };
         if (!userData->spectator) {
@@ -279,6 +281,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                         json resp = g->disconnectPlayer(session);
                         if (!resp.is_null()) {
                             app->publish(room, resp.dump(), uWS::OpCode::TEXT);
+                            app->publish("home/list", coordinator.list_rooms().toString(), uWS::OpCode::TEXT);
                         }
                         if (!g->connectedPlayerCount()) {
                             coordinator.queue_eviction(room);
@@ -286,6 +289,21 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     }
                 }};
 }
+
+uWS::App::WebSocketBehavior<HomeSocketData> makeHomeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer, std::shared_ptr<prometheus::Registry> registry, GameCoordinator &coordinator) {
+
+    return {/* Settings */
+            .compression = uWS::SHARED_COMPRESSOR,
+            .maxPayloadLength = 16 * 1024,
+            /* Handlers */
+            .open =
+                [&, app](auto *ws) {
+                    ws->subscribe("home/list");
+                    ws->send(coordinator.list_rooms().toString(), uWS::OpCode::TEXT);
+                }
+            };
+}
+
 
 int main(int argc, char **argv) {
 
@@ -362,6 +380,7 @@ int main(int argc, char **argv) {
                 res->end(coordinator.createRoom(isPrivate));
             }
         })
+        .ws<HomeSocketData>("/ws/list", makeHomeWebsocketBehavior(&app, jwt_verifier, authServer, registry, coordinator))
         .ws<PerSocketData>("/ws/:mode/:room", makeWebsocketBehavior(&app, jwt_verifier, authServer, registry, coordinator))
         .listen(port, [port](auto *socket) {
             if (socket) {

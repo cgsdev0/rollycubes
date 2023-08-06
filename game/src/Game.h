@@ -37,14 +37,6 @@ class Game {
     ~Game();
     Game(bool isPrivate) : Game() {
         this->state.private_session = isPrivate;
-        this->state.victory = false;
-        this->state.players.reserve(MAX_PLAYERS);
-        this->state.rolls.resize(DICE_COUNT);
-        this->state.used.resize(DICE_COUNT);
-        for (uint i = 0; i < DICE_COUNT; ++i) {
-            this->state.rolls[i] = 1;
-            this->state.used[i] = false;
-        }
     }
 
     // Rehydrate game from disk
@@ -53,7 +45,6 @@ class Game {
         for (auto &player : this->state.players) {
             player.connected = false;
         }
-        this->state.spectators = 0;
         if (this->state.players.size()) {
             turn_token = g.players[g.turn_index].session;
         }

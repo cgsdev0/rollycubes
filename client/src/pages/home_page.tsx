@@ -128,30 +128,25 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  const fetchGameList = async () => {
-    try {
-      const data = await window.fetch('/list');
-      const allGames = await data.json();
-      const games = allGames.rooms
-        .filter((game: Game) => game.player_count)
-        .sort((a: Game, b: Game) => {
-          if (a.player_count === b.player_count) {
-            // how should we break ties
-            return b.last_updated > a.last_updated;
-          }
-          // move full lobbies to the bottom
-          if (b.player_count === 8 && a.player_count !== 8) {
-            return -1;
-          }
-          // default: sort by player count
-          return b.player_count - a.player_count;
-        });
-      setGames(games);
-      setHasData(true);
-    } catch (e) {
-      console.error(e);
-    }
+  const updateGameList = (data) => {
+    const games = data.rooms
+      .filter((game: Game) => game.player_count)
+      .sort((a: Game, b: Game) => {
+        if (a.player_count === b.player_count) {
+          // how should we break ties
+          return b.last_updated > a.last_updated;
+        }
+        // move full lobbies to the bottom
+        if (b.player_count === 8 && a.player_count !== 8) {
+          return -1;
+        }
+        // default: sort by player count
+        return b.player_count - a.player_count;
+      });
+    setGames(games);
+    setHasData(true);
   };
+
   const onStart = (priv: boolean) => async () => {
     navigate(`/onboard`);
     if (pressed) return;
@@ -166,9 +161,54 @@ const HomePage = () => {
   };
 
   React.useEffect(() => {
-    const interval = setInterval(fetchGameList, 2000);
-    fetchGameList();
-    return () => clearInterval(interval);
+    let shouldConnect = true;
+    let ws = null;
+
+    let conjunctionJunction = () => {
+        if (!shouldConnect) {
+            return null;
+        }
+
+        let portString = '';
+        if (window.location.port !== '80') {
+          portString = `:${window.location.port}`;
+        }
+
+        const innerWs = new WebSocket(
+          `${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${
+            window.location.hostname
+          }${portString}/ws/list`);
+
+        innerWs.onopen = (e) => {
+          console.log("ws open");
+        };
+
+        innerWs.onmessage = (e) => {
+            console.log("ws message");
+            try {
+                const list = JSON.parse(e.data);
+                updateGameList(list);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        innerWs.onclose = (e) => {
+          console.log(`on close - ${(!shouldConnect) ? "not " : " "}reconnecting`);
+          if (shouldConnect) {
+            ws = conjunctionJunction();
+          }
+        };
+
+        return innerWs;
+    };
+
+    ws = conjunctionJunction();
+
+    return () => {
+        shouldConnect = false;
+        ws.close();
+    };
   }, []);
 
   const dispatch = useDispatch();

@@ -9,12 +9,23 @@
 #include "achievements/All.h"
 
 Game::Game() {
+    this->state.victory = false;
+    this->state.players.reserve(MAX_PLAYERS);
+    this->state.rolls.resize(DICE_COUNT);
+    this->state.used.resize(DICE_COUNT);
+    this->state.spectators = 0;
+    for (uint i = 0; i < DICE_COUNT; ++i) {
+        this->state.rolls[i] = 1;
+        this->state.used[i] = false;
+    }
+
     // Initialize all achievements
     this->achievements = initAchievements();
 
     // seed the RNG (one per Game)
     gen.seed(rd());
 }
+
 Game::~Game() {
     for (auto &achievement : this->achievements) {
         delete achievement;
