@@ -31,6 +31,10 @@ const string PLAYER_COLORS[] = {
     "#fabed4",
 };
 
+/* ws->getUserData returns one of these (only for the home page) */
+struct HomeSocketData {
+};
+
 /* ws->getUserData returns one of these */
 struct PerSocketData {
     string session;
