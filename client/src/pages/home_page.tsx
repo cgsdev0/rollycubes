@@ -3,16 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { keyframes, css, styled } from 'stitches.config';
 import { ReduxState } from 'store';
+import { Room, RoomList } from 'types/server_messages';
 import { Button } from '../ui/buttons/button';
 import OnboardPage from './onboard_page';
 import itsBoatsLogo from '/itsboats.png';
-
-interface Game {
-  last_updated: number;
-  host_name: string;
-  code: string;
-  player_count: number;
-}
 
 type NavFn = ReturnType<typeof useNavigate>;
 
@@ -124,17 +118,17 @@ const hideDesktop = css({
 const HomePage = () => {
   const [pressed, setPressed] = React.useState(false);
   const [hasData, setHasData] = React.useState(false);
-  const [games, setGames] = React.useState<Game[]>([]);
+  const [games, setGames] = React.useState<Room[]>([]);
 
   const navigate = useNavigate();
 
-  const updateGameList = (data) => {
+  const updateGameList = (data: RoomList) => {
     const games = data.rooms
-      .filter((game: Game) => game.player_count)
-      .sort((a: Game, b: Game) => {
+      .filter((game: Room) => game.player_count)
+      .sort((a: Room, b: Room) => {
         if (a.player_count === b.player_count) {
           // how should we break ties
-          return b.last_updated > a.last_updated;
+          return Number(b.last_updated > a.last_updated);
         }
         // move full lobbies to the bottom
         if (b.player_count === 8 && a.player_count !== 8) {
@@ -162,52 +156,53 @@ const HomePage = () => {
 
   React.useEffect(() => {
     let shouldConnect = true;
-    let ws = null;
+    let ws: WebSocket | null = null;
 
     let conjunctionJunction = () => {
-        if (!shouldConnect) {
-            return null;
+      if (!shouldConnect) {
+        return null;
+      }
+
+      let portString = '';
+      if (window.location.port !== '80') {
+        portString = `:${window.location.port}`;
+      }
+
+      const innerWs = new WebSocket(
+        `${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${
+          window.location.hostname
+        }${portString}/ws/list`
+      );
+
+      innerWs.onopen = () => {
+        console.log('ws open');
+      };
+
+      innerWs.onmessage = (e: any) => {
+        console.log('ws message');
+        try {
+          const list = JSON.parse(e.data);
+          updateGameList(list);
+        } catch (e) {
+          console.error(e);
         }
+      };
 
-        let portString = '';
-        if (window.location.port !== '80') {
-          portString = `:${window.location.port}`;
+      innerWs.onclose = () => {
+        console.log(`on close - ${!shouldConnect ? 'not ' : ' '}reconnecting`);
+        if (shouldConnect) {
+          ws = conjunctionJunction();
         }
+      };
 
-        const innerWs = new WebSocket(
-          `${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${
-            window.location.hostname
-          }${portString}/ws/list`);
-
-        innerWs.onopen = (e) => {
-          console.log("ws open");
-        };
-
-        innerWs.onmessage = (e) => {
-            console.log("ws message");
-            try {
-                const list = JSON.parse(e.data);
-                updateGameList(list);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        innerWs.onclose = (e) => {
-          console.log(`on close - ${(!shouldConnect) ? "not " : " "}reconnecting`);
-          if (shouldConnect) {
-            ws = conjunctionJunction();
-          }
-        };
-
-        return innerWs;
+      return innerWs;
     };
 
     ws = conjunctionJunction();
 
     return () => {
-        shouldConnect = false;
-        ws.close();
+      shouldConnect = false;
+      ws?.close();
     };
   }, []);
 
@@ -261,7 +256,7 @@ const HomePage = () => {
   );
 };
 
-const TableRow = ({ game, navigate }: { game: Game; navigate: NavFn }) => {
+const TableRow = ({ game, navigate }: { game: Room; navigate: NavFn }) => {
   const [expanded, setExpanded] = React.useState(false);
   return (
     <>
