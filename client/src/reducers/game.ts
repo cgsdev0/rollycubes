@@ -53,10 +53,8 @@ export const gameReducer = createReducer<GameState>(
         state.rolled = action.rolled;
         state.turn_index = action.turn_index;
 
-        if (action.id >= 0) {
-          // server returns -1 if we are a spectator
-          state.self_index = action.id;
-        }
+        // server returns -1 if we are a spectator (coalesce to undefined)
+        state.self_index = action.id >= 0 ? action.id : undefined;
       })
       .addCase('spectators', (state, action: SpectatorsMsg) => {
         state.spectators = action.count;
