@@ -36,4 +36,5 @@ jobs:
           tsc_dir: client/
           prettier: true
           clang_format: true
+          clang_format_dir: game/src
           auto_fix: true
