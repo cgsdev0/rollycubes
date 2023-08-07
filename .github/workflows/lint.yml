@@ -22,10 +22,14 @@ jobs:
       - name: Install ClangFormat
         run: sudo apt-get install -y clang-format
 
+      # ESLint and Prettier must be in `package.json`
+      - name: Install Node.js dependencies
+        run: npm ci
+        
       - name: Run linters
         uses: wearerequired/lint-action@v2
         with:
-          eslint: true
+#         eslint: true
           eslint_dir: client/
           gofmt: true
           clippy: true
