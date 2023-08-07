@@ -32,6 +32,7 @@ jobs:
 #         eslint: true
           eslint_dir: client/
           gofmt: true
-          clippy: true
+          tsc: true
+          tsc_dir: client/
           prettier: true
           clang_format: true
