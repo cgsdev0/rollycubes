@@ -28,6 +28,6 @@ jobs:
           eslint: true
           eslint_dir: client/
           gofmt: true
-          rustfmt: true
+          clippy: true
           prettier: true
           clang_format: true
