@@ -36,3 +36,4 @@ jobs:
           tsc_dir: client/
           prettier: true
           clang_format: true
+          auto_fix: true
