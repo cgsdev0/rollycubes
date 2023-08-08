@@ -19,16 +19,10 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
 
-      - name: Install ClangFormat
-        run: sudo apt-get install -y clang-format
-
-      # ESLint and Prettier must be in `package.json`
-      - name: Install Node.js dependencies
-        run: npm ci
-        
-      - name: Run linters
-        uses: wearerequired/lint-action@v2
+      - uses: purduesigbots/clang-format-action@1
+      # commit the changes (if there are any)
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4.1.2
         with:
-          clang_format: true
-          clang_format_dir: game/src
-          clang_format_auto_fix: true
+          commit_message: 🎨 apply clang-format changes
+          branch: ${{ github.head_ref }}
