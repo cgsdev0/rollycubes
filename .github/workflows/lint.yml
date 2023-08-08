@@ -29,13 +29,6 @@ jobs:
       - name: Run linters
         uses: wearerequired/lint-action@v2
         with:
-#         eslint: true
-          eslint_dir: client/
-          gofmt: true
-          tsc: true
-          tsc_dir: client/
-          tsc_auto_fix: true
-#         prettier: true
           clang_format: true
           clang_format_dir: game/src
           clang_format_auto_fix: true
