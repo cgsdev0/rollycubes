@@ -19,7 +19,9 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
 
-      - uses: purduesigbots/clang-format-action@1
+      - name: Install ClangFormat
+        run: sudo apt-get install -y clang-format
+      - run: clang-format -i game/src/**/*.cpp game/src/**/*.h game/src/**/*.hpp
       # commit the changes (if there are any)
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4.1.2
