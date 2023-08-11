@@ -10,18 +10,25 @@ interface Props {
 
 // TODO: use a blowtorch to burn all of this garbage CSS
 const Wrapper = styled('div', {
-  position: 'absolute',
   backgroundColor: '#e44c4d',
-  width: 'calc(100% - 46px)',
-  left: 0,
-  top: 24,
-  marginLeft: 23,
-  overflow: 'hidden',
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
+  '@bp1': {
+    position: 'absolute',
+    width: 'calc(100% - 46px)',
+    left: 0,
+    top: 24,
+    marginLeft: 23,
+    overflow: 'hidden',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
   paddingTop: 4,
   '& div': {
     textAlign: 'center',
+  },
+  '@bp0': {
+    position: 'relative',
+    marginLeft: -20,
+    marginRight: -20,
   },
 });
 
