@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { keyframes, css, styled } from 'stitches.config';
 import { ReduxState } from 'store';
-import { Room, RoomList } from 'types/server_messages';
+import { Room, RoomList } from 'types/api';
 import { Button } from '../ui/buttons/button';
 import OnboardPage from './onboard_page';
 import itsBoatsLogo from '/itsboats.png';

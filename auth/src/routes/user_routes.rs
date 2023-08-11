@@ -6,9 +6,7 @@ use axum::{
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use base64::{engine::general_purpose, Engine as _};
-use int_enum::IntEnum;
 use serde::{Deserialize, Serialize};
-use serde_repr::*;
 use std::fs;
 use time::{Duration, OffsetDateTime, PrimitiveDateTime};
 use twitch_oauth2::{AccessToken, UserToken};
@@ -38,11 +36,26 @@ pub struct AchievementProgress {
     rd: Option<i64>,
 }
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, PartialOrd, Eq, IntEnum, Clone, Copy)]
-#[repr(i32)]
+#[derive(Serialize, Deserialize)]
 pub enum DiceType {
-    D6 = 0,
-    D20 = 1,
+    D6,
+    D20,
+}
+
+impl DiceType {
+    fn int_value(self) -> i32 {
+        match self {
+            DiceType::D6 => 0,
+            DiceType::D20 => 1,
+        }
+    }
+    fn from_int(i: i32) -> DiceType {
+        match i {
+            0 => DiceType::D6,
+            1 => DiceType::D20,
+            _ => DiceType::D6,
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -652,7 +665,7 @@ WHERE id=$1::UUID",
             image_url: row.get("image_url"),
             donor: row.get("donor"),
             dice: DiceSettings {
-                dice_type: DiceType::from_int(row.get::<'_, _, i32>("dice_type"))?,
+                dice_type: DiceType::from_int(row.get::<'_, _, i32>("dice_type")),
             },
             color: ColorSettings {
                 hue: row.get("color_hue"),

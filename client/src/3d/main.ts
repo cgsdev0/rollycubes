@@ -1,5 +1,5 @@
 /* eslint no-loop-func: "off" */
-import { DiceType } from 'types/store_types';
+import { DiceType } from 'types/api';
 import { store } from '../store';
 
 /// <reference path="babylonjs" />
@@ -364,8 +364,8 @@ export const initScene = async () => {
   // make some dice
   //
   const createDie = {
-    [DiceType.D6]: makeDieCreator(), //  makeD20Creator()
-    [DiceType.D20]: makeD20Creator(), //  makeD20Creator()
+    D6: makeDieCreator(), //  makeD20Creator()
+    D20: makeD20Creator(), //  makeD20Creator()
   };
 
   const initDice = async (type: DiceType, scene: BABYLON.Scene) => {
@@ -378,7 +378,7 @@ export const initScene = async () => {
       //dice[i].position = new BABYLON.Vector3(1000 + i, 1000, 1000);
     }
   };
-  initDice(DiceType.D6, scene!);
+  initDice('D6', scene!);
 
   var greenMat = new BABYLON.StandardMaterial('GREENmat', scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 0.35, 0);

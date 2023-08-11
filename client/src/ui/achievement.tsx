@@ -1,5 +1,5 @@
 import { styled } from 'stitches.config';
-import { AchievementUnlock } from 'types/store_types';
+import { AchievementUnlock } from 'types/api';
 
 const AchievementDiv = styled('div', {
   display: 'flex',

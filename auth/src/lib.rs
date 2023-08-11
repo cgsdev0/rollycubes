@@ -4,7 +4,6 @@ extern crate lazy_static;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use bb8_postgres::PostgresConnectionManager;
-use routes::user_routes::DiceType;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
@@ -36,8 +35,6 @@ pub enum RouteError {
     #[error("twitch client error")]
     TwitchError(#[from] ClientRequestError<reqwest::Error>),
     #[error("invalid type of dice")]
-    DiceTypeError(#[from] int_enum::IntEnumError<DiceType>),
-    #[error("some upstream service is broken, sorry")]
     HttpError(#[from] reqwest::Error),
     #[error("json serialization error")]
     SerdeJsonError(#[from] serde_json::Error),

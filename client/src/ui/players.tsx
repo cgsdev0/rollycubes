@@ -1,10 +1,10 @@
 import React from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { selectPlayers } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 import PlayerComponent from './player';
 import { GameState } from '../reducers/game';
-import { Player } from '../types/store_types';
+import { Player } from '../types/api';
 import { css, styled } from 'stitches.config';
 import { useLocation, useNavigate } from 'react-router';
 

@@ -13,8 +13,9 @@ import {
   UpdateTurnMsg,
   WelcomeMsg,
   WinMsg,
-} from '../types/server_messages';
-import { DieRoll, Player } from '../types/store_types';
+  DieRoll,
+  Player,
+} from '../types/api';
 
 export interface GameState {
   players: Player[];

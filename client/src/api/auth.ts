@@ -13,8 +13,9 @@ import {
   AchievementUnlock,
   DiceType,
   UserData,
-} from 'types/store_types';
-import { RollMsg, WinMsg } from 'types/server_messages';
+  RollMsg,
+  WinMsg,
+} from 'types/api';
 import { Store } from 'redux';
 
 interface AuthAPIUser {

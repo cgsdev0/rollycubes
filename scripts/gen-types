@@ -21,6 +21,12 @@ rm ssh-gateway/api/generated.go
   --lang golang \
   --src-lang schema "./schema.json#/definitions/"
 
+./node_modules/.bin/quicktype \
+  -o client/src/types/api.ts \
+  --src-lang schema "./schema.json#/definitions/" \
+  --just-types \
+  --prefer-unions
+
 # avert your eyes, this next part is a crime
 
 pushd game/src/api &> /dev/null

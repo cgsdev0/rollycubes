@@ -1,7 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { AchievementList } from 'api/auth';
 import decode from 'jwt-decode';
-import { UserData } from '../types/store_types';
 
 interface TokenUserData {
   exp: number;

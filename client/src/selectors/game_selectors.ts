@@ -4,7 +4,6 @@ import {
   createSelectorCreator,
 } from 'reselect';
 import { customTheme } from 'stitches.config';
-import { Achievement, DiceType, UserData } from 'types/store_types';
 import { ReduxState, selectState, TARGET_SCORES } from '../store';
 import { QuerySubState } from '@reduxjs/toolkit/dist/query/core/apiState';
 import { authApi, endpoints } from 'api/auth';
@@ -257,7 +256,7 @@ export const selectCurrentDiceType = createSelector(
   selectPlayers,
   selectUserData,
   (turn, players, userData) =>
-    userData[players[turn]?.user_id || '']?.data?.dice.type || DiceType.D6
+    userData[players[turn]?.user_id || '']?.data?.dice.type || 'D6'
 );
 
 export const selectCurrentColors = createSelector(

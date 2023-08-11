@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { UpdateMsg, UpdateTurnMsg } from '../types/server_messages';
+import { UpdateMsg, UpdateTurnMsg } from '../types/api';
 
 export interface PopTextState {
   rollCount: number;

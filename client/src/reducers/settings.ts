@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { CheatsAction } from 'actions/settings';
 import { endpoints } from 'api/auth';
-import { DiceType } from 'types/store_types';
+import { DiceType } from 'types/api';
 
 export interface SettingsState {
   cheats: boolean;
@@ -39,7 +39,7 @@ export const settingsReducer = createReducer<SettingsState>(
       hue: 0,
       sat: 80,
     },
-    dice_type: DiceType.D6,
+    dice_type: 'D6',
   },
   (builder) => {
     builder.addCase('TOGGLE_3D', (state, action) => {

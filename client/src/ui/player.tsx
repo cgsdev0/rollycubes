@@ -6,12 +6,7 @@ import {
   selectTurnIndex,
 } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
-import {
-  Achievement,
-  AchievementData,
-  Player,
-  UserData,
-} from '../types/store_types';
+import { Achievement, AchievementData, Player, UserData } from '../types/api';
 import Avatar from './avatar';
 import { usePopperTooltip } from 'react-popper-tooltip';
 

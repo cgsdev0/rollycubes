@@ -16,7 +16,7 @@ import RollButton from './buttons/roll_button';
 import RestartButton from './buttons/restart_button';
 import AddSubButton from './buttons/add_sub_button';
 import Dice from './dice';
-import { DieRoll } from '../types/store_types';
+import { DieRoll } from '../types/api';
 import { css, styled } from 'stitches.config';
 
 interface Props {

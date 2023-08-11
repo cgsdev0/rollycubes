@@ -210,8 +210,6 @@ func (r *AchievementData) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-type DiceType float64
-
 func UnmarshalDiceType(data []byte) (DiceType, error) {
 	var r DiceType
 	err := json.Unmarshal(data, &r)
@@ -519,7 +517,7 @@ type Color struct {
 }
 
 type Dice struct {
-	Type float64 `json:"type"`
+	Type DiceType `json:"type"`
 }
 
 type UserStats struct {
@@ -713,6 +711,13 @@ type AchievementUnlockType string
 
 const (
 	TypeAchievementUnlock AchievementUnlockType = "achievement_unlock"
+)
+
+type DiceType string
+
+const (
+	D20 DiceType = "D20"
+	D6  DiceType = "D6"
 )
 
 type GameErrorType string

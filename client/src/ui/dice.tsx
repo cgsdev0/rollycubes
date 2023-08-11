@@ -6,7 +6,7 @@ import {
   selectShouldShowDiceBoxes,
 } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
-import { DieRoll } from '../types/store_types';
+import { DieRoll } from '../types/api';
 import Die from './die';
 import './dice.css';
 

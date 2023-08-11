@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { CheatsAction } from 'actions/settings';
-import { ChatMsg, WelcomeMsg } from '../types/server_messages';
+import { ChatMsg, WelcomeMsg } from '../types/api';
 
 export interface ChatState {
   chat: string[];

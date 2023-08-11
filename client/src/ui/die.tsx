@@ -1,5 +1,5 @@
 import React from 'react';
-import { DieRoll } from '../types/store_types';
+import { DieRoll } from '../types/api';
 import './dice.css';
 
 interface Props {

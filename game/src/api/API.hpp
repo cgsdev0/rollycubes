@@ -15,6 +15,7 @@
 #include "AchievementData.hpp"
 #include "Achievement.hpp"
 #include "Color.hpp"
+#include "DiceType.hpp"
 #include "Dice.hpp"
 #include "UserStats.hpp"
 #include "UserData.hpp"
@@ -62,5 +63,4 @@
 #include "UpdateMsg.hpp"
 namespace API {
     using Integer = double;
-    using DiceType = double;
 }

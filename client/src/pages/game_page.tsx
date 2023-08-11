@@ -15,17 +15,10 @@ import {
   selectWinner,
 } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
-import { DiceType, Player } from '../types/store_types';
+import { Player } from '../types/api';
 import ChatBox from '../ui/chat';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
-import {
-  HelpIcon,
-  GearIcon,
-  HomeIcon,
-  LogoutIcon,
-  LoginIcon,
-} from '../ui/icons/help';
 import { useStore } from 'react-redux';
 import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
@@ -292,10 +285,8 @@ const Settings: React.FC<{}> = () => {
           />
           <Select
             options={[
-              { value: DiceType.D6, label: 'D6' },
-              ...(hasD20Unlocked
-                ? [{ value: DiceType.D20, label: 'D20' }]
-                : []),
+              { value: 'D6', label: 'D6' },
+              ...(hasD20Unlocked ? [{ value: 'D20', label: 'D20' }] : []),
             ]}
             value={dice_type.toString()}
             id="dice_type"

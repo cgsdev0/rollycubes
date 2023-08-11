@@ -118,6 +118,9 @@ namespace API {
     void from_json(const json & j, AchievementUnlockType & x);
     void to_json(json & j, const AchievementUnlockType & x);
 
+    void from_json(const json & j, DiceType & x);
+    void to_json(json & j, const DiceType & x);
+
     void from_json(const json & j, GameErrorType & x);
     void to_json(json & j, const GameErrorType & x);
 
@@ -286,7 +289,7 @@ namespace API {
     }
 
     inline void from_json(const json & j, Dice& x) {
-        x.type = j.at("type").get<double>();
+        x.type = j.at("type").get<DiceType>();
     }
 
     inline void to_json(json & j, const Dice & x) {
@@ -728,6 +731,20 @@ namespace API {
     inline void to_json(json & j, const AchievementUnlockType & x) {
         switch (x) {
             case AchievementUnlockType::ACHIEVEMENT_UNLOCK: j = "achievement_unlock"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
+    inline void from_json(const json & j, DiceType & x) {
+        if (j == "D20") x = DiceType::D20;
+        else if (j == "D6") x = DiceType::D6;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const DiceType & x) {
+        switch (x) {
+            case DiceType::D20: j = "D20"; break;
+            case DiceType::D6: j = "D6"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
