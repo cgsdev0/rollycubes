@@ -31,6 +31,13 @@ const RenderCanvas = styled('canvas', {
   zIndex: 500,
   pointerEvents: 'none',
   touchAction: 'none',
+  transitionProperty: 'opacity',
+  transitionDuration: '0.4s',
+  transitionDelay: '0s',
+  '&.faded': {
+    transitionDelay: '0.4s',
+    opacity: 0.05,
+  },
 });
 
 const App = () => {

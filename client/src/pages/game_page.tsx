@@ -364,7 +364,7 @@ const Rules = () => {
   return (
     <RulesDiv>
       <h1>Rules</h1>
-      <p>
+      <div>
         On your turn:
         <br />
         <br />
@@ -375,7 +375,7 @@ const Rules = () => {
         </ol>
         <br />
         First player to reach a winning score wins!
-      </p>
+      </div>
       <br />
       <p>Additionally...</p>
       <br />

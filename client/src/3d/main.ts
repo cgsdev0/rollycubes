@@ -7,6 +7,9 @@ import { store } from '../store';
 var BABYLON: any;
 const frameRate = 60;
 
+let mouse_x = 0;
+let mouse_y = 0;
+
 // var cannonPlugin = new CannonJSPlugin(true, 10, cannon)
 
 var signaler: any;
@@ -309,6 +312,10 @@ export const initScene = async () => {
   //     }
   //   });
   var canvas: any = document.getElementById('renderCanvas');
+  document.addEventListener('mousemove', (e) => {
+    mouse_x = e.pageX;
+    mouse_y = e.pageY;
+  });
   // Load the 3D engine
   engine = new BABYLON.Engine(canvas, true, {
     preserveDrawingBuffer: true,
@@ -826,6 +833,19 @@ export const initScene = async () => {
   // );
   engine!.runRenderLoop(function () {
     if (scene) {
+      let ray = scene.createPickingRay(
+        mouse_x,
+        mouse_y,
+        BABYLON.Matrix.Identity(),
+        null
+      );
+      let hit = scene.pickWithRay(ray);
+      let picked = hit?.pickedMesh?.id || '';
+      if (!picked.startsWith('ground')) {
+        canvas.classList.add('faded');
+      } else {
+        canvas.classList.remove('faded');
+      }
       scene.render();
     }
   });
