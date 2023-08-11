@@ -80,12 +80,14 @@
     "id": "oops",
     "name": "Oops...",
     "description": "Miss an opportunity to win the game.",
-    "max_progress": 1
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/oops.png"
   },
   "perfect": {
     "id": "perfect",
     "name": "Perfect Game",
     "description": "Win a game in a single turn.",
-    "max_progress": 1
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/perfect.png"
   }
 }
