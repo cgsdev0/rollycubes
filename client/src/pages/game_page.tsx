@@ -40,6 +40,7 @@ import {
   useSetUserColorMutation,
 } from 'api/auth';
 import { TextArea } from 'ui/buttons/textarea';
+import { ConnBanner } from 'ui/conn_banner';
 
 interface Props {
   winner?: Player;
@@ -193,7 +194,7 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
         <Settings />
       ) : (
         <>
-          {/* <ConnBanner /> */}
+          <ConnBanner />
 
           {spectating ? (
             <SpectatorTitle>You are spectating</SpectatorTitle>

@@ -2,24 +2,64 @@ import React from 'react';
 import { Transition } from 'react-transition-group';
 import { connect, DispatchProp } from 'react-redux';
 import { ReduxState } from '../store';
+import { css, styled } from 'stitches.config';
 
 interface Props {
   connected: boolean;
 }
 
-const ConnBanner: React.FC<Props & DispatchProp> = ({ connected }) => {
-  const ref = React.useRef<any>();
+// TODO: use a blowtorch to burn all of this garbage CSS
+const Wrapper = styled('div', {
+  position: 'absolute',
+  backgroundColor: '#e44c4d',
+  width: 'calc(100% - 46px)',
+  left: 0,
+  top: 24,
+  marginLeft: 23,
+  overflow: 'hidden',
+  borderTopLeftRadius: 16,
+  borderTopRightRadius: 16,
+  paddingTop: 4,
+  '& div': {
+    textAlign: 'center',
+  },
+});
+
+const show = css({
+  transition: 'height 500ms ease-out',
+  height: 30,
+});
+
+const exiting = css({
+  opacity: 0,
+  height: 30,
+  transition: 'opacity 250ms linear',
+});
+
+const hide = css({
+  opacity: 0,
+  height: 0,
+  transition: 'opacity 250ms linear',
+});
+
+const ConnBannerC: React.FC<Props & DispatchProp> = ({ connected }) => {
   return (
-    <Transition
-      in={!connected}
-      timeout={{ enter: 6000, exit: 0 }}
-      nodeRef={ref}
-      appear
-    >
+    <Transition in={!connected} timeout={{ enter: 6000, exit: 250 }} appear>
       {(state) => (
-        <div ref={ref}>
-          <div>Reconnecting...</div>
-        </div>
+        console.log(state),
+        (
+          <Wrapper
+            className={
+              state === 'entered'
+                ? show()
+                : state === 'exiting'
+                ? exiting()
+                : hide()
+            }
+          >
+            <div>Reconnecting...</div>
+          </Wrapper>
+        )
       )}
     </Transition>
   );
@@ -31,6 +71,6 @@ const mapStateToProps = (state: ReduxState) => {
   };
 };
 
-const ConnectedConnBanner = connect(mapStateToProps)(ConnBanner);
+const ConnectedConnBanner = connect(mapStateToProps)(ConnBannerC);
 
-export default ConnectedConnBanner;
+export const ConnBanner = ConnectedConnBanner;
