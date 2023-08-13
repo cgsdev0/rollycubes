@@ -256,7 +256,7 @@ const Settings: React.FC<{}> = () => {
     (e) =>
       dispatch({
         type: 'SET_DICE_TYPE',
-        dice_type: Number.parseInt(e.target.value),
+        dice_type: e.target.value,
       }),
     [dispatch]
   );
