@@ -4,7 +4,7 @@ import { AchievementProvider } from 'providers/achievements';
 import { AuthProvider } from 'providers/auth';
 import { StrictMode } from 'react';
 import { Provider, useSelector } from 'react-redux';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { HistoryRouter as Router } from 'redux-first-history/rr6';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -191,6 +191,7 @@ const AppInner = () => {
                           path="spectate/:room"
                           element={<GamePage mode={'spectate'} />}
                         />
+                        <Route path="*" element={<Navigate to="/" />} />
                       </Route>
                     </Routes>
                   </div>
