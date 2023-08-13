@@ -161,6 +161,9 @@ json Game::reconnectPlayer(std::string id, std::string old_id, const PerSocketDa
         if (has_old_id && state.players[i].session == old_id) {
             // Update our session to the new id
             state.players[i].session = id;
+            if (state.turn_index == i) {
+                turn_token = id;
+            }
             if (isSignedIn(state.players[i])) {
                 state.players[i].name = std::optional<std::string>(data.display_name);
                 result["name"] = *state.players[i].name;
