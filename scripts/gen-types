@@ -22,6 +22,11 @@ rm ssh-gateway/api/generated.go
   --src-lang schema "./schema.json#/definitions/"
 
 ./node_modules/.bin/quicktype \
+  -o auth/src/generated.rs \
+  --lang rust \
+  --src-lang schema "./schema.json#/definitions/"
+
+./node_modules/.bin/quicktype \
   -o client/src/types/api.ts \
   --src-lang schema "./schema.json#/definitions/" \
   --just-types \
@@ -83,4 +88,3 @@ sed -i '1s/^/#include <vector>\n/' API.hpp
 sed -i '1s/^/#include <memory>\n/' API.hpp
 
 popd &> /dev/null
-sed -i '1s/^/package main\n/' ssh-gateway/api/generated.go
