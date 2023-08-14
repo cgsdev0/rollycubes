@@ -17,7 +17,7 @@ void fromString(const std::string &str);
         std::vector<ServerPlayer> players;
         bool private_session;
         bool rolled;
-        std::vector<double> rolls;
+        std::vector<int64_t> rolls;
         int64_t spectators;
         int64_t turn_index;
         GameStateType type = static_cast<GameStateType>(0);
