@@ -102,15 +102,16 @@ export interface Redirect {
 
 export type RedirectType = "redirect";
 
-export interface RefetchPlayer {
-    type:    RefetchPlayerType;
+export interface RefetchPlayerMsg {
+    type:    RefetchPlayerMsgType;
     user_id: string;
 }
 
-export type RefetchPlayerType = "refetch_player";
+export type RefetchPlayerMsgType = "refetch_player";
 
-export interface RoomList {
+export interface RoomListMsg {
     rooms: Room[];
+    type?: RoomListMsgType;
 }
 
 export interface Room {
@@ -119,6 +120,8 @@ export interface Room {
     last_updated: string;
     player_count: number;
 }
+
+export type RoomListMsgType = "room_list";
 
 export interface IGameState {
     chatLog:        string[];

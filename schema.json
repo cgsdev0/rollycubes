@@ -466,8 +466,8 @@
       "additionalProperties": false,
       "required": ["room", "type"]
     },
-    "RefetchPlayer": {
-      "title": "RefetchPlayer",
+    "RefetchPlayerMsg": {
+      "title": "RefetchPlayerMsg",
       "type": "object",
       "properties": {
         "type": {
@@ -507,10 +507,15 @@
       "additionalProperties": false,
       "required": ["code", "host_name", "last_updated", "player_count"]
     },
-    "RoomList": {
+    "RoomListMsg": {
       "title": "RoomList",
       "type": "object",
       "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["room_list"],
+          "title": "type"
+        },
         "rooms": {
           "type": "array",
           "items": {

@@ -486,7 +486,7 @@ void Game::sub_nth(HANDLER_ARGS) {
 }
 
 void Game::refetch_player(HANDLER_ARGS) {
-    API::RefetchPlayer msg;
+    API::RefetchPlayerMsg msg;
     msg.fromString(data.dump());
     broadcast(msg.toString());
 }

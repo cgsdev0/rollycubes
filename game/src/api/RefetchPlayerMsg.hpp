@@ -4,15 +4,15 @@
 #include <optional>
 
 namespace API {
-    enum class RefetchPlayerType : int;
+    enum class RefetchPlayerMsgType : int;
 }
 
 namespace API {
 
-    struct RefetchPlayer {
+    struct RefetchPlayerMsg {
 std::string toString() const;
 void fromString(const std::string &str);
-        RefetchPlayerType type = static_cast<RefetchPlayerType>(0);
+        RefetchPlayerMsgType type = static_cast<RefetchPlayerMsgType>(0);
         std::string user_id;
     };
 }

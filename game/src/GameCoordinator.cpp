@@ -31,8 +31,8 @@ static std::string serializeTimePoint(const time_point &time,
     return ss.str();
 }
 
-API::RoomList GameCoordinator::list_rooms() {
-    API::RoomList respList;
+API::RoomListMsg GameCoordinator::list_rooms() {
+    API::RoomListMsg respList;
     for (auto const &[code, game] : games) {
         if (game->isPrivate()) {
             continue;

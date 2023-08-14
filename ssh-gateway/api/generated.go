@@ -43,14 +43,14 @@
 //    redirect, err := UnmarshalRedirect(bytes)
 //    bytes, err = redirect.Marshal()
 //
-//    refetchPlayer, err := UnmarshalRefetchPlayer(bytes)
-//    bytes, err = refetchPlayer.Marshal()
+//    refetchPlayerMsg, err := UnmarshalRefetchPlayerMsg(bytes)
+//    bytes, err = refetchPlayerMsg.Marshal()
 //
 //    room, err := UnmarshalRoom(bytes)
 //    bytes, err = room.Marshal()
 //
-//    roomList, err := UnmarshalRoomList(bytes)
-//    bytes, err = roomList.Marshal()
+//    roomListMsg, err := UnmarshalRoomListMsg(bytes)
+//    bytes, err = roomListMsg.Marshal()
 //
 //    iGameState, err := UnmarshalIGameState(bytes)
 //    bytes, err = iGameState.Marshal()
@@ -244,13 +244,13 @@ func (r *Redirect) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-func UnmarshalRefetchPlayer(data []byte) (RefetchPlayer, error) {
-	var r RefetchPlayer
+func UnmarshalRefetchPlayerMsg(data []byte) (RefetchPlayerMsg, error) {
+	var r RefetchPlayerMsg
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *RefetchPlayer) Marshal() ([]byte, error) {
+func (r *RefetchPlayerMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
@@ -264,13 +264,13 @@ func (r *Room) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-func UnmarshalRoomList(data []byte) (RoomList, error) {
-	var r RoomList
+func UnmarshalRoomListMsg(data []byte) (RoomListMsg, error) {
+	var r RoomListMsg
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *RoomList) Marshal() ([]byte, error) {
+func (r *RoomListMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
@@ -526,13 +526,14 @@ type Redirect struct {
 	Type RedirectType `json:"type"`
 }
 
-type RefetchPlayer struct {
-	Type   RefetchPlayerType `json:"type"`
-	UserID string            `json:"user_id"`
+type RefetchPlayerMsg struct {
+	Type   RefetchPlayerMsgType `json:"type"`
+	UserID string               `json:"user_id"`
 }
 
-type RoomList struct {
-	Rooms []Room `json:"rooms"`
+type RoomListMsg struct {
+	Rooms []Room           `json:"rooms"`
+	Type  *RoomListMsgType `json:"type,omitempty"`
 }
 
 type Room struct {
@@ -716,10 +717,16 @@ const (
 	TypeRedirect RedirectType = "redirect"
 )
 
-type RefetchPlayerType string
+type RefetchPlayerMsgType string
 
 const (
-	TypeRefetchPlayer RefetchPlayerType = "refetch_player"
+	RefetchPlayer RefetchPlayerMsgType = "refetch_player"
+)
+
+type RoomListMsgType string
+
+const (
+	RoomList RoomListMsgType = "room_list"
 )
 
 type GameStateType string
