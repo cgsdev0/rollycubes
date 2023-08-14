@@ -1,6 +1,81 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "AuthRefreshTokenResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "access_token": {
+          "type": "string"
+        }
+      },
+      "required": ["access_token"]
+    },
+    "AuthDonateResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "required": ["link"]
+    },
+    "AuthSettingsRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "setting": {
+              "type": "string",
+              "enum": ["Color"]
+            },
+            "color": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "hue": {
+                  "type": "number"
+                },
+                "sat": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "required": ["setting", "color"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "setting": {
+              "type": "string",
+              "enum": ["DiceType"]
+            },
+            "dice_type": {
+              "$ref": "#/definitions/DiceType"
+            }
+          },
+          "required": ["setting", "dice_type"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "setting": {
+              "type": "string",
+              "enum": ["Pubkey"]
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": ["setting", "text"]
+        }
+      ]
+    },
     "Player": {
       "title": "Player",
       "type": "object",
@@ -331,91 +406,6 @@
       "title": "DiceType",
       "enum": ["D6", "D20"]
     },
-    "UserData": {
-      "title": "UserData",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "title": "id"
-        },
-        "username": {
-          "type": "string",
-          "title": "username"
-        },
-        "image_url": {
-          "type": ["null", "string"],
-          "title": "image_url"
-        },
-        "stats": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/UserStats"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "stats"
-        },
-        "dice": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "$ref": "#/definitions/DiceType",
-              "title": "type"
-            }
-          },
-          "additionalProperties": false,
-          "required": ["type"],
-          "title": "dice"
-        },
-        "color": {
-          "type": "object",
-          "properties": {
-            "hue": {
-              "type": "number",
-              "title": "hue"
-            },
-            "sat": {
-              "type": "number",
-              "title": "sat"
-            }
-          },
-          "additionalProperties": false,
-          "required": ["hue", "sat"],
-          "title": "color"
-        },
-        "pubkey_text": {
-          "type": ["null", "string"],
-          "title": "pubkey_text"
-        },
-        "achievements": {
-          "anyOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Achievement"
-              }
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "achievements"
-        },
-        "createdDate": {
-          "type": "string",
-          "title": "createdDate"
-        },
-        "donor": {
-          "type": "boolean",
-          "title": "donor"
-        }
-      },
-      "additionalProperties": false,
-      "required": ["color", "createdDate", "dice", "donor", "id", "username"]
-    },
     "DieRoll": {
       "title": "DieRoll",
       "type": "object",
@@ -466,23 +456,6 @@
       "additionalProperties": false,
       "required": ["room", "type"]
     },
-    "RefetchPlayerMsg": {
-      "title": "RefetchPlayerMsg",
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": ["refetch_player"],
-          "title": "type"
-        },
-        "user_id": {
-          "type": "string",
-          "title": "user_id"
-        }
-      },
-      "additionalProperties": false,
-      "required": ["type", "user_id"]
-    },
     "Room": {
       "title": "Room",
       "type": "object",
@@ -506,26 +479,6 @@
       },
       "additionalProperties": false,
       "required": ["code", "host_name", "last_updated", "player_count"]
-    },
-    "RoomListMsg": {
-      "title": "RoomList",
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": ["room_list"],
-          "title": "type"
-        },
-        "rooms": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Room"
-          },
-          "title": "rooms"
-        }
-      },
-      "additionalProperties": false,
-      "required": ["rooms"]
     },
     "IGameState": {
       "title": "IGameState",
@@ -664,6 +617,43 @@
         "used",
         "victory"
       ]
+    },
+    "RoomListMsg": {
+      "title": "RoomListMsg",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["room_list"],
+          "title": "type"
+        },
+        "rooms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Room"
+          },
+          "title": "rooms"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["rooms"]
+    },
+    "RefetchPlayerMsg": {
+      "title": "RefetchPlayerMsg",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["refetch_player"],
+          "title": "type"
+        },
+        "user_id": {
+          "type": "string",
+          "title": "user_id"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["type", "user_id"]
     },
     "WelcomeMsg": {
       "title": "WelcomeMsg",

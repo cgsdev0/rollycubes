@@ -1,6 +1,15 @@
 // This file was generated from JSON Schema using quicktype, do not modify it directly.
 // To parse and unparse this JSON data, add this code to your project and do:
 //
+//    authRefreshTokenResponse, err := UnmarshalAuthRefreshTokenResponse(bytes)
+//    bytes, err = authRefreshTokenResponse.Marshal()
+//
+//    authDonateResponse, err := UnmarshalAuthDonateResponse(bytes)
+//    bytes, err = authDonateResponse.Marshal()
+//
+//    authSettingsRequest, err := UnmarshalAuthSettingsRequest(bytes)
+//    bytes, err = authSettingsRequest.Marshal()
+//
 //    player, err := UnmarshalPlayer(bytes)
 //    bytes, err = player.Marshal()
 //
@@ -31,9 +40,6 @@
 //    diceType, err := UnmarshalDiceType(bytes)
 //    bytes, err = diceType.Marshal()
 //
-//    userData, err := UnmarshalUserData(bytes)
-//    bytes, err = userData.Marshal()
-//
 //    dieRoll, err := UnmarshalDieRoll(bytes)
 //    bytes, err = dieRoll.Marshal()
 //
@@ -43,20 +49,20 @@
 //    redirect, err := UnmarshalRedirect(bytes)
 //    bytes, err = redirect.Marshal()
 //
-//    refetchPlayerMsg, err := UnmarshalRefetchPlayerMsg(bytes)
-//    bytes, err = refetchPlayerMsg.Marshal()
-//
 //    room, err := UnmarshalRoom(bytes)
 //    bytes, err = room.Marshal()
-//
-//    roomListMsg, err := UnmarshalRoomListMsg(bytes)
-//    bytes, err = roomListMsg.Marshal()
 //
 //    iGameState, err := UnmarshalIGameState(bytes)
 //    bytes, err = iGameState.Marshal()
 //
 //    gameState, err := UnmarshalGameState(bytes)
 //    bytes, err = gameState.Marshal()
+//
+//    roomListMsg, err := UnmarshalRoomListMsg(bytes)
+//    bytes, err = roomListMsg.Marshal()
+//
+//    refetchPlayerMsg, err := UnmarshalRefetchPlayerMsg(bytes)
+//    bytes, err = refetchPlayerMsg.Marshal()
 //
 //    welcomeMsg, err := UnmarshalWelcomeMsg(bytes)
 //    bytes, err = welcomeMsg.Marshal()
@@ -103,6 +109,36 @@
 package main
 
 import "encoding/json"
+
+func UnmarshalAuthRefreshTokenResponse(data []byte) (AuthRefreshTokenResponse, error) {
+	var r AuthRefreshTokenResponse
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *AuthRefreshTokenResponse) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func UnmarshalAuthDonateResponse(data []byte) (AuthDonateResponse, error) {
+	var r AuthDonateResponse
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *AuthDonateResponse) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func UnmarshalAuthSettingsRequest(data []byte) (AuthSettingsRequest, error) {
+	var r AuthSettingsRequest
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *AuthSettingsRequest) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
 
 func UnmarshalPlayer(data []byte) (Player, error) {
 	var r Player
@@ -204,16 +240,6 @@ func (r *DiceType) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-func UnmarshalUserData(data []byte) (UserData, error) {
-	var r UserData
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *UserData) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
-
 func UnmarshalDieRoll(data []byte) (DieRoll, error) {
 	var r DieRoll
 	err := json.Unmarshal(data, &r)
@@ -244,16 +270,6 @@ func (r *Redirect) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-func UnmarshalRefetchPlayerMsg(data []byte) (RefetchPlayerMsg, error) {
-	var r RefetchPlayerMsg
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *RefetchPlayerMsg) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
-
 func UnmarshalRoom(data []byte) (Room, error) {
 	var r Room
 	err := json.Unmarshal(data, &r)
@@ -261,16 +277,6 @@ func UnmarshalRoom(data []byte) (Room, error) {
 }
 
 func (r *Room) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
-
-func UnmarshalRoomListMsg(data []byte) (RoomListMsg, error) {
-	var r RoomListMsg
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *RoomListMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
@@ -291,6 +297,26 @@ func UnmarshalGameState(data []byte) (GameState, error) {
 }
 
 func (r *GameState) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func UnmarshalRoomListMsg(data []byte) (RoomListMsg, error) {
+	var r RoomListMsg
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *RoomListMsg) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func UnmarshalRefetchPlayerMsg(data []byte) (RefetchPlayerMsg, error) {
+	var r RefetchPlayerMsg
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *RefetchPlayerMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
@@ -434,6 +460,26 @@ func (r *UpdateMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
+type AuthRefreshTokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+type AuthDonateResponse struct {
+	Link string `json:"link"`
+}
+
+type AuthSettingsRequest struct {
+	Color    *ColorClass `json:"color,omitempty"`
+	Setting  Setting     `json:"setting"`
+	DiceType *DiceType   `json:"dice_type,omitempty"`
+	Text     *string     `json:"text,omitempty"`
+}
+
+type ColorClass struct {
+	Hue *float64 `json:"hue,omitempty"`
+	Sat *float64 `json:"sat,omitempty"`
+}
+
 type AchievementProgress struct {
 	AchievementID string                  `json:"achievement_id"`
 	Progress      int64                   `json:"progress"`
@@ -466,25 +512,11 @@ type ReportStats struct {
 	WINS    int64  `json:"wins"`
 }
 
-type AchievementData struct {
-	Description string  `json:"description"`
-	ID          string  `json:"id"`
-	ImageURL    *string `json:"image_url"`
-	MaxProgress int64   `json:"max_progress"`
-	Name        string  `json:"name"`
-}
-
-type UserData struct {
-	Achievements []Achievement `json:"achievements"`
-	Color        Color         `json:"color"`
-	CreatedDate  string        `json:"createdDate"`
-	Dice         Dice          `json:"dice"`
-	Donor        bool          `json:"donor"`
-	ID           string        `json:"id"`
-	ImageURL     *string       `json:"image_url"`
-	PubkeyText   *string       `json:"pubkey_text"`
-	Stats        *UserStats    `json:"stats"`
-	Username     string        `json:"username"`
+type UserStats struct {
+	Doubles int64 `json:"doubles"`
+	Games   int64 `json:"games"`
+	Rolls   int64 `json:"rolls"`
+	WINS    int64 `json:"wins"`
 }
 
 type Achievement struct {
@@ -495,20 +527,12 @@ type Achievement struct {
 	Unlocked string `json:"unlocked"`
 }
 
-type Color struct {
-	Hue float64 `json:"hue"`
-	Sat float64 `json:"sat"`
-}
-
-type Dice struct {
-	Type DiceType `json:"type"`
-}
-
-type UserStats struct {
-	Doubles int64 `json:"doubles"`
-	Games   int64 `json:"games"`
-	Rolls   int64 `json:"rolls"`
-	WINS    int64 `json:"wins"`
+type AchievementData struct {
+	Description string  `json:"description"`
+	ID          string  `json:"id"`
+	ImageURL    *string `json:"image_url"`
+	MaxProgress int64   `json:"max_progress"`
+	Name        string  `json:"name"`
 }
 
 type DieRoll struct {
@@ -524,23 +548,6 @@ type GameError struct {
 type Redirect struct {
 	Room string       `json:"room"`
 	Type RedirectType `json:"type"`
-}
-
-type RefetchPlayerMsg struct {
-	Type   RefetchPlayerMsgType `json:"type"`
-	UserID string               `json:"user_id"`
-}
-
-type RoomListMsg struct {
-	Rooms []Room           `json:"rooms"`
-	Type  *RoomListMsgType `json:"type,omitempty"`
-}
-
-type Room struct {
-	Code        string `json:"code"`
-	HostName    string `json:"host_name"`
-	LastUpdated string `json:"last_updated"`
-	PlayerCount int64  `json:"player_count"`
 }
 
 type IGameState struct {
@@ -590,6 +597,23 @@ type ServerPlayer struct {
 	TurnCount    int64   `json:"turn_count"`
 	UserID       *string `json:"user_id,omitempty"`
 	WinCount     int64   `json:"win_count"`
+}
+
+type RoomListMsg struct {
+	Rooms []Room           `json:"rooms"`
+	Type  *RoomListMsgType `json:"type,omitempty"`
+}
+
+type Room struct {
+	Code        string `json:"code"`
+	HostName    string `json:"host_name"`
+	LastUpdated string `json:"last_updated"`
+	PlayerCount int64  `json:"player_count"`
+}
+
+type RefetchPlayerMsg struct {
+	Type   RefetchPlayerMsgType `json:"type"`
+	UserID string               `json:"user_id"`
 }
 
 type WelcomeMsg struct {
@@ -679,6 +703,21 @@ type UpdateMsg struct {
 	Used  []bool        `json:"used,omitempty"`
 }
 
+type DiceType string
+
+const (
+	D20 DiceType = "D20"
+	D6  DiceType = "D6"
+)
+
+type Setting string
+
+const (
+	Color           Setting = "Color"
+	Pubkey          Setting = "Pubkey"
+	SettingDiceType Setting = "DiceType"
+)
+
 type AchievementProgressType string
 
 const (
@@ -698,13 +737,6 @@ const (
 	TypeAchievementUnlock AchievementUnlockType = "achievement_unlock"
 )
 
-type DiceType string
-
-const (
-	D20 DiceType = "D20"
-	D6  DiceType = "D6"
-)
-
 type GameErrorType string
 
 const (
@@ -717,10 +749,10 @@ const (
 	TypeRedirect RedirectType = "redirect"
 )
 
-type RefetchPlayerMsgType string
+type GameStateType string
 
 const (
-	RefetchPlayer RefetchPlayerMsgType = "refetch_player"
+	TypeGameState GameStateType = "game_state"
 )
 
 type RoomListMsgType string
@@ -729,10 +761,10 @@ const (
 	RoomList RoomListMsgType = "room_list"
 )
 
-type GameStateType string
+type RefetchPlayerMsgType string
 
 const (
-	TypeGameState GameStateType = "game_state"
+	RefetchPlayer RefetchPlayerMsgType = "refetch_player"
 )
 
 type WelcomeMsgType string

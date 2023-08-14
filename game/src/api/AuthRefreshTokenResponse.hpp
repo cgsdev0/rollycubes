@@ -5,10 +5,9 @@
 
 namespace API {
 
-    struct Color {
+    struct AuthRefreshTokenResponse {
 std::string toString() const;
 void fromString(const std::string &str);
-        std::optional<double> hue;
-        std::optional<double> sat;
+        std::string access_token;
     };
 }

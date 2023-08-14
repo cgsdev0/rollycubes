@@ -7,6 +7,18 @@
 
 
 namespace API {
+    void from_json(const json & j, AuthRefreshTokenResponse & x);
+    void to_json(json & j, const AuthRefreshTokenResponse & x);
+
+    void from_json(const json & j, AuthDonateResponse & x);
+    void to_json(json & j, const AuthDonateResponse & x);
+
+    void from_json(const json & j, Color & x);
+    void to_json(json & j, const Color & x);
+
+    void from_json(const json & j, AuthSettingsRequest & x);
+    void to_json(json & j, const AuthSettingsRequest & x);
+
     void from_json(const json & j, UserId & x);
     void to_json(json & j, const UserId & x);
 
@@ -19,23 +31,14 @@ namespace API {
     void from_json(const json & j, ReportStats & x);
     void to_json(json & j, const ReportStats & x);
 
-    void from_json(const json & j, AchievementData & x);
-    void to_json(json & j, const AchievementData & x);
+    void from_json(const json & j, UserStats & x);
+    void to_json(json & j, const UserStats & x);
 
     void from_json(const json & j, Achievement & x);
     void to_json(json & j, const Achievement & x);
 
-    void from_json(const json & j, Color & x);
-    void to_json(json & j, const Color & x);
-
-    void from_json(const json & j, Dice & x);
-    void to_json(json & j, const Dice & x);
-
-    void from_json(const json & j, UserStats & x);
-    void to_json(json & j, const UserStats & x);
-
-    void from_json(const json & j, UserData & x);
-    void to_json(json & j, const UserData & x);
+    void from_json(const json & j, AchievementData & x);
+    void to_json(json & j, const AchievementData & x);
 
     void from_json(const json & j, DieRoll & x);
     void to_json(json & j, const DieRoll & x);
@@ -45,15 +48,6 @@ namespace API {
 
     void from_json(const json & j, Redirect & x);
     void to_json(json & j, const Redirect & x);
-
-    void from_json(const json & j, RefetchPlayerMsg & x);
-    void to_json(json & j, const RefetchPlayerMsg & x);
-
-    void from_json(const json & j, Room & x);
-    void to_json(json & j, const Room & x);
-
-    void from_json(const json & j, RoomListMsg & x);
-    void to_json(json & j, const RoomListMsg & x);
 
     void from_json(const json & j, Player & x);
     void to_json(json & j, const Player & x);
@@ -66,6 +60,15 @@ namespace API {
 
     void from_json(const json & j, GameState & x);
     void to_json(json & j, const GameState & x);
+
+    void from_json(const json & j, Room & x);
+    void to_json(json & j, const Room & x);
+
+    void from_json(const json & j, RoomListMsg & x);
+    void to_json(json & j, const RoomListMsg & x);
+
+    void from_json(const json & j, RefetchPlayerMsg & x);
+    void to_json(json & j, const RefetchPlayerMsg & x);
 
     void from_json(const json & j, WelcomeMsg & x);
     void to_json(json & j, const WelcomeMsg & x);
@@ -109,6 +112,12 @@ namespace API {
     void from_json(const json & j, UpdateMsg & x);
     void to_json(json & j, const UpdateMsg & x);
 
+    void from_json(const json & j, DiceType & x);
+    void to_json(json & j, const DiceType & x);
+
+    void from_json(const json & j, Setting & x);
+    void to_json(json & j, const Setting & x);
+
     void from_json(const json & j, AchievementProgressType & x);
     void to_json(json & j, const AchievementProgressType & x);
 
@@ -118,23 +127,20 @@ namespace API {
     void from_json(const json & j, AchievementUnlockType & x);
     void to_json(json & j, const AchievementUnlockType & x);
 
-    void from_json(const json & j, DiceType & x);
-    void to_json(json & j, const DiceType & x);
-
     void from_json(const json & j, GameErrorType & x);
     void to_json(json & j, const GameErrorType & x);
 
     void from_json(const json & j, RedirectType & x);
     void to_json(json & j, const RedirectType & x);
 
-    void from_json(const json & j, RefetchPlayerMsgType & x);
-    void to_json(json & j, const RefetchPlayerMsgType & x);
+    void from_json(const json & j, GameStateType & x);
+    void to_json(json & j, const GameStateType & x);
 
     void from_json(const json & j, RoomListMsgType & x);
     void to_json(json & j, const RoomListMsgType & x);
 
-    void from_json(const json & j, GameStateType & x);
-    void to_json(json & j, const GameStateType & x);
+    void from_json(const json & j, RefetchPlayerMsgType & x);
+    void to_json(json & j, const RefetchPlayerMsgType & x);
 
     void from_json(const json & j, WelcomeMsgType & x);
     void to_json(json & j, const WelcomeMsgType & x);
@@ -177,6 +183,50 @@ namespace API {
 
     void from_json(const json & j, UpdateMsgType & x);
     void to_json(json & j, const UpdateMsgType & x);
+
+    inline void from_json(const json & j, AuthRefreshTokenResponse& x) {
+        x.access_token = j.at("access_token").get<std::string>();
+    }
+
+    inline void to_json(json & j, const AuthRefreshTokenResponse & x) {
+        j = json::object();
+        j["access_token"] = x.access_token;
+    }
+
+    inline void from_json(const json & j, AuthDonateResponse& x) {
+        x.link = j.at("link").get<std::string>();
+    }
+
+    inline void to_json(json & j, const AuthDonateResponse & x) {
+        j = json::object();
+        j["link"] = x.link;
+    }
+
+    inline void from_json(const json & j, Color& x) {
+        x.hue = get_stack_optional<double>(j, "hue");
+        x.sat = get_stack_optional<double>(j, "sat");
+    }
+
+    inline void to_json(json & j, const Color & x) {
+        j = json::object();
+        j["hue"] = x.hue;
+        j["sat"] = x.sat;
+    }
+
+    inline void from_json(const json & j, AuthSettingsRequest& x) {
+        x.color = get_stack_optional<Color>(j, "color");
+        x.setting = j.at("setting").get<Setting>();
+        x.dice_type = get_stack_optional<DiceType>(j, "dice_type");
+        x.text = get_stack_optional<std::string>(j, "text");
+    }
+
+    inline void to_json(json & j, const AuthSettingsRequest & x) {
+        j = json::object();
+        j["color"] = x.color;
+        j["setting"] = x.setting;
+        j["dice_type"] = x.dice_type;
+        j["text"] = x.text;
+    }
 
     inline void from_json(const json & j, UserId& x) {
         x.id = j.at("id").get<std::string>();
@@ -246,21 +296,19 @@ namespace API {
         j["wins"] = x.wins;
     }
 
-    inline void from_json(const json & j, AchievementData& x) {
-        x.description = j.at("description").get<std::string>();
-        x.id = j.at("id").get<std::string>();
-        x.image_url = get_stack_optional<std::string>(j, "image_url");
-        x.max_progress = j.at("max_progress").get<int64_t>();
-        x.name = j.at("name").get<std::string>();
+    inline void from_json(const json & j, UserStats& x) {
+        x.doubles = j.at("doubles").get<int64_t>();
+        x.games = j.at("games").get<int64_t>();
+        x.rolls = j.at("rolls").get<int64_t>();
+        x.wins = j.at("wins").get<int64_t>();
     }
 
-    inline void to_json(json & j, const AchievementData & x) {
+    inline void to_json(json & j, const UserStats & x) {
         j = json::object();
-        j["description"] = x.description;
-        j["id"] = x.id;
-        j["image_url"] = x.image_url;
-        j["max_progress"] = x.max_progress;
-        j["name"] = x.name;
+        j["doubles"] = x.doubles;
+        j["games"] = x.games;
+        j["rolls"] = x.rolls;
+        j["wins"] = x.wins;
     }
 
     inline void from_json(const json & j, Achievement& x) {
@@ -280,66 +328,21 @@ namespace API {
         j["unlocked"] = x.unlocked;
     }
 
-    inline void from_json(const json & j, Color& x) {
-        x.hue = j.at("hue").get<double>();
-        x.sat = j.at("sat").get<double>();
-    }
-
-    inline void to_json(json & j, const Color & x) {
-        j = json::object();
-        j["hue"] = x.hue;
-        j["sat"] = x.sat;
-    }
-
-    inline void from_json(const json & j, Dice& x) {
-        x.type = j.at("type").get<DiceType>();
-    }
-
-    inline void to_json(json & j, const Dice & x) {
-        j = json::object();
-        j["type"] = x.type;
-    }
-
-    inline void from_json(const json & j, UserStats& x) {
-        x.doubles = j.at("doubles").get<int64_t>();
-        x.games = j.at("games").get<int64_t>();
-        x.rolls = j.at("rolls").get<int64_t>();
-        x.wins = j.at("wins").get<int64_t>();
-    }
-
-    inline void to_json(json & j, const UserStats & x) {
-        j = json::object();
-        j["doubles"] = x.doubles;
-        j["games"] = x.games;
-        j["rolls"] = x.rolls;
-        j["wins"] = x.wins;
-    }
-
-    inline void from_json(const json & j, UserData& x) {
-        x.achievements = get_stack_optional<std::vector<Achievement>>(j, "achievements");
-        x.color = j.at("color").get<Color>();
-        x.created_date = j.at("createdDate").get<std::string>();
-        x.dice = j.at("dice").get<Dice>();
-        x.donor = j.at("donor").get<bool>();
+    inline void from_json(const json & j, AchievementData& x) {
+        x.description = j.at("description").get<std::string>();
         x.id = j.at("id").get<std::string>();
         x.image_url = get_stack_optional<std::string>(j, "image_url");
-        x.pubkey_text = get_stack_optional<std::string>(j, "pubkey_text");
-        x.stats = get_stack_optional<UserStats>(j, "stats");
-        x.username = j.at("username").get<std::string>();
+        x.max_progress = j.at("max_progress").get<int64_t>();
+        x.name = j.at("name").get<std::string>();
     }
 
-    inline void to_json(json & j, const UserData & x) {
+    inline void to_json(json & j, const AchievementData & x) {
         j = json::object();
-        j["achievements"] = x.achievements;
-        j["color"] = x.color;
-        j["createdDate"] = x.created_date;
-        j["dice"] = x.dice;
-        j["donor"] = x.donor;
+        j["description"] = x.description;
         j["id"] = x.id;
         j["image_url"] = x.image_url;
-        j["pubkey_text"] = x.pubkey_text;
-        j["stats"] = x.stats;
-        j["username"] = x.username;
+        j["max_progress"] = x.max_progress;
+        j["name"] = x.name;
     }
 
     inline void from_json(const json & j, DieRoll& x) {
@@ -372,43 +375,6 @@ namespace API {
     inline void to_json(json & j, const Redirect & x) {
         j = json::object();
         j["room"] = x.room;
-        j["type"] = x.type;
-    }
-
-    inline void from_json(const json & j, RefetchPlayerMsg& x) {
-        x.type = j.at("type").get<RefetchPlayerMsgType>();
-        x.user_id = j.at("user_id").get<std::string>();
-    }
-
-    inline void to_json(json & j, const RefetchPlayerMsg & x) {
-        j = json::object();
-        j["type"] = x.type;
-        j["user_id"] = x.user_id;
-    }
-
-    inline void from_json(const json & j, Room& x) {
-        x.code = j.at("code").get<std::string>();
-        x.host_name = j.at("host_name").get<std::string>();
-        x.last_updated = j.at("last_updated").get<std::string>();
-        x.player_count = j.at("player_count").get<int64_t>();
-    }
-
-    inline void to_json(json & j, const Room & x) {
-        j = json::object();
-        j["code"] = x.code;
-        j["host_name"] = x.host_name;
-        j["last_updated"] = x.last_updated;
-        j["player_count"] = x.player_count;
-    }
-
-    inline void from_json(const json & j, RoomListMsg& x) {
-        x.rooms = j.at("rooms").get<std::vector<Room>>();
-        x.type = get_stack_optional<RoomListMsgType>(j, "type");
-    }
-
-    inline void to_json(json & j, const RoomListMsg & x) {
-        j = json::object();
-        j["rooms"] = x.rooms;
         j["type"] = x.type;
     }
 
@@ -512,6 +478,43 @@ namespace API {
         j["type"] = x.type;
         j["used"] = x.used;
         j["victory"] = x.victory;
+    }
+
+    inline void from_json(const json & j, Room& x) {
+        x.code = j.at("code").get<std::string>();
+        x.host_name = j.at("host_name").get<std::string>();
+        x.last_updated = j.at("last_updated").get<std::string>();
+        x.player_count = j.at("player_count").get<int64_t>();
+    }
+
+    inline void to_json(json & j, const Room & x) {
+        j = json::object();
+        j["code"] = x.code;
+        j["host_name"] = x.host_name;
+        j["last_updated"] = x.last_updated;
+        j["player_count"] = x.player_count;
+    }
+
+    inline void from_json(const json & j, RoomListMsg& x) {
+        x.rooms = j.at("rooms").get<std::vector<Room>>();
+        x.type = get_stack_optional<RoomListMsgType>(j, "type");
+    }
+
+    inline void to_json(json & j, const RoomListMsg & x) {
+        j = json::object();
+        j["rooms"] = x.rooms;
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, RefetchPlayerMsg& x) {
+        x.type = j.at("type").get<RefetchPlayerMsgType>();
+        x.user_id = j.at("user_id").get<std::string>();
+    }
+
+    inline void to_json(json & j, const RefetchPlayerMsg & x) {
+        j = json::object();
+        j["type"] = x.type;
+        j["user_id"] = x.user_id;
     }
 
     inline void from_json(const json & j, WelcomeMsg& x) {
@@ -702,6 +705,36 @@ namespace API {
         j["used"] = x.used;
     }
 
+    inline void from_json(const json & j, DiceType & x) {
+        if (j == "D20") x = DiceType::D20;
+        else if (j == "D6") x = DiceType::D6;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const DiceType & x) {
+        switch (x) {
+            case DiceType::D20: j = "D20"; break;
+            case DiceType::D6: j = "D6"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
+    inline void from_json(const json & j, Setting & x) {
+        if (j == "Color") x = Setting::COLOR;
+        else if (j == "DiceType") x = Setting::DICE_TYPE;
+        else if (j == "Pubkey") x = Setting::PUBKEY;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const Setting & x) {
+        switch (x) {
+            case Setting::COLOR: j = "Color"; break;
+            case Setting::DICE_TYPE: j = "DiceType"; break;
+            case Setting::PUBKEY: j = "Pubkey"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
     inline void from_json(const json & j, AchievementProgressType & x) {
         if (j == "achievement_progress") x = AchievementProgressType::ACHIEVEMENT_PROGRESS;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
@@ -740,20 +773,6 @@ namespace API {
         }
     }
 
-    inline void from_json(const json & j, DiceType & x) {
-        if (j == "D20") x = DiceType::D20;
-        else if (j == "D6") x = DiceType::D6;
-        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
-    }
-
-    inline void to_json(json & j, const DiceType & x) {
-        switch (x) {
-            case DiceType::D20: j = "D20"; break;
-            case DiceType::D6: j = "D6"; break;
-            default: throw std::runtime_error("This should not happen");
-        }
-    }
-
     inline void from_json(const json & j, GameErrorType & x) {
         if (j == "error") x = GameErrorType::ERROR;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
@@ -778,14 +797,14 @@ namespace API {
         }
     }
 
-    inline void from_json(const json & j, RefetchPlayerMsgType & x) {
-        if (j == "refetch_player") x = RefetchPlayerMsgType::REFETCH_PLAYER;
+    inline void from_json(const json & j, GameStateType & x) {
+        if (j == "game_state") x = GameStateType::GAME_STATE;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const RefetchPlayerMsgType & x) {
+    inline void to_json(json & j, const GameStateType & x) {
         switch (x) {
-            case RefetchPlayerMsgType::REFETCH_PLAYER: j = "refetch_player"; break;
+            case GameStateType::GAME_STATE: j = "game_state"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
@@ -802,14 +821,14 @@ namespace API {
         }
     }
 
-    inline void from_json(const json & j, GameStateType & x) {
-        if (j == "game_state") x = GameStateType::GAME_STATE;
+    inline void from_json(const json & j, RefetchPlayerMsgType & x) {
+        if (j == "refetch_player") x = RefetchPlayerMsgType::REFETCH_PLAYER;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const GameStateType & x) {
+    inline void to_json(json & j, const RefetchPlayerMsgType & x) {
         switch (x) {
-            case GameStateType::GAME_STATE: j = "game_state"; break;
+            case RefetchPlayerMsgType::REFETCH_PLAYER: j = "refetch_player"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
@@ -983,21 +1002,21 @@ namespace API {
     }
 }
 namespace API {
-std::string Achievement::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void Achievement::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string AchievementData::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void AchievementData::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string Achievement::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Achievement::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -1019,6 +1038,33 @@ void AchievementUnlock::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
+std::string AuthDonateResponse::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AuthDonateResponse::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AuthRefreshTokenResponse::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AuthRefreshTokenResponse::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AuthSettingsRequest::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AuthSettingsRequest::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
 std::string ChatMsg::toString() const {
 json j;
 to_json(j, *this);
@@ -1034,15 +1080,6 @@ to_json(j, *this);
 return j.dump();
 }
 void Color::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
-std::string Dice::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void Dice::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -1241,15 +1278,6 @@ to_json(j, *this);
 return j.dump();
 }
 void UpdateTurnMsg::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
-std::string UserData::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void UserData::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
