@@ -47,10 +47,12 @@ const gamePanel = css({
 const gamePanelInner = css({
   display: 'flex',
   flexDirection: 'column',
+  // flex: 1,
 });
 
 const buttonPanel = css({
   display: 'flex',
+  // flex: 1,
   flexDirection: 'row',
   alignItems: 'stretch',
   justifyContent: 'stretch',
@@ -116,7 +118,7 @@ const GamePanel: React.FC<Props & DispatchProp> = ({
   };
   return (
     <div className={gamePanel()}>
-      <ScoreTableComponent />
+      {/* <ScoreTableComponent /> */}
       <div className={gamePanelInner()}>
         {victory ? <RestartButton /> : null}
         <Dice rolling={rolling} />
