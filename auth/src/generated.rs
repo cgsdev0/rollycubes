@@ -4,16 +4,14 @@
 // extern crate serde_derive;
 // extern crate serde_json;
 //
-// use generated_module::integer;
+// use generated_module::Player;
 //
 // fn main() {
 //     let json = r#"{"answer": 42}"#;
-//     let model: integer = serde_json::from_str(&json).unwrap();
+//     let model: Player = serde_json::from_str(&json).unwrap();
 // }
 
 use serde::{Serialize, Deserialize};
-
-pub type Integer = f64;
 
 #[derive(Serialize, Deserialize)]
 pub struct AchievementProgress {

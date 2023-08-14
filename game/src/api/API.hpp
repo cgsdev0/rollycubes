@@ -62,5 +62,4 @@
 #include "UpdateMsgType.hpp"
 #include "UpdateMsg.hpp"
 namespace API {
-    using Integer = double;
 }
