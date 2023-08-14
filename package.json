@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/cgsdev0/rollycubes#readme",
   "devDependencies": {
+    "json-schema-to-typescript": "^13.0.2",
     "quicktype": "23.0.64"
   }
 }
