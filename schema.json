@@ -289,11 +289,11 @@
           "title": "unlocked"
         },
         "rn": {
-          "type": ["null", "number"],
+          "type": ["null", "integer"],
           "title": "rn"
         },
         "rd": {
-          "type": ["null", "number"],
+          "type": ["null", "integer"],
           "title": "rd"
         }
       },
@@ -547,7 +547,7 @@
         "rolls": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "integer"
           },
           "title": "rolls"
         },
@@ -618,7 +618,7 @@
         "rolls": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "integer"
           },
           "title": "rolls"
         },
@@ -694,7 +694,7 @@
         "rolls": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "integer"
           },
           "title": "rolls"
         },
@@ -800,7 +800,7 @@
         "rolls": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "integer"
           },
           "title": "rolls"
         }

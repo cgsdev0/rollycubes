@@ -263,8 +263,8 @@ namespace API {
     inline void from_json(const json & j, Achievement& x) {
         x.id = j.at("id").get<std::string>();
         x.progress = j.at("progress").get<int64_t>();
-        x.rd = get_stack_optional<double>(j, "rd");
-        x.rn = get_stack_optional<double>(j, "rn");
+        x.rd = get_stack_optional<int64_t>(j, "rd");
+        x.rn = get_stack_optional<int64_t>(j, "rn");
         x.unlocked = j.at("unlocked").get<std::string>();
     }
 
@@ -433,7 +433,7 @@ namespace API {
         x.players = j.at("players").get<std::vector<Player>>();
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
-        x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.rolls = j.at("rolls").get<std::vector<int64_t>>();
         x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
         x.used = j.at("used").get<std::vector<bool>>();
@@ -487,7 +487,7 @@ namespace API {
         x.players = j.at("players").get<std::vector<ServerPlayer>>();
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
-        x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.rolls = j.at("rolls").get<std::vector<int64_t>>();
         x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
         x.type = j.at("type").get<GameStateType>();
@@ -515,7 +515,7 @@ namespace API {
         x.players = j.at("players").get<std::vector<Player>>();
         x.private_session = j.at("privateSession").get<bool>();
         x.rolled = j.at("rolled").get<bool>();
-        x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.rolls = j.at("rolls").get<std::vector<int64_t>>();
         x.spectators = j.at("spectators").get<int64_t>();
         x.turn_index = j.at("turn_index").get<int64_t>();
         x.type = j.at("type").get<WelcomeMsgType>();
@@ -572,7 +572,7 @@ namespace API {
     }
 
     inline void from_json(const json & j, RollMsg& x) {
-        x.rolls = j.at("rolls").get<std::vector<double>>();
+        x.rolls = j.at("rolls").get<std::vector<int64_t>>();
         x.type = j.at("type").get<RollMsgType>();
     }
 

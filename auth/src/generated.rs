@@ -132,9 +132,9 @@ pub struct Achievement {
 
     progress: i64,
 
-    rd: Option<f64>,
+    rd: Option<i64>,
 
-    rn: Option<f64>,
+    rn: Option<i64>,
 
     unlocked: String,
 }
@@ -247,7 +247,7 @@ pub struct IGameState {
 
     rolled: bool,
 
-    rolls: Vec<f64>,
+    rolls: Vec<i64>,
 
     spectators: i64,
 
@@ -287,7 +287,7 @@ pub struct GameState {
 
     rolled: bool,
 
-    rolls: Vec<f64>,
+    rolls: Vec<i64>,
 
     spectators: i64,
 
@@ -347,7 +347,7 @@ pub struct WelcomeMsg {
 
     rolled: bool,
 
-    rolls: Vec<f64>,
+    rolls: Vec<i64>,
 
     spectators: i64,
 
@@ -412,7 +412,7 @@ pub enum WinMsgType {
 
 #[derive(Serialize, Deserialize)]
 pub struct RollMsg {
-    rolls: Vec<f64>,
+    rolls: Vec<i64>,
 
     #[serde(rename = "type")]
     roll_msg_type: RollMsgType,

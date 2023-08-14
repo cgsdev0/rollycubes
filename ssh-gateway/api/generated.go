@@ -488,11 +488,11 @@ type UserData struct {
 }
 
 type Achievement struct {
-	ID       string   `json:"id"`
-	Progress int64    `json:"progress"`
-	RD       *float64 `json:"rd"`
-	Rn       *float64 `json:"rn"`
-	Unlocked string   `json:"unlocked"`
+	ID       string `json:"id"`
+	Progress int64  `json:"progress"`
+	RD       *int64 `json:"rd"`
+	Rn       *int64 `json:"rn"`
+	Unlocked string `json:"unlocked"`
 }
 
 type Color struct {
@@ -543,15 +543,15 @@ type Room struct {
 }
 
 type IGameState struct {
-	ChatLog        []string  `json:"chatLog"`
-	Players        []Player  `json:"players"`
-	PrivateSession bool      `json:"privateSession"`
-	Rolled         bool      `json:"rolled"`
-	Rolls          []float64 `json:"rolls"`
-	Spectators     int64     `json:"spectators"`
-	TurnIndex      int64     `json:"turn_index"`
-	Used           []bool    `json:"used"`
-	Victory        bool      `json:"victory"`
+	ChatLog        []string `json:"chatLog"`
+	Players        []Player `json:"players"`
+	PrivateSession bool     `json:"privateSession"`
+	Rolled         bool     `json:"rolled"`
+	Rolls          []int64  `json:"rolls"`
+	Spectators     int64    `json:"spectators"`
+	TurnIndex      int64    `json:"turn_index"`
+	Used           []bool   `json:"used"`
+	Victory        bool     `json:"victory"`
 }
 
 type Player struct {
@@ -569,7 +569,7 @@ type GameState struct {
 	Players        []ServerPlayer `json:"players"`
 	PrivateSession bool           `json:"privateSession"`
 	Rolled         bool           `json:"rolled"`
-	Rolls          []float64      `json:"rolls"`
+	Rolls          []int64        `json:"rolls"`
 	Spectators     int64          `json:"spectators"`
 	TurnIndex      int64          `json:"turn_index"`
 	Type           GameStateType  `json:"type"`
@@ -597,7 +597,7 @@ type WelcomeMsg struct {
 	Players        []Player       `json:"players"`
 	PrivateSession bool           `json:"privateSession"`
 	Rolled         bool           `json:"rolled"`
-	Rolls          []float64      `json:"rolls"`
+	Rolls          []int64        `json:"rolls"`
 	Spectators     int64          `json:"spectators"`
 	TurnIndex      int64          `json:"turn_index"`
 	Type           WelcomeMsgType `json:"type"`
@@ -621,7 +621,7 @@ type WinMsg struct {
 }
 
 type RollMsg struct {
-	Rolls []float64   `json:"rolls"`
+	Rolls []int64     `json:"rolls"`
 	Type  RollMsgType `json:"type"`
 }
 
