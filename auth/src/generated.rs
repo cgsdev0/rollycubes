@@ -49,7 +49,7 @@ pub struct AchievementProgress {
     pub achievement_id: String,
     pub progress: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: AchievementProgressType,
     pub user_id: UserId,
     pub user_index: i64,
 }
@@ -63,6 +63,50 @@ impl AchievementProgress {
         builder::AchievementProgress::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum AchievementProgressType {
+    #[serde(rename = "achievement_progress")]
+    AchievementProgress,
+}
+impl From<&AchievementProgressType> for AchievementProgressType {
+    fn from(value: &AchievementProgressType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for AchievementProgressType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::AchievementProgress => "achievement_progress".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for AchievementProgressType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "achievement_progress" => Ok(Self::AchievementProgress),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for AchievementProgressType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for AchievementProgressType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for AchievementProgressType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct AchievementUnlock {
@@ -72,7 +116,7 @@ pub struct AchievementUnlock {
     pub max_progress: i64,
     pub name: String,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: AchievementUnlockType,
     pub user_id: String,
     pub user_index: i64,
 }
@@ -84,6 +128,50 @@ impl From<&AchievementUnlock> for AchievementUnlock {
 impl AchievementUnlock {
     pub fn builder() -> builder::AchievementUnlock {
         builder::AchievementUnlock::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum AchievementUnlockType {
+    #[serde(rename = "achievement_unlock")]
+    AchievementUnlock,
+}
+impl From<&AchievementUnlockType> for AchievementUnlockType {
+    fn from(value: &AchievementUnlockType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for AchievementUnlockType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::AchievementUnlock => "achievement_unlock".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for AchievementUnlockType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "achievement_unlock" => Ok(Self::AchievementUnlock),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for AchievementUnlockType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for AchievementUnlockType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for AchievementUnlockType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -151,7 +239,7 @@ impl AuthSettingsRequestColor {
 pub struct ChatMsg {
     pub msg: String,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: ChatMsgType,
 }
 impl From<&ChatMsg> for ChatMsg {
     fn from(value: &ChatMsg) -> Self {
@@ -161,6 +249,50 @@ impl From<&ChatMsg> for ChatMsg {
 impl ChatMsg {
     pub fn builder() -> builder::ChatMsg {
         builder::ChatMsg::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum ChatMsgType {
+    #[serde(rename = "chat")]
+    Chat,
+}
+impl From<&ChatMsgType> for ChatMsgType {
+    fn from(value: &ChatMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for ChatMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Chat => "chat".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for ChatMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "chat" => Ok(Self::Chat),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for ChatMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for ChatMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for ChatMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
@@ -230,7 +362,7 @@ impl DieRoll {
 pub struct DisconnectMsg {
     pub id: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: DisconnectMsgType,
 }
 impl From<&DisconnectMsg> for DisconnectMsg {
     fn from(value: &DisconnectMsg) -> Self {
@@ -242,12 +374,56 @@ impl DisconnectMsg {
         builder::DisconnectMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum DisconnectMsgType {
+    #[serde(rename = "disconnect")]
+    Disconnect,
+}
+impl From<&DisconnectMsgType> for DisconnectMsgType {
+    fn from(value: &DisconnectMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for DisconnectMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Disconnect => "disconnect".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for DisconnectMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "disconnect" => Ok(Self::Disconnect),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for DisconnectMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for DisconnectMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for DisconnectMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GameError {
     pub error: String,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: GameErrorType,
 }
 impl From<&GameError> for GameError {
     fn from(value: &GameError) -> Self {
@@ -257,6 +433,50 @@ impl From<&GameError> for GameError {
 impl GameError {
     pub fn builder() -> builder::GameError {
         builder::GameError::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum GameErrorType {
+    #[serde(rename = "error")]
+    Error,
+}
+impl From<&GameErrorType> for GameErrorType {
+    fn from(value: &GameErrorType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for GameErrorType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Error => "error".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for GameErrorType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "error" => Ok(Self::Error),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for GameErrorType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for GameErrorType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for GameErrorType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -272,7 +492,7 @@ pub struct GameState {
     pub spectators: i64,
     pub turn_index: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: GameStateType,
     pub used: Vec<bool>,
     pub victory: bool,
 }
@@ -284,6 +504,50 @@ impl From<&GameState> for GameState {
 impl GameState {
     pub fn builder() -> builder::GameState {
         builder::GameState::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum GameStateType {
+    #[serde(rename = "game_state")]
+    GameState,
+}
+impl From<&GameStateType> for GameStateType {
+    fn from(value: &GameStateType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for GameStateType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::GameState => "game_state".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for GameStateType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "game_state" => Ok(Self::GameState),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for GameStateType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for GameStateType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for GameStateType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -318,7 +582,7 @@ pub struct JoinMsg {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: JoinMsgType,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -332,12 +596,56 @@ impl JoinMsg {
         builder::JoinMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum JoinMsgType {
+    #[serde(rename = "join")]
+    Join,
+}
+impl From<&JoinMsgType> for JoinMsgType {
+    fn from(value: &JoinMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for JoinMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Join => "join".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for JoinMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "join" => Ok(Self::Join),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for JoinMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for JoinMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for JoinMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct KickMsg {
     pub id: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: KickMsgType,
 }
 impl From<&KickMsg> for KickMsg {
     fn from(value: &KickMsg) -> Self {
@@ -347,6 +655,50 @@ impl From<&KickMsg> for KickMsg {
 impl KickMsg {
     pub fn builder() -> builder::KickMsg {
         builder::KickMsg::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum KickMsgType {
+    #[serde(rename = "kick")]
+    Kick,
+}
+impl From<&KickMsgType> for KickMsgType {
+    fn from(value: &KickMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for KickMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Kick => "kick".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for KickMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "kick" => Ok(Self::Kick),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for KickMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for KickMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for KickMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -380,7 +732,7 @@ pub struct ReconnectMsg {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: ReconnectMsgType,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -394,12 +746,56 @@ impl ReconnectMsg {
         builder::ReconnectMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum ReconnectMsgType {
+    #[serde(rename = "reconnect")]
+    Reconnect,
+}
+impl From<&ReconnectMsgType> for ReconnectMsgType {
+    fn from(value: &ReconnectMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for ReconnectMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Reconnect => "reconnect".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for ReconnectMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "reconnect" => Ok(Self::Reconnect),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for ReconnectMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for ReconnectMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for ReconnectMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Redirect {
     pub room: String,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: RedirectType,
 }
 impl From<&Redirect> for Redirect {
     fn from(value: &Redirect) -> Self {
@@ -411,11 +807,55 @@ impl Redirect {
         builder::Redirect::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum RedirectType {
+    #[serde(rename = "redirect")]
+    Redirect,
+}
+impl From<&RedirectType> for RedirectType {
+    fn from(value: &RedirectType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for RedirectType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Redirect => "redirect".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for RedirectType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "redirect" => Ok(Self::Redirect),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for RedirectType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for RedirectType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for RedirectType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct RefetchPlayerMsg {
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: RefetchPlayerMsgType,
     pub user_id: String,
 }
 impl From<&RefetchPlayerMsg> for RefetchPlayerMsg {
@@ -426,6 +866,50 @@ impl From<&RefetchPlayerMsg> for RefetchPlayerMsg {
 impl RefetchPlayerMsg {
     pub fn builder() -> builder::RefetchPlayerMsg {
         builder::RefetchPlayerMsg::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum RefetchPlayerMsgType {
+    #[serde(rename = "refetch_player")]
+    RefetchPlayer,
+}
+impl From<&RefetchPlayerMsgType> for RefetchPlayerMsgType {
+    fn from(value: &RefetchPlayerMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for RefetchPlayerMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::RefetchPlayer => "refetch_player".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for RefetchPlayerMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "refetch_player" => Ok(Self::RefetchPlayer),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for RefetchPlayerMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for RefetchPlayerMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for RefetchPlayerMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -452,7 +936,7 @@ impl ReportStats {
 pub struct RestartMsg {
     pub id: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: RestartMsgType,
 }
 impl From<&RestartMsg> for RestartMsg {
     fn from(value: &RestartMsg) -> Self {
@@ -464,11 +948,55 @@ impl RestartMsg {
         builder::RestartMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum RestartMsgType {
+    #[serde(rename = "restart")]
+    Restart,
+}
+impl From<&RestartMsgType> for RestartMsgType {
+    fn from(value: &RestartMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for RestartMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Restart => "restart".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for RestartMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "restart" => Ok(Self::Restart),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for RestartMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for RestartMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for RestartMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct RollAgainMsg {
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: RollAgainMsgType,
 }
 impl From<&RollAgainMsg> for RollAgainMsg {
     fn from(value: &RollAgainMsg) -> Self {
@@ -480,12 +1008,56 @@ impl RollAgainMsg {
         builder::RollAgainMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum RollAgainMsgType {
+    #[serde(rename = "roll_again")]
+    RollAgain,
+}
+impl From<&RollAgainMsgType> for RollAgainMsgType {
+    fn from(value: &RollAgainMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for RollAgainMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::RollAgain => "roll_again".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for RollAgainMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "roll_again" => Ok(Self::RollAgain),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for RollAgainMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for RollAgainMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for RollAgainMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct RollMsg {
     pub rolls: Vec<i64>,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: RollMsgType,
 }
 impl From<&RollMsg> for RollMsg {
     fn from(value: &RollMsg) -> Self {
@@ -495,6 +1067,50 @@ impl From<&RollMsg> for RollMsg {
 impl RollMsg {
     pub fn builder() -> builder::RollMsg {
         builder::RollMsg::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum RollMsgType {
+    #[serde(rename = "roll")]
+    Roll,
+}
+impl From<&RollMsgType> for RollMsgType {
+    fn from(value: &RollMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for RollMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Roll => "roll".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for RollMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "roll" => Ok(Self::Roll),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for RollMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for RollMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for RollMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -520,7 +1136,7 @@ impl Room {
 pub struct RoomListMsg {
     pub rooms: Vec<Room>,
     #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
-    pub type_: Option<Type>,
+    pub type_: Option<RoomListMsgType>,
 }
 impl From<&RoomListMsg> for RoomListMsg {
     fn from(value: &RoomListMsg) -> Self {
@@ -530,6 +1146,50 @@ impl From<&RoomListMsg> for RoomListMsg {
 impl RoomListMsg {
     pub fn builder() -> builder::RoomListMsg {
         builder::RoomListMsg::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum RoomListMsgType {
+    #[serde(rename = "room_list")]
+    RoomList,
+}
+impl From<&RoomListMsgType> for RoomListMsgType {
+    fn from(value: &RoomListMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for RoomListMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::RoomList => "room_list".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for RoomListMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "room_list" => Ok(Self::RoomList),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for RoomListMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for RoomListMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for RoomListMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -565,7 +1225,7 @@ impl ServerPlayer {
 pub struct SpectatorsMsg {
     pub count: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: SpectatorsMsgType,
 }
 impl From<&SpectatorsMsg> for SpectatorsMsg {
     fn from(value: &SpectatorsMsg) -> Self {
@@ -578,44 +1238,44 @@ impl SpectatorsMsg {
     }
 }
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
-pub enum Type {
-    #[serde(rename = "achievement_progress")]
-    AchievementProgress,
+pub enum SpectatorsMsgType {
+    #[serde(rename = "spectators")]
+    Spectators,
 }
-impl From<&Type> for Type {
-    fn from(value: &Type) -> Self {
+impl From<&SpectatorsMsgType> for SpectatorsMsgType {
+    fn from(value: &SpectatorsMsgType) -> Self {
         value.clone()
     }
 }
-impl ToString for Type {
+impl ToString for SpectatorsMsgType {
     fn to_string(&self) -> String {
         match *self {
-            Self::AchievementProgress => "achievement_progress".to_string(),
+            Self::Spectators => "spectators".to_string(),
         }
     }
 }
-impl std::str::FromStr for Type {
+impl std::str::FromStr for SpectatorsMsgType {
     type Err = &'static str;
     fn from_str(value: &str) -> Result<Self, &'static str> {
         match value {
-            "achievement_progress" => Ok(Self::AchievementProgress),
+            "spectators" => Ok(Self::Spectators),
             _ => Err("invalid value"),
         }
     }
 }
-impl std::convert::TryFrom<&str> for Type {
+impl std::convert::TryFrom<&str> for SpectatorsMsgType {
     type Error = &'static str;
     fn try_from(value: &str) -> Result<Self, &'static str> {
         value.parse()
     }
 }
-impl std::convert::TryFrom<&String> for Type {
+impl std::convert::TryFrom<&String> for SpectatorsMsgType {
     type Error = &'static str;
     fn try_from(value: &String) -> Result<Self, &'static str> {
         value.parse()
     }
 }
-impl std::convert::TryFrom<String> for Type {
+impl std::convert::TryFrom<String> for SpectatorsMsgType {
     type Error = &'static str;
     fn try_from(value: String) -> Result<Self, &'static str> {
         value.parse()
@@ -629,7 +1289,7 @@ pub struct UpdateMsg {
     pub reset: Option<bool>,
     pub score: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: UpdateMsgType,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub used: Vec<bool>,
 }
@@ -643,13 +1303,57 @@ impl UpdateMsg {
         builder::UpdateMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum UpdateMsgType {
+    #[serde(rename = "update")]
+    Update,
+}
+impl From<&UpdateMsgType> for UpdateMsgType {
+    fn from(value: &UpdateMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for UpdateMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Update => "update".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for UpdateMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "update" => Ok(Self::Update),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for UpdateMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for UpdateMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for UpdateMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct UpdateNameMsg {
     pub id: i64,
     pub name: String,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: UpdateNameMsgType,
 }
 impl From<&UpdateNameMsg> for UpdateNameMsg {
     fn from(value: &UpdateNameMsg) -> Self {
@@ -661,6 +1365,50 @@ impl UpdateNameMsg {
         builder::UpdateNameMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum UpdateNameMsgType {
+    #[serde(rename = "update_name")]
+    UpdateName,
+}
+impl From<&UpdateNameMsgType> for UpdateNameMsgType {
+    fn from(value: &UpdateNameMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for UpdateNameMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::UpdateName => "update_name".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for UpdateNameMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "update_name" => Ok(Self::UpdateName),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for UpdateNameMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for UpdateNameMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for UpdateNameMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct UpdateTurnMsg {
@@ -668,7 +1416,7 @@ pub struct UpdateTurnMsg {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub skip: Option<bool>,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: UpdateTurnMsgType,
 }
 impl From<&UpdateTurnMsg> for UpdateTurnMsg {
     fn from(value: &UpdateTurnMsg) -> Self {
@@ -678,6 +1426,50 @@ impl From<&UpdateTurnMsg> for UpdateTurnMsg {
 impl UpdateTurnMsg {
     pub fn builder() -> builder::UpdateTurnMsg {
         builder::UpdateTurnMsg::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum UpdateTurnMsgType {
+    #[serde(rename = "update_turn")]
+    UpdateTurn,
+}
+impl From<&UpdateTurnMsgType> for UpdateTurnMsgType {
+    fn from(value: &UpdateTurnMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for UpdateTurnMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::UpdateTurn => "update_turn".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for UpdateTurnMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "update_turn" => Ok(Self::UpdateTurn),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for UpdateTurnMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for UpdateTurnMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for UpdateTurnMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -723,7 +1515,7 @@ pub struct WelcomeMsg {
     pub spectators: i64,
     pub turn_index: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: WelcomeMsgType,
     pub used: Vec<bool>,
     pub victory: bool,
 }
@@ -737,12 +1529,56 @@ impl WelcomeMsg {
         builder::WelcomeMsg::default()
     }
 }
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum WelcomeMsgType {
+    #[serde(rename = "welcome")]
+    Welcome,
+}
+impl From<&WelcomeMsgType> for WelcomeMsgType {
+    fn from(value: &WelcomeMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for WelcomeMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Welcome => "welcome".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for WelcomeMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "welcome" => Ok(Self::Welcome),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for WelcomeMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for WelcomeMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for WelcomeMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct WinMsg {
     pub id: i64,
     #[serde(rename = "type")]
-    pub type_: Type,
+    pub type_: WinMsgType,
 }
 impl From<&WinMsg> for WinMsg {
     fn from(value: &WinMsg) -> Self {
@@ -752,6 +1588,50 @@ impl From<&WinMsg> for WinMsg {
 impl WinMsg {
     pub fn builder() -> builder::WinMsg {
         builder::WinMsg::default()
+    }
+}
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum WinMsgType {
+    #[serde(rename = "win")]
+    Win,
+}
+impl From<&WinMsgType> for WinMsgType {
+    fn from(value: &WinMsgType) -> Self {
+        value.clone()
+    }
+}
+impl ToString for WinMsgType {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::Win => "win".to_string(),
+        }
+    }
+}
+impl std::str::FromStr for WinMsgType {
+    type Err = &'static str;
+    fn from_str(value: &str) -> Result<Self, &'static str> {
+        match value {
+            "win" => Ok(Self::Win),
+            _ => Err("invalid value"),
+        }
+    }
+}
+impl std::convert::TryFrom<&str> for WinMsgType {
+    type Error = &'static str;
+    fn try_from(value: &str) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<&String> for WinMsgType {
+    type Error = &'static str;
+    fn try_from(value: &String) -> Result<Self, &'static str> {
+        value.parse()
+    }
+}
+impl std::convert::TryFrom<String> for WinMsgType {
+    type Error = &'static str;
+    fn try_from(value: String) -> Result<Self, &'static str> {
+        value.parse()
     }
 }
 pub mod builder {
@@ -947,7 +1827,7 @@ pub mod builder {
     pub struct AchievementProgress {
         achievement_id: Result<String, String>,
         progress: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::AchievementProgressType, String>,
         user_id: Result<super::UserId, String>,
         user_index: Result<i64, String>,
     }
@@ -985,7 +1865,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::AchievementProgressType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -1044,7 +1924,7 @@ pub mod builder {
         image_url: Result<Option<String>, String>,
         max_progress: Result<i64, String>,
         name: Result<String, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::AchievementUnlockType, String>,
         user_id: Result<String, String>,
         user_index: Result<i64, String>,
     }
@@ -1115,7 +1995,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::AchievementUnlockType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -1302,7 +2182,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct ChatMsg {
         msg: Result<String, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::ChatMsgType, String>,
     }
     impl Default for ChatMsg {
         fn default() -> Self {
@@ -1325,7 +2205,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::ChatMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -1406,7 +2286,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct DisconnectMsg {
         id: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::DisconnectMsgType, String>,
     }
     impl Default for DisconnectMsg {
         fn default() -> Self {
@@ -1429,7 +2309,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::DisconnectMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -1458,7 +2338,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct GameError {
         error: Result<String, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::GameErrorType, String>,
     }
     impl Default for GameError {
         fn default() -> Self {
@@ -1481,7 +2361,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::GameErrorType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -1516,7 +2396,7 @@ pub mod builder {
         rolls: Result<Vec<i64>, String>,
         spectators: Result<i64, String>,
         turn_index: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::GameStateType, String>,
         used: Result<Vec<bool>, String>,
         victory: Result<bool, String>,
     }
@@ -1609,7 +2489,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::GameStateType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -1825,7 +2705,7 @@ pub mod builder {
     pub struct JoinMsg {
         id: Result<i64, String>,
         name: Result<Option<String>, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::JoinMsgType, String>,
         user_id: Result<Option<String>, String>,
     }
     impl Default for JoinMsg {
@@ -1861,7 +2741,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::JoinMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -1904,7 +2784,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct KickMsg {
         id: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::KickMsgType, String>,
     }
     impl Default for KickMsg {
         fn default() -> Self {
@@ -1927,7 +2807,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::KickMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2079,7 +2959,7 @@ pub mod builder {
     pub struct ReconnectMsg {
         id: Result<i64, String>,
         name: Result<Option<String>, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::ReconnectMsgType, String>,
         user_id: Result<Option<String>, String>,
     }
     impl Default for ReconnectMsg {
@@ -2115,7 +2995,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::ReconnectMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2158,7 +3038,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct Redirect {
         room: Result<String, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::RedirectType, String>,
     }
     impl Default for Redirect {
         fn default() -> Self {
@@ -2181,7 +3061,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::RedirectType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2209,7 +3089,7 @@ pub mod builder {
     }
     #[derive(Clone, Debug)]
     pub struct RefetchPlayerMsg {
-        type_: Result<super::Type, String>,
+        type_: Result<super::RefetchPlayerMsgType, String>,
         user_id: Result<String, String>,
     }
     impl Default for RefetchPlayerMsg {
@@ -2223,7 +3103,7 @@ pub mod builder {
     impl RefetchPlayerMsg {
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::RefetchPlayerMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2356,7 +3236,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct RestartMsg {
         id: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::RestartMsgType, String>,
     }
     impl Default for RestartMsg {
         fn default() -> Self {
@@ -2379,7 +3259,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::RestartMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2407,7 +3287,7 @@ pub mod builder {
     }
     #[derive(Clone, Debug)]
     pub struct RollAgainMsg {
-        type_: Result<super::Type, String>,
+        type_: Result<super::RollAgainMsgType, String>,
     }
     impl Default for RollAgainMsg {
         fn default() -> Self {
@@ -2419,7 +3299,7 @@ pub mod builder {
     impl RollAgainMsg {
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::RollAgainMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2446,7 +3326,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct RollMsg {
         rolls: Result<Vec<i64>, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::RollMsgType, String>,
     }
     impl Default for RollMsg {
         fn default() -> Self {
@@ -2469,7 +3349,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::RollMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2578,7 +3458,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct RoomListMsg {
         rooms: Result<Vec<super::Room>, String>,
-        type_: Result<Option<super::Type>, String>,
+        type_: Result<Option<super::RoomListMsgType>, String>,
     }
     impl Default for RoomListMsg {
         fn default() -> Self {
@@ -2601,7 +3481,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<Option<super::Type>>,
+            T: std::convert::TryInto<Option<super::RoomListMsgType>>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2808,7 +3688,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct SpectatorsMsg {
         count: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::SpectatorsMsgType, String>,
     }
     impl Default for SpectatorsMsg {
         fn default() -> Self {
@@ -2831,7 +3711,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::SpectatorsMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2862,7 +3742,7 @@ pub mod builder {
         id: Result<i64, String>,
         reset: Result<Option<bool>, String>,
         score: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::UpdateMsgType, String>,
         used: Result<Vec<bool>, String>,
     }
     impl Default for UpdateMsg {
@@ -2909,7 +3789,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::UpdateMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -2955,7 +3835,7 @@ pub mod builder {
     pub struct UpdateNameMsg {
         id: Result<i64, String>,
         name: Result<String, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::UpdateNameMsgType, String>,
     }
     impl Default for UpdateNameMsg {
         fn default() -> Self {
@@ -2989,7 +3869,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::UpdateNameMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -3021,7 +3901,7 @@ pub mod builder {
     pub struct UpdateTurnMsg {
         id: Result<i64, String>,
         skip: Result<Option<bool>, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::UpdateTurnMsgType, String>,
     }
     impl Default for UpdateTurnMsg {
         fn default() -> Self {
@@ -3055,7 +3935,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::UpdateTurnMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -3173,7 +4053,7 @@ pub mod builder {
         rolls: Result<Vec<i64>, String>,
         spectators: Result<i64, String>,
         turn_index: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::WelcomeMsgType, String>,
         used: Result<Vec<bool>, String>,
         victory: Result<bool, String>,
     }
@@ -3277,7 +4157,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::WelcomeMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
@@ -3344,7 +4224,7 @@ pub mod builder {
     #[derive(Clone, Debug)]
     pub struct WinMsg {
         id: Result<i64, String>,
-        type_: Result<super::Type, String>,
+        type_: Result<super::WinMsgType, String>,
     }
     impl Default for WinMsg {
         fn default() -> Self {
@@ -3367,7 +4247,7 @@ pub mod builder {
         }
         pub fn type_<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<super::Type>,
+            T: std::convert::TryInto<super::WinMsgType>,
             T::Error: std::fmt::Display,
         {
             self.type_ = value
