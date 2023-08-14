@@ -4,14 +4,10 @@
 #include <optional>
 
 namespace API {
-    enum class DiceType : int;
-}
 
-namespace API {
-
-    struct Dice {
+    struct AuthDonateResponse {
 std::string toString() const;
 void fromString(const std::string &str);
-        DiceType type = static_cast<DiceType>(0);
+        std::string link;
     };
 }

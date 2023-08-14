@@ -1,3 +1,27 @@
+export interface AuthRefreshTokenResponse {
+    access_token: string;
+}
+
+export interface AuthDonateResponse {
+    link: string;
+}
+
+export interface AuthSettingsRequest {
+    color?:     Color;
+    setting:    Setting;
+    dice_type?: DiceType;
+    text?:      string;
+}
+
+export interface Color {
+    hue?: number;
+    sat?: number;
+}
+
+export type DiceType = "D6" | "D20";
+
+export type Setting = "Color" | "DiceType" | "Pubkey";
+
 export interface AchievementProgress {
     achievement_id: string;
     progress:       number;
@@ -36,25 +60,11 @@ export interface ReportStats {
     wins:    number;
 }
 
-export interface AchievementData {
-    description:  string;
-    id:           string;
-    image_url:    null | string;
-    max_progress: number;
-    name:         string;
-}
-
-export interface UserData {
-    achievements?: Achievement[] | null;
-    color:         Color;
-    createdDate:   string;
-    dice:          Dice;
-    donor:         boolean;
-    id:            string;
-    image_url?:    null | string;
-    pubkey_text?:  null | string;
-    stats?:        UserStats | null;
-    username:      string;
+export interface UserStats {
+    doubles: number;
+    games:   number;
+    rolls:   number;
+    wins:    number;
 }
 
 export interface Achievement {
@@ -65,22 +75,12 @@ export interface Achievement {
     unlocked: string;
 }
 
-export interface Color {
-    hue: number;
-    sat: number;
-}
-
-export interface Dice {
-    type: DiceType;
-}
-
-export type DiceType = "D6" | "D20";
-
-export interface UserStats {
-    doubles: number;
-    games:   number;
-    rolls:   number;
-    wins:    number;
+export interface AchievementData {
+    description:  string;
+    id:           string;
+    image_url:    null | string;
+    max_progress: number;
+    name:         string;
 }
 
 export interface DieRoll {
@@ -101,27 +101,6 @@ export interface Redirect {
 }
 
 export type RedirectType = "redirect";
-
-export interface RefetchPlayerMsg {
-    type:    RefetchPlayerMsgType;
-    user_id: string;
-}
-
-export type RefetchPlayerMsgType = "refetch_player";
-
-export interface RoomListMsg {
-    rooms: Room[];
-    type?: RoomListMsgType;
-}
-
-export interface Room {
-    code:         string;
-    host_name:    string;
-    last_updated: string;
-    player_count: number;
-}
-
-export type RoomListMsgType = "room_list";
 
 export interface IGameState {
     chatLog:        string[];
@@ -173,6 +152,27 @@ export interface ServerPlayer {
 }
 
 export type GameStateType = "game_state";
+
+export interface RoomListMsg {
+    rooms: Room[];
+    type?: RoomListMsgType;
+}
+
+export interface Room {
+    code:         string;
+    host_name:    string;
+    last_updated: string;
+    player_count: number;
+}
+
+export type RoomListMsgType = "room_list";
+
+export interface RefetchPlayerMsg {
+    type:    RefetchPlayerMsgType;
+    user_id: string;
+}
+
+export type RefetchPlayerMsgType = "refetch_player";
 
 export interface WelcomeMsg {
     chatLog:        string[];

@@ -22,15 +22,13 @@ rm ssh-gateway/api/generated.go
   --src-lang schema "./schema.json#/definitions/"
 
 ./node_modules/.bin/quicktype \
-  -o auth/src/generated.rs \
-  --lang rust \
-  --src-lang schema "./schema.json#/definitions/"
-
-./node_modules/.bin/quicktype \
   -o client/src/types/api.ts \
   --src-lang schema "./schema.json#/definitions/" \
   --just-types \
   --prefer-unions
+
+# quicktype is not very good at rust :(
+cargo typify schema.json --output auth/src/generated.rs
 
 # avert your eyes, this next part is a crime
 
