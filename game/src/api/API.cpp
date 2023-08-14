@@ -46,14 +46,14 @@ namespace API {
     void from_json(const json & j, Redirect & x);
     void to_json(json & j, const Redirect & x);
 
-    void from_json(const json & j, RefetchPlayer & x);
-    void to_json(json & j, const RefetchPlayer & x);
+    void from_json(const json & j, RefetchPlayerMsg & x);
+    void to_json(json & j, const RefetchPlayerMsg & x);
 
     void from_json(const json & j, Room & x);
     void to_json(json & j, const Room & x);
 
-    void from_json(const json & j, RoomList & x);
-    void to_json(json & j, const RoomList & x);
+    void from_json(const json & j, RoomListMsg & x);
+    void to_json(json & j, const RoomListMsg & x);
 
     void from_json(const json & j, Player & x);
     void to_json(json & j, const Player & x);
@@ -127,8 +127,11 @@ namespace API {
     void from_json(const json & j, RedirectType & x);
     void to_json(json & j, const RedirectType & x);
 
-    void from_json(const json & j, RefetchPlayerType & x);
-    void to_json(json & j, const RefetchPlayerType & x);
+    void from_json(const json & j, RefetchPlayerMsgType & x);
+    void to_json(json & j, const RefetchPlayerMsgType & x);
+
+    void from_json(const json & j, RoomListMsgType & x);
+    void to_json(json & j, const RoomListMsgType & x);
 
     void from_json(const json & j, GameStateType & x);
     void to_json(json & j, const GameStateType & x);
@@ -372,12 +375,12 @@ namespace API {
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, RefetchPlayer& x) {
-        x.type = j.at("type").get<RefetchPlayerType>();
+    inline void from_json(const json & j, RefetchPlayerMsg& x) {
+        x.type = j.at("type").get<RefetchPlayerMsgType>();
         x.user_id = j.at("user_id").get<std::string>();
     }
 
-    inline void to_json(json & j, const RefetchPlayer & x) {
+    inline void to_json(json & j, const RefetchPlayerMsg & x) {
         j = json::object();
         j["type"] = x.type;
         j["user_id"] = x.user_id;
@@ -398,13 +401,15 @@ namespace API {
         j["player_count"] = x.player_count;
     }
 
-    inline void from_json(const json & j, RoomList& x) {
+    inline void from_json(const json & j, RoomListMsg& x) {
         x.rooms = j.at("rooms").get<std::vector<Room>>();
+        x.type = get_stack_optional<RoomListMsgType>(j, "type");
     }
 
-    inline void to_json(json & j, const RoomList & x) {
+    inline void to_json(json & j, const RoomListMsg & x) {
         j = json::object();
         j["rooms"] = x.rooms;
+        j["type"] = x.type;
     }
 
     inline void from_json(const json & j, Player& x) {
@@ -773,14 +778,26 @@ namespace API {
         }
     }
 
-    inline void from_json(const json & j, RefetchPlayerType & x) {
-        if (j == "refetch_player") x = RefetchPlayerType::REFETCH_PLAYER;
+    inline void from_json(const json & j, RefetchPlayerMsgType & x) {
+        if (j == "refetch_player") x = RefetchPlayerMsgType::REFETCH_PLAYER;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const RefetchPlayerType & x) {
+    inline void to_json(json & j, const RefetchPlayerMsgType & x) {
         switch (x) {
-            case RefetchPlayerType::REFETCH_PLAYER: j = "refetch_player"; break;
+            case RefetchPlayerMsgType::REFETCH_PLAYER: j = "refetch_player"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
+    inline void from_json(const json & j, RoomListMsgType & x) {
+        if (j == "room_list") x = RoomListMsgType::ROOM_LIST;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const RoomListMsgType & x) {
+        switch (x) {
+            case RoomListMsgType::ROOM_LIST: j = "room_list"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
@@ -1119,12 +1136,12 @@ void Redirect::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
-std::string RefetchPlayer::toString() const {
+std::string RefetchPlayerMsg::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
-void RefetchPlayer::fromString(const std::string &s) {
+void RefetchPlayerMsg::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -1173,12 +1190,12 @@ void Room::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
-std::string RoomList::toString() const {
+std::string RoomListMsg::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
-void RoomList::fromString(const std::string &s) {
+void RoomListMsg::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

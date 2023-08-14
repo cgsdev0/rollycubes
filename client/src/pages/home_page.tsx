@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { keyframes, css, styled } from 'stitches.config';
 import { ReduxState } from 'store';
-import { Room, RoomList } from 'types/api';
+import { Room, RoomListMsg } from 'types/api';
 import { Button } from '../ui/buttons/button';
 import OnboardPage from './onboard_page';
 import itsBoatsLogo from '/itsboats.png';
@@ -122,7 +122,7 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  const updateGameList = (data: RoomList) => {
+  const updateGameList = (data: RoomListMsg) => {
     const games = data.rooms
       .filter((game: Room) => game.player_count)
       .sort((a: Room, b: Room) => {

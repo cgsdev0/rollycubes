@@ -206,23 +206,33 @@ pub enum RedirectType {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct RefetchPlayer {
+pub struct RefetchPlayerMsg {
     #[serde(rename = "type")]
-    refetch_player_type: RefetchPlayerType,
+    refetch_player_msg_type: RefetchPlayerMsgType,
 
     user_id: String,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum RefetchPlayerType {
+pub enum RefetchPlayerMsgType {
     #[serde(rename = "refetch_player")]
     RefetchPlayer,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct RoomList {
+pub struct RoomListMsg {
     rooms: Vec<Room>,
+
+    #[serde(rename = "type")]
+    room_list_msg_type: Option<RoomListMsgType>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RoomListMsgType {
+    #[serde(rename = "room_list")]
+    RoomList,
 }
 
 #[derive(Serialize, Deserialize)]

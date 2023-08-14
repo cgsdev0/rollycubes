@@ -20,7 +20,7 @@ class GameCoordinator {
     std::queue<std::pair<std::chrono::system_clock::time_point, std::string>>
         eviction_queue;
 
-    API::RoomList list_rooms();
+    API::RoomListMsg list_rooms();
     void load_persistence();
     void runEviction(bool limited = true);
     void save_to_disk();
