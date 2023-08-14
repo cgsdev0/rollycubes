@@ -1,9 +1,6 @@
 // This file was generated from JSON Schema using quicktype, do not modify it directly.
 // To parse and unparse this JSON data, add this code to your project and do:
 //
-//    integer, err := UnmarshalInteger(bytes)
-//    bytes, err = integer.Marshal()
-//
 //    player, err := UnmarshalPlayer(bytes)
 //    bytes, err = player.Marshal()
 //
@@ -106,18 +103,6 @@
 package main
 
 import "encoding/json"
-
-type Integer float64
-
-func UnmarshalInteger(data []byte) (Integer, error) {
-	var r Integer
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *Integer) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
 
 func UnmarshalPlayer(data []byte) (Player, error) {
 	var r Player
