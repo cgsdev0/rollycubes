@@ -116,7 +116,7 @@ func (m LobbyScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			defer resp.Body.Close()
 			body, err := io.ReadAll(resp.Body)
-			roomList, err := api.UnmarshalRoomList(body)
+			roomList, err := api.UnmarshalRoomListMsg(body)
 			if err != nil {
 				log.Println(err)
 				return m, nil
@@ -719,7 +719,7 @@ type model struct {
 	Width  int
 	Height int
 
-	roomList api.RoomList
+	roomList api.RoomListMsg
 	err      error
 
 	scene tea.Model

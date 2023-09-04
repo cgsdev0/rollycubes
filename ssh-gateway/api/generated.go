@@ -115,7 +115,7 @@
 //    updateMsg, err := UnmarshalUpdateMsg(bytes)
 //    bytes, err = updateMsg.Marshal()
 
-package main
+package api
 
 import "encoding/json"
 
