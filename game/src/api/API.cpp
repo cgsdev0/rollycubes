@@ -1044,21 +1044,21 @@ namespace API {
     }
 }
 namespace API {
-std::string AchievementData::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void AchievementData::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string Achievement::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void Achievement::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AchievementData::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AchievementData::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

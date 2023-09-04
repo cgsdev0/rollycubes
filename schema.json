@@ -43,7 +43,8 @@
           "$ref": "#/definitions/Color"
         },
         "createdDate": {
-          "type": "string"
+          "type": "string",
+          "format": "date"
         },
         "dice": {
           "$ref": "#/definitions/Dice"
@@ -466,7 +467,8 @@
           "type": "string"
         },
         "last_updated": {
-          "type": "string"
+          "type": "string",
+          "format": "date"
         },
         "player_count": {
           "type": "integer"

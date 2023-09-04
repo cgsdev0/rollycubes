@@ -4,16 +4,18 @@ extern crate lazy_static;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use bb8_postgres::PostgresConnectionManager;
+use chrono::Duration;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use thiserror::Error;
-use time::{Duration, OffsetDateTime};
 use tokio_postgres::NoTls;
 use twitch_api::helix::ClientRequestError;
 use twitch_oauth2::tokens::errors::ValidationError;
 use uuid::Uuid;
 
+pub mod generated;
 pub mod migrations;
+
 pub mod routes {
     pub mod server_routes;
     pub mod user_routes;
@@ -100,10 +102,10 @@ pub struct Claims {
 
 impl Claims {
     pub fn new(user_id: Uuid, display_name: &str) -> Claims {
-        let exp = OffsetDateTime::now_utc()
-            .checked_add(Duration::hours(2))
+        let exp = chrono::offset::Utc::now()
+            .checked_add_signed(Duration::hours(2))
             .unwrap()
-            .unix_timestamp();
+            .timestamp();
         Claims {
             exp,
             user_id,
