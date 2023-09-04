@@ -8,7 +8,14 @@ namespace API {
 }
 
 namespace API {
+    /**
+     * TODO: add descriptions to these things
+     */
 
+
+    /**
+     * TODO: add descriptions to these things
+     */
     struct UpdateMsg {
 std::string toString() const;
 void fromString(const std::string &str);

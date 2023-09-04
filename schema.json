@@ -1,5 +1,82 @@
 {
   "definitions": {
+    "Dice": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/DiceType"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["type"]
+    },
+    "Color": {
+      "type": "object",
+      "properties": {
+        "hue": {
+          "type": "number"
+        },
+        "sat": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["hue", "sat"]
+    },
+    "UserData": {
+      "type": "object",
+      "properties": {
+        "achievements": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Achievement"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "$ref": "#/definitions/Color"
+        },
+        "createdDate": {
+          "type": "string"
+        },
+        "dice": {
+          "$ref": "#/definitions/Dice"
+        },
+        "donor": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": ["null", "string"]
+        },
+        "pubkey_text": {
+          "type": ["null", "string"]
+        },
+        "stats": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/UserStats"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["color", "createdDate", "dice", "donor", "id", "username"]
+    },
     "AuthRefreshTokenResponse": {
       "type": "object",
       "additionalProperties": false,
@@ -31,16 +108,7 @@
               "enum": ["Color"]
             },
             "color": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "hue": {
-                  "type": "number"
-                },
-                "sat": {
-                  "type": "number"
-                }
-              }
+              "$ref": "#/definitions/Color"
             }
           },
           "required": ["setting", "color"]
@@ -807,6 +875,7 @@
       "required": ["id", "name", "type"]
     },
     "UpdateMsg": {
+      "description": "TODO: add descriptions to these things",
       "type": "object",
       "properties": {
         "type": {

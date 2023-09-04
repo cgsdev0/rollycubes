@@ -1,6 +1,15 @@
 // This file was generated from JSON Schema using quicktype, do not modify it directly.
 // To parse and unparse this JSON data, add this code to your project and do:
 //
+//    dice, err := UnmarshalDice(bytes)
+//    bytes, err = dice.Marshal()
+//
+//    color, err := UnmarshalColor(bytes)
+//    bytes, err = color.Marshal()
+//
+//    userData, err := UnmarshalUserData(bytes)
+//    bytes, err = userData.Marshal()
+//
 //    authRefreshTokenResponse, err := UnmarshalAuthRefreshTokenResponse(bytes)
 //    bytes, err = authRefreshTokenResponse.Marshal()
 //
@@ -109,6 +118,36 @@
 package main
 
 import "encoding/json"
+
+func UnmarshalDice(data []byte) (Dice, error) {
+	var r Dice
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *Dice) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func UnmarshalColor(data []byte) (Color, error) {
+	var r Color
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *Color) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func UnmarshalUserData(data []byte) (UserData, error) {
+	var r UserData
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *UserData) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
 
 func UnmarshalAuthRefreshTokenResponse(data []byte) (AuthRefreshTokenResponse, error) {
 	var r AuthRefreshTokenResponse
@@ -460,6 +499,43 @@ func (r *UpdateMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
+type UserData struct {
+	Achievements []Achievement `json:"achievements"`
+	Color        Color         `json:"color"`
+	CreatedDate  string        `json:"createdDate"`
+	Dice         Dice          `json:"dice"`
+	Donor        bool          `json:"donor"`
+	ID           string        `json:"id"`
+	ImageURL     *string       `json:"image_url"`
+	PubkeyText   *string       `json:"pubkey_text"`
+	Stats        *UserStats    `json:"stats"`
+	Username     string        `json:"username"`
+}
+
+type Achievement struct {
+	ID       string `json:"id"`
+	Progress int64  `json:"progress"`
+	RD       *int64 `json:"rd"`
+	Rn       *int64 `json:"rn"`
+	Unlocked string `json:"unlocked"`
+}
+
+type Color struct {
+	Hue float64 `json:"hue"`
+	Sat float64 `json:"sat"`
+}
+
+type Dice struct {
+	Type DiceType `json:"type"`
+}
+
+type UserStats struct {
+	Doubles int64 `json:"doubles"`
+	Games   int64 `json:"games"`
+	Rolls   int64 `json:"rolls"`
+	WINS    int64 `json:"wins"`
+}
+
 type AuthRefreshTokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
@@ -469,15 +545,10 @@ type AuthDonateResponse struct {
 }
 
 type AuthSettingsRequest struct {
-	Color    *ColorClass `json:"color,omitempty"`
-	Setting  Setting     `json:"setting"`
-	DiceType *DiceType   `json:"dice_type,omitempty"`
-	Text     *string     `json:"text,omitempty"`
-}
-
-type ColorClass struct {
-	Hue *float64 `json:"hue,omitempty"`
-	Sat *float64 `json:"sat,omitempty"`
+	Color    *Color    `json:"color,omitempty"`
+	Setting  Setting   `json:"setting"`
+	DiceType *DiceType `json:"dice_type,omitempty"`
+	Text     *string   `json:"text,omitempty"`
 }
 
 type AchievementProgress struct {
@@ -510,21 +581,6 @@ type ReportStats struct {
 	Rolls   int64  `json:"rolls"`
 	UserID  UserID `json:"user_id"`
 	WINS    int64  `json:"wins"`
-}
-
-type UserStats struct {
-	Doubles int64 `json:"doubles"`
-	Games   int64 `json:"games"`
-	Rolls   int64 `json:"rolls"`
-	WINS    int64 `json:"wins"`
-}
-
-type Achievement struct {
-	ID       string `json:"id"`
-	Progress int64  `json:"progress"`
-	RD       *int64 `json:"rd"`
-	Rn       *int64 `json:"rn"`
-	Unlocked string `json:"unlocked"`
 }
 
 type AchievementData struct {
@@ -695,6 +751,7 @@ type UpdateNameMsg struct {
 	Type UpdateNameMsgType `json:"type"`
 }
 
+// TODO: add descriptions to these things
 type UpdateMsg struct {
 	ID    int64         `json:"id"`
 	Reset *bool         `json:"reset,omitempty"`
@@ -713,8 +770,8 @@ const (
 type Setting string
 
 const (
-	Color           Setting = "Color"
 	Pubkey          Setting = "Pubkey"
+	SettingColor    Setting = "Color"
 	SettingDiceType Setting = "DiceType"
 )
 

@@ -7,14 +7,26 @@
 
 
 namespace API {
+    void from_json(const json & j, Achievement & x);
+    void to_json(json & j, const Achievement & x);
+
+    void from_json(const json & j, Color & x);
+    void to_json(json & j, const Color & x);
+
+    void from_json(const json & j, Dice & x);
+    void to_json(json & j, const Dice & x);
+
+    void from_json(const json & j, UserStats & x);
+    void to_json(json & j, const UserStats & x);
+
+    void from_json(const json & j, UserData & x);
+    void to_json(json & j, const UserData & x);
+
     void from_json(const json & j, AuthRefreshTokenResponse & x);
     void to_json(json & j, const AuthRefreshTokenResponse & x);
 
     void from_json(const json & j, AuthDonateResponse & x);
     void to_json(json & j, const AuthDonateResponse & x);
-
-    void from_json(const json & j, Color & x);
-    void to_json(json & j, const Color & x);
 
     void from_json(const json & j, AuthSettingsRequest & x);
     void to_json(json & j, const AuthSettingsRequest & x);
@@ -30,12 +42,6 @@ namespace API {
 
     void from_json(const json & j, ReportStats & x);
     void to_json(json & j, const ReportStats & x);
-
-    void from_json(const json & j, UserStats & x);
-    void to_json(json & j, const UserStats & x);
-
-    void from_json(const json & j, Achievement & x);
-    void to_json(json & j, const Achievement & x);
 
     void from_json(const json & j, AchievementData & x);
     void to_json(json & j, const AchievementData & x);
@@ -184,6 +190,85 @@ namespace API {
     void from_json(const json & j, UpdateMsgType & x);
     void to_json(json & j, const UpdateMsgType & x);
 
+    inline void from_json(const json & j, Achievement& x) {
+        x.id = j.at("id").get<std::string>();
+        x.progress = j.at("progress").get<int64_t>();
+        x.rd = get_stack_optional<int64_t>(j, "rd");
+        x.rn = get_stack_optional<int64_t>(j, "rn");
+        x.unlocked = j.at("unlocked").get<std::string>();
+    }
+
+    inline void to_json(json & j, const Achievement & x) {
+        j = json::object();
+        j["id"] = x.id;
+        j["progress"] = x.progress;
+        j["rd"] = x.rd;
+        j["rn"] = x.rn;
+        j["unlocked"] = x.unlocked;
+    }
+
+    inline void from_json(const json & j, Color& x) {
+        x.hue = j.at("hue").get<double>();
+        x.sat = j.at("sat").get<double>();
+    }
+
+    inline void to_json(json & j, const Color & x) {
+        j = json::object();
+        j["hue"] = x.hue;
+        j["sat"] = x.sat;
+    }
+
+    inline void from_json(const json & j, Dice& x) {
+        x.type = j.at("type").get<DiceType>();
+    }
+
+    inline void to_json(json & j, const Dice & x) {
+        j = json::object();
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, UserStats& x) {
+        x.doubles = j.at("doubles").get<int64_t>();
+        x.games = j.at("games").get<int64_t>();
+        x.rolls = j.at("rolls").get<int64_t>();
+        x.wins = j.at("wins").get<int64_t>();
+    }
+
+    inline void to_json(json & j, const UserStats & x) {
+        j = json::object();
+        j["doubles"] = x.doubles;
+        j["games"] = x.games;
+        j["rolls"] = x.rolls;
+        j["wins"] = x.wins;
+    }
+
+    inline void from_json(const json & j, UserData& x) {
+        x.achievements = get_stack_optional<std::vector<Achievement>>(j, "achievements");
+        x.color = j.at("color").get<Color>();
+        x.created_date = j.at("createdDate").get<std::string>();
+        x.dice = j.at("dice").get<Dice>();
+        x.donor = j.at("donor").get<bool>();
+        x.id = j.at("id").get<std::string>();
+        x.image_url = get_stack_optional<std::string>(j, "image_url");
+        x.pubkey_text = get_stack_optional<std::string>(j, "pubkey_text");
+        x.stats = get_stack_optional<UserStats>(j, "stats");
+        x.username = j.at("username").get<std::string>();
+    }
+
+    inline void to_json(json & j, const UserData & x) {
+        j = json::object();
+        j["achievements"] = x.achievements;
+        j["color"] = x.color;
+        j["createdDate"] = x.created_date;
+        j["dice"] = x.dice;
+        j["donor"] = x.donor;
+        j["id"] = x.id;
+        j["image_url"] = x.image_url;
+        j["pubkey_text"] = x.pubkey_text;
+        j["stats"] = x.stats;
+        j["username"] = x.username;
+    }
+
     inline void from_json(const json & j, AuthRefreshTokenResponse& x) {
         x.access_token = j.at("access_token").get<std::string>();
     }
@@ -200,17 +285,6 @@ namespace API {
     inline void to_json(json & j, const AuthDonateResponse & x) {
         j = json::object();
         j["link"] = x.link;
-    }
-
-    inline void from_json(const json & j, Color& x) {
-        x.hue = get_stack_optional<double>(j, "hue");
-        x.sat = get_stack_optional<double>(j, "sat");
-    }
-
-    inline void to_json(json & j, const Color & x) {
-        j = json::object();
-        j["hue"] = x.hue;
-        j["sat"] = x.sat;
     }
 
     inline void from_json(const json & j, AuthSettingsRequest& x) {
@@ -294,38 +368,6 @@ namespace API {
         j["rolls"] = x.rolls;
         j["user_id"] = x.user_id;
         j["wins"] = x.wins;
-    }
-
-    inline void from_json(const json & j, UserStats& x) {
-        x.doubles = j.at("doubles").get<int64_t>();
-        x.games = j.at("games").get<int64_t>();
-        x.rolls = j.at("rolls").get<int64_t>();
-        x.wins = j.at("wins").get<int64_t>();
-    }
-
-    inline void to_json(json & j, const UserStats & x) {
-        j = json::object();
-        j["doubles"] = x.doubles;
-        j["games"] = x.games;
-        j["rolls"] = x.rolls;
-        j["wins"] = x.wins;
-    }
-
-    inline void from_json(const json & j, Achievement& x) {
-        x.id = j.at("id").get<std::string>();
-        x.progress = j.at("progress").get<int64_t>();
-        x.rd = get_stack_optional<int64_t>(j, "rd");
-        x.rn = get_stack_optional<int64_t>(j, "rn");
-        x.unlocked = j.at("unlocked").get<std::string>();
-    }
-
-    inline void to_json(json & j, const Achievement & x) {
-        j = json::object();
-        j["id"] = x.id;
-        j["progress"] = x.progress;
-        j["rd"] = x.rd;
-        j["rn"] = x.rn;
-        j["unlocked"] = x.unlocked;
     }
 
     inline void from_json(const json & j, AchievementData& x) {
@@ -1083,6 +1125,15 @@ void Color::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
+std::string Dice::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Dice::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
 std::string DieRoll::toString() const {
 json j;
 to_json(j, *this);
@@ -1278,6 +1329,15 @@ to_json(j, *this);
 return j.dump();
 }
 void UpdateTurnMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string UserData::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void UserData::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
