@@ -83,3 +83,10 @@ sed -i '1s/^/#include <vector>\n/' API.hpp
 sed -i '1s/^/#include <memory>\n/' API.hpp
 
 popd &> /dev/null
+
+
+pushd client/src/types &> /dev/null
+sed -i '/^ \* This interface was referenced by /d' api.ts
+sed -i '/^ \* via the `definition` /d' api.ts
+# quick and easy sed loop mechanism
+sed -i ':a;N;$!ba;s/\/\*\*\n \*\///g' api.ts

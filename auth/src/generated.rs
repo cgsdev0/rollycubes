@@ -207,31 +207,13 @@ impl AuthRefreshTokenResponse {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(tag = "setting", deny_unknown_fields)]
 pub enum AuthSettingsRequest {
-    Color { color: AuthSettingsRequestColor },
+    Color { color: Color },
     DiceType { dice_type: DiceType },
     Pubkey { text: String },
 }
 impl From<&AuthSettingsRequest> for AuthSettingsRequest {
     fn from(value: &AuthSettingsRequest) -> Self {
         value.clone()
-    }
-}
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct AuthSettingsRequestColor {
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub hue: Option<f64>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub sat: Option<f64>,
-}
-impl From<&AuthSettingsRequestColor> for AuthSettingsRequestColor {
-    fn from(value: &AuthSettingsRequestColor) -> Self {
-        value.clone()
-    }
-}
-impl AuthSettingsRequestColor {
-    pub fn builder() -> builder::AuthSettingsRequestColor {
-        builder::AuthSettingsRequestColor::default()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -293,6 +275,38 @@ impl std::convert::TryFrom<String> for ChatMsgType {
     type Error = &'static str;
     fn try_from(value: String) -> Result<Self, &'static str> {
         value.parse()
+    }
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Color {
+    pub hue: f64,
+    pub sat: f64,
+}
+impl From<&Color> for Color {
+    fn from(value: &Color) -> Self {
+        value.clone()
+    }
+}
+impl Color {
+    pub fn builder() -> builder::Color {
+        builder::Color::default()
+    }
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Dice {
+    #[serde(rename = "type")]
+    pub type_: DiceType,
+}
+impl From<&Dice> for Dice {
+    fn from(value: &Dice) -> Self {
+        value.clone()
+    }
+}
+impl Dice {
+    pub fn builder() -> builder::Dice {
+        builder::Dice::default()
     }
 }
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
@@ -1281,6 +1295,7 @@ impl std::convert::TryFrom<String> for SpectatorsMsgType {
         value.parse()
     }
 }
+#[doc = "TODO: add descriptions to these things"]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct UpdateMsg {
@@ -1470,6 +1485,35 @@ impl std::convert::TryFrom<String> for UpdateTurnMsgType {
     type Error = &'static str;
     fn try_from(value: String) -> Result<Self, &'static str> {
         value.parse()
+    }
+}
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct UserData {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub achievements: Option<Vec<Achievement>>,
+    pub color: Color,
+    #[serde(rename = "createdDate")]
+    pub created_date: String,
+    pub dice: Dice,
+    pub donor: bool,
+    pub id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub image_url: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pubkey_text: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stats: Option<UserStats>,
+    pub username: String,
+}
+impl From<&UserData> for UserData {
+    fn from(value: &UserData) -> Self {
+        value.clone()
+    }
+}
+impl UserData {
+    pub fn builder() -> builder::UserData {
+        builder::UserData::default()
     }
 }
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -2128,58 +2172,6 @@ pub mod builder {
         }
     }
     #[derive(Clone, Debug)]
-    pub struct AuthSettingsRequestColor {
-        hue: Result<Option<f64>, String>,
-        sat: Result<Option<f64>, String>,
-    }
-    impl Default for AuthSettingsRequestColor {
-        fn default() -> Self {
-            Self {
-                hue: Ok(Default::default()),
-                sat: Ok(Default::default()),
-            }
-        }
-    }
-    impl AuthSettingsRequestColor {
-        pub fn hue<T>(mut self, value: T) -> Self
-        where
-            T: std::convert::TryInto<Option<f64>>,
-            T::Error: std::fmt::Display,
-        {
-            self.hue = value
-                .try_into()
-                .map_err(|e| format!("error converting supplied value for hue: {}", e));
-            self
-        }
-        pub fn sat<T>(mut self, value: T) -> Self
-        where
-            T: std::convert::TryInto<Option<f64>>,
-            T::Error: std::fmt::Display,
-        {
-            self.sat = value
-                .try_into()
-                .map_err(|e| format!("error converting supplied value for sat: {}", e));
-            self
-        }
-    }
-    impl std::convert::TryFrom<AuthSettingsRequestColor> for super::AuthSettingsRequestColor {
-        type Error = String;
-        fn try_from(value: AuthSettingsRequestColor) -> Result<Self, String> {
-            Ok(Self {
-                hue: value.hue?,
-                sat: value.sat?,
-            })
-        }
-    }
-    impl From<super::AuthSettingsRequestColor> for AuthSettingsRequestColor {
-        fn from(value: super::AuthSettingsRequestColor) -> Self {
-            Self {
-                hue: Ok(value.hue),
-                sat: Ok(value.sat),
-            }
-        }
-    }
-    #[derive(Clone, Debug)]
     pub struct ChatMsg {
         msg: Result<String, String>,
         type_: Result<super::ChatMsgType, String>,
@@ -2227,6 +2219,96 @@ pub mod builder {
         fn from(value: super::ChatMsg) -> Self {
             Self {
                 msg: Ok(value.msg),
+                type_: Ok(value.type_),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct Color {
+        hue: Result<f64, String>,
+        sat: Result<f64, String>,
+    }
+    impl Default for Color {
+        fn default() -> Self {
+            Self {
+                hue: Err("no value supplied for hue".to_string()),
+                sat: Err("no value supplied for sat".to_string()),
+            }
+        }
+    }
+    impl Color {
+        pub fn hue<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<f64>,
+            T::Error: std::fmt::Display,
+        {
+            self.hue = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for hue: {}", e));
+            self
+        }
+        pub fn sat<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<f64>,
+            T::Error: std::fmt::Display,
+        {
+            self.sat = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for sat: {}", e));
+            self
+        }
+    }
+    impl std::convert::TryFrom<Color> for super::Color {
+        type Error = String;
+        fn try_from(value: Color) -> Result<Self, String> {
+            Ok(Self {
+                hue: value.hue?,
+                sat: value.sat?,
+            })
+        }
+    }
+    impl From<super::Color> for Color {
+        fn from(value: super::Color) -> Self {
+            Self {
+                hue: Ok(value.hue),
+                sat: Ok(value.sat),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct Dice {
+        type_: Result<super::DiceType, String>,
+    }
+    impl Default for Dice {
+        fn default() -> Self {
+            Self {
+                type_: Err("no value supplied for type_".to_string()),
+            }
+        }
+    }
+    impl Dice {
+        pub fn type_<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<super::DiceType>,
+            T::Error: std::fmt::Display,
+        {
+            self.type_ = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for type_: {}", e));
+            self
+        }
+    }
+    impl std::convert::TryFrom<Dice> for super::Dice {
+        type Error = String;
+        fn try_from(value: Dice) -> Result<Self, String> {
+            Ok(Self {
+                type_: value.type_?,
+            })
+        }
+    }
+    impl From<super::Dice> for Dice {
+        fn from(value: super::Dice) -> Self {
+            Self {
                 type_: Ok(value.type_),
             }
         }
@@ -3960,6 +4042,170 @@ pub mod builder {
                 id: Ok(value.id),
                 skip: Ok(value.skip),
                 type_: Ok(value.type_),
+            }
+        }
+    }
+    #[derive(Clone, Debug)]
+    pub struct UserData {
+        achievements: Result<Option<Vec<super::Achievement>>, String>,
+        color: Result<super::Color, String>,
+        created_date: Result<String, String>,
+        dice: Result<super::Dice, String>,
+        donor: Result<bool, String>,
+        id: Result<String, String>,
+        image_url: Result<Option<String>, String>,
+        pubkey_text: Result<Option<String>, String>,
+        stats: Result<Option<super::UserStats>, String>,
+        username: Result<String, String>,
+    }
+    impl Default for UserData {
+        fn default() -> Self {
+            Self {
+                achievements: Ok(Default::default()),
+                color: Err("no value supplied for color".to_string()),
+                created_date: Err("no value supplied for created_date".to_string()),
+                dice: Err("no value supplied for dice".to_string()),
+                donor: Err("no value supplied for donor".to_string()),
+                id: Err("no value supplied for id".to_string()),
+                image_url: Ok(Default::default()),
+                pubkey_text: Ok(Default::default()),
+                stats: Ok(Default::default()),
+                username: Err("no value supplied for username".to_string()),
+            }
+        }
+    }
+    impl UserData {
+        pub fn achievements<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<Option<Vec<super::Achievement>>>,
+            T::Error: std::fmt::Display,
+        {
+            self.achievements = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for achievements: {}", e));
+            self
+        }
+        pub fn color<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<super::Color>,
+            T::Error: std::fmt::Display,
+        {
+            self.color = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for color: {}", e));
+            self
+        }
+        pub fn created_date<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<String>,
+            T::Error: std::fmt::Display,
+        {
+            self.created_date = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for created_date: {}", e));
+            self
+        }
+        pub fn dice<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<super::Dice>,
+            T::Error: std::fmt::Display,
+        {
+            self.dice = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for dice: {}", e));
+            self
+        }
+        pub fn donor<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<bool>,
+            T::Error: std::fmt::Display,
+        {
+            self.donor = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for donor: {}", e));
+            self
+        }
+        pub fn id<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<String>,
+            T::Error: std::fmt::Display,
+        {
+            self.id = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for id: {}", e));
+            self
+        }
+        pub fn image_url<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<Option<String>>,
+            T::Error: std::fmt::Display,
+        {
+            self.image_url = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for image_url: {}", e));
+            self
+        }
+        pub fn pubkey_text<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<Option<String>>,
+            T::Error: std::fmt::Display,
+        {
+            self.pubkey_text = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for pubkey_text: {}", e));
+            self
+        }
+        pub fn stats<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<Option<super::UserStats>>,
+            T::Error: std::fmt::Display,
+        {
+            self.stats = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for stats: {}", e));
+            self
+        }
+        pub fn username<T>(mut self, value: T) -> Self
+        where
+            T: std::convert::TryInto<String>,
+            T::Error: std::fmt::Display,
+        {
+            self.username = value
+                .try_into()
+                .map_err(|e| format!("error converting supplied value for username: {}", e));
+            self
+        }
+    }
+    impl std::convert::TryFrom<UserData> for super::UserData {
+        type Error = String;
+        fn try_from(value: UserData) -> Result<Self, String> {
+            Ok(Self {
+                achievements: value.achievements?,
+                color: value.color?,
+                created_date: value.created_date?,
+                dice: value.dice?,
+                donor: value.donor?,
+                id: value.id?,
+                image_url: value.image_url?,
+                pubkey_text: value.pubkey_text?,
+                stats: value.stats?,
+                username: value.username?,
+            })
+        }
+    }
+    impl From<super::UserData> for UserData {
+        fn from(value: super::UserData) -> Self {
+            Self {
+                achievements: Ok(value.achievements),
+                color: Ok(value.color),
+                created_date: Ok(value.created_date),
+                dice: Ok(value.dice),
+                donor: Ok(value.donor),
+                id: Ok(value.id),
+                image_url: Ok(value.image_url),
+                pubkey_text: Ok(value.pubkey_text),
+                stats: Ok(value.stats),
+                username: Ok(value.username),
             }
         }
     }

@@ -5,10 +5,14 @@
 
 #include <optional>
 
-#include "AuthRefreshTokenResponse.hpp"
-#include "AuthDonateResponse.hpp"
+#include "Achievement.hpp"
 #include "Color.hpp"
 #include "DiceType.hpp"
+#include "Dice.hpp"
+#include "UserStats.hpp"
+#include "UserData.hpp"
+#include "AuthRefreshTokenResponse.hpp"
+#include "AuthDonateResponse.hpp"
 #include "Setting.hpp"
 #include "AuthSettingsRequest.hpp"
 #include "AchievementProgressType.hpp"
@@ -18,8 +22,6 @@
 #include "AchievementUnlockType.hpp"
 #include "AchievementUnlock.hpp"
 #include "ReportStats.hpp"
-#include "UserStats.hpp"
-#include "Achievement.hpp"
 #include "AchievementData.hpp"
 #include "DieRoll.hpp"
 #include "GameErrorType.hpp"

@@ -5,17 +5,13 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "AuthSettingsRequest".
- */
+
+export type DiceType = "D6" | "D20";
+
 export type AuthSettingsRequest =
   | {
       setting: "Color";
-      color: {
-        hue?: number;
-        sat?: number;
-      };
+      color: Color;
     }
   | {
       setting: "DiceType";
@@ -25,15 +21,7 @@ export type AuthSettingsRequest =
       setting: "Pubkey";
       text: string;
     };
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "DiceType".
- */
-export type DiceType = "D6" | "D20";
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "UserId".
- */
+
 export type UserId =
   | {
       type: "User";
@@ -47,24 +35,52 @@ export type UserId =
 export interface Schema {
   [k: string]: unknown;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "AuthRefreshTokenResponse".
- */
+
+export interface Dice {
+  type: DiceType;
+}
+
+export interface Color {
+  hue: number;
+  sat: number;
+}
+
+export interface UserData {
+  achievements?: Achievement[] | null;
+  color: Color;
+  createdDate: string;
+  dice: Dice;
+  donor: boolean;
+  id: string;
+  image_url?: null | string;
+  pubkey_text?: null | string;
+  stats?: UserStats | null;
+  username: string;
+}
+
+export interface Achievement {
+  id: string;
+  progress: number;
+  unlocked: string;
+  rn: null | number;
+  rd: null | number;
+}
+
+export interface UserStats {
+  rolls: number;
+  doubles: number;
+  games: number;
+  wins: number;
+}
+
 export interface AuthRefreshTokenResponse {
   access_token: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "AuthDonateResponse".
- */
+
 export interface AuthDonateResponse {
   link: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "Player".
- */
+
 export interface Player {
   connected: boolean;
   name?: string;
@@ -74,10 +90,7 @@ export interface Player {
   crowned?: boolean;
   skip_count: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "AchievementProgress".
- */
+
 export interface AchievementProgress {
   achievement_id: string;
   user_id: UserId;
@@ -85,10 +98,7 @@ export interface AchievementProgress {
   progress: number;
   type: "achievement_progress";
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "AchievementUnlock".
- */
+
 export interface AchievementUnlock {
   id: string;
   image_url: null | string;
@@ -99,10 +109,7 @@ export interface AchievementUnlock {
   user_id: string;
   type: "achievement_unlock";
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "ReportStats".
- */
+
 export interface ReportStats {
   user_id: UserId;
   rolls: number;
@@ -110,10 +117,7 @@ export interface ReportStats {
   games: number;
   doubles: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "ServerPlayer".
- */
+
 export interface ServerPlayer {
   session: string;
   turn_count: number;
@@ -127,31 +131,7 @@ export interface ServerPlayer {
   crowned?: boolean;
   skip_count: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "UserStats".
- */
-export interface UserStats {
-  rolls: number;
-  doubles: number;
-  games: number;
-  wins: number;
-}
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "Achievement".
- */
-export interface Achievement {
-  id: string;
-  progress: number;
-  unlocked: string;
-  rn: null | number;
-  rd: null | number;
-}
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "AchievementData".
- */
+
 export interface AchievementData {
   description: string;
   image_url: null | string;
@@ -159,44 +139,29 @@ export interface AchievementData {
   name: string;
   max_progress: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "DieRoll".
- */
+
 export interface DieRoll {
   used: boolean;
   value: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "GameError".
- */
+
 export interface GameError {
   type: "error";
   error: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "Redirect".
- */
+
 export interface Redirect {
   type: "redirect";
   room: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "Room".
- */
+
 export interface Room {
   code: string;
   host_name: string;
   last_updated: string;
   player_count: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "IGameState".
- */
+
 export interface IGameState {
   players: Player[];
   chatLog: string[];
@@ -208,10 +173,7 @@ export interface IGameState {
   privateSession: boolean;
   spectators: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "GameState".
- */
+
 export interface GameState {
   type: "game_state";
   players: ServerPlayer[];
@@ -224,26 +186,17 @@ export interface GameState {
   privateSession: boolean;
   spectators: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "RoomListMsg".
- */
+
 export interface RoomListMsg {
   type?: "room_list";
   rooms: Room[];
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "RefetchPlayerMsg".
- */
+
 export interface RefetchPlayerMsg {
   type: "refetch_player";
   user_id: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "WelcomeMsg".
- */
+
 export interface WelcomeMsg {
   type: "welcome";
   id: number;
@@ -257,110 +210,74 @@ export interface WelcomeMsg {
   privateSession: boolean;
   spectators: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "RestartMsg".
- */
+
 export interface RestartMsg {
   type: "restart";
   id: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "SpectatorsMsg".
- */
+
 export interface SpectatorsMsg {
   type: "spectators";
   count: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "WinMsg".
- */
+
 export interface WinMsg {
   type: "win";
   id: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "RollMsg".
- */
+
 export interface RollMsg {
   type: "roll";
   rolls: number[];
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "RollAgainMsg".
- */
+
 export interface RollAgainMsg {
   type: "roll_again";
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "JoinMsg".
- */
+
 export interface JoinMsg {
   type: "join";
   id: number;
   name?: string;
   user_id?: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "DisconnectMsg".
- */
+
 export interface DisconnectMsg {
   type: "disconnect";
   id: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "ReconnectMsg".
- */
+
 export interface ReconnectMsg {
   type: "reconnect";
   id: number;
   name?: string;
   user_id?: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "KickMsg".
- */
+
 export interface KickMsg {
   type: "kick";
   id: number;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "ChatMsg".
- */
+
 export interface ChatMsg {
   type: "chat";
   msg: string;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "UpdateTurnMsg".
- */
+
 export interface UpdateTurnMsg {
   type: "update_turn";
   id: number;
   skip?: boolean;
 }
-/**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "UpdateNameMsg".
- */
+
 export interface UpdateNameMsg {
   type: "update_name";
   name: string;
   id: number;
 }
 /**
- * This interface was referenced by `Schema`'s JSON-Schema
- * via the `definition` "UpdateMsg".
+ * TODO: add descriptions to these things
+ *
  */
 export interface UpdateMsg {
   type: "update";

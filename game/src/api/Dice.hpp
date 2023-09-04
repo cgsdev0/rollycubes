@@ -4,11 +4,14 @@
 #include <optional>
 
 namespace API {
+    enum class DiceType : int;
+}
 
-    struct Color {
+namespace API {
+
+    struct Dice {
 std::string toString() const;
 void fromString(const std::string &str);
-        double hue;
-        double sat;
+        DiceType type = static_cast<DiceType>(0);
     };
 }
