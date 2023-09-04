@@ -8,7 +8,6 @@ use axum_extra::extract::cookie::{Cookie, CookieJar};
 use base64::{engine::general_purpose, Engine as _};
 use serde::{Deserialize, Serialize};
 use std::fs;
-use time::{Duration, OffsetDateTime, PrimitiveDateTime};
 use twitch_oauth2::{AccessToken, UserToken};
 use uuid::Uuid;
 
@@ -18,20 +17,11 @@ pub struct LoginResponse {
 }
 
 #[derive(Serialize)]
-pub struct PlayerStats {
-    rolls: i32,
-    doubles: i32,
-    games: i32,
-    wins: i32,
-}
-
-#[derive(Serialize)]
 pub struct AchievementProgress {
     #[serde(rename = "id")]
     achievement_id: String,
     progress: i32,
-    #[serde(with = "time::serde::rfc3339::option")]
-    unlocked: Option<OffsetDateTime>,
+    unlocked: Option<chrono::DateTime<chrono::Utc>>,
     rn: Option<i64>,
     rd: Option<i64>,
 }
@@ -85,10 +75,9 @@ pub struct User {
     image_url: Option<String>,
     dice: DiceSettings,
     color: ColorSettings,
-    #[serde(rename = "createdDate", with = "time::serde::rfc3339")]
-    created_date: OffsetDateTime,
+    created_date: chrono::DateTime<chrono::Utc>,
     achievements: Option<Vec<AchievementProgress>>,
-    stats: Option<PlayerStats>,
+    stats: Option<generated::UserStats>,
     donor: bool,
     pubkey_text: Option<String>,
 }
@@ -189,8 +178,8 @@ async fn login_helper(
     let access_token = s.jwt.sign_jwt(Claims::new(*x, username))?;
     // Create a refresh token
     let token_id = Uuid::new_v4();
-    let exp = OffsetDateTime::now_utc()
-        .checked_add(Duration::days(30))
+    let exp = chrono::offset::Utc::now()
+        .checked_add_days(chrono::Days::new(30))
         .unwrap();
     tracing::debug!("we made a date");
     client
@@ -208,7 +197,7 @@ VALUES ($1::UUID, $2::UUID)",
                 .http_only(true)
                 .same_site(axum_extra::extract::cookie::SameSite::None)
                 .path("/")
-                .expires(exp)
+                .expires(Some(std::time::SystemTime::from(exp).into()))
                 .finish(),
         ),
         Json(LoginResponse { access_token }),
@@ -244,8 +233,8 @@ WHERE id = $1::UUID",
         .await
         .unwrap();
     // check expiration
-    let issued_at: PrimitiveDateTime = row.get("issued_at");
-    let dur = OffsetDateTime::now_utc() - issued_at.assume_utc();
+    let issued_at: chrono::NaiveDateTime = row.get("issued_at");
+    let dur = chrono::offset::Utc::now() - issued_at.and_utc();
     if dur > Duration::days(30) {
         return Err(RouteError::Forbidden);
     }
@@ -672,9 +661,9 @@ WHERE id=$1::UUID",
                 sat: row.get("color_sat"),
             },
             created_date: row
-                .get::<'_, _, PrimitiveDateTime>("created_date")
-                .assume_utc(),
-            stats: rolls.map(|_| PlayerStats {
+                .get::<'_, _, chrono::NaiveDateTime>("created_date")
+                .and_utc(),
+            stats: rolls.map(|_| generated::UserStats {
                 rolls: row.get("rolls"),
                 games: row.get("games"),
                 wins: row.get("wins"),
@@ -685,8 +674,8 @@ WHERE id=$1::UUID",
                     .map(|r| AchievementProgress {
                         achievement_id: r.get("achievement_id"),
                         unlocked: r
-                            .get::<'_, _, Option<PrimitiveDateTime>>("unlocked")
-                            .map(PrimitiveDateTime::assume_utc),
+                            .get::<'_, _, Option<chrono::NaiveDateTime>>("unlocked")
+                            .map(|t| t.and_utc()),
                         rd: r.get("rd"),
                         rn: r.get("rn"),
                         progress: r.get("progress"),
