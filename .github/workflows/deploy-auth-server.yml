@@ -28,6 +28,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - run: cp schema.json auth/schema.json
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:

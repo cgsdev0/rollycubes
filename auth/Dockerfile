@@ -11,6 +11,7 @@ RUN apk add musl-dev pkgconfig make perl
 
 WORKDIR /usr/build
 
+ENV SCHEMA_PATH .
 COPY --from=planner /usr/build/recipe.json recipe.json
 RUN cargo chef cook --recipe-path recipe.json --release
 

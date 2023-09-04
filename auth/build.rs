@@ -5,7 +5,10 @@ use std::{env, fs, path::Path};
 use typify::{TypeSpace, TypeSpaceImpl, TypeSpaceSettings};
 
 fn main() {
-    let content = std::fs::read_to_string("../schema.json").unwrap();
+    let mut ofile = Path::new(&env::var("SCHEMA_PATH").map_or_else(|_| "..".to_string(), |ok| ok))
+        .to_path_buf();
+    ofile.push("schema.json");
+    let content = std::fs::read_to_string(ofile).unwrap();
     let schema = serde_json::from_str::<schemars::schema::RootSchema>(&content).unwrap();
 
     let mut type_space = TypeSpace::new(
