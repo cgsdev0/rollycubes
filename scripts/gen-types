@@ -87,3 +87,9 @@ sed -i '/^ \* This interface was referenced by /d' api.ts
 sed -i '/^ \* via the `definition` /d' api.ts
 # quick and easy sed loop mechanism
 sed -i ':a;N;$!ba;s/\/\*\*\n \*\///g' api.ts
+
+
+popd &> /dev/null
+
+pushd ssh-gateway/api &> /dev/null
+sed -i 's/package main/package api/' generated.go
