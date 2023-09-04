@@ -664,10 +664,10 @@ WHERE id=$1::UUID",
                 .get::<'_, _, chrono::NaiveDateTime>("created_date")
                 .and_utc(),
             stats: rolls.map(|_| generated::UserStats {
-                rolls: row.get("rolls"),
-                games: row.get("games"),
-                wins: row.get("wins"),
-                doubles: row.get("doubles"),
+                rolls: row.get::<'_, _, i32>("rolls") as i64,
+                games: row.get::<'_, _, i32>("games") as i64,
+                wins: row.get::<'_, _, i32>("wins") as i64,
+                doubles: row.get::<'_, _, i32>("doubles") as i64,
             }),
             achievements: achievement_id.map(|_| {
                 rows.iter()
