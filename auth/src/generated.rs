@@ -117,7 +117,7 @@ pub struct AchievementUnlock {
     pub name: String,
     #[serde(rename = "type")]
     pub type_: AchievementUnlockType,
-    pub user_id: String,
+    pub user_id: uuid::Uuid,
     pub user_index: i64,
 }
 impl From<&AchievementUnlock> for AchievementUnlock {
@@ -712,7 +712,7 @@ pub struct Player {
     pub score: i64,
     pub skip_count: i64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: Option<uuid::Uuid>,
     pub win_count: i64,
 }
 impl From<&Player> for Player {
@@ -1207,7 +1207,7 @@ pub struct ServerPlayer {
     pub skip_count: i64,
     pub turn_count: i64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
+    pub user_id: Option<uuid::Uuid>,
     pub win_count: i64,
 }
 impl From<&ServerPlayer> for ServerPlayer {
@@ -1475,8 +1475,8 @@ impl std::convert::TryFrom<String> for UpdateTurnMsgType {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(tag = "type", content = "id")]
 pub enum UserId {
-    User(String),
-    Anonymous(String),
+    User(uuid::Uuid),
+    Anonymous(uuid::Uuid),
 }
 impl From<&UserId> for UserId {
     fn from(value: &UserId) -> Self {
@@ -1925,7 +1925,7 @@ pub mod builder {
         max_progress: Result<i64, String>,
         name: Result<String, String>,
         type_: Result<super::AchievementUnlockType, String>,
-        user_id: Result<String, String>,
+        user_id: Result<uuid::Uuid, String>,
         user_index: Result<i64, String>,
     }
     impl Default for AchievementUnlock {
@@ -2005,7 +2005,7 @@ pub mod builder {
         }
         pub fn user_id<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<String>,
+            T: std::convert::TryInto<uuid::Uuid>,
             T::Error: std::fmt::Display,
         {
             self.user_id = value
@@ -2840,7 +2840,7 @@ pub mod builder {
         name: Result<Option<String>, String>,
         score: Result<i64, String>,
         skip_count: Result<i64, String>,
-        user_id: Result<Option<String>, String>,
+        user_id: Result<Option<uuid::Uuid>, String>,
         win_count: Result<i64, String>,
     }
     impl Default for Player {
@@ -2909,7 +2909,7 @@ pub mod builder {
         }
         pub fn user_id<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<Option<String>>,
+            T: std::convert::TryInto<Option<uuid::Uuid>>,
             T::Error: std::fmt::Display,
         {
             self.user_id = value
@@ -3518,7 +3518,7 @@ pub mod builder {
         session: Result<String, String>,
         skip_count: Result<i64, String>,
         turn_count: Result<i64, String>,
-        user_id: Result<Option<String>, String>,
+        user_id: Result<Option<uuid::Uuid>, String>,
         win_count: Result<i64, String>,
     }
     impl Default for ServerPlayer {
@@ -3631,7 +3631,7 @@ pub mod builder {
         }
         pub fn user_id<T>(mut self, value: T) -> Self
         where
-            T: std::convert::TryInto<Option<String>>,
+            T: std::convert::TryInto<Option<uuid::Uuid>>,
             T::Error: std::fmt::Display,
         {
             self.user_id = value

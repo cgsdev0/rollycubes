@@ -91,7 +91,8 @@
           "type": "integer"
         },
         "user_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid"
         },
         "crowned": {
           "type": "boolean"
@@ -113,7 +114,8 @@
               "enum": ["User"]
             },
             "id": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           },
           "additionalProperties": false,
@@ -127,7 +129,8 @@
               "enum": ["Anonymous"]
             },
             "id": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           },
           "additionalProperties": false,
@@ -186,7 +189,8 @@
           "type": "integer"
         },
         "user_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid"
         },
         "type": {
           "type": "string",
@@ -255,7 +259,8 @@
           "type": "integer"
         },
         "user_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid"
         },
         "crowned": {
           "type": "boolean"
