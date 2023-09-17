@@ -5,6 +5,7 @@ use std::{env, fs, path::Path};
 use typify::{TypeSpace, TypeSpaceImpl, TypeSpaceSettings};
 
 fn main() {
+    println!("cargo:rerun-if-changed=../schema.json");
     let mut ofile = Path::new(&env::var("SCHEMA_PATH").map_or_else(|_| "..".to_string(), |ok| ok))
         .to_path_buf();
     ofile.push("schema.json");
