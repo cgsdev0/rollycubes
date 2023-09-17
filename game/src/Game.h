@@ -104,7 +104,11 @@ class Game {
             if (isSignedIn(player)) {
                 user_id = player.session;
             }
-            players.emplace_back(player.connected, player.crowned, player.name, player.score, player.skip_count, std::optional<std::string>{user_id}, player.win_count);
+            auto uid = std::optional<std::string>{user_id};
+            if (!user_id.length()) {
+              uid = std::nullopt;
+            }
+            players.emplace_back(player.connected, player.crowned, player.name, player.score, player.skip_count, uid, player.win_count);
         }
         return API::WelcomeMsg{
             .chat_log = this->state.chat_log,
