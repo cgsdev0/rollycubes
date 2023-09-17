@@ -1,5 +1,26 @@
 {
   "definitions": {
+    "ServerMsg": {
+      "type": "object",
+      "oneOf": [
+        { "$ref": "#/definitions/RoomListMsg" },
+        { "$ref": "#/definitions/RefetchPlayerMsg" },
+        { "$ref": "#/definitions/WelcomeMsg" },
+        { "$ref": "#/definitions/RestartMsg" },
+        { "$ref": "#/definitions/SpectatorsMsg" },
+        { "$ref": "#/definitions/WinMsg" },
+        { "$ref": "#/definitions/RollMsg" },
+        { "$ref": "#/definitions/RollAgainMsg" },
+        { "$ref": "#/definitions/JoinMsg" },
+        { "$ref": "#/definitions/DisconnectMsg" },
+        { "$ref": "#/definitions/ReconnectMsg" },
+        { "$ref": "#/definitions/KickMsg" },
+        { "$ref": "#/definitions/ChatMsg" },
+        { "$ref": "#/definitions/UpdateTurnMsg" },
+        { "$ref": "#/definitions/UpdateNameMsg" },
+        { "$ref": "#/definitions/UpdateMsg" }
+      ]
+    },
     "Dice": {
       "type": "object",
       "properties": {
