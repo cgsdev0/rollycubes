@@ -127,6 +127,7 @@
           "properties": {
             "setting": {
               "type": "string",
+              "default": "Color",
               "enum": ["Color"]
             },
             "color": {
@@ -141,6 +142,7 @@
           "properties": {
             "setting": {
               "type": "string",
+              "default": "DiceType",
               "enum": ["DiceType"]
             },
             "dice_type": {
@@ -155,6 +157,7 @@
           "properties": {
             "setting": {
               "type": "string",
+              "default": "Pubkey",
               "enum": ["Pubkey"]
             },
             "text": {
@@ -201,6 +204,7 @@
           "properties": {
             "type": {
               "type": "string",
+              "default": "User",
               "enum": ["User"]
             },
             "id": {
@@ -216,6 +220,7 @@
           "properties": {
             "type": {
               "type": "string",
+              "default": "Anonymous",
               "enum": ["Anonymous"]
             },
             "id": {
@@ -245,6 +250,7 @@
         },
         "type": {
           "type": "string",
+          "default": "achievement_progress",
           "enum": ["achievement_progress"]
         }
       },
@@ -284,6 +290,7 @@
         },
         "type": {
           "type": "string",
+          "default": "achievement_unlock",
           "enum": ["achievement_unlock"]
         }
       },
@@ -455,6 +462,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "error",
           "enum": ["error"]
         },
         "error": {
@@ -469,6 +477,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "redirect",
           "enum": ["redirect"]
         },
         "room": {
@@ -559,6 +568,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "game_state",
           "enum": ["game_state"]
         },
         "players": {
@@ -620,6 +630,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "room_list",
           "enum": ["room_list"]
         },
         "rooms": {
@@ -637,6 +648,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "refetch_player",
           "enum": ["refetch_player"]
         },
         "user_id": {
@@ -651,6 +663,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "welcome",
           "enum": ["welcome"]
         },
         "id": {
@@ -716,6 +729,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "restart",
           "enum": ["restart"]
         },
         "id": {
@@ -730,6 +744,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "spectators",
           "enum": ["spectators"]
         },
         "count": {
@@ -744,6 +759,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "win",
           "enum": ["win"]
         },
         "id": {
@@ -758,6 +774,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "roll",
           "enum": ["roll"]
         },
         "rolls": {
@@ -775,6 +792,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "roll_again",
           "enum": ["roll_again"]
         }
       },
@@ -786,6 +804,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "join",
           "enum": ["join"]
         },
         "id": {
@@ -806,6 +825,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "disconnect",
           "enum": ["disconnect"]
         },
         "id": {
@@ -820,6 +840,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "reconnect",
           "enum": ["reconnect"]
         },
         "id": {
@@ -840,6 +861,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "kick",
           "enum": ["kick"]
         },
         "id": {
@@ -854,6 +876,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "chat",
           "enum": ["chat"]
         },
         "msg": {
@@ -868,6 +891,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "update_turn",
           "enum": ["update_turn"]
         },
         "id": {
@@ -885,6 +909,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "update_name",
           "enum": ["update_name"]
         },
         "name": {
@@ -903,6 +928,7 @@
       "properties": {
         "type": {
           "type": "string",
+          "default": "update",
           "enum": ["update"]
         },
         "id": {
