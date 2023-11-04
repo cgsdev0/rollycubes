@@ -42,6 +42,42 @@ import (
 	"nhooyr.io/websocket/wsjson"
 )
 
+// Tabs.
+
+var (
+	activeTabBorder = lipgloss.Border{
+		Top:         "─",
+		Bottom:      " ",
+		Left:        "│",
+		Right:       "│",
+		TopLeft:     "╭",
+		TopRight:    "╮",
+		BottomLeft:  "┘",
+		BottomRight: "└",
+	}
+
+	tabBorder = lipgloss.Border{
+		Top:         "─",
+		Bottom:      "─",
+		Left:        "│",
+		Right:       "│",
+		TopLeft:     "╭",
+		TopRight:    "╮",
+		BottomLeft:  "┴",
+		BottomRight: "┴",
+	}
+	tab = lipgloss.NewStyle().
+		Border(tabBorder, true).
+		Padding(0, 1)
+
+	activeTab = tab.Copy().Border(activeTabBorder, true)
+
+	tabGap = tab.Copy().
+		BorderTop(false).
+		BorderLeft(false).
+		BorderRight(false)
+)
+
 type CommonModel struct {
 	mu          *sync.Mutex
 	ctx         ssh.Context
@@ -55,8 +91,12 @@ type CommonModel struct {
 }
 
 type LobbyScene struct {
-	Common *CommonModel
-	list   list.Model
+	Common      *CommonModel
+	list        list.Model
+	Width       int
+	Height      int
+	ActiveTab   int
+	initialized bool
 }
 
 type GameScene struct {
@@ -70,6 +110,7 @@ type GameScene struct {
 	textInput textinput.Model
 	roomCode  string
 	players   table.Model
+	TabID     int
 }
 
 type SwitchSceneMsg struct {
@@ -94,37 +135,157 @@ func reverse[S ~[]E, E any](s S) {
 	}
 }
 
+func GetRoomList(activeTab int) (*api.RoomListMsg, error) {
+	var resp *http.Response
+	var err error
+	if activeTab == 0 {
+		resp, err = http.Get("https://rollycubes.com/list")
+	} else {
+		resp, err = http.Get("https://beta.rollycubes.com/list")
+	}
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	roomList, err := api.UnmarshalRoomListMsg(body)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return &roomList, nil
+}
+
 func (m LobbyScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
-		m.list.SetHeight(msg.Height)
+		m.Width = msg.Width
+		m.Height = msg.Height
+		m.list.SetHeight(msg.Height - 4)
 		m.list.SetWidth(msg.Width)
+		if !m.initialized {
+			m.initialized = true
 
+			var cmd tea.Cmd
+			roomList, err := GetRoomList(m.ActiveTab)
+			if err != nil {
+				// lol rip
+				return m, nil
+			}
+			// TODO: sort and filter room list
+			for i, v := range roomList.Rooms {
+				if v.PlayerCount == 0 {
+					continue
+				}
+				cmd = m.list.InsertItem(i, v)
+			}
+			return m, cmd
+		}
+
+	case tea.MouseMsg:
+
+		if msg.Type != tea.MouseLeft {
+			return m, nil
+		}
+
+		if m.Common.zone.Get("beta").InBounds(msg) {
+			m.ActiveTab = 1
+			m.list.SetItems(nil)
+			var cmd tea.Cmd
+			roomList, err := GetRoomList(m.ActiveTab)
+			if err != nil {
+				// lol rip
+				return m, nil
+			}
+			// TODO: sort and filter room list
+			for i, v := range roomList.Rooms {
+				if v.PlayerCount == 0 {
+					continue
+				}
+				cmd = m.list.InsertItem(i, v)
+			}
+			return m, cmd
+		}
+
+		if m.Common.zone.Get("primary").InBounds(msg) {
+			m.ActiveTab = 0
+			m.list.SetItems(nil)
+			var cmd tea.Cmd
+			roomList, err := GetRoomList(m.ActiveTab)
+			if err != nil {
+				// lol rip
+				return m, nil
+			}
+			// TODO: sort and filter room list
+			for i, v := range roomList.Rooms {
+				if v.PlayerCount == 0 {
+					continue
+				}
+				cmd = m.list.InsertItem(i, v)
+			}
+			return m, cmd
+		}
 	// Is it a key press?
 	case tea.KeyMsg:
 
 		// Cool, what was the actual key pressed?
+		log.Println(msg.String())
 		switch msg.String() {
 
-		case "r":
-			resp, err := http.Get("https://rollycubes.com/list")
-
-			if err != nil {
-				log.Println(err)
-				return m, nil
-			}
-			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
-			roomList, err := api.UnmarshalRoomListMsg(body)
-			if err != nil {
-				log.Println(err)
-				return m, nil
-			}
+		case "left":
+			fallthrough
+		case "h":
+			m.ActiveTab = 0
 			m.list.SetItems(nil)
 			var cmd tea.Cmd
+			roomList, err := GetRoomList(m.ActiveTab)
+			if err != nil {
+				// lol rip
+				return m, nil
+			}
 			// TODO: sort and filter room list
 			for i, v := range roomList.Rooms {
+				if v.PlayerCount == 0 {
+					continue
+				}
+				cmd = m.list.InsertItem(i, v)
+			}
+			return m, cmd
+		case "right":
+			fallthrough
+		case "l":
+			m.ActiveTab = 1
+			m.list.SetItems(nil)
+			var cmd tea.Cmd
+			roomList, err := GetRoomList(m.ActiveTab)
+			if err != nil {
+				// lol rip
+				return m, nil
+			}
+			// TODO: sort and filter room list
+			for i, v := range roomList.Rooms {
+				if v.PlayerCount == 0 {
+					continue
+				}
+				cmd = m.list.InsertItem(i, v)
+			}
+			return m, cmd
+		case "r":
+			m.list.SetItems(nil)
+			var cmd tea.Cmd
+			roomList, err := GetRoomList(m.ActiveTab)
+			if err != nil {
+				// lol rip
+				return m, nil
+			}
+			// TODO: sort and filter room list
+			for i, v := range roomList.Rooms {
+				if v.PlayerCount == 0 {
+					continue
+				}
 				cmd = m.list.InsertItem(i, v)
 			}
 			return m, cmd
@@ -427,7 +588,6 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			// Update our name
 			if m.Common.ws != nil {
-				log.Printf("HELLO HELLO %v+\n", m.Common.session.Environ())
 				msg := api.UpdateNameMsg{Type: api.UpdateName, Name: m.Common.session.User()}
 				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
 				if err != nil {
@@ -708,8 +868,33 @@ func (m GameScene) View() string {
 		Render(scene)
 }
 
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func (m LobbyScene) View() string {
-	return m.list.View()
+
+	var row string
+	if m.ActiveTab == 0 {
+		row = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			activeTab.Render("Primary Servers"),
+			m.Common.zone.Mark("beta", tab.Render("Beta Servers")),
+		)
+	} else {
+		row = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			m.Common.zone.Mark("primary", tab.Render("Primary Servers")),
+			activeTab.Render("Beta Servers"),
+		)
+	}
+	gap := tabGap.Render(strings.Repeat(" ", max(0, m.Width-lipgloss.Width(row)-2)))
+	row = lipgloss.JoinHorizontal(lipgloss.Bottom, row, gap)
+
+	return lipgloss.JoinVertical(lipgloss.Center, row, m.list.View())
 }
 
 type model struct {
@@ -742,7 +927,12 @@ func startWebsocket(m model, s GameScene) {
 	if m.Common.User != nil && len(m.Common.AccessToken) > 0 {
 		userIdStr = "?userId=" + m.Common.User.Id
 	}
-	serverURL := prodWsUrl + "/ws/room/" + s.roomCode + userIdStr
+	var serverURL string
+	if s.TabID == 0 {
+		serverURL = prodWsUrl + "/ws/room/" + s.roomCode + userIdStr
+	} else {
+		serverURL = betaWsUrl + "/ws/room/" + s.roomCode + userIdStr
+	}
 	ipstr, _, _ := net.SplitHostPort(m.Common.ctx.RemoteAddr().String())
 	fingstring := ipstr + m.Common.ctx.ClientVersion() + m.Common.ctx.User()
 	fingerprint := fmt.Sprintf("gateway:%x", sha1.Sum([]byte(fingstring)))
@@ -831,21 +1021,35 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+q":
 			return m, tea.Quit
 
-			// The "enter" key and the spacebar (a literal space) toggle
-			// the selected state for the item that the cursor is pointing at.
 		case "enter":
 			lobbyScene, ok := m.scene.(LobbyScene)
 			if !ok {
+				// this will never happen (probably)
 				break
 			}
 			if lobbyScene.list.SettingFilter() {
-				log.Println("filtering")
 				break
 			}
 			var room api.Room
 			if room, ok = lobbyScene.list.SelectedItem().(api.Room); !ok {
-				log.Println("not selected")
-				return m, nil
+				log.Println("creating new room")
+				var apiString string
+				if lobbyScene.ActiveTab == 0 {
+					apiString = "https://rollycubes.com/create?public"
+				} else {
+					apiString = "https://beta.rollycubes.com/create?public"
+				}
+
+				resp, err := http.Get(apiString)
+				if err != nil || resp.StatusCode != 200 {
+					return m, nil
+				}
+				defer resp.Body.Close()
+				bytes, err := io.ReadAll(resp.Body)
+				if err != nil {
+					return m, nil
+				}
+				room.Code = string(bytes)
 			}
 			columns := []table.Column{
 				{Title: "Player", Width: 14},
@@ -859,6 +1063,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Height:    m.Height,
 				textInput: textinput.New(),
 				players:   table.New(table.WithColumns(columns), table.WithHeight(8)),
+				TabID:     lobbyScene.ActiveTab,
 			}
 			newScene.ConstrainSize()
 			log.Println("new scene")
@@ -940,9 +1145,13 @@ func bubbleTeaMiddleware(store *user.Store, jwt_signing_key any) wish.Middleware
 			AccessToken: theyJWT,
 			User:        u,
 		}
+		newList := list.New([]list.Item{}, list.NewDefaultDelegate(), pty.Window.Width, pty.Window.Height-4)
+		newList.SetStatusBarItemName("room", "rooms")
 		lobbyScene := LobbyScene{
 			Common: commonModel,
-			list:   list.New([]list.Item{}, list.NewDefaultDelegate(), pty.Window.Width-6, pty.Window.Height-2),
+			list:   newList,
+			Width:  pty.Window.Width,
+			Height: pty.Window.Height,
 		}
 		lobbyScene.list.Title = "Active Rooms"
 
