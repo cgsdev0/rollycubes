@@ -70,6 +70,9 @@ var (
 		Border(tabBorder, true).
 		Padding(0, 1)
 
+	disconnected = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#ff0000"))
+
 	activeTab = tab.Copy().Border(activeTabBorder, true)
 
 	tabGap = tab.Copy().
@@ -311,6 +314,27 @@ func (m *GameScene) ConstrainSize() {
 	m.viewport.Height = m.Height - 1
 }
 
+func (m *GameScene) renderTable() {
+	var rows []table.Row
+	for i, player := range m.State.Players {
+		var name string
+		if player.Name == nil {
+			name = "User" + fmt.Sprint(i+1)
+		} else {
+			name = *player.Name
+		}
+		if !player.Connected {
+			name = fmt.Sprintf("\x1b[38:5:196m%s\x1b[39m", name)
+		} else {
+			name = fmt.Sprintf("\x1b[39m%s", name)
+		}
+		row := table.Row{name, fmt.Sprint(player.Score)}
+		rows = append(rows, row)
+	}
+	m.players.SetRows(rows)
+	m.players.SetCursor(int(m.State.TurnIndex))
+}
+
 func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var cmds []tea.Cmd
@@ -431,29 +455,26 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.players.SetRows(rows)
 			m.players.SetCursor(int(m.State.TurnIndex))
+		case "disconnect":
+			disconnect, err := api.UnmarshalDisconnectMsg(msg.Msg)
+			if err != nil {
+				log.Printf("idfk it broke %v+\n", err)
+				break
+			}
+			m.State.Players[disconnect.ID].Connected = false
+			m.renderTable()
 		case "reconnect":
 			reconnect, err := api.UnmarshalReconnectMsg(msg.Msg)
 			if err != nil {
 				log.Printf("idfk it broke %v+\n", err)
 				break
 			}
+			m.State.Players[reconnect.ID].Connected = true
 			if reconnect.UserID != nil {
 				m.State.Players[reconnect.ID].UserID = reconnect.UserID
 				m.State.Players[reconnect.ID].Name = reconnect.Name
 			}
-			var rows []table.Row
-			for i, player := range m.State.Players {
-				var name string
-				if player.Name == nil {
-					name = "User" + fmt.Sprint(i+1)
-				} else {
-					name = *player.Name
-				}
-				row := table.Row{name, fmt.Sprint(player.Score)}
-				rows = append(rows, row)
-			}
-			m.players.SetRows(rows)
-			m.players.SetCursor(int(m.State.TurnIndex))
+			m.renderTable()
 		case "join":
 			join, err := api.UnmarshalJoinMsg(msg.Msg)
 			if err != nil {
@@ -464,19 +485,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				Name: join.Name,
 			}
 			m.State.Players = append(m.State.Players, newPlayer)
-			var rows []table.Row
-			for i, player := range m.State.Players {
-				var name string
-				if player.Name == nil {
-					name = "User" + fmt.Sprint(i+1)
-				} else {
-					name = *player.Name
-				}
-				row := table.Row{name, fmt.Sprint(player.Score)}
-				rows = append(rows, row)
-			}
-			m.players.SetRows(rows)
-			m.players.SetCursor(int(m.State.TurnIndex))
+			m.renderTable()
 		case "restart":
 			restart, err := api.UnmarshalRestartMsg(msg.Msg)
 			if err != nil {
@@ -486,21 +495,9 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.State.TurnIndex = restart.ID
 			m.State.Used[0] = false
 			m.State.Used[1] = false
-			var rows []table.Row
-			for i := range m.State.Players {
-				m.State.Players[i].Score = 0
-				var name string
-				if m.State.Players[i].Name == nil {
-					name = "User" + fmt.Sprint(i+1)
-				} else {
-					name = *m.State.Players[i].Name
-				}
-				rows = append(rows, table.Row{name, fmt.Sprint(m.State.Players[i].Score)})
-			}
-			m.players.SetRows(rows)
 			m.State.Victory = false
 			m.State.Rolled = false
-			m.players.SetCursor(int(m.State.TurnIndex))
+			m.renderTable()
 		case "win":
 			m.State.Victory = true
 		case "update":
@@ -513,19 +510,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.State.Used = update.Used
 			}
 			m.State.Players[update.ID].Score = update.Score
-			var rows []table.Row
-			for i, player := range m.State.Players {
-				var name string
-				if player.Name == nil {
-					name = "User" + fmt.Sprint(i+1)
-				} else {
-					name = *player.Name
-				}
-				row := table.Row{name, fmt.Sprint(player.Score)}
-				rows = append(rows, row)
-			}
-			m.players.SetRows(rows)
-			m.players.SetCursor(int(m.State.TurnIndex))
+			m.renderTable()
 		case "roll":
 			roll, err := api.UnmarshalRollMsg(msg.Msg)
 			if err != nil {
@@ -566,19 +551,8 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.SelfID = int(welcome.ID)
 			// Put the players into the table
-			var rows []table.Row
-			for i, player := range state.Players {
-				var name string
-				if player.Name == nil {
-					name = "User" + fmt.Sprint(i+1)
-				} else {
-					name = *player.Name
-				}
-				row := table.Row{name, fmt.Sprint(player.Score)}
-				rows = append(rows, row)
-			}
-			m.players.SetRows(rows)
-			m.players.SetCursor(int(state.TurnIndex))
+			m.State = &state
+			m.renderTable()
 			// Put the chat into the pager
 			reverse(state.ChatLog)
 			m.State = &state
@@ -602,19 +576,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				break
 			}
 			m.State.Players[updateName.ID].Name = &updateName.Name
-			var rows []table.Row
-			for i, player := range m.State.Players {
-				var name string
-				if player.Name == nil {
-					name = "User" + fmt.Sprint(i+1)
-				} else {
-					name = *player.Name
-				}
-				row := table.Row{name, fmt.Sprint(player.Score)}
-				rows = append(rows, row)
-			}
-			m.players.SetRows(rows)
-			m.players.SetCursor(int(m.State.TurnIndex))
+			m.renderTable()
 		case "chat":
 			chat, err := api.UnmarshalChatMsg(msg.Msg)
 			if err != nil {
@@ -762,7 +724,6 @@ func (m GameScene) View() string {
 	die2 := m.Common.zone.Mark("die2", die2s.Render(strings.Join(Dice[die2v], "\n")))
 	dice := lipgloss.JoinHorizontal(lipgloss.Bottom, die1, die2)
 
-	var rollButton string
 	var addButton string
 	var subButton string
 
@@ -771,7 +732,10 @@ func (m GameScene) View() string {
 	var add2Button string
 	var sub2Button string
 
-	var newGame string
+	newGame := lipgloss.NewStyle().Height(3).Render("")
+	rollButton := newGame
+
+	underButtons := false
 
 	var addColor = lipgloss.Color("#007bff")
 	var subColor = lipgloss.Color("240")
@@ -781,6 +745,7 @@ func (m GameScene) View() string {
 		if !m.State.Victory {
 			if m.State.Rolled && m.SelfID == int(m.State.TurnIndex) && is7 {
 				if !m.State.Used[0] {
+					underButtons = true
 					add1Button = m.Common.zone.Mark("add1", lipgloss.NewStyle().
 						Foreground(lipgloss.Color(addColor)).
 						BorderForeground(lipgloss.Color(addColor)).
@@ -799,6 +764,7 @@ func (m GameScene) View() string {
 					add1Button = "            "
 				}
 				if !m.State.Used[1] {
+					underButtons = true
 					add2Button = m.Common.zone.Mark("add2", lipgloss.NewStyle().
 						Foreground(lipgloss.Color(addColor)).
 						BorderForeground(lipgloss.Color(addColor)).
@@ -817,6 +783,7 @@ func (m GameScene) View() string {
 			}
 
 			if m.State.Rolled && m.SelfID == int(m.State.TurnIndex) && !is7 {
+				underButtons = true
 				addButton = m.Common.zone.Mark("add", lipgloss.NewStyle().
 					Foreground(lipgloss.Color(addColor)).
 					BorderForeground(lipgloss.Color(addColor)).
@@ -856,6 +823,9 @@ func (m GameScene) View() string {
 	}
 
 	underDice := lipgloss.JoinHorizontal(lipgloss.Bottom, addButton, subButton, add1Button, sub1Button, add2Button, sub2Button)
+	if underButtons {
+		rollButton = ""
+	}
 	if m.State != nil && !m.State.Victory {
 		newGame = rollButton
 	}
