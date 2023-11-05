@@ -332,7 +332,9 @@ func (m *GameScene) renderTable() {
 		rows = append(rows, row)
 	}
 	m.players.SetRows(rows)
-	m.players.SetCursor(int(m.State.TurnIndex))
+	if !m.players.Focused() {
+		m.players.SetCursor(int(m.State.TurnIndex))
+	}
 }
 
 func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -601,10 +603,30 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "esc":
 			m.textInput.Blur()
+			m.players.Blur()
+			m.renderTable()
+		case "j":
+			fallthrough
+		case "down":
+			if m.textInput.Focused() {
+				break
+			}
+			m.players.Focus()
+			m.renderTable()
+		case "k":
+			fallthrough
+		case "up":
+			if m.textInput.Focused() {
+				break
+			}
+			m.players.Focus()
+			m.renderTable()
 		case "i":
 			if m.textInput.Focused() {
 				break
 			}
+			m.players.Blur()
+			m.renderTable()
 			cmd = m.textInput.Focus()
 			return m, cmd
 		case "enter":
@@ -685,6 +707,9 @@ func (m GameScene) View() string {
 		MarginLeft(1).
 		Height(m.Height - 2 - 5 - 3)
 
+	if m.players.Focused() {
+		playerPanel.BorderForeground(lipgloss.Color("57"))
+	}
 	// var chatStr string
 	// if m.State != nil {
 	// 	chatStr = strings.Join(m.State.ChatLog, "\n")
