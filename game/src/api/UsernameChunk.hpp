@@ -5,16 +5,16 @@
 #include <variant>
 
 namespace API {
-    enum class UpdateNameMsgType : int;
+    enum class UsernameChunkType : int;
 }
 
 namespace API {
 
-    struct UpdateNameMsg {
+    struct UsernameChunk {
 std::string toString() const;
 void fromString(const std::string &str);
-        int64_t id;
         std::string name;
-        UpdateNameMsgType type = static_cast<UpdateNameMsgType>(0);
+        UsernameChunkType type = static_cast<UsernameChunkType>(0);
+        std::optional<std::string> user_id;
     };
 }

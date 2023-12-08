@@ -9,7 +9,10 @@
 #pragma once
 
 #include <optional>
+#include <variant>
 #include "json.hpp"
+
+#include <unordered_map>
 
 #include <sstream>
 

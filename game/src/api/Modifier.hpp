@@ -6,5 +6,5 @@
 
 namespace API {
 
-    enum class WinMsgType : int { WIN };
+    enum class Modifier : int { BOLD, ITALIC, STRIKETHROUGH, UNDERLINE };
 }

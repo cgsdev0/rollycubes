@@ -7,188 +7,343 @@
 
 
 namespace API {
-    void from_json(const json & j, Achievement & x);
-    void to_json(json & j, const Achievement & x);
+void from_json(const json & j, RichTextChunk & x);
+void to_json(json & j, const RichTextChunk & x);
 
-    void from_json(const json & j, Color & x);
-    void to_json(json & j, const Color & x);
+void from_json(const json & j, Player & x);
+void to_json(json & j, const Player & x);
 
-    void from_json(const json & j, Dice & x);
-    void to_json(json & j, const Dice & x);
+void from_json(const json & j, RichTextMsg & x);
+void to_json(json & j, const RichTextMsg & x);
 
-    void from_json(const json & j, UserStats & x);
-    void to_json(json & j, const UserStats & x);
+void from_json(const json & j, Room & x);
+void to_json(json & j, const Room & x);
 
-    void from_json(const json & j, UserData & x);
-    void to_json(json & j, const UserData & x);
+void from_json(const json & j, ServerMsg & x);
+void to_json(json & j, const ServerMsg & x);
 
-    void from_json(const json & j, AuthRefreshTokenResponse & x);
-    void to_json(json & j, const AuthRefreshTokenResponse & x);
+void from_json(const json & j, Achievement & x);
+void to_json(json & j, const Achievement & x);
 
-    void from_json(const json & j, AuthDonateResponse & x);
-    void to_json(json & j, const AuthDonateResponse & x);
+void from_json(const json & j, Color & x);
+void to_json(json & j, const Color & x);
 
-    void from_json(const json & j, AuthSettingsRequest & x);
-    void to_json(json & j, const AuthSettingsRequest & x);
+void from_json(const json & j, Dice & x);
+void to_json(json & j, const Dice & x);
 
-    void from_json(const json & j, UserId & x);
-    void to_json(json & j, const UserId & x);
+void from_json(const json & j, UserStats & x);
+void to_json(json & j, const UserStats & x);
 
-    void from_json(const json & j, AchievementProgress & x);
-    void to_json(json & j, const AchievementProgress & x);
+void from_json(const json & j, UserData & x);
+void to_json(json & j, const UserData & x);
 
-    void from_json(const json & j, AchievementUnlock & x);
-    void to_json(json & j, const AchievementUnlock & x);
+void from_json(const json & j, AuthRefreshTokenResponse & x);
+void to_json(json & j, const AuthRefreshTokenResponse & x);
 
-    void from_json(const json & j, ReportStats & x);
-    void to_json(json & j, const ReportStats & x);
+void from_json(const json & j, AuthDonateResponse & x);
+void to_json(json & j, const AuthDonateResponse & x);
 
-    void from_json(const json & j, AchievementData & x);
-    void to_json(json & j, const AchievementData & x);
+void from_json(const json & j, AuthSettingsRequest & x);
+void to_json(json & j, const AuthSettingsRequest & x);
 
-    void from_json(const json & j, DieRoll & x);
-    void to_json(json & j, const DieRoll & x);
+void from_json(const json & j, UserId & x);
+void to_json(json & j, const UserId & x);
 
-    void from_json(const json & j, GameError & x);
-    void to_json(json & j, const GameError & x);
+void from_json(const json & j, AchievementProgress & x);
+void to_json(json & j, const AchievementProgress & x);
 
-    void from_json(const json & j, Redirect & x);
-    void to_json(json & j, const Redirect & x);
+void from_json(const json & j, AchievementUnlock & x);
+void to_json(json & j, const AchievementUnlock & x);
 
-    void from_json(const json & j, Player & x);
-    void to_json(json & j, const Player & x);
+void from_json(const json & j, ReportStats & x);
+void to_json(json & j, const ReportStats & x);
 
-    void from_json(const json & j, IGameState & x);
-    void to_json(json & j, const IGameState & x);
+void from_json(const json & j, AchievementData & x);
+void to_json(json & j, const AchievementData & x);
 
-    void from_json(const json & j, ServerPlayer & x);
-    void to_json(json & j, const ServerPlayer & x);
+void from_json(const json & j, DieRoll & x);
+void to_json(json & j, const DieRoll & x);
 
-    void from_json(const json & j, GameState & x);
-    void to_json(json & j, const GameState & x);
+void from_json(const json & j, GameError & x);
+void to_json(json & j, const GameError & x);
 
-    void from_json(const json & j, Room & x);
-    void to_json(json & j, const Room & x);
+void from_json(const json & j, Redirect & x);
+void to_json(json & j, const Redirect & x);
 
-    void from_json(const json & j, RoomListMsg & x);
-    void to_json(json & j, const RoomListMsg & x);
+void from_json(const json & j, IGameState & x);
+void to_json(json & j, const IGameState & x);
 
-    void from_json(const json & j, RefetchPlayerMsg & x);
-    void to_json(json & j, const RefetchPlayerMsg & x);
+void from_json(const json & j, ServerPlayer & x);
+void to_json(json & j, const ServerPlayer & x);
 
-    void from_json(const json & j, WelcomeMsg & x);
-    void to_json(json & j, const WelcomeMsg & x);
+void from_json(const json & j, GameState & x);
+void to_json(json & j, const GameState & x);
 
-    void from_json(const json & j, RestartMsg & x);
-    void to_json(json & j, const RestartMsg & x);
+void from_json(const json & j, RoomListMsg & x);
+void to_json(json & j, const RoomListMsg & x);
 
-    void from_json(const json & j, SpectatorsMsg & x);
-    void to_json(json & j, const SpectatorsMsg & x);
+void from_json(const json & j, RefetchPlayerMsg & x);
+void to_json(json & j, const RefetchPlayerMsg & x);
 
-    void from_json(const json & j, WinMsg & x);
-    void to_json(json & j, const WinMsg & x);
+void from_json(const json & j, WelcomeMsg & x);
+void to_json(json & j, const WelcomeMsg & x);
 
-    void from_json(const json & j, RollMsg & x);
-    void to_json(json & j, const RollMsg & x);
+void from_json(const json & j, RestartMsg & x);
+void to_json(json & j, const RestartMsg & x);
 
-    void from_json(const json & j, RollAgainMsg & x);
-    void to_json(json & j, const RollAgainMsg & x);
+void from_json(const json & j, SpectatorsMsg & x);
+void to_json(json & j, const SpectatorsMsg & x);
 
-    void from_json(const json & j, JoinMsg & x);
-    void to_json(json & j, const JoinMsg & x);
+void from_json(const json & j, WinMsg & x);
+void to_json(json & j, const WinMsg & x);
 
-    void from_json(const json & j, DisconnectMsg & x);
-    void to_json(json & j, const DisconnectMsg & x);
+void from_json(const json & j, RollMsg & x);
+void to_json(json & j, const RollMsg & x);
 
-    void from_json(const json & j, ReconnectMsg & x);
-    void to_json(json & j, const ReconnectMsg & x);
+void from_json(const json & j, RollAgainMsg & x);
+void to_json(json & j, const RollAgainMsg & x);
 
-    void from_json(const json & j, KickMsg & x);
-    void to_json(json & j, const KickMsg & x);
+void from_json(const json & j, JoinMsg & x);
+void to_json(json & j, const JoinMsg & x);
 
-    void from_json(const json & j, ChatMsg & x);
-    void to_json(json & j, const ChatMsg & x);
+void from_json(const json & j, DisconnectMsg & x);
+void to_json(json & j, const DisconnectMsg & x);
 
-    void from_json(const json & j, UpdateTurnMsg & x);
-    void to_json(json & j, const UpdateTurnMsg & x);
+void from_json(const json & j, ReconnectMsg & x);
+void to_json(json & j, const ReconnectMsg & x);
 
-    void from_json(const json & j, UpdateNameMsg & x);
-    void to_json(json & j, const UpdateNameMsg & x);
+void from_json(const json & j, KickMsg & x);
+void to_json(json & j, const KickMsg & x);
 
-    void from_json(const json & j, UpdateMsg & x);
-    void to_json(json & j, const UpdateMsg & x);
+void from_json(const json & j, UsernameChunk & x);
+void to_json(json & j, const UsernameChunk & x);
 
-    void from_json(const json & j, DiceType & x);
-    void to_json(json & j, const DiceType & x);
+void from_json(const json & j, ChatMsg & x);
+void to_json(json & j, const ChatMsg & x);
 
-    void from_json(const json & j, Setting & x);
-    void to_json(json & j, const Setting & x);
+void from_json(const json & j, UpdateTurnMsg & x);
+void to_json(json & j, const UpdateTurnMsg & x);
 
-    void from_json(const json & j, AchievementProgressType & x);
-    void to_json(json & j, const AchievementProgressType & x);
+void from_json(const json & j, UpdateNameMsg & x);
+void to_json(json & j, const UpdateNameMsg & x);
 
-    void from_json(const json & j, UserIdType & x);
-    void to_json(json & j, const UserIdType & x);
+void from_json(const json & j, UpdateMsg & x);
+void to_json(json & j, const UpdateMsg & x);
 
-    void from_json(const json & j, AchievementUnlockType & x);
-    void to_json(json & j, const AchievementUnlockType & x);
+void from_json(const json & j, Alignment & x);
+void to_json(json & j, const Alignment & x);
 
-    void from_json(const json & j, GameErrorType & x);
-    void to_json(json & j, const GameErrorType & x);
+void from_json(const json & j, Modifier & x);
+void to_json(json & j, const Modifier & x);
 
-    void from_json(const json & j, RedirectType & x);
-    void to_json(json & j, const RedirectType & x);
+void from_json(const json & j, RichTextChunkType & x);
+void to_json(json & j, const RichTextChunkType & x);
 
-    void from_json(const json & j, GameStateType & x);
-    void to_json(json & j, const GameStateType & x);
+void from_json(const json & j, RichTextMsgType & x);
+void to_json(json & j, const RichTextMsgType & x);
 
-    void from_json(const json & j, RoomListMsgType & x);
-    void to_json(json & j, const RoomListMsgType & x);
+void from_json(const json & j, ServerMsgType & x);
+void to_json(json & j, const ServerMsgType & x);
 
-    void from_json(const json & j, RefetchPlayerMsgType & x);
-    void to_json(json & j, const RefetchPlayerMsgType & x);
+void from_json(const json & j, DiceType & x);
+void to_json(json & j, const DiceType & x);
 
-    void from_json(const json & j, WelcomeMsgType & x);
-    void to_json(json & j, const WelcomeMsgType & x);
+void from_json(const json & j, Setting & x);
+void to_json(json & j, const Setting & x);
 
-    void from_json(const json & j, RestartMsgType & x);
-    void to_json(json & j, const RestartMsgType & x);
+void from_json(const json & j, AchievementProgressType & x);
+void to_json(json & j, const AchievementProgressType & x);
 
-    void from_json(const json & j, SpectatorsMsgType & x);
-    void to_json(json & j, const SpectatorsMsgType & x);
+void from_json(const json & j, UserIdType & x);
+void to_json(json & j, const UserIdType & x);
 
-    void from_json(const json & j, WinMsgType & x);
-    void to_json(json & j, const WinMsgType & x);
+void from_json(const json & j, AchievementUnlockType & x);
+void to_json(json & j, const AchievementUnlockType & x);
 
-    void from_json(const json & j, RollMsgType & x);
-    void to_json(json & j, const RollMsgType & x);
+void from_json(const json & j, GameErrorType & x);
+void to_json(json & j, const GameErrorType & x);
 
-    void from_json(const json & j, RollAgainMsgType & x);
-    void to_json(json & j, const RollAgainMsgType & x);
+void from_json(const json & j, RedirectType & x);
+void to_json(json & j, const RedirectType & x);
 
-    void from_json(const json & j, JoinMsgType & x);
-    void to_json(json & j, const JoinMsgType & x);
+void from_json(const json & j, GameStateType & x);
+void to_json(json & j, const GameStateType & x);
 
-    void from_json(const json & j, DisconnectMsgType & x);
-    void to_json(json & j, const DisconnectMsgType & x);
+void from_json(const json & j, RoomListMsgType & x);
+void to_json(json & j, const RoomListMsgType & x);
 
-    void from_json(const json & j, ReconnectMsgType & x);
-    void to_json(json & j, const ReconnectMsgType & x);
+void from_json(const json & j, RefetchPlayerMsgType & x);
+void to_json(json & j, const RefetchPlayerMsgType & x);
 
-    void from_json(const json & j, KickMsgType & x);
-    void to_json(json & j, const KickMsgType & x);
+void from_json(const json & j, WelcomeMsgType & x);
+void to_json(json & j, const WelcomeMsgType & x);
 
-    void from_json(const json & j, ChatMsgType & x);
-    void to_json(json & j, const ChatMsgType & x);
+void from_json(const json & j, RestartMsgType & x);
+void to_json(json & j, const RestartMsgType & x);
 
-    void from_json(const json & j, UpdateTurnMsgType & x);
-    void to_json(json & j, const UpdateTurnMsgType & x);
+void from_json(const json & j, SpectatorsMsgType & x);
+void to_json(json & j, const SpectatorsMsgType & x);
 
-    void from_json(const json & j, UpdateNameMsgType & x);
-    void to_json(json & j, const UpdateNameMsgType & x);
+void from_json(const json & j, WinMsgType & x);
+void to_json(json & j, const WinMsgType & x);
 
-    void from_json(const json & j, UpdateMsgType & x);
-    void to_json(json & j, const UpdateMsgType & x);
+void from_json(const json & j, RollMsgType & x);
+void to_json(json & j, const RollMsgType & x);
+
+void from_json(const json & j, RollAgainMsgType & x);
+void to_json(json & j, const RollAgainMsgType & x);
+
+void from_json(const json & j, JoinMsgType & x);
+void to_json(json & j, const JoinMsgType & x);
+
+void from_json(const json & j, DisconnectMsgType & x);
+void to_json(json & j, const DisconnectMsgType & x);
+
+void from_json(const json & j, ReconnectMsgType & x);
+void to_json(json & j, const ReconnectMsgType & x);
+
+void from_json(const json & j, KickMsgType & x);
+void to_json(json & j, const KickMsgType & x);
+
+void from_json(const json & j, UsernameChunkType & x);
+void to_json(json & j, const UsernameChunkType & x);
+
+void from_json(const json & j, ChatMsgType & x);
+void to_json(json & j, const ChatMsgType & x);
+
+void from_json(const json & j, UpdateTurnMsgType & x);
+void to_json(json & j, const UpdateTurnMsgType & x);
+
+void from_json(const json & j, UpdateNameMsgType & x);
+void to_json(json & j, const UpdateNameMsgType & x);
+
+void from_json(const json & j, UpdateMsgType & x);
+void to_json(json & j, const UpdateMsgType & x);
+}
+namespace nlohmann {
+template <>
+struct adl_serializer<std::variant<API::RichTextChunk, std::string>> {
+    static void from_json(const json & j, std::variant<API::RichTextChunk, std::string> & x);
+    static void to_json(json & j, const std::variant<API::RichTextChunk, std::string> & x);
+};
+
+template <>
+struct adl_serializer<std::variant<std::vector<API::MsgElement>, std::string>> {
+    static void from_json(const json & j, std::variant<std::vector<API::MsgElement>, std::string> & x);
+    static void to_json(json & j, const std::variant<std::vector<API::MsgElement>, std::string> & x);
+};
+}
+namespace API {
+    inline void from_json(const json & j, RichTextChunk& x) {
+        x.alignment = get_stack_optional<Alignment>(j, "alignment");
+        x.color = get_stack_optional<std::string>(j, "color");
+        x.modifiers = get_stack_optional<std::vector<Modifier>>(j, "modifiers");
+        x.msg = j.at("msg").get<std::string>();
+        x.type = j.at("type").get<RichTextChunkType>();
+    }
+
+    inline void to_json(json & j, const RichTextChunk & x) {
+        j = json::object();
+        j["alignment"] = x.alignment;
+        j["color"] = x.color;
+        j["modifiers"] = x.modifiers;
+        j["msg"] = x.msg;
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, Player& x) {
+        x.connected = j.at("connected").get<bool>();
+        x.crowned = get_stack_optional<bool>(j, "crowned");
+        x.name = get_stack_optional<std::string>(j, "name");
+        x.score = j.at("score").get<int64_t>();
+        x.skip_count = j.at("skip_count").get<int64_t>();
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
+        x.win_count = j.at("win_count").get<int64_t>();
+    }
+
+    inline void to_json(json & j, const Player & x) {
+        j = json::object();
+        j["connected"] = x.connected;
+        j["crowned"] = x.crowned;
+        j["name"] = x.name;
+        j["score"] = x.score;
+        j["skip_count"] = x.skip_count;
+        j["user_id"] = x.user_id;
+        j["win_count"] = x.win_count;
+    }
+
+    inline void from_json(const json & j, RichTextMsg& x) {
+        x.msg = j.at("msg").get<std::vector<MsgElement>>();
+        x.type = j.at("type").get<RichTextMsgType>();
+    }
+
+    inline void to_json(json & j, const RichTextMsg & x) {
+        j = json::object();
+        j["msg"] = x.msg;
+        j["type"] = x.type;
+    }
+
+    inline void from_json(const json & j, Room& x) {
+        x.code = j.at("code").get<std::string>();
+        x.host_name = j.at("host_name").get<std::string>();
+        x.last_updated = j.at("last_updated").get<std::string>();
+        x.player_count = j.at("player_count").get<int64_t>();
+    }
+
+    inline void to_json(json & j, const Room & x) {
+        j = json::object();
+        j["code"] = x.code;
+        j["host_name"] = x.host_name;
+        j["last_updated"] = x.last_updated;
+        j["player_count"] = x.player_count;
+    }
+
+    inline void from_json(const json & j, ServerMsg& x) {
+        x.rooms = get_stack_optional<std::vector<Room>>(j, "rooms");
+        x.type = get_stack_optional<ServerMsgType>(j, "type");
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
+        x.chat_log = get_stack_optional<std::vector<std::string>>(j, "chatLog");
+        x.id = get_stack_optional<int64_t>(j, "id");
+        x.players = get_stack_optional<std::vector<Player>>(j, "players");
+        x.private_session = get_stack_optional<bool>(j, "privateSession");
+        x.rich_chat_log = get_stack_optional<std::vector<RichTextMsg>>(j, "richChatLog");
+        x.rolled = get_stack_optional<bool>(j, "rolled");
+        x.rolls = get_stack_optional<std::vector<int64_t>>(j, "rolls");
+        x.spectators = get_stack_optional<int64_t>(j, "spectators");
+        x.turn_index = get_stack_optional<int64_t>(j, "turn_index");
+        x.used = get_stack_optional<std::vector<bool>>(j, "used");
+        x.victory = get_stack_optional<bool>(j, "victory");
+        x.count = get_stack_optional<int64_t>(j, "count");
+        x.name = get_stack_optional<std::string>(j, "name");
+        x.msg = get_stack_optional<std::variant<std::vector<MsgElement>, std::string>>(j, "msg");
+        x.skip = get_stack_optional<bool>(j, "skip");
+        x.reset = get_stack_optional<bool>(j, "reset");
+        x.score = get_stack_optional<int64_t>(j, "score");
+    }
+
+    inline void to_json(json & j, const ServerMsg & x) {
+        j = json::object();
+        j["rooms"] = x.rooms;
+        j["type"] = x.type;
+        j["user_id"] = x.user_id;
+        j["chatLog"] = x.chat_log;
+        j["id"] = x.id;
+        j["players"] = x.players;
+        j["privateSession"] = x.private_session;
+        j["richChatLog"] = x.rich_chat_log;
+        j["rolled"] = x.rolled;
+        j["rolls"] = x.rolls;
+        j["spectators"] = x.spectators;
+        j["turn_index"] = x.turn_index;
+        j["used"] = x.used;
+        j["victory"] = x.victory;
+        j["count"] = x.count;
+        j["name"] = x.name;
+        j["msg"] = x.msg;
+        j["skip"] = x.skip;
+        j["reset"] = x.reset;
+        j["score"] = x.score;
+    }
 
     inline void from_json(const json & j, Achievement& x) {
         x.id = j.at("id").get<std::string>();
@@ -420,31 +575,11 @@ namespace API {
         j["type"] = x.type;
     }
 
-    inline void from_json(const json & j, Player& x) {
-        x.connected = j.at("connected").get<bool>();
-        x.crowned = get_stack_optional<bool>(j, "crowned");
-        x.name = get_stack_optional<std::string>(j, "name");
-        x.score = j.at("score").get<int64_t>();
-        x.skip_count = j.at("skip_count").get<int64_t>();
-        x.user_id = get_stack_optional<std::string>(j, "user_id");
-        x.win_count = j.at("win_count").get<int64_t>();
-    }
-
-    inline void to_json(json & j, const Player & x) {
-        j = json::object();
-        j["connected"] = x.connected;
-        j["crowned"] = x.crowned;
-        j["name"] = x.name;
-        j["score"] = x.score;
-        j["skip_count"] = x.skip_count;
-        j["user_id"] = x.user_id;
-        j["win_count"] = x.win_count;
-    }
-
     inline void from_json(const json & j, IGameState& x) {
         x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
         x.players = j.at("players").get<std::vector<Player>>();
         x.private_session = j.at("privateSession").get<bool>();
+        x.rich_chat_log = j.at("richChatLog").get<std::vector<RichTextMsg>>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<int64_t>>();
         x.spectators = j.at("spectators").get<int64_t>();
@@ -458,6 +593,7 @@ namespace API {
         j["chatLog"] = x.chat_log;
         j["players"] = x.players;
         j["privateSession"] = x.private_session;
+        j["richChatLog"] = x.rich_chat_log;
         j["rolled"] = x.rolled;
         j["rolls"] = x.rolls;
         j["spectators"] = x.spectators;
@@ -499,6 +635,7 @@ namespace API {
         x.chat_log = j.at("chatLog").get<std::vector<std::string>>();
         x.players = j.at("players").get<std::vector<ServerPlayer>>();
         x.private_session = j.at("privateSession").get<bool>();
+        x.rich_chat_log = j.at("richChatLog").get<std::vector<RichTextMsg>>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<int64_t>>();
         x.spectators = j.at("spectators").get<int64_t>();
@@ -513,6 +650,7 @@ namespace API {
         j["chatLog"] = x.chat_log;
         j["players"] = x.players;
         j["privateSession"] = x.private_session;
+        j["richChatLog"] = x.rich_chat_log;
         j["rolled"] = x.rolled;
         j["rolls"] = x.rolls;
         j["spectators"] = x.spectators;
@@ -520,21 +658,6 @@ namespace API {
         j["type"] = x.type;
         j["used"] = x.used;
         j["victory"] = x.victory;
-    }
-
-    inline void from_json(const json & j, Room& x) {
-        x.code = j.at("code").get<std::string>();
-        x.host_name = j.at("host_name").get<std::string>();
-        x.last_updated = j.at("last_updated").get<std::string>();
-        x.player_count = j.at("player_count").get<int64_t>();
-    }
-
-    inline void to_json(json & j, const Room & x) {
-        j = json::object();
-        j["code"] = x.code;
-        j["host_name"] = x.host_name;
-        j["last_updated"] = x.last_updated;
-        j["player_count"] = x.player_count;
     }
 
     inline void from_json(const json & j, RoomListMsg& x) {
@@ -564,6 +687,7 @@ namespace API {
         x.id = j.at("id").get<int64_t>();
         x.players = j.at("players").get<std::vector<Player>>();
         x.private_session = j.at("privateSession").get<bool>();
+        x.rich_chat_log = j.at("richChatLog").get<std::vector<RichTextMsg>>();
         x.rolled = j.at("rolled").get<bool>();
         x.rolls = j.at("rolls").get<std::vector<int64_t>>();
         x.spectators = j.at("spectators").get<int64_t>();
@@ -579,6 +703,7 @@ namespace API {
         j["id"] = x.id;
         j["players"] = x.players;
         j["privateSession"] = x.private_session;
+        j["richChatLog"] = x.rich_chat_log;
         j["rolled"] = x.rolled;
         j["rolls"] = x.rolls;
         j["spectators"] = x.spectators;
@@ -693,6 +818,19 @@ namespace API {
         j["type"] = x.type;
     }
 
+    inline void from_json(const json & j, UsernameChunk& x) {
+        x.name = j.at("name").get<std::string>();
+        x.type = j.at("type").get<UsernameChunkType>();
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
+    }
+
+    inline void to_json(json & j, const UsernameChunk & x) {
+        j = json::object();
+        j["name"] = x.name;
+        j["type"] = x.type;
+        j["user_id"] = x.user_id;
+    }
+
     inline void from_json(const json & j, ChatMsg& x) {
         x.msg = j.at("msg").get<std::string>();
         x.type = j.at("type").get<ChatMsgType>();
@@ -745,6 +883,113 @@ namespace API {
         j["score"] = x.score;
         j["type"] = x.type;
         j["used"] = x.used;
+    }
+
+    inline void from_json(const json & j, Alignment & x) {
+        if (j == "center") x = Alignment::CENTER;
+        else if (j == "left") x = Alignment::LEFT;
+        else if (j == "right") x = Alignment::RIGHT;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const Alignment & x) {
+        switch (x) {
+            case Alignment::CENTER: j = "center"; break;
+            case Alignment::LEFT: j = "left"; break;
+            case Alignment::RIGHT: j = "right"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
+    inline void from_json(const json & j, Modifier & x) {
+        if (j == "bold") x = Modifier::BOLD;
+        else if (j == "italic") x = Modifier::ITALIC;
+        else if (j == "strikethrough") x = Modifier::STRIKETHROUGH;
+        else if (j == "underline") x = Modifier::UNDERLINE;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const Modifier & x) {
+        switch (x) {
+            case Modifier::BOLD: j = "bold"; break;
+            case Modifier::ITALIC: j = "italic"; break;
+            case Modifier::STRIKETHROUGH: j = "strikethrough"; break;
+            case Modifier::UNDERLINE: j = "underline"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
+    inline void from_json(const json & j, RichTextChunkType & x) {
+        if (j == "rt_text") x = RichTextChunkType::RT_TEXT;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const RichTextChunkType & x) {
+        switch (x) {
+            case RichTextChunkType::RT_TEXT: j = "rt_text"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
+    inline void from_json(const json & j, RichTextMsgType & x) {
+        if (j == "chat_v2") x = RichTextMsgType::CHAT_V2;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const RichTextMsgType & x) {
+        switch (x) {
+            case RichTextMsgType::CHAT_V2: j = "chat_v2"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
+    inline void from_json(const json & j, ServerMsgType & x) {
+        static std::unordered_map<std::string, ServerMsgType> enumValues {
+            {"chat", ServerMsgType::CHAT},
+            {"chat_v2", ServerMsgType::CHAT_V2},
+            {"disconnect", ServerMsgType::DISCONNECT},
+            {"join", ServerMsgType::JOIN},
+            {"kick", ServerMsgType::KICK},
+            {"reconnect", ServerMsgType::RECONNECT},
+            {"refetch_player", ServerMsgType::REFETCH_PLAYER},
+            {"restart", ServerMsgType::RESTART},
+            {"roll", ServerMsgType::ROLL},
+            {"roll_again", ServerMsgType::ROLL_AGAIN},
+            {"room_list", ServerMsgType::ROOM_LIST},
+            {"spectators", ServerMsgType::SPECTATORS},
+            {"update", ServerMsgType::UPDATE},
+            {"update_name", ServerMsgType::UPDATE_NAME},
+            {"update_turn", ServerMsgType::UPDATE_TURN},
+            {"welcome", ServerMsgType::WELCOME},
+            {"win", ServerMsgType::WIN},
+        };
+        auto iter = enumValues.find(j.get<std::string>());
+        if (iter != enumValues.end()) {
+            x = iter->second;
+        }
+    }
+
+    inline void to_json(json & j, const ServerMsgType & x) {
+        switch (x) {
+            case ServerMsgType::CHAT: j = "chat"; break;
+            case ServerMsgType::CHAT_V2: j = "chat_v2"; break;
+            case ServerMsgType::DISCONNECT: j = "disconnect"; break;
+            case ServerMsgType::JOIN: j = "join"; break;
+            case ServerMsgType::KICK: j = "kick"; break;
+            case ServerMsgType::RECONNECT: j = "reconnect"; break;
+            case ServerMsgType::REFETCH_PLAYER: j = "refetch_player"; break;
+            case ServerMsgType::RESTART: j = "restart"; break;
+            case ServerMsgType::ROLL: j = "roll"; break;
+            case ServerMsgType::ROLL_AGAIN: j = "roll_again"; break;
+            case ServerMsgType::ROOM_LIST: j = "room_list"; break;
+            case ServerMsgType::SPECTATORS: j = "spectators"; break;
+            case ServerMsgType::UPDATE: j = "update"; break;
+            case ServerMsgType::UPDATE_NAME: j = "update_name"; break;
+            case ServerMsgType::UPDATE_TURN: j = "update_turn"; break;
+            case ServerMsgType::WELCOME: j = "welcome"; break;
+            case ServerMsgType::WIN: j = "win"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
     }
 
     inline void from_json(const json & j, DiceType & x) {
@@ -995,6 +1240,18 @@ namespace API {
         }
     }
 
+    inline void from_json(const json & j, UsernameChunkType & x) {
+        if (j == "rt_username") x = UsernameChunkType::RT_USERNAME;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const UsernameChunkType & x) {
+        switch (x) {
+            case UsernameChunkType::RT_USERNAME: j = "rt_username"; break;
+            default: throw std::runtime_error("This should not happen");
+        }
+    }
+
     inline void from_json(const json & j, ChatMsgType & x) {
         if (j == "chat") x = ChatMsgType::CHAT;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
@@ -1043,22 +1300,63 @@ namespace API {
         }
     }
 }
+namespace nlohmann {
+    inline void adl_serializer<std::variant<API::RichTextChunk, std::string>>::from_json(const json & j, std::variant<API::RichTextChunk, std::string> & x) {
+        if (j.is_string())
+            x = j.get<std::string>();
+        else if (j.is_object())
+            x = j.get<API::RichTextChunk>();
+        else throw std::runtime_error("Could not deserialise!");
+    }
+
+    inline void adl_serializer<std::variant<API::RichTextChunk, std::string>>::to_json(json & j, const std::variant<API::RichTextChunk, std::string> & x) {
+        switch (x.index()) {
+            case 0:
+                j = std::get<API::RichTextChunk>(x);
+                break;
+            case 1:
+                j = std::get<std::string>(x);
+                break;
+            default: throw std::runtime_error("Input JSON does not conform to schema!");
+        }
+    }
+
+    inline void adl_serializer<std::variant<std::vector<API::MsgElement>, std::string>>::from_json(const json & j, std::variant<std::vector<API::MsgElement>, std::string> & x) {
+        if (j.is_string())
+            x = j.get<std::string>();
+        else if (j.is_array())
+            x = j.get<std::vector<API::MsgElement>>();
+        else throw std::runtime_error("Could not deserialise!");
+    }
+
+    inline void adl_serializer<std::variant<std::vector<API::MsgElement>, std::string>>::to_json(json & j, const std::variant<std::vector<API::MsgElement>, std::string> & x) {
+        switch (x.index()) {
+            case 0:
+                j = std::get<std::vector<API::MsgElement>>(x);
+                break;
+            case 1:
+                j = std::get<std::string>(x);
+                break;
+            default: throw std::runtime_error("Input JSON does not conform to schema!");
+        }
+    }
+}
 namespace API {
-std::string Achievement::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void Achievement::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string AchievementData::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void AchievementData::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string Achievement::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Achievement::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -1251,6 +1549,24 @@ void RestartMsg::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
+std::string RichTextChunk::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void RichTextChunk::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string RichTextMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void RichTextMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
 std::string RollAgainMsg::toString() const {
 json j;
 to_json(j, *this);
@@ -1284,6 +1600,15 @@ to_json(j, *this);
 return j.dump();
 }
 void RoomListMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string ServerMsg::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void ServerMsg::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
@@ -1347,6 +1672,15 @@ to_json(j, *this);
 return j.dump();
 }
 void UserId::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string UsernameChunk::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void UsernameChunk::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

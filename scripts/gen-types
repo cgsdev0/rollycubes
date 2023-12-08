@@ -58,6 +58,7 @@ grep "struct.*{" * -l \
   | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
 
 structs=$(grep "struct.*{" * \
+  | grep -v "adl_serializer" \
   | grep -v "^helper.hpp" \
   | cut -d':' -f2 \
   | sed 's/.*struct \(.*\) {/\1/')

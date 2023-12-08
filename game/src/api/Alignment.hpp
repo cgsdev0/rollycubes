@@ -6,5 +6,5 @@
 
 namespace API {
 
-    enum class WinMsgType : int { WIN };
+    enum class Alignment : int { CENTER, LEFT, RIGHT };
 }

@@ -6,5 +6,5 @@
 
 namespace API {
 
-    enum class WinMsgType : int { WIN };
+    enum class UsernameChunkType : int { RT_USERNAME };
 }

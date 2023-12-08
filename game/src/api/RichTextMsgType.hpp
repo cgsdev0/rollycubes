@@ -6,5 +6,5 @@
 
 namespace API {
 
-    enum class WinMsgType : int { WIN };
+    enum class RichTextMsgType : int { CHAT_V2 };
 }

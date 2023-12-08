@@ -4,7 +4,20 @@
 #pragma once
 
 #include <optional>
+#include <variant>
 
+#include "Alignment.hpp"
+#include "Modifier.hpp"
+#include "RichTextChunkType.hpp"
+#include "RichTextChunk.hpp"
+#include "MsgElement.hpp"
+#include "ServerMsgMsg.hpp"
+#include "Player.hpp"
+#include "RichTextMsgType.hpp"
+#include "RichTextMsg.hpp"
+#include "Room.hpp"
+#include "ServerMsgType.hpp"
+#include "ServerMsg.hpp"
 #include "Achievement.hpp"
 #include "Color.hpp"
 #include "DiceType.hpp"
@@ -28,12 +41,10 @@
 #include "GameError.hpp"
 #include "RedirectType.hpp"
 #include "Redirect.hpp"
-#include "Player.hpp"
 #include "IGameState.hpp"
 #include "ServerPlayer.hpp"
 #include "GameStateType.hpp"
 #include "GameState.hpp"
-#include "Room.hpp"
 #include "RoomListMsgType.hpp"
 #include "RoomListMsg.hpp"
 #include "RefetchPlayerMsgType.hpp"
@@ -58,6 +69,8 @@
 #include "ReconnectMsg.hpp"
 #include "KickMsgType.hpp"
 #include "KickMsg.hpp"
+#include "UsernameChunkType.hpp"
+#include "UsernameChunk.hpp"
 #include "ChatMsgType.hpp"
 #include "ChatMsg.hpp"
 #include "UpdateTurnMsgType.hpp"
