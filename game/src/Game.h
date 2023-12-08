@@ -3,8 +3,8 @@
 
 #include "Consts.h"
 #include "achievements/BaseAchievement.h"
+#include "RichTextStream.h"
 
-#include "api/API.hpp"
 #include <chrono>
 #include <deque>
 #include <functional>
@@ -17,10 +17,6 @@ using json = nlohmann::json;
 typedef std::function<void(std::string)> SendFunc;
 typedef std::function<void(std::string, std::string)> AuthSendFunc;
 typedef std::function<void(std::string, std::string, SendFunc)> AuthSendFunc2;
-
-inline bool isSignedIn(const API::ServerPlayer &player) {
-    return (player.session.find("guest:") != 0);
-}
 
 struct HandlerArgs {
     SendFunc send;
@@ -139,6 +135,13 @@ class Game {
     void processEvent(const API::ServerPlayer *player, SendFunc &broadcast, HandlerArgs *server, const json &data, const API::GameState &prev);
 
   private:
+    std::string log_rich_chat(const RichTextStream& stream) {
+            state.rich_chat_log.insert(state.rich_chat_log.begin(), stream.obj());
+            if (state.rich_chat_log.size() > MAX_CHAT_LOG) {
+                state.rich_chat_log.pop_back();
+            }
+            return stream.str();
+    }
     std::uniform_int_distribution<int> dis{1, 6};
     std::chrono::system_clock::time_point updated = std::chrono::system_clock::now();
     std::string turn_token;

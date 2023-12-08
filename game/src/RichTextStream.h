@@ -1,8 +1,15 @@
+#ifndef INCLUDE_RICH_TEXT_STREAM_H
+#define INCLUDE_RICH_TEXT_STREAM_H
+
 #include "api/API.hpp"
 #include <vector>
 #include <variant>
 #include <string>
 #include <optional>
+
+static inline bool isSignedIn(const API::ServerPlayer &player) {
+    return (player.session.find("guest:") != 0);
+}
 
 namespace RT {
   typedef int Modifier_t;
@@ -29,12 +36,13 @@ class RichTextStream {
   RichTextStream& operator<<(const API::ServerPlayer& obj)
   {
       this->msg.msg.emplace_back<API::RichTextChunk>({
-            .alignment = std::nullopt,
-            .color = std::nullopt,
-            .modifiers = std::nullopt,
+            .alignment = this->alignment,
+            .color = this->color,
+            .modifiers = this->modifiers,
             .text = obj.name.value_or("guest"),
             .type = API::RichTextChunkType::RT_USERNAME,
-            .user_id = obj.user_id,
+            .user_id = isSignedIn(obj) ?
+              std::optional<std::string>(obj.session) : std::nullopt,
           });
     return *this;
   }
@@ -69,7 +77,7 @@ class RichTextStream {
   RichTextStream& operator<<(const RT::Modifier_t& obj)
   {
     if (!this->modifiers.has_value()) {
-      this->modifiers = std::optional<std::vector<API::Modifier>>{};
+      this->modifiers = std::make_optional<std::vector<API::Modifier>>();
     }
     switch(obj) {
       case 1:
@@ -103,10 +111,12 @@ class RichTextStream {
 };
 
 namespace RT {
-  void reset(RichTextStream& os) {
+  static void reset(RichTextStream& os) {
   }
   const RT::Modifier_t bold = 1;
   const RT::Modifier_t underline = 2;
   const RT::Modifier_t strike = 3;
   const RT::Modifier_t italic = 4;
 }
+
+#endif

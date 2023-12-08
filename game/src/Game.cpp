@@ -7,7 +7,6 @@
 #include "Loop.h"
 #include "StringUtils.h"
 #include "achievements/All.h"
-#include "RichTextStream.h"
 
 Game::Game() {
     this->state.victory = false;
@@ -269,17 +268,13 @@ void Game::chat(HANDLER_ARGS) {
             }
 
             /* NEW API */
-            RichTextStream stream;
             auto msg2 = msg;
             if (msg.length() > MAX_CHAT_LEN) {
                 msg2 = trimString(msg, MAX_CHAT_LEN, true);
             }
-            stream << state.players[i] << msg2;
-            state.rich_chat_log.insert(state.rich_chat_log.begin(), stream.obj());
-            if (state.rich_chat_log.size() > MAX_CHAT_LOG) {
-                state.rich_chat_log.pop_back();
-            }
-            broadcast(stream.str());
+            RichTextStream stream;
+            stream << state.players[i] << ": " << msg2;
+            broadcast(log_rich_chat(stream));
             /* END NEW API */
 
             std::string fullMsg = name + ": " + msg;
@@ -389,6 +384,16 @@ void Game::restart(HANDLER_ARGS) {
     res["type"] = "restart";
     res["id"] = state.turn_index;
     broadcast(res.dump());
+    for (uint i = 0; i < state.players.size(); ++i) {
+      if (state.players[i].session == session) {
+        RichTextStream stream;
+        stream << RT::italic
+          << state.players[i]
+          << " started a new game.";
+        broadcast(log_rich_chat(stream));
+        break;
+      }
+    }
 }
 
 void Game::update_name(HANDLER_ARGS) {
@@ -554,6 +559,11 @@ void Game::update(HANDLER_ARGS) {
                 win["id"] = winnerId;
                 state.victory = true;
                 broadcast(win.dump());
+                RichTextStream stream;
+                stream << RT::italic
+                  << state.players[winnerId]
+                  << " won the game with a " + std::to_string(score) + "!";
+                broadcast(log_rich_chat(stream));
             } else {
                 for (uint i = 0; i < state.players.size(); ++i) {
                     if (session == state.players[i].session) {
@@ -567,6 +577,18 @@ void Game::update(HANDLER_ARGS) {
                         update["score"] = 0;
                         update["reset"] = true;
                         broadcast(update.dump());
+                        RichTextStream stream;
+                        stream << RT::italic
+                          << state.players[state.turn_index]
+                          << " reset "
+                          << state.players[i]
+                          << " to "
+                          << RT::color("red")
+                          << "zero"
+                          << RT::reset
+                          << RT::italic
+                          << "!";
+                        broadcast(log_rich_chat(stream));
                         break;
                     }
                 }

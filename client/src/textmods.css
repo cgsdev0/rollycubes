@@ -1,0 +1,12 @@
+.-textmod-bold {
+  font-weight: bold;
+}
+.-textmod-underline {
+  text-decoration: underline;
+}
+.-textmod-italic {
+  font-style: italic;
+}
+.-textmod-strikethrough {
+  text-decoration: line-through;
+}

@@ -1,14 +1,17 @@
 import { cheatsAction } from 'actions/settings';
+import { useGetUserByIdQuery } from 'api/auth';
 import React, { FormEvent } from 'react';
 import Linkify from 'react-linkify';
 import { connect, DispatchProp } from 'react-redux';
 import { styled } from 'stitches.config';
+import { RichTextChunk, RichTextMsg } from 'types/api';
 import { selectIsSpectator } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
+import '../textmods.css';
 
 interface Props {
   socket?: WebSocket;
-  chat: string[];
+  chat: RichTextMsg[];
   isSpectator: boolean;
 }
 
@@ -172,13 +175,53 @@ const LinkDecorator = (
   );
 };
 
-const ChatMsg = (props: { msg: string }) => {
+const ChatChunk = (props: RichTextChunk) => {
+  const { data } = useGetUserByIdQuery(props.user_id!, {
+    skip: !props.user_id || props.type !== 'rt_username',
+  });
+  const color =
+    data && data.donor
+      ? `hsl(${data.color.hue}, ${data.color.sat}%, 50%)`
+      : 'rgb(149, 149, 151)';
+  switch (props.type) {
+    case 'rt_text':
+      return (
+        <span
+          style={{ color: props.color }}
+          className={props.modifiers?.map((mod) => `-textmod-${mod}`).join(' ')}
+        >
+          {props.text}
+        </span>
+      );
+    case 'rt_username':
+      return (
+        <span
+          className={props.modifiers?.map((mod) => `-textmod-${mod}`).join(' ')}
+          style={{
+            color: color,
+            fontWeight: props.user_id ? 'bold' : undefined,
+          }}
+        >
+          {props.text}
+        </span>
+      );
+  }
+};
+
+const ChatMsg = React.memo((props: { msg: RichTextMsg }) => {
   return (
     <Linkify componentDecorator={LinkDecorator}>
-      <p>{props.msg}</p>
+      <div>
+        {props.msg?.msg.map((e, i) => (
+          <ChatChunk
+            key={i}
+            {...(typeof e === 'object' ? e : { type: 'rt_text', text: e })}
+          />
+        ))}
+      </div>
     </Linkify>
   );
-};
+});
 
 const mapStateToProps = (state: ReduxState) => {
   return {
