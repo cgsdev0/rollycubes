@@ -208,7 +208,9 @@ const PlayerComponent = (props: Props) => {
           <span className={playerName()}>{player.name || `User${n + 1}`}</span>
         </span>
         <span className={score()}>{JSON.stringify(player.score)}</span>
-        {player.skip_count < 2 || props.isSpectator ? null : (
+        {player.skip_count < 2 ||
+        props.isSpectator ||
+        n === props.self_index ? null : (
           <span className={kick()} onClick={onKick}>
             <KickIcon />
           </span>
