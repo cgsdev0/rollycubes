@@ -106,9 +106,6 @@
 //    kickMsg, err := UnmarshalKickMsg(bytes)
 //    bytes, err = kickMsg.Marshal()
 //
-//    usernameChunk, err := UnmarshalUsernameChunk(bytes)
-//    bytes, err = usernameChunk.Marshal()
-//
 //    richTextChunk, err := UnmarshalRichTextChunk(bytes)
 //    bytes, err = richTextChunk.Marshal()
 //
@@ -483,16 +480,6 @@ func (r *KickMsg) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-func UnmarshalUsernameChunk(data []byte) (UsernameChunk, error) {
-	var r UsernameChunk
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *UsernameChunk) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
-
 func UnmarshalRichTextChunk(data []byte) (RichTextChunk, error) {
 	var r RichTextChunk
 	err := json.Unmarshal(data, &r)
@@ -581,8 +568,9 @@ type RichTextChunk struct {
 	Alignment *Alignment        `json:"alignment,omitempty"`
 	Color     *string           `json:"color,omitempty"`
 	Modifiers []Modifier        `json:"modifiers,omitempty"`
-	Msg       string            `json:"msg"`
+	Text      string            `json:"text"`
 	Type      RichTextChunkType `json:"type"`
+	UserID    *string           `json:"user_id,omitempty"`
 }
 
 type Player struct {
@@ -828,12 +816,6 @@ type KickMsg struct {
 	Type KickMsgType `json:"type"`
 }
 
-type UsernameChunk struct {
-	Name   string            `json:"name"`
-	Type   UsernameChunkType `json:"type"`
-	UserID *string           `json:"user_id,omitempty"`
-}
-
 type ChatMsg struct {
 	Msg  string      `json:"msg"`
 	Type ChatMsgType `json:"type"`
@@ -880,7 +862,8 @@ const (
 type RichTextChunkType string
 
 const (
-	RtText RichTextChunkType = "rt_text"
+	RtText     RichTextChunkType = "rt_text"
+	RtUsername RichTextChunkType = "rt_username"
 )
 
 type RichTextMsgType string
@@ -1033,12 +1016,6 @@ type KickMsgType string
 
 const (
 	FluffyKick KickMsgType = "kick"
-)
-
-type UsernameChunkType string
-
-const (
-	RtUsername UsernameChunkType = "rt_username"
 )
 
 type ChatMsgType string

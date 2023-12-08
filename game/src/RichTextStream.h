@@ -22,6 +22,22 @@ class RichTextStream {
     return msg.toString();
   }
 
+  const API::RichTextMsg& obj() const {
+    return msg;
+  }
+
+  RichTextStream& operator<<(const API::ServerPlayer& obj)
+  {
+      this->msg.msg.emplace_back<API::RichTextChunk>({
+            .alignment = std::nullopt,
+            .color = std::nullopt,
+            .modifiers = std::nullopt,
+            .text = obj.name.value_or("guest"),
+            .type = API::RichTextChunkType::RT_USERNAME,
+            .user_id = obj.user_id,
+          });
+    return *this;
+  }
   RichTextStream& operator<<(const std::string& obj)
   {
       if (!this->modifiers.has_value()
@@ -34,7 +50,8 @@ class RichTextStream {
             .alignment = this->alignment,
             .color = this->color,
             .modifiers = this->modifiers,
-            .msg = obj
+            .text = obj,
+            .user_id = std::nullopt,
           });
       }
       return *this;

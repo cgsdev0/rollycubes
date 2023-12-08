@@ -115,9 +115,6 @@ void to_json(json & j, const ReconnectMsg & x);
 void from_json(const json & j, KickMsg & x);
 void to_json(json & j, const KickMsg & x);
 
-void from_json(const json & j, UsernameChunk & x);
-void to_json(json & j, const UsernameChunk & x);
-
 void from_json(const json & j, ChatMsg & x);
 void to_json(json & j, const ChatMsg & x);
 
@@ -205,9 +202,6 @@ void to_json(json & j, const ReconnectMsgType & x);
 void from_json(const json & j, KickMsgType & x);
 void to_json(json & j, const KickMsgType & x);
 
-void from_json(const json & j, UsernameChunkType & x);
-void to_json(json & j, const UsernameChunkType & x);
-
 void from_json(const json & j, ChatMsgType & x);
 void to_json(json & j, const ChatMsgType & x);
 
@@ -238,17 +232,27 @@ namespace API {
         x.alignment = get_stack_optional<Alignment>(j, "alignment");
         x.color = get_stack_optional<std::string>(j, "color");
         x.modifiers = get_stack_optional<std::vector<Modifier>>(j, "modifiers");
-        x.msg = j.at("msg").get<std::string>();
+        x.text = j.at("text").get<std::string>();
         x.type = j.at("type").get<RichTextChunkType>();
+        x.user_id = get_stack_optional<std::string>(j, "user_id");
     }
 
     inline void to_json(json & j, const RichTextChunk & x) {
         j = json::object();
-        j["alignment"] = x.alignment;
-        j["color"] = x.color;
-        j["modifiers"] = x.modifiers;
-        j["msg"] = x.msg;
+        if (x.alignment) {
+            j["alignment"] = x.alignment;
+        }
+        if (x.color) {
+            j["color"] = x.color;
+        }
+        if (x.modifiers) {
+            j["modifiers"] = x.modifiers;
+        }
+        j["text"] = x.text;
         j["type"] = x.type;
+        if (x.user_id) {
+            j["user_id"] = x.user_id;
+        }
     }
 
     inline void from_json(const json & j, Player& x) {
@@ -264,11 +268,17 @@ namespace API {
     inline void to_json(json & j, const Player & x) {
         j = json::object();
         j["connected"] = x.connected;
-        j["crowned"] = x.crowned;
-        j["name"] = x.name;
+        if (x.crowned) {
+            j["crowned"] = x.crowned;
+        }
+        if (x.name) {
+            j["name"] = x.name;
+        }
         j["score"] = x.score;
         j["skip_count"] = x.skip_count;
-        j["user_id"] = x.user_id;
+        if (x.user_id) {
+            j["user_id"] = x.user_id;
+        }
         j["win_count"] = x.win_count;
     }
 
@@ -323,26 +333,66 @@ namespace API {
 
     inline void to_json(json & j, const ServerMsg & x) {
         j = json::object();
-        j["rooms"] = x.rooms;
-        j["type"] = x.type;
-        j["user_id"] = x.user_id;
-        j["chatLog"] = x.chat_log;
-        j["id"] = x.id;
-        j["players"] = x.players;
-        j["privateSession"] = x.private_session;
-        j["richChatLog"] = x.rich_chat_log;
-        j["rolled"] = x.rolled;
-        j["rolls"] = x.rolls;
-        j["spectators"] = x.spectators;
-        j["turn_index"] = x.turn_index;
-        j["used"] = x.used;
-        j["victory"] = x.victory;
-        j["count"] = x.count;
-        j["name"] = x.name;
-        j["msg"] = x.msg;
-        j["skip"] = x.skip;
-        j["reset"] = x.reset;
-        j["score"] = x.score;
+        if (x.rooms) {
+            j["rooms"] = x.rooms;
+        }
+        if (x.type) {
+            j["type"] = x.type;
+        }
+        if (x.user_id) {
+            j["user_id"] = x.user_id;
+        }
+        if (x.chat_log) {
+            j["chatLog"] = x.chat_log;
+        }
+        if (x.id) {
+            j["id"] = x.id;
+        }
+        if (x.players) {
+            j["players"] = x.players;
+        }
+        if (x.private_session) {
+            j["privateSession"] = x.private_session;
+        }
+        if (x.rich_chat_log) {
+            j["richChatLog"] = x.rich_chat_log;
+        }
+        if (x.rolled) {
+            j["rolled"] = x.rolled;
+        }
+        if (x.rolls) {
+            j["rolls"] = x.rolls;
+        }
+        if (x.spectators) {
+            j["spectators"] = x.spectators;
+        }
+        if (x.turn_index) {
+            j["turn_index"] = x.turn_index;
+        }
+        if (x.used) {
+            j["used"] = x.used;
+        }
+        if (x.victory) {
+            j["victory"] = x.victory;
+        }
+        if (x.count) {
+            j["count"] = x.count;
+        }
+        if (x.name) {
+            j["name"] = x.name;
+        }
+        if (x.msg) {
+            j["msg"] = x.msg;
+        }
+        if (x.skip) {
+            j["skip"] = x.skip;
+        }
+        if (x.reset) {
+            j["reset"] = x.reset;
+        }
+        if (x.score) {
+            j["score"] = x.score;
+        }
     }
 
     inline void from_json(const json & j, Achievement& x) {
@@ -412,15 +462,23 @@ namespace API {
 
     inline void to_json(json & j, const UserData & x) {
         j = json::object();
-        j["achievements"] = x.achievements;
+        if (x.achievements) {
+            j["achievements"] = x.achievements;
+        }
         j["color"] = x.color;
         j["createdDate"] = x.created_date;
         j["dice"] = x.dice;
         j["donor"] = x.donor;
         j["id"] = x.id;
-        j["image_url"] = x.image_url;
-        j["pubkey_text"] = x.pubkey_text;
-        j["stats"] = x.stats;
+        if (x.image_url) {
+            j["image_url"] = x.image_url;
+        }
+        if (x.pubkey_text) {
+            j["pubkey_text"] = x.pubkey_text;
+        }
+        if (x.stats) {
+            j["stats"] = x.stats;
+        }
         j["username"] = x.username;
     }
 
@@ -451,10 +509,16 @@ namespace API {
 
     inline void to_json(json & j, const AuthSettingsRequest & x) {
         j = json::object();
-        j["color"] = x.color;
+        if (x.color) {
+            j["color"] = x.color;
+        }
         j["setting"] = x.setting;
-        j["dice_type"] = x.dice_type;
-        j["text"] = x.text;
+        if (x.dice_type) {
+            j["dice_type"] = x.dice_type;
+        }
+        if (x.text) {
+            j["text"] = x.text;
+        }
     }
 
     inline void from_json(const json & j, UserId& x) {
@@ -619,15 +683,21 @@ namespace API {
     inline void to_json(json & j, const ServerPlayer & x) {
         j = json::object();
         j["connected"] = x.connected;
-        j["crowned"] = x.crowned;
+        if (x.crowned) {
+            j["crowned"] = x.crowned;
+        }
         j["doubles_count"] = x.doubles_count;
-        j["name"] = x.name;
+        if (x.name) {
+            j["name"] = x.name;
+        }
         j["roll_count"] = x.roll_count;
         j["score"] = x.score;
         j["session"] = x.session;
         j["skip_count"] = x.skip_count;
         j["turn_count"] = x.turn_count;
-        j["user_id"] = x.user_id;
+        if (x.user_id) {
+            j["user_id"] = x.user_id;
+        }
         j["win_count"] = x.win_count;
     }
 
@@ -668,7 +738,9 @@ namespace API {
     inline void to_json(json & j, const RoomListMsg & x) {
         j = json::object();
         j["rooms"] = x.rooms;
-        j["type"] = x.type;
+        if (x.type) {
+            j["type"] = x.type;
+        }
     }
 
     inline void from_json(const json & j, RefetchPlayerMsg& x) {
@@ -776,9 +848,13 @@ namespace API {
     inline void to_json(json & j, const JoinMsg & x) {
         j = json::object();
         j["id"] = x.id;
-        j["name"] = x.name;
+        if (x.name) {
+            j["name"] = x.name;
+        }
         j["type"] = x.type;
-        j["user_id"] = x.user_id;
+        if (x.user_id) {
+            j["user_id"] = x.user_id;
+        }
     }
 
     inline void from_json(const json & j, DisconnectMsg& x) {
@@ -802,9 +878,13 @@ namespace API {
     inline void to_json(json & j, const ReconnectMsg & x) {
         j = json::object();
         j["id"] = x.id;
-        j["name"] = x.name;
+        if (x.name) {
+            j["name"] = x.name;
+        }
         j["type"] = x.type;
-        j["user_id"] = x.user_id;
+        if (x.user_id) {
+            j["user_id"] = x.user_id;
+        }
     }
 
     inline void from_json(const json & j, KickMsg& x) {
@@ -816,19 +896,6 @@ namespace API {
         j = json::object();
         j["id"] = x.id;
         j["type"] = x.type;
-    }
-
-    inline void from_json(const json & j, UsernameChunk& x) {
-        x.name = j.at("name").get<std::string>();
-        x.type = j.at("type").get<UsernameChunkType>();
-        x.user_id = get_stack_optional<std::string>(j, "user_id");
-    }
-
-    inline void to_json(json & j, const UsernameChunk & x) {
-        j = json::object();
-        j["name"] = x.name;
-        j["type"] = x.type;
-        j["user_id"] = x.user_id;
     }
 
     inline void from_json(const json & j, ChatMsg& x) {
@@ -851,7 +918,9 @@ namespace API {
     inline void to_json(json & j, const UpdateTurnMsg & x) {
         j = json::object();
         j["id"] = x.id;
-        j["skip"] = x.skip;
+        if (x.skip) {
+            j["skip"] = x.skip;
+        }
         j["type"] = x.type;
     }
 
@@ -879,10 +948,14 @@ namespace API {
     inline void to_json(json & j, const UpdateMsg & x) {
         j = json::object();
         j["id"] = x.id;
-        j["reset"] = x.reset;
+        if (x.reset) {
+            j["reset"] = x.reset;
+        }
         j["score"] = x.score;
         j["type"] = x.type;
-        j["used"] = x.used;
+        if (x.used) {
+            j["used"] = x.used;
+        }
     }
 
     inline void from_json(const json & j, Alignment & x) {
@@ -921,12 +994,14 @@ namespace API {
 
     inline void from_json(const json & j, RichTextChunkType & x) {
         if (j == "rt_text") x = RichTextChunkType::RT_TEXT;
+        else if (j == "rt_username") x = RichTextChunkType::RT_USERNAME;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
     inline void to_json(json & j, const RichTextChunkType & x) {
         switch (x) {
             case RichTextChunkType::RT_TEXT: j = "rt_text"; break;
+            case RichTextChunkType::RT_USERNAME: j = "rt_username"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
@@ -1236,18 +1311,6 @@ namespace API {
     inline void to_json(json & j, const KickMsgType & x) {
         switch (x) {
             case KickMsgType::KICK: j = "kick"; break;
-            default: throw std::runtime_error("This should not happen");
-        }
-    }
-
-    inline void from_json(const json & j, UsernameChunkType & x) {
-        if (j == "rt_username") x = UsernameChunkType::RT_USERNAME;
-        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
-    }
-
-    inline void to_json(json & j, const UsernameChunkType & x) {
-        switch (x) {
-            case UsernameChunkType::RT_USERNAME: j = "rt_username"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
@@ -1672,15 +1735,6 @@ to_json(j, *this);
 return j.dump();
 }
 void UserId::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
-std::string UsernameChunk::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void UsernameChunk::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

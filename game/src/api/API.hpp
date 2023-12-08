@@ -69,8 +69,6 @@
 #include "ReconnectMsg.hpp"
 #include "KickMsgType.hpp"
 #include "KickMsg.hpp"
-#include "UsernameChunkType.hpp"
-#include "UsernameChunk.hpp"
 #include "ChatMsgType.hpp"
 #include "ChatMsg.hpp"
 #include "UpdateTurnMsgType.hpp"

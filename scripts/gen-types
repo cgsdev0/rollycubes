@@ -13,6 +13,7 @@ rm ssh-gateway/api/generated.go
   --no-boost \
   --source-style multi-source \
   --lang c++ \
+  --hide-null-optional \
   --namespace API \
   --src-lang schema "./schema.json#/definitions/"
 

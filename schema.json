@@ -887,35 +887,20 @@
       "additionalProperties": false,
       "required": ["id", "type"]
     },
-    "UsernameChunk": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "default": "rt_username",
-          "enum": ["rt_username"]
-        },
-        "name": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
-        }
-      },
-      "additionalProperties": false,
-      "required": ["name", "type"]
-    },
     "RichTextChunk": {
       "type": "object",
       "properties": {
         "type": {
           "type": "string",
           "default": "rt_text",
-          "enum": ["rt_text"]
+          "enum": ["rt_text", "rt_username"]
         },
-        "msg": {
+        "text": {
           "type": "string"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
         },
         "color": {
           "type": "string"
@@ -933,7 +918,7 @@
         }
       },
       "additionalProperties": false,
-      "required": ["msg", "type"]
+      "required": ["text", "type"]
     },
     "RichTextMsg": {
       "type": "object",
@@ -948,8 +933,7 @@
           "items": {
             "oneOf": [
               { "type": "string" },
-              { "$ref": "#/definitions/RichTextChunk" },
-              { "$ref": "#/definitions/UsernameChunk" }
+              { "$ref": "#/definitions/RichTextChunk" }
             ]
           }
         }

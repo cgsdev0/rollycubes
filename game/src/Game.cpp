@@ -255,9 +255,6 @@ void Game::handleMessage(HANDLER_ARGS) {
 void Game::chat(HANDLER_ARGS) {
     json res;
 
-    RichTextStream stream;
-    stream << "hello " << RT::color("red") << "red" << RT::reset << " world\n";
-    std::cout << stream.str() << std::endl;
     if (!data["msg"].is_string())
         throw API::GameError({.error = "Message must be a string"});
     for (uint i = 0; i < state.players.size(); ++i) {
@@ -270,6 +267,21 @@ void Game::chat(HANDLER_ARGS) {
             if (name == "") {
                 name = "User" + std::to_string(i + 1);
             }
+
+            /* NEW API */
+            RichTextStream stream;
+            auto msg2 = msg;
+            if (msg.length() > MAX_CHAT_LEN) {
+                msg2 = trimString(msg, MAX_CHAT_LEN, true);
+            }
+            stream << state.players[i] << msg2;
+            state.rich_chat_log.insert(state.rich_chat_log.begin(), stream.obj());
+            if (state.rich_chat_log.size() > MAX_CHAT_LOG) {
+                state.rich_chat_log.pop_back();
+            }
+            broadcast(stream.str());
+            /* END NEW API */
+
             std::string fullMsg = name + ": " + msg;
             if (fullMsg.length() > MAX_CHAT_LEN) {
                 fullMsg = trimString(fullMsg, MAX_CHAT_LEN, true);

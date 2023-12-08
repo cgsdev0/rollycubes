@@ -103,8 +103,9 @@ export interface RichTextMsg {
 }
 
 export interface RichTextChunk {
-  type: "rt_text";
-  msg: string;
+  type: "rt_text" | "rt_username";
+  text: string;
+  user_id?: string;
   color?: string;
   alignment?: "left" | "right" | "center";
   modifiers?: ("bold" | "italic" | "underline" | "strikethrough")[];
@@ -320,10 +321,4 @@ export interface GameState {
   victory: boolean;
   privateSession: boolean;
   spectators: number;
-}
-
-export interface UsernameChunk {
-  type: "rt_username";
-  name: string;
-  user_id?: string;
 }

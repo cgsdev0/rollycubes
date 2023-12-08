@@ -6,5 +6,5 @@
 
 namespace API {
 
-    enum class RichTextChunkType : int { RT_TEXT };
+    enum class RichTextChunkType : int { RT_TEXT, RT_USERNAME };
 }
