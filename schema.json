@@ -948,7 +948,8 @@
           "items": {
             "oneOf": [
               { "type": "string" },
-              { "$ref": "#/definitions/RichTextChunk" }
+              { "$ref": "#/definitions/RichTextChunk" },
+              { "$ref": "#/definitions/UsernameChunk" }
             ]
           }
         }

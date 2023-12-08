@@ -115,6 +115,7 @@ class Game {
             .id = -1,
             .players = players,
             .private_session = this->state.private_session,
+            .rich_chat_log = this->state.rich_chat_log,
             .rolled = this->state.rolled,
             .rolls = this->state.rolls,
             .spectators = this->state.spectators,

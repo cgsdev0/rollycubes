@@ -7,6 +7,7 @@
 #include "Loop.h"
 #include "StringUtils.h"
 #include "achievements/All.h"
+#include "RichTextStream.h"
 
 Game::Game() {
     this->state.victory = false;
@@ -253,6 +254,10 @@ void Game::handleMessage(HANDLER_ARGS) {
 
 void Game::chat(HANDLER_ARGS) {
     json res;
+
+    RichTextStream stream;
+    stream << "hello " << RT::color("red") << "red" << RT::reset << " world\n";
+    std::cout << stream.str() << std::endl;
     if (!data["msg"].is_string())
         throw API::GameError({.error = "Message must be a string"});
     for (uint i = 0; i < state.players.size(); ++i) {
