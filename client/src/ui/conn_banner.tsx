@@ -53,7 +53,6 @@ const ConnBannerC: React.FC<Props & DispatchProp> = ({ connected }) => {
   return (
     <Transition in={!connected} timeout={{ enter: 6000, exit: 250 }} appear>
       {(state) => (
-        console.log(state),
         (
           <Wrapper
             className={
