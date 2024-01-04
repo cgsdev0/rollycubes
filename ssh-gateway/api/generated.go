@@ -897,8 +897,9 @@ const (
 type DiceType string
 
 const (
-	D20 DiceType = "D20"
-	D6  DiceType = "D6"
+	D20     DiceType = "D20"
+	Default DiceType = "Default"
+	Golden  DiceType = "Golden"
 )
 
 type Setting string
