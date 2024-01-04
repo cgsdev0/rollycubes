@@ -411,7 +411,6 @@ export const initScene = async () => {
       if (dice[i]) {
         dice[i].dispose();
       }
-      console.log(type);
       dice[i] = await createDie[type](scene);
       // console.log(await createDie(scene))
       //dice[i].position = new BABYLON.Vector3(1000 + i, 1000, 1000);
