@@ -13,6 +13,9 @@ const octocat = css({
   '&:hover .octo-arm': {
     animation: `${octocatWave} 560ms ease-in-out`,
   },
+  '& svg': {
+    fill: '$primary',
+  },
   '@bp0': {
     display: 'none',
   },
@@ -35,7 +38,7 @@ export const Octocat = () => {
         height="80"
         viewBox="0 0 250 250"
         style={{
-          fill: '#ffffff55',
+          opacity: 0.4,
           color: '#151515',
           position: 'absolute',
           top: 0,

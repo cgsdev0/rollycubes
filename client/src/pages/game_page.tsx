@@ -6,6 +6,7 @@ import { css, styled } from 'stitches.config';
 import Connection from '../connection';
 import {
   selectHasD20Unlocked,
+  selectHasGoldenUnlocked,
   selectIs3d,
   selectIsReset,
   selectIsSpectator,
@@ -220,10 +221,12 @@ const Settings: React.FC<{}> = () => {
 
   const user_id = useSelector(selectSelfUserId);
   const hasD20Unlocked = useSelector(selectHasD20Unlocked);
+  const hasGoldenUnlocked = useSelector(selectHasGoldenUnlocked);
   const { data } = useGetUserByIdQuery(user_id || '');
   const socket = useSelector((state: ReduxState) => state.connection.socket);
   const dispatch = useDispatch();
   const dice3d = useSelector((state: ReduxState) => state.settings.sick3dmode);
+  const darkMode = useSelector((state: ReduxState) => state.settings.darkMode);
   const color = useSelector((state: ReduxState) => state.settings.color);
   const pubkey = useSelector((state: ReduxState) => state.settings.pubkey);
   const dice_type = useSelector(
@@ -283,14 +286,25 @@ const Settings: React.FC<{}> = () => {
               dispatch({ type: 'TOGGLE_3D' });
             }}
           />
+          <ToggleSwitch
+            id="dark"
+            desc="Dark mode"
+            checked={darkMode}
+            onChange={() => {
+              dispatch({ type: 'TOGGLE_DARK' });
+            }}
+          />
           <Select
             options={[
-              { value: 'D6', label: 'D6' },
+              { value: 'Default', label: 'Default' },
               ...(hasD20Unlocked ? [{ value: 'D20', label: 'D20' }] : []),
+              ...(hasGoldenUnlocked
+                ? [{ value: 'Golden', label: 'Golden' }]
+                : []),
             ]}
             value={dice_type.toString()}
             id="dice_type"
-            label="Dice shape"
+            label="Dice type"
             onChange={onDiceTypeChange}
           />
         </Column>

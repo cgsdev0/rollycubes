@@ -90,8 +90,14 @@ const buttonContainer = css({
   },
 });
 
+const guestTextDisabled = css({
+  color: '$primaryDimmed',
+});
 const guestText = css({
-  color: 'white',
+  '&::after': {
+    content: '  →',
+  },
+  color: '$primary',
   cursor: 'pointer',
   '&:hover': {
     color: '#55dfa0',
@@ -164,7 +170,7 @@ const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
               />
             </form>
             <p
-              className={username ? guestText() : ''}
+              className={username ? guestText() : guestTextDisabled()}
               onClick={username ? onStart : undefined}
             >
               Play as a guest
