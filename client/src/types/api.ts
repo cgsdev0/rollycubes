@@ -25,7 +25,7 @@ export type ServerMsg =
   | UpdateNameMsg
   | UpdateMsg;
 
-export type DiceType = "D6" | "D20";
+export type DiceType = "Default" | "D20" | "Golden";
 
 export type AuthSettingsRequest =
   | {

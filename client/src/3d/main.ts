@@ -190,16 +190,34 @@ const makeD20Creator = () => {
   };
 };
 
-const makeDieCreator = () => {
+const makeDieCreator = (type: 'normal' | 'gold') => {
   var diceMat: BABYLON.StandardMaterial;
+  var diceGoldMat: BABYLON.StandardMaterial;
   let i = 0;
   return async (scene: BABYLON.Scene) => {
-    if (!diceMat) {
+    if (!diceMat || !diceGoldMat) {
       diceMat = new BABYLON.StandardMaterial('diceMat', scene);
       diceMat.diffuseTexture = new BABYLON.Texture('/dice.png', scene);
       diceMat.ambientColor = scene.ambientColor;
       diceMat.roughness = 1.0;
       diceMat.specularPower = 5000;
+      diceGoldMat = new BABYLON.StandardMaterial('diceGoldMat', scene);
+      diceGoldMat.reflectionTexture = new BABYLON.CubeTexture(
+        '/skybox/skybox',
+        scene
+      );
+      diceGoldMat.reflectionTexture!.coordinatesMode =
+        BABYLON.Texture.CUBIC_MODE;
+      diceGoldMat.reflectionTexture!.level = 0.5;
+      diceGoldMat.diffuseTexture = new BABYLON.Texture('/gold6.png', scene);
+      diceGoldMat.specularColor = new BABYLON.Color3(0, 0, 0);
+      diceGoldMat.ambientColor = new BABYLON.Color3(0, 0, 0);
+      diceGoldMat.bumpTexture = new BABYLON.Texture('/normal6_2.png', scene);
+      // diceGoldMat.ambientColor = scene.ambientColor;
+      diceGoldMat.backFaceCulling = true;
+      diceGoldMat.roughness = 0.0;
+      diceGoldMat.emissiveColor = new BABYLON.Color3(0.05, 0.02, 0);
+      diceGoldMat.specularPower = 1000;
     }
     const diceUV = createDiceUVs(0);
     const die = BABYLON.MeshBuilder.CreateBox(
@@ -214,16 +232,30 @@ const makeDieCreator = () => {
       scene
     );
     die.isPickable = true;
-    die.material = diceMat;
+    switch (type) {
+      case 'normal':
+        die.material = diceMat;
+        die.physicsImpostor = new BABYLON.PhysicsImpostor(
+          die,
+          BABYLON.PhysicsImpostor.BoxImpostor,
+          { mass: 2.5, restitution: 0.95, friction: 1.8 },
+          scene
+        );
+        break;
+      case 'gold':
+        die.material = diceGoldMat;
+        die.physicsImpostor = new BABYLON.PhysicsImpostor(
+          die,
+          BABYLON.PhysicsImpostor.BoxImpostor,
+          { mass: 4.0, restitution: 0.2, friction: 3.0 },
+          scene
+        );
+        break;
+    }
+
     die.rotationQuaternion = new BABYLON.Quaternion(0, 1, 0, 0);
     //let buffer = die.getVerticesData(BABYLON.VertexBuffer.UVKind);
     //console.log(buffer);
-    die.physicsImpostor = new BABYLON.PhysicsImpostor(
-      die,
-      BABYLON.PhysicsImpostor.BoxImpostor,
-      { mass: 2.5, restitution: 0.95, friction: 1.8 },
-      scene
-    );
 
     // make that shit draggable
     //var pointerDragBehavior = new BABYLON.PointerDragBehavior({
@@ -323,6 +355,10 @@ export const initScene = async () => {
   });
   scene = new BABYLON.Scene(engine);
 
+  const gl = new BABYLON.GlowLayer('glow', scene, {
+    mainTextureFixedSize: 1024,
+    blurKernelSize: 64,
+  });
   // scene.ambientColor = new BABYLON.Color3(1, 1, 1)
   const camera = new BABYLON.FreeCamera(
     'camera',
@@ -337,6 +373,7 @@ export const initScene = async () => {
     scene
   );
   light.intensity = 0.8;
+  // light.diffuse = new BABYLON.Color3(0, 0, 0);
 
   // var light1 = new BABYLON.HemisphericLight(
   //   'light1',
@@ -364,8 +401,9 @@ export const initScene = async () => {
   // make some dice
   //
   const createDie = {
-    D6: makeDieCreator(), //  makeD20Creator()
-    D20: makeD20Creator(), //  makeD20Creator()
+    D6: makeDieCreator('gold'),
+    D20: makeD20Creator(),
+    Golden: makeDieCreator('gold'),
   };
 
   const initDice = async (type: DiceType, scene: BABYLON.Scene) => {

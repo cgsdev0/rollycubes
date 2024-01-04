@@ -1069,14 +1069,16 @@ namespace API {
 
     inline void from_json(const json & j, DiceType & x) {
         if (j == "D20") x = DiceType::D20;
-        else if (j == "D6") x = DiceType::D6;
+        else if (j == "Default") x = DiceType::DEFAULT;
+        else if (j == "Golden") x = DiceType::GOLDEN;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
     inline void to_json(json & j, const DiceType & x) {
         switch (x) {
             case DiceType::D20: j = "D20"; break;
-            case DiceType::D6: j = "D6"; break;
+            case DiceType::DEFAULT: j = "Default"; break;
+            case DiceType::GOLDEN: j = "Golden"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
@@ -1405,21 +1407,21 @@ namespace nlohmann {
     }
 }
 namespace API {
-std::string AchievementData::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void AchievementData::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string Achievement::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void Achievement::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AchievementData::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AchievementData::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }
