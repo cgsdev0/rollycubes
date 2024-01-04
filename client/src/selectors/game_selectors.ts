@@ -3,7 +3,7 @@ import {
   defaultMemoize,
   createSelectorCreator,
 } from 'reselect';
-import { customTheme } from 'stitches.config';
+import { customTheme, lightTheme } from 'stitches.config';
 import { ReduxState, selectState, TARGET_SCORES } from '../store';
 import { QuerySubState } from '@reduxjs/toolkit/dist/query/core/apiState';
 import { authApi, endpoints } from 'api/auth';
@@ -223,6 +223,13 @@ export const selectSelfUserDataFromApi = createSelector(
   (userData, self_id) => userData[self_id || '']?.data
 );
 
+export const selectHasGoldenUnlocked = createSelector(
+  selectSelfUserDataFromApi,
+  (data) =>
+    Boolean(
+      data?.achievements?.some((achievement) => achievement.id === 'perfect')
+    )
+);
 export const selectHasD20Unlocked = createSelector(
   selectSelfUserDataFromApi,
   (data) =>
@@ -233,6 +240,13 @@ export const selectHasD20Unlocked = createSelector(
     )
 );
 
+export const selectIsDarkMode = createSelector(
+  selectState,
+  (state) => state.settings.darkMode
+);
+export const selectDefaultTheme = createSelector(selectIsDarkMode, (dark) =>
+  dark ? undefined : lightTheme
+);
 export const selectCurrentTheme = createSelector(
   selectLocation,
   selectTurnIndex,
@@ -240,15 +254,16 @@ export const selectCurrentTheme = createSelector(
   selectSettingsShowing,
   selectUserData,
   selectSelfUserId,
-  (location, turn, players, showing, userData, self_id) =>
+  selectDefaultTheme,
+  (location, turn, players, showing, userData, self_id, defaultTheme) =>
     showing && userData[self_id || '']?.data?.donor
       ? customTheme
       : location?.pathname.startsWith('/room/') ||
         location?.pathname.startsWith('/spectate/')
       ? userData[players[turn]?.user_id || '']?.data?.donor
         ? customTheme
-        : undefined
-      : undefined
+        : defaultTheme
+      : defaultTheme
 );
 
 export const selectCurrentDiceType = createSelector(
@@ -256,7 +271,7 @@ export const selectCurrentDiceType = createSelector(
   selectPlayers,
   selectUserData,
   (turn, players, userData) =>
-    userData[players[turn]?.user_id || '']?.data?.dice.type || 'D6'
+    userData[players[turn]?.user_id || '']?.data?.dice.type || 'Default'
 );
 
 export const selectCurrentColors = createSelector(

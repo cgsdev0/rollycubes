@@ -30,6 +30,7 @@ pub struct AchievementProgress {
 pub enum DiceType {
     D6,
     D20,
+    Golden,
 }
 
 impl DiceType {
@@ -37,12 +38,14 @@ impl DiceType {
         match self {
             DiceType::D6 => 0,
             DiceType::D20 => 1,
+            DiceType::Golden => 2,
         }
     }
     fn from_int(i: i32) -> DiceType {
         match i {
             0 => DiceType::D6,
             1 => DiceType::D20,
+            2 => DiceType::Golden,
             _ => DiceType::D6,
         }
     }
@@ -427,6 +430,12 @@ pub async fn update_user_setting(
                 DiceType::D20 => {
                     let result = client.query_one(
 "SELECT COUNT(*) FROM user_to_achievement WHERE user_id = $1::UUID AND unlocked IS NOT NULL AND achievement_id = 'astronaut:1'",
+&[&verified_token.claims.user_id]).await?;
+                    result.get::<'_, _, i64>(0) > 0
+                }
+                DiceType::Golden => {
+                    let result = client.query_one(
+"SELECT COUNT(*) FROM user_to_achievement WHERE user_id = $1::UUID AND unlocked IS NOT NULL AND achievement_id = 'perfect'",
 &[&verified_token.claims.user_id]).await?;
                     result.get::<'_, _, i64>(0) > 0
                 }

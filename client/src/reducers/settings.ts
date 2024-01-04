@@ -6,6 +6,7 @@ import { DiceType } from 'types/api';
 export interface SettingsState {
   cheats: boolean;
   sick3dmode: boolean;
+  darkMode: boolean;
   authServiceOrigin: string;
   showSettings: boolean;
   showHelp: boolean;
@@ -26,6 +27,7 @@ export const settingsReducer = createReducer<SettingsState>(
   {
     cheats: true,
     sick3dmode: localStorage.getItem('3d_mode') !== 'false',
+    darkMode: localStorage.getItem('dark_mode') !== 'false',
     authServiceOrigin: import.meta.env.VITE_FANCY_LOCAL_AUTH
       ? FANCY_LOCAL_AUTH_SERVICE
       : import.meta.env.VITE_LOCAL_AUTH
@@ -39,9 +41,18 @@ export const settingsReducer = createReducer<SettingsState>(
       hue: 0,
       sat: 80,
     },
-    dice_type: 'D6',
+    dice_type: 'Default',
   },
   (builder) => {
+    builder.addCase('TOGGLE_DARK', (state, action) => {
+      state.darkMode = !state.darkMode;
+      // TODO: remove these side effects
+      if (!state.darkMode) {
+        localStorage.setItem('dark_mode', 'false');
+      } else {
+        localStorage.removeItem('dark_mode');
+      }
+    });
     builder.addCase('TOGGLE_3D', (state, action) => {
       state.sick3dmode = !state.sick3dmode;
       // TODO: remove these side effects

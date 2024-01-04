@@ -27,6 +27,9 @@ export const {
       gray800: '#2A2A2A',
       gray900: '#151515',
     },
+    shadows: {
+      poptext: '#040404',
+    },
   },
   media: {
     hbp0: '(max-height: 770px)',
@@ -41,9 +44,24 @@ export const {
 const hue = 'var(--custom-hue)';
 const sat = 'var(--custom-sat)';
 
+export const lightTheme = createTheme({
+  colors: {
+    primary: '#040404',
+    primaryDimmed: '#343434',
+    brand: '#3acecd',
+    brandFaded: 'rgba(58, 256, 255, 0.4)',
+    gray800: 'gainsboro',
+    gray750: '#888888',
+    gray700: '#bbbbbb',
+    gray600: '#888888',
+    gray500: '#555555',
+    gray400: '#222222',
+    gray900: '#FFFFFF',
+  },
+});
+
 export const customTheme = createTheme({
   colors: {
-    bad: '#ff0000',
     primary: `hsl(${hue}, ${sat}, 90%)`,
     primaryDimmed: `hsl(${hue}, ${sat}, 60%)`,
     brand: `hsl(${hue}, ${sat}, 50%)`,

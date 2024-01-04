@@ -401,7 +401,7 @@ export const initScene = async () => {
   // make some dice
   //
   const createDie = {
-    D6: makeDieCreator('gold'),
+    Default: makeDieCreator('normal'),
     D20: makeD20Creator(),
     Golden: makeDieCreator('gold'),
   };
@@ -411,12 +411,13 @@ export const initScene = async () => {
       if (dice[i]) {
         dice[i].dispose();
       }
+      console.log(type);
       dice[i] = await createDie[type](scene);
       // console.log(await createDie(scene))
       //dice[i].position = new BABYLON.Vector3(1000 + i, 1000, 1000);
     }
   };
-  initDice('D6', scene!);
+  initDice('Default', scene!);
 
   var greenMat = new BABYLON.StandardMaterial('GREENmat', scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 0.35, 0);

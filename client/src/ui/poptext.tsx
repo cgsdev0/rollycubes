@@ -36,6 +36,8 @@ const PopTextContainer = styled('div', {
     fontSize: 96,
     animation: `${popTextAnim} 1.4s ease-out forwards`,
     fontWeight: 'bold',
+    textShadow:
+      '3px 3px 0 $poptext, -3px 3px 0 $poptext, -3px -3px 0 $poptext, 3px -3px 0 $poptext',
   },
 });
 
