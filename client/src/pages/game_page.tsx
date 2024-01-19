@@ -119,23 +119,15 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
 
   const store = useStore<ReduxState>();
 
-  const [localOnboarded, setLocalOnboarded] = React.useState(false);
-
-  const needsToOnboard =
-    authToken === null && (showLogin || !localOnboarded) && mode === 'room';
+  const needsToOnboard = authToken === null && showLogin;
 
   const showHelp = useSelector((state: ReduxState) => state.settings.showHelp);
-
-  const showSettings = useSelector(
-    (state: ReduxState) => state.settings.showSettings
-  );
 
   const dispatch = useDispatch();
 
   const setShowLogin = React.useCallback(
     (show: boolean) => {
       dispatch({ type: 'SET_SHOW_LOGIN', show });
-      setLocalOnboarded(true);
     },
     [dispatch]
   );
@@ -184,169 +176,20 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
         />
       )}
 
-      {showSettings ? (
-        <Settings />
-      ) : (
-        <>
-          <ConnBanner />
+      <ConnBanner />
 
-          {spectating ? (
-            <SpectatorTitle>You are spectating</SpectatorTitle>
-          ) : spectators ? (
-            <SpectatorTitle>{spectators} spectating</SpectatorTitle>
-          ) : null}
-          <div className={flexColumn()}>
-            <GamePanel />
-            <Players />
-          </div>
-          {showHelp ? <Rules /> : <ChatBox />}
-          <PopText />
-        </>
-      )}
+      {spectating ? (
+        <SpectatorTitle>You are spectating</SpectatorTitle>
+      ) : spectators ? (
+        <SpectatorTitle>{spectators} spectating</SpectatorTitle>
+      ) : null}
+      <div className={flexColumn()}>
+        <GamePanel />
+        <Players />
+      </div>
+      {showHelp ? <Rules /> : <ChatBox />}
+      <PopText />
     </React.Fragment>
-  );
-};
-
-const Settings: React.FC<{}> = () => {
-  const [trigger] = useSetUserColorMutation();
-  const [setDiceType] = useSetDiceTypeMutation();
-  const [setPubkeyText] = useSetPubkeyTextMutation();
-  const [donate, { data: donateData }] = useDonateMutation();
-
-  React.useEffect(() => {
-    if (donateData) {
-      window.open(donateData.link, '_blank', 'noreferrer');
-    }
-  }, [donateData]);
-
-  const user_id = useSelector(selectSelfUserId);
-  const hasD20Unlocked = useSelector(selectHasD20Unlocked);
-  const hasGoldenUnlocked = useSelector(selectHasGoldenUnlocked);
-  const { data } = useGetUserByIdQuery(user_id || '');
-  const socket = useSelector((state: ReduxState) => state.connection.socket);
-  const dispatch = useDispatch();
-  const dice3d = useSelector((state: ReduxState) => state.settings.sick3dmode);
-  const darkMode = useSelector((state: ReduxState) => state.settings.darkMode);
-  const color = useSelector((state: ReduxState) => state.settings.color);
-  const pubkey = useSelector((state: ReduxState) => state.settings.pubkey);
-  const dice_type = useSelector(
-    (state: ReduxState) => state.settings.dice_type
-  );
-  const onSave = React.useCallback(async () => {
-    await trigger(color);
-    await setDiceType(dice_type);
-    await setPubkeyText(pubkey);
-    socket?.send(JSON.stringify({ type: 'refetch_player', user_id }));
-  }, [trigger, color, socket, user_id, dice_type, setDiceType, pubkey]);
-
-  const onHueChange = React.useCallback(
-    (e) =>
-      dispatch({
-        type: 'SET_CUSTOM_HUE',
-        hue: Number.parseInt(e.target.value),
-      }),
-    [dispatch]
-  );
-  const onSatChange = React.useCallback(
-    (e) =>
-      dispatch({
-        type: 'SET_CUSTOM_SAT',
-        sat: Number.parseInt(e.target.value),
-      }),
-    [dispatch]
-  );
-  const onDiceTypeChange = React.useCallback(
-    (e) =>
-      dispatch({
-        type: 'SET_DICE_TYPE',
-        dice_type: e.target.value,
-      }),
-    [dispatch]
-  );
-  const onPubkeyChange = React.useCallback(
-    (e) =>
-      dispatch({
-        type: 'SET_PUBKEY_TEXT',
-        pubkey_text: e.target.value,
-      }),
-    [dispatch]
-  );
-
-  return (
-    <SettingsContainer>
-      <h1>Settings</h1>
-      <TwoColumns>
-        <Column>
-          <h2>Dice</h2>
-          <ToggleSwitch
-            id="dice3d"
-            desc="3D dice animation"
-            checked={dice3d}
-            onChange={() => {
-              dispatch({ type: 'TOGGLE_3D' });
-            }}
-          />
-          <ToggleSwitch
-            id="dark"
-            desc="Dark mode"
-            checked={darkMode}
-            onChange={() => {
-              dispatch({ type: 'TOGGLE_DARK' });
-            }}
-          />
-          <Select
-            options={[
-              { value: 'Default', label: 'Default' },
-              ...(hasD20Unlocked ? [{ value: 'D20', label: 'D20' }] : []),
-              ...(hasGoldenUnlocked
-                ? [{ value: 'Golden', label: 'Golden' }]
-                : []),
-            ]}
-            value={dice_type.toString()}
-            id="dice_type"
-            label="Dice type"
-            onChange={onDiceTypeChange}
-          />
-        </Column>
-        {data?.donor ? (
-          <Column>
-            <h2>Color Scheme</h2>
-            <Slider
-              desc="hue"
-              min={0}
-              max={360}
-              value={color.hue}
-              id="hue"
-              onChange={onHueChange}
-            />
-            <Slider
-              desc="saturation"
-              min={0}
-              max={80}
-              value={color.sat}
-              id="saturation"
-              onChange={onSatChange}
-            />
-          </Column>
-        ) : user_id ? (
-          <PlsDonate>
-            <h2>Enjoying rolly cubes?</h2>
-            <p>Consider donating to unlock additional customization options.</p>
-            <Button onClick={() => donate()}>Donate</Button>
-          </PlsDonate>
-        ) : null}
-      </TwoColumns>
-      <TextArea
-        id="pubkey"
-        desc="SSH Public Keys"
-        value={pubkey}
-        placeholder={'ssh-rsa ...'}
-        onChange={onPubkeyChange}
-      />
-      <SaveButtonWrapper>
-        <Button onClick={onSave}>Save</Button>
-      </SaveButtonWrapper>
-    </SettingsContainer>
   );
 };
 

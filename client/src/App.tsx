@@ -18,9 +18,10 @@ import { v4 as uuidv4 } from 'uuid';
 import GamePage from './pages/game_page';
 import HomePage from './pages/home_page';
 import TwitchOAuthPage from './pages/twitch_oauth_page';
-import { store, history } from './store';
+import { store, history, ReduxState } from './store';
 import { FloatingButtonBar } from 'ui/floating_bar';
 import 'toastify.css';
+import { SettingsPage } from 'pages/settings_page';
 
 const RenderCanvas = styled('canvas', {
   position: 'absolute',
@@ -125,6 +126,9 @@ const AppInner = () => {
 
   const theme = useSelector(selectCurrentTheme);
   const colors = useSelector(selectCurrentColors);
+  const showSettings = useSelector(
+    (state: ReduxState) => state.settings.showSettings
+  );
 
   return (
     <div
@@ -155,6 +159,7 @@ const AppInner = () => {
                 >
                   <div className={innerContainer()}>
                     <FloatingButtonBar />
+                    {showSettings ? <SettingsPage /> : null}
                     <Routes>
                       <Route path="/">
                         <Route index element={<HomePage />} />
@@ -197,7 +202,10 @@ const AppInner = () => {
                   </div>
                 </div>
               </div>
-              <RenderCanvas id="renderCanvas" />
+              <RenderCanvas
+                id="renderCanvas"
+                style={showSettings ? { opacity: 0.05 } : {}}
+              />
             </Router>
           </AchievementProvider>
         </AuthProvider>

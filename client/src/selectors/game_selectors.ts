@@ -255,15 +255,20 @@ export const selectCurrentTheme = createSelector(
   selectUserData,
   selectSelfUserId,
   selectDefaultTheme,
-  (location, turn, players, showing, userData, self_id, defaultTheme) =>
-    showing && userData[self_id || '']?.data?.donor
-      ? customTheme
-      : location?.pathname.startsWith('/room/') ||
-        location?.pathname.startsWith('/spectate/')
-      ? userData[players[turn]?.user_id || '']?.data?.donor
-        ? customTheme
-        : defaultTheme
-      : defaultTheme
+  (location, turn, players, showing, userData, self_id, defaultTheme) => {
+    if (showing && userData[self_id || '']?.data?.donor) {
+      return customTheme;
+    }
+    if (
+      !showing &&
+      userData[players[turn]?.user_id || '']?.data?.donor &&
+      (location?.pathname.startsWith('/room/') ||
+        location?.pathname.startsWith('/spectate/'))
+    ) {
+      return customTheme;
+    }
+    return defaultTheme;
+  }
 );
 
 export const selectCurrentDiceType = createSelector(
