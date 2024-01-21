@@ -26,7 +26,7 @@ pub struct AchievementProgress {
     rd: Option<i64>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum DiceType {
     D6,
     D20,

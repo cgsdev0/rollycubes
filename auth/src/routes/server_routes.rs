@@ -11,6 +11,8 @@ use std::fs;
 use std::time::SystemTime;
 use uuid::Uuid;
 
+use super::user_routes::DiceType;
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Achievement {
     id: String,
@@ -18,6 +20,9 @@ pub struct Achievement {
     image_url: Option<String>,
     description: String,
     max_progress: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    unlocks: Option<DiceType>,
 }
 lazy_static! {
     static ref PRE_SHARED_KEY: String = fs::read_to_string("./secrets/.pre-shared-key")
