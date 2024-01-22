@@ -157,7 +157,6 @@ const updateUVs = (
 
 const makeD20Creator = (physics?: boolean) => {
   var diceMat: BABYLON.StandardMaterial;
-  let i = 0;
   return async (scene: BABYLON.Scene) => {
     if (!diceMat) {
       diceMat = new BABYLON.StandardMaterial('d20mat', scene);
@@ -167,7 +166,7 @@ const makeD20Creator = (physics?: boolean) => {
       diceMat.specularPower = 100;
     }
     const mesh = BABYLON.MeshBuilder.CreateIcoSphere(
-      `d20-${i++}`,
+      `d20-${idx++}`,
       { subdivisions: 1, updatable: true, radius: 0.45 },
       scene
     );
@@ -192,10 +191,10 @@ const makeD20Creator = (physics?: boolean) => {
   };
 };
 
+let idx = 0;
 const makeDieCreator = (type: 'normal' | 'gold', physics?: boolean) => {
   var diceMat: BABYLON.StandardMaterial;
   var diceGoldMat: BABYLON.StandardMaterial;
-  let i = 0;
   return async (scene: BABYLON.Scene) => {
     if (!diceMat || !diceGoldMat) {
       diceMat = new BABYLON.StandardMaterial('diceMat', scene);
@@ -223,7 +222,7 @@ const makeDieCreator = (type: 'normal' | 'gold', physics?: boolean) => {
     }
     const diceUV = createDiceUVs(0);
     const die = BABYLON.MeshBuilder.CreateBox(
-      `die${i++}`,
+      `die${idx++}`,
       {
         width: diceSize,
         height: diceSize,
