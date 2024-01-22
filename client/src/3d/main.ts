@@ -342,7 +342,9 @@ export const initPreview = async (diceType: DiceType) => {
     return;
   }
   previewInit = true;
-  BABYLON = await import('babylonjs');
+  if (!BABYLON) {
+    BABYLON = await import('babylonjs');
+  }
   const diceCount = 1;
   const previewDice: BABYLON.Mesh[] = [];
   var canvas: any = document.getElementById('previewCanvas');
@@ -409,7 +411,9 @@ export const initScene = async () => {
   if (sceneInit || !window.hasOwnProperty('Ammo')) {
     return;
   }
-  BABYLON = await import('babylonjs');
+  if (!BABYLON) {
+    BABYLON = await import('babylonjs');
+  }
   gravityVector = new BABYLON.Vector3(0, -9.81, 0);
   if (typeof (window as any).Ammo === 'function') {
     await (window as any).Ammo();
