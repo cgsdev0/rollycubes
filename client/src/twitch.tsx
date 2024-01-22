@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { selectAuthService } from './selectors/game_selectors';
 import { ReduxState } from './store';
 
-const twitchLogin = (authService: string, intent: string) => () => {
+export const twitchLogin = (authService: string, intent?: string) => () => {
   if (!intent) {
     localStorage.removeItem('intent');
   } else {

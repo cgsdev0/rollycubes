@@ -279,6 +279,7 @@ export interface AchievementData {
   id: string;
   name: string;
   max_progress: number;
+  unlocks?: DiceType;
 }
 
 export interface DieRoll {

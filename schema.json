@@ -437,6 +437,9 @@
         },
         "max_progress": {
           "type": "integer"
+        },
+        "unlocks": {
+          "$ref": "#/definitions/DiceType"
         }
       },
       "additionalProperties": false,

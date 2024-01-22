@@ -155,7 +155,7 @@ const updateUVs = (
   }
 };
 
-const makeD20Creator = () => {
+const makeD20Creator = (physics?: boolean) => {
   var diceMat: BABYLON.StandardMaterial;
   let i = 0;
   return async (scene: BABYLON.Scene) => {
@@ -179,18 +179,20 @@ const makeD20Creator = () => {
     // )
     // const mesh = result.meshes[0]
     mesh.updateVerticesData(BABYLON.VertexBuffer.UVKind, d20UVs.slice());
-    mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
-      mesh,
-      BABYLON.PhysicsImpostor.MeshImpostor,
-      { mass: 2.5, restitution: 0.75, friction: 1.9 },
-      scene
-    );
+    if (physics) {
+      mesh.physicsImpostor = new BABYLON.PhysicsImpostor(
+        mesh,
+        BABYLON.PhysicsImpostor.MeshImpostor,
+        { mass: 2.5, restitution: 0.75, friction: 1.9 },
+        scene
+      );
+    }
     mesh.material = diceMat;
     return mesh;
   };
 };
 
-const makeDieCreator = (type: 'normal' | 'gold') => {
+const makeDieCreator = (type: 'normal' | 'gold', physics?: boolean) => {
   var diceMat: BABYLON.StandardMaterial;
   var diceGoldMat: BABYLON.StandardMaterial;
   let i = 0;
@@ -235,21 +237,25 @@ const makeDieCreator = (type: 'normal' | 'gold') => {
     switch (type) {
       case 'normal':
         die.material = diceMat;
-        die.physicsImpostor = new BABYLON.PhysicsImpostor(
-          die,
-          BABYLON.PhysicsImpostor.BoxImpostor,
-          { mass: 2.5, restitution: 0.95, friction: 1.8 },
-          scene
-        );
+        if (physics) {
+          die.physicsImpostor = new BABYLON.PhysicsImpostor(
+            die,
+            BABYLON.PhysicsImpostor.BoxImpostor,
+            { mass: 2.5, restitution: 0.95, friction: 1.8 },
+            scene
+          );
+        }
         break;
       case 'gold':
         die.material = diceGoldMat;
-        die.physicsImpostor = new BABYLON.PhysicsImpostor(
-          die,
-          BABYLON.PhysicsImpostor.BoxImpostor,
-          { mass: 4.0, restitution: 0.2, friction: 3.0 },
-          scene
-        );
+        if (physics) {
+          die.physicsImpostor = new BABYLON.PhysicsImpostor(
+            die,
+            BABYLON.PhysicsImpostor.BoxImpostor,
+            { mass: 4.0, restitution: 0.2, friction: 3.0 },
+            scene
+          );
+        }
         break;
     }
 
@@ -286,10 +292,27 @@ const killAnimation = (die: BABYLON.AbstractMesh) => {
 };
 
 let sceneInit = false;
+let previewInit = false;
 let scene: BABYLON.Scene | undefined;
+let previewScene: BABYLON.Scene | undefined;
 let engine: BABYLON.Engine | undefined;
+let previewEngine: BABYLON.Engine | undefined;
 let rollListener: any;
 let snapListener: any;
+
+export const destroyPreview = () => {
+  if (!previewInit) {
+    return;
+  }
+  previewInit = false;
+
+  if (previewScene) {
+    previewScene.dispose();
+  }
+  if (previewEngine) {
+    previewEngine.dispose();
+  }
+};
 
 export const destroyScene = async () => {
   if (!sceneInit) {
@@ -313,6 +336,74 @@ export const destroyScene = async () => {
   rollListener = undefined;
   document.removeEventListener('snapDice', snapListener);
   snapListener = undefined;
+};
+export const initPreview = async (diceType: DiceType) => {
+  if (previewInit) {
+    return;
+  }
+  previewInit = true;
+  BABYLON = await import('babylonjs');
+  const diceCount = 1;
+  const previewDice: BABYLON.Mesh[] = [];
+  var canvas: any = document.getElementById('previewCanvas');
+  previewEngine = new BABYLON.Engine(canvas, true, {
+    preserveDrawingBuffer: true,
+    stencil: true,
+  });
+  previewScene = new BABYLON.Scene(previewEngine);
+
+  const gl = new BABYLON.GlowLayer('glowPreview', previewScene, {
+    mainTextureFixedSize: 1024,
+    blurKernelSize: 64,
+  });
+  const camera = new BABYLON.FreeCamera(
+    'cameraPreview',
+    new BABYLON.Vector3(0, 5, 0),
+    previewScene
+  );
+  // camera.attachControl(canvas, true);
+  camera.setTarget(BABYLON.Vector3.Zero());
+  var light = new BABYLON.HemisphericLight(
+    'light1Preview',
+    new BABYLON.Vector3(0, 5, 0),
+    previewScene
+  );
+  light.intensity = 0.8;
+
+  const createDie = {
+    Default: makeDieCreator('normal'),
+    D20: makeD20Creator(),
+    Golden: makeDieCreator('gold'),
+  };
+
+  const initDice = async (type: DiceType) => {
+    for (let i = 0; i < diceCount; ++i) {
+      if (previewDice[i]) {
+        previewDice[i].dispose();
+      }
+      previewDice[i] = await createDie[type](previewScene!);
+      previewDice[i].position = new BABYLON.Vector3(0, 3, 0.15);
+      previewDice[i].rotation = new BABYLON.Vector3(0, 0, 0);
+    }
+  };
+  initDice(diceType);
+
+  previewScene!.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+  window.addEventListener('resize', function () {
+    if (previewEngine) {
+      previewEngine.resize();
+    }
+  });
+  previewEngine!.runRenderLoop(function () {
+    if (previewEngine && previewScene) {
+      for (let i = 0; i < diceCount; ++i) {
+        previewDice[i].rotation.z += previewEngine.getDeltaTime() * 0.001;
+        previewDice[i].rotation.x += previewEngine.getDeltaTime() * 0.0005;
+      }
+      previewScene.render();
+    }
+  });
+  return initDice;
 };
 export const initScene = async () => {
   if (sceneInit || !window.hasOwnProperty('Ammo')) {
@@ -401,9 +492,9 @@ export const initScene = async () => {
   // make some dice
   //
   const createDie = {
-    Default: makeDieCreator('normal'),
-    D20: makeD20Creator(),
-    Golden: makeDieCreator('gold'),
+    Default: makeDieCreator('normal', true),
+    D20: makeD20Creator(true),
+    Golden: makeDieCreator('gold', true),
   };
 
   const initDice = async (type: DiceType, scene: BABYLON.Scene) => {

@@ -1,5 +1,6 @@
 import { useLogoutMutation } from 'api/auth';
 import { useSelector, useStore } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router';
 import { styled } from 'stitches.config';
 import { ReduxState } from 'store';
@@ -11,6 +12,8 @@ import {
   LoginIcon,
   LogoutIcon,
 } from './icons/help';
+import { twitchLogin } from 'twitch';
+import { selectAuthService } from 'selectors/game_selectors';
 
 const FloatingBar = styled('div', {
   width: '100%',
@@ -47,10 +50,6 @@ export const FloatingButtonBar = () => {
 
   const authToken = useSelector((state: ReduxState) => state.auth.authToken);
 
-  const showSettings = useSelector(
-    (state: ReduxState) => state.settings.showSettings
-  );
-
   const pathname = useSelector(
     (state: ReduxState) =>
       (state.router.location?.pathname || '/').split('#')[0].split('?')[0]
@@ -60,6 +59,10 @@ export const FloatingButtonBar = () => {
 
   const isError = pathname === '/multiple-tabs';
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showSettings = searchParams.get('settings');
+
+  const authService = useSelector(selectAuthService);
   return (
     <FloatingBar>
       <InnerBar>
@@ -67,17 +70,20 @@ export const FloatingButtonBar = () => {
           <HomeIcon onClick={() => navigate('/')} />
         ) : (
           <>
-            {showSettings || isHome ? null : (
+            {showSettings ? null : (
               <>
                 <HomeIcon onClick={() => navigate('/')} />
                 <GearIcon
-                  onClick={() =>
-                    store.dispatch({ type: 'TOGGLE_SHOW_SETTINGS' })
-                  }
+                  onClick={() => {
+                    searchParams.set('settings', 'main');
+                    setSearchParams(searchParams);
+                  }}
                 />
-                <HelpIcon
-                  onClick={() => store.dispatch({ type: 'TOGGLE_SHOW_HELP' })}
-                />
+                {isHome ? null : (
+                  <HelpIcon
+                    onClick={() => store.dispatch({ type: 'TOGGLE_SHOW_HELP' })}
+                  />
+                )}
               </>
             )}
             <RightAlign>
@@ -85,7 +91,8 @@ export const FloatingButtonBar = () => {
                 <>
                   <CloseIcon
                     onClick={() => {
-                      store.dispatch({ type: 'TOGGLE_SHOW_SETTINGS' });
+                      searchParams.delete('settings');
+                      setSearchParams(searchParams);
                     }}
                   />
                 </>
@@ -100,11 +107,7 @@ export const FloatingButtonBar = () => {
                     />
                   ) : null}
                   {authToken === null ? (
-                    <LoginIcon
-                      onClick={() => {
-                        store.dispatch({ type: 'SET_SHOW_LOGIN', show: true });
-                      }}
-                    />
+                    <LoginIcon onClick={twitchLogin(authService)} />
                   ) : null}
                 </>
               )}

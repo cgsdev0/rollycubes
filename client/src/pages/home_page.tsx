@@ -142,7 +142,6 @@ const HomePage = () => {
   };
 
   const onStart = (priv: boolean) => async () => {
-    navigate(`/onboard`);
     if (pressed) return;
     setPressed(true);
     const result = await window.fetch(`/create?public`);
@@ -206,21 +205,6 @@ const HomePage = () => {
     };
   }, []);
 
-  const dispatch = useDispatch();
-
-  const setShowLogin = React.useCallback(
-    (show: boolean) => {
-      dispatch({ type: 'SET_SHOW_LOGIN', show });
-    },
-    [dispatch]
-  );
-  const showLogin = useSelector(
-    (state: ReduxState) => state.settings.showLogin
-  );
-
-  if (showLogin) {
-    return <OnboardPage onBoard={() => setShowLogin(false)} />;
-  }
   return (
     <>
       <div className={content()}>

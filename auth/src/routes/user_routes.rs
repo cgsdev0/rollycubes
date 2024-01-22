@@ -28,7 +28,7 @@ pub struct AchievementProgress {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub enum DiceType {
-    D6,
+    Default,
     D20,
     Golden,
 }
@@ -36,17 +36,17 @@ pub enum DiceType {
 impl DiceType {
     fn int_value(self) -> i32 {
         match self {
-            DiceType::D6 => 0,
+            DiceType::Default => 0,
             DiceType::D20 => 1,
             DiceType::Golden => 2,
         }
     }
     fn from_int(i: i32) -> DiceType {
         match i {
-            0 => DiceType::D6,
+            0 => DiceType::Default,
             1 => DiceType::D20,
             2 => DiceType::Golden,
-            _ => DiceType::D6,
+            _ => DiceType::Default,
         }
     }
 }
@@ -426,7 +426,7 @@ pub async fn update_user_setting(
         }
         UpdateSettingsPayload::DiceType { dice_type } => {
             let unlocked = match dice_type {
-                DiceType::D6 => true,
+                DiceType::Default => true,
                 DiceType::D20 => {
                     let result = client.query_one(
 "SELECT COUNT(*) FROM user_to_achievement WHERE user_id = $1::UUID AND unlocked IS NOT NULL AND achievement_id = 'astronaut:1'",
@@ -435,7 +435,7 @@ pub async fn update_user_setting(
                 }
                 DiceType::Golden => {
                     let result = client.query_one(
-"SELECT COUNT(*) FROM user_to_achievement WHERE user_id = $1::UUID AND unlocked IS NOT NULL AND achievement_id = 'perfect'",
+"SELECT COUNT(*) FROM user_to_achievement WHERE user_id = $1::UUID AND unlocked IS NOT NULL AND achievement_id = 'win_games:3'",
 &[&verified_token.claims.user_id]).await?;
                     result.get::<'_, _, i64>(0) > 0
                 }

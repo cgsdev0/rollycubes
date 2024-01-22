@@ -680,11 +680,12 @@ type ReportStats struct {
 }
 
 type AchievementData struct {
-	Description string  `json:"description"`
-	ID          string  `json:"id"`
-	ImageURL    *string `json:"image_url"`
-	MaxProgress int64   `json:"max_progress"`
-	Name        string  `json:"name"`
+	Description string    `json:"description"`
+	ID          string    `json:"id"`
+	ImageURL    *string   `json:"image_url"`
+	MaxProgress int64     `json:"max_progress"`
+	Name        string    `json:"name"`
+	Unlocks     *DiceType `json:"unlocks,omitempty"`
 }
 
 type DieRoll struct {

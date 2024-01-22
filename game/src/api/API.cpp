@@ -595,6 +595,7 @@ namespace API {
         x.image_url = get_stack_optional<std::string>(j, "image_url");
         x.max_progress = j.at("max_progress").get<int64_t>();
         x.name = j.at("name").get<std::string>();
+        x.unlocks = get_stack_optional<DiceType>(j, "unlocks");
     }
 
     inline void to_json(json & j, const AchievementData & x) {
@@ -604,6 +605,9 @@ namespace API {
         j["image_url"] = x.image_url;
         j["max_progress"] = x.max_progress;
         j["name"] = x.name;
+        if (x.unlocks) {
+            j["unlocks"] = x.unlocks;
+        }
     }
 
     inline void from_json(const json & j, DieRoll& x) {

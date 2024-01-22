@@ -8,6 +8,7 @@ import { ReduxState, selectState, TARGET_SCORES } from '../store';
 import { QuerySubState } from '@reduxjs/toolkit/dist/query/core/apiState';
 import { authApi, endpoints } from 'api/auth';
 import { ApiEndpointQuery } from '@reduxjs/toolkit/dist/query/core/module';
+import { Achievement, AchievementData, DiceType } from 'types/api';
 
 export const selectIs3d = createSelector(
   selectState,
@@ -223,6 +224,55 @@ export const selectSelfUserDataFromApi = createSelector(
   (userData, self_id) => userData[self_id || '']?.data
 );
 
+export const selectAuthSlice = createSelector(
+  selectState,
+  (state) => state.auth
+);
+const defaultOptions: Array<
+  AchievementData & {
+    key?: string;
+    unlocks: DiceType;
+    user?: Achievement;
+  }
+> = [
+  {
+    unlocks: 'Default',
+    description: 'Standard issue cubes.',
+    id: 'howdy',
+    name: 'Starter Dice',
+    max_progress: 0,
+    image_url: '',
+    user: {
+      id: 'hello',
+      progress: 0,
+      rn: 0,
+      rd: 0,
+      unlocked: 'true',
+    },
+  },
+];
+export const selectCustomDiceOptions = createSelector(
+  selectAuthSlice,
+  selectSelfUserDataFromApi,
+  (auth, self) => {
+    if (!auth.achievements) {
+      return defaultOptions;
+    }
+    return defaultOptions.concat(
+      Object.entries(auth.achievements)
+        .filter(([_, a]) => a.unlocks)
+        .map(([key, a]) => ({
+          key,
+          ...a,
+          unlocks: a.unlocks!,
+          user: self?.achievements?.find(
+            (achievement) => achievement.id === key
+          ),
+        }))
+    );
+  }
+);
+
 export const selectHasGoldenUnlocked = createSelector(
   selectSelfUserDataFromApi,
   (data) =>
@@ -251,16 +301,16 @@ export const selectCurrentTheme = createSelector(
   selectLocation,
   selectTurnIndex,
   selectPlayers,
-  selectSettingsShowing,
   selectUserData,
   selectSelfUserId,
   selectDefaultTheme,
-  (location, turn, players, showing, userData, self_id, defaultTheme) => {
+  (location, turn, players, userData, self_id, defaultTheme) => {
+    const showing =
+      new URLSearchParams(location?.search).get('settings') === 'premium';
     if (showing && userData[self_id || '']?.data?.donor) {
       return customTheme;
     }
     if (
-      !showing &&
       userData[players[turn]?.user_id || '']?.data?.donor &&
       (location?.pathname.startsWith('/room/') ||
         location?.pathname.startsWith('/spectate/'))
@@ -283,16 +333,20 @@ export const selectCurrentColors = createSelector(
   selectLocation,
   selectTurnIndex,
   selectPlayers,
-  selectSettingsShowing,
   selectSettingsColor,
   selectUserData,
-  (location, turn, players, showing, color, userData) =>
-    showing
+  selectSelfUserId,
+  (location, turn, players, color, userData, self_id) => {
+    const showing =
+      new URLSearchParams(location?.search).get('settings') === 'premium';
+    const donor = userData[self_id || '']?.data?.donor;
+    return showing && donor
       ? color
       : location?.pathname.startsWith('/room/') ||
         location?.pathname.startsWith('/spectate/')
       ? userData[players[turn]?.user_id || '']?.data?.color
-      : undefined
+      : undefined;
+  }
 );
 
 export const selectSelf = createSelector(

@@ -15,6 +15,7 @@ import {
 import { styled, css, globalStyles } from 'stitches.config';
 import { Octocat } from 'ui/buttons/octocat';
 import { v4 as uuidv4 } from 'uuid';
+import { useSearchParams } from 'react-router-dom';
 import GamePage from './pages/game_page';
 import HomePage from './pages/home_page';
 import TwitchOAuthPage from './pages/twitch_oauth_page';
@@ -115,20 +116,8 @@ const innerContainer = css({
 
 const AppInner = () => {
   globalStyles();
-  const size = useWindowSize();
-  const transformString =
-    size!.width! >= 480
-      ? `scale(${Math.min(
-          1,
-          Math.min(size!.width! / 1080, size.height! / 740)
-        )})`
-      : 'scale(1)';
-
   const theme = useSelector(selectCurrentTheme);
   const colors = useSelector(selectCurrentColors);
-  const showSettings = useSelector(
-    (state: ReduxState) => state.settings.showSettings
-  );
 
   return (
     <div
@@ -151,66 +140,74 @@ const AppInner = () => {
         <AuthProvider>
           <AchievementProvider>
             <Router history={history}>
-              <div className={app()}>
-                <Octocat />
-                <div
-                  className={container()}
-                  style={{ transform: transformString }}
-                >
-                  <div className={innerContainer()}>
-                    <FloatingButtonBar />
-                    {showSettings ? <SettingsPage /> : null}
-                    <Routes>
-                      <Route path="/">
-                        <Route index element={<HomePage />} />
-                        <Route path="home" element={<HomePage />} />
-                        <Route
-                          path="twitch_oauth"
-                          element={<TwitchOAuthPage />}
-                        />
-                        <Route
-                          path="multiple-tabs"
-                          element={
-                            <GenericErrorPage
-                              error={
-                                'You already have that room open in another tab.'
-                              }
-                            />
-                          }
-                        />
-                        <Route
-                          path="kicked"
-                          element={
-                            <GenericErrorPage
-                              error={
-                                'You have been kicked from the session for inactivity.'
-                              }
-                            />
-                          }
-                        />
-                        <Route
-                          path="room/:room"
-                          element={<GamePage mode={'room'} />}
-                        />
-                        <Route
-                          path="spectate/:room"
-                          element={<GamePage mode={'spectate'} />}
-                        />
-                        <Route path="*" element={<Navigate to="/" />} />
-                      </Route>
-                    </Routes>
-                  </div>
-                </div>
-              </div>
-              <RenderCanvas
-                id="renderCanvas"
-                style={showSettings ? { opacity: 0.05 } : {}}
-              />
+              <Routed />
             </Router>
           </AchievementProvider>
         </AuthProvider>
       </div>
     </div>
+  );
+};
+
+const Routed = () => {
+  const size = useWindowSize();
+  const transformString =
+    size!.width! >= 480
+      ? `scale(${Math.min(
+          1,
+          Math.min(size!.width! / 1080, size.height! / 740)
+        )})`
+      : 'scale(1)';
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showSettings = searchParams.get('settings');
+  return (
+    <>
+      <div className={app()}>
+        <Octocat />
+        <div className={container()} style={{ transform: transformString }}>
+          <div className={innerContainer()}>
+            <FloatingButtonBar />
+            {showSettings ? <SettingsPage /> : null}
+            <Routes>
+              <Route path="/">
+                <Route index element={<HomePage />} />
+                <Route path="home" element={<HomePage />} />
+                <Route path="twitch_oauth" element={<TwitchOAuthPage />} />
+                <Route
+                  path="multiple-tabs"
+                  element={
+                    <GenericErrorPage
+                      error={'You already have that room open in another tab.'}
+                    />
+                  }
+                />
+                <Route
+                  path="kicked"
+                  element={
+                    <GenericErrorPage
+                      error={
+                        'You have been kicked from the session for inactivity.'
+                      }
+                    />
+                  }
+                />
+                <Route path="room/:room" element={<GamePage mode={'room'} />} />
+                <Route
+                  path="spectate/:room"
+                  element={<GamePage mode={'spectate'} />}
+                />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Route>
+            </Routes>
+          </div>
+        </div>
+      </div>
+      <RenderCanvas
+        id="renderCanvas"
+        style={showSettings ? { opacity: 0.05 } : {}}
+      />
+    </>
   );
 };
 
