@@ -238,6 +238,7 @@ export const SettingsPage: React.FC<{}> = () => {
         {Object.entries(tabs).map(([tab, info]) => {
           return (
             <li
+              key={tab}
               className={selected === tab ? 'selected' : undefined}
               onClick={() => {
                 searchParams.set('settings', tab);

@@ -773,7 +773,7 @@ export const initScene = async () => {
     wall.position.y = 0;
     scene.physicsEnabled = false;
 
-    const rollGroup = new BABYLON.AnimationGroup('rollGroup');
+    const rollGroup = new BABYLON.AnimationGroup('rollGroup', scene);
     dice.forEach((die, i) => {
       if (!scene) {
         return;
@@ -839,7 +839,7 @@ export const initScene = async () => {
       signaler = undefined;
     }
     signalRolled3D(lastRollWasDoubles);
-    var snapGroup = new BABYLON.AnimationGroup('SnapGroup');
+    var snapGroup = new BABYLON.AnimationGroup('SnapGroup', scene);
     const center = picker(x * canvas.width, y * canvas.height);
     dice.sort((a, b) => a.position.x - b.position.x);
     const midpoint = dice
