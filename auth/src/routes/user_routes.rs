@@ -427,10 +427,7 @@ pub async fn update_user_setting(
             client
                 .execute(
                     "UPDATE user_settings SET dice_type = $2 WHERE user_id = $1::UUID",
-                    &[
-                        &verified_token.claims.user_id,
-                        &serde_json::to_string(&dice_type).unwrap(),
-                    ],
+                    &[&verified_token.claims.user_id, &dice_type.to_string()],
                 )
                 .await?;
             Ok(())
@@ -631,8 +628,6 @@ WHERE id=$1::UUID",
         let row = &rows[0];
         let rolls: Option<i32> = row.get("rolls");
         let achievement_id: Option<String> = row.get("achievement_id");
-        let thing = row.get::<'_, _, &str>("dice_type");
-        println!("GOT THING: {}", thing);
         let user = User {
             pubkey_text: if self_id == Some(user_id) {
                 Some(row.get("pubkey_text"))
@@ -644,7 +639,10 @@ WHERE id=$1::UUID",
             image_url: row.get("image_url"),
             donor: row.get("donor"),
             dice: DiceSettings {
-                dice_type: serde_json::from_str(row.get::<'_, _, &str>("dice_type")).unwrap(),
+                dice_type: row
+                    .get::<'_, _, &str>("dice_type")
+                    .parse::<DiceType>()
+                    .unwrap(),
             },
             color: ColorSettings {
                 hue: row.get("color_hue"),
