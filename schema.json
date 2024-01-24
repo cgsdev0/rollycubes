@@ -64,7 +64,7 @@
         "color": {
           "$ref": "#/definitions/Color"
         },
-        "createdDate": {
+        "created_date": {
           "type": "string",
           "format": "date"
         },
@@ -98,7 +98,7 @@
         }
       },
       "additionalProperties": false,
-      "required": ["color", "createdDate", "dice", "donor", "id", "username"]
+      "required": ["color", "created_date", "dice", "donor", "id", "username"]
     },
     "AuthRefreshTokenResponse": {
       "type": "object",

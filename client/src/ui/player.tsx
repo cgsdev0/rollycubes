@@ -232,7 +232,7 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
 
   const win_rate = Math.floor((wins / (games || 1)) * 1000) / 10;
 
-  const join_date = new Date(props.data?.createdDate || 0)
+  const join_date = new Date(props.data?.created_date || 0)
     .toDateString()
     .split(' ');
   join_date.shift();
