@@ -598,7 +598,7 @@ type Room struct {
 type UserData struct {
 	Achievements []Achievement `json:"achievements"`
 	Color        Color         `json:"color"`
-	CreatedDate  string        `json:"createdDate"`
+	CreatedDate  string        `json:"created_date"`
 	Dice         Dice          `json:"dice"`
 	Donor        bool          `json:"donor"`
 	ID           string        `json:"id"`

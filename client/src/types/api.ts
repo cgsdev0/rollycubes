@@ -199,7 +199,7 @@ export interface Color {
 export interface UserData {
   achievements?: Achievement[] | null;
   color: Color;
-  createdDate: string;
+  created_date: string;
   dice: Dice;
   donor: boolean;
   id: string;
