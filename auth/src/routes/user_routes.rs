@@ -642,7 +642,10 @@ WHERE id=$1::UUID",
             image_url: row.get("image_url"),
             donor: row.get("donor"),
             dice: DiceSettings {
-                dice_type: serde_json::from_str(row.get("dice_type")).unwrap(),
+                dice_type: serde_json::from_str::<'_, DiceType>(
+                    row.get::<'_, _, &str>("dice_type"),
+                )
+                .unwrap(),
             },
             color: ColorSettings {
                 hue: row.get("color_hue"),
