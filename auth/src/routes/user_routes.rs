@@ -631,6 +631,8 @@ WHERE id=$1::UUID",
         let row = &rows[0];
         let rolls: Option<i32> = row.get("rolls");
         let achievement_id: Option<String> = row.get("achievement_id");
+        let thing = row.get::<'_, _, &str>("dice_type");
+        println!("GOT THING: {}", thing);
         let user = User {
             pubkey_text: if self_id == Some(user_id) {
                 Some(row.get("pubkey_text"))
@@ -642,10 +644,7 @@ WHERE id=$1::UUID",
             image_url: row.get("image_url"),
             donor: row.get("donor"),
             dice: DiceSettings {
-                dice_type: serde_json::from_str::<'_, DiceType>(
-                    row.get::<'_, _, &str>("dice_type"),
-                )
-                .unwrap(),
+                dice_type: serde_json::from_str(row.get::<'_, _, &str>("dice_type")).unwrap(),
             },
             color: ColorSettings {
                 hue: row.get("color_hue"),
