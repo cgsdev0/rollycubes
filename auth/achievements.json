@@ -2,7 +2,7 @@
   "astronaut:1": {
     "id": "astronaut:1",
     "name": "Astronaut",
-    "description": "Win with a score of 100",
+    "description": "Win with a score of 100.",
     "max_progress": 1,
     "image_url": "https://cdn.rollycubes.com/achievements/astronaut.png",
     "unlocks": "D20"
