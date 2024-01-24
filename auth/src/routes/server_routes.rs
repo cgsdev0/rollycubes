@@ -15,21 +15,21 @@ use generated::DiceType;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Achievement {
-    id: String,
-    name: String,
-    image_url: Option<String>,
-    description: String,
-    max_progress: Option<i32>,
+    pub id: String,
+    pub name: String,
+    pub image_url: Option<String>,
+    pub description: String,
+    pub max_progress: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    unlocks: Option<DiceType>,
+    pub unlocks: Option<DiceType>,
 }
 lazy_static! {
     static ref PRE_SHARED_KEY: String = fs::read_to_string("./secrets/.pre-shared-key")
         .expect("Should have been able to read the file")
         .trim()
         .to_string();
-    static ref ACHIEVEMENTS: HashMap<String, Achievement> =
+    pub static ref ACHIEVEMENTS: HashMap<String, Achievement> =
         serde_json::from_str(include_str!("../../achievements.json")).unwrap();
 }
 
