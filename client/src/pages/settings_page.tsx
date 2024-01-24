@@ -15,11 +15,20 @@ import { TextArea } from 'ui/buttons/textarea';
 import { ToggleSwitch } from 'ui/buttons/toggle';
 import {
   selectCustomDiceOptions,
+  selectIsMyTurn,
   selectSelfUserId,
 } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 import { destroyPreview, initPreview } from '3d/main';
 import { toast } from 'react-toastify';
+import { DiceType } from 'types/api';
+
+const display_names: Partial<Record<DiceType, string>> = {
+  D20: 'Suspicious D20',
+  Golden: 'Golden Dice',
+  Jumbo: 'Jumbo Dice',
+  Hands: 'Handy Dice',
+};
 
 const NextBtn = styled(Button, {
   position: 'absolute',
@@ -193,6 +202,14 @@ const GateBoundary = styled('div', {
 });
 
 export const SettingsPage: React.FC<{}> = () => {
+  const is_my_turn = useSelector(selectIsMyTurn);
+  const was_my_turn = React.useRef(is_my_turn);
+  React.useEffect(() => {
+    if (is_my_turn && !was_my_turn.current) {
+      was_my_turn.current = true;
+      toast.warning("It's your turn!", { position: 'top-right' });
+    }
+  }, [is_my_turn, was_my_turn]);
   let [searchParams, setSearchParams] = useSearchParams();
 
   const tabs = {
@@ -438,7 +455,7 @@ const Customize = () => {
         }}
       >
         <Customizer>
-          <h2>{option.unlocks}</h2>
+          <h2>{display_names[option.unlocks] || option.unlocks}</h2>
           <RenderCanvas id="previewCanvas" />
           <NextBtn style={{ left: 50 }} onClick={advance(-1)}>
             &larr;
