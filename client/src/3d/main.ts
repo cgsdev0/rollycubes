@@ -3,14 +3,11 @@ import { DiceType } from 'types/api';
 import { store } from '../store';
 
 /// <reference path="babylonjs" />
-
 var BABYLON: any;
 const frameRate = 60;
 
 let mouse_x = 0;
 let mouse_y = 0;
-
-// var cannonPlugin = new CannonJSPlugin(true, 10, cannon)
 
 var signaler: any;
 const signalRolled3D = (doubles: boolean) => {
@@ -155,7 +152,7 @@ const updateUVs = (
   }
 };
 
-const makeD20Creator = (physics?: boolean) => {
+const makeD20Creator = (physics: boolean) => {
   var diceMat: BABYLON.StandardMaterial;
   return async (scene: BABYLON.Scene) => {
     if (!diceMat) {
@@ -192,40 +189,44 @@ const makeD20Creator = (physics?: boolean) => {
 };
 
 let idx = 0;
-const makeDieCreator = (type: Exclude<DiceType, 'D20'>, physics?: boolean) => {
-  var diceMat: BABYLON.StandardMaterial;
-  var diceGoldMat: BABYLON.StandardMaterial;
+let matIdx = 0;
+const makeD6Creator = (type: Exclude<DiceType, 'D20'>, physics: boolean) => {
+  let diceMat: BABYLON.StandardMaterial;
   return async (scene: BABYLON.Scene) => {
-    if (!diceMat || !diceGoldMat) {
-      diceMat = new BABYLON.StandardMaterial('diceMat', scene);
-      diceMat.ambientColor = scene.ambientColor;
-      diceMat.roughness = 1.0;
-      diceMat.specularPower = 5000;
-      diceGoldMat = new BABYLON.StandardMaterial('diceGoldMat', scene);
-      diceGoldMat.reflectionTexture = new BABYLON.CubeTexture(
-        '/skybox/skybox',
-        scene
-      );
-      diceGoldMat.reflectionTexture!.coordinatesMode =
-        BABYLON.Texture.CUBIC_MODE;
-      diceGoldMat.reflectionTexture!.level = 0.5;
-      diceGoldMat.diffuseTexture = new BABYLON.Texture('/gold6.png', scene);
-      diceGoldMat.specularColor = new BABYLON.Color3(0, 0, 0);
-      diceGoldMat.ambientColor = new BABYLON.Color3(0, 0, 0);
-      diceGoldMat.bumpTexture = new BABYLON.Texture('/normal6_2.png', scene);
-      // diceGoldMat.ambientColor = scene.ambientColor;
-      diceGoldMat.backFaceCulling = true;
-      diceGoldMat.roughness = 0.0;
-      diceGoldMat.emissiveColor = new BABYLON.Color3(0.05, 0.02, 0);
-      diceGoldMat.specularPower = 1000;
-    }
-    switch (type) {
-      case 'Default':
-        diceMat.diffuseTexture = new BABYLON.Texture('/dice.png', scene);
-        break;
-      case 'Hands':
-        diceMat.diffuseTexture = new BABYLON.Texture('/hands.png', scene);
-        break;
+    if (!diceMat) {
+      diceMat = new BABYLON.StandardMaterial(`die-material${matIdx++}`, scene);
+      switch (type) {
+        case 'Default':
+          diceMat.ambientColor = scene.ambientColor;
+          diceMat.diffuseTexture = new BABYLON.Texture('/dice.png', scene);
+          diceMat.roughness = 1.0;
+          diceMat.specularPower = 5000;
+          break;
+        case 'Hands':
+          diceMat.ambientColor = scene.ambientColor;
+          diceMat.diffuseTexture = new BABYLON.Texture('/hands.png', scene);
+          diceMat.roughness = 1.0;
+          diceMat.specularPower = 5000;
+          break;
+        case 'Golden':
+          diceMat.reflectionTexture = new BABYLON.CubeTexture(
+            '/skybox/skybox',
+            scene
+          );
+          diceMat.reflectionTexture!.coordinatesMode =
+            BABYLON.Texture.CUBIC_MODE;
+          diceMat.reflectionTexture!.level = 0.5;
+          diceMat.diffuseTexture = new BABYLON.Texture('/gold6.png', scene);
+          diceMat.specularColor = new BABYLON.Color3(0, 0, 0);
+          diceMat.ambientColor = new BABYLON.Color3(0, 0, 0);
+          diceMat.bumpTexture = new BABYLON.Texture('/normal6_2.png', scene);
+          // diceGoldMat.ambientColor = scene.ambientColor;
+          diceMat.backFaceCulling = true;
+          diceMat.roughness = 0.0;
+          diceMat.emissiveColor = new BABYLON.Color3(0.05, 0.02, 0);
+          diceMat.specularPower = 1000;
+          break;
+      }
     }
     const diceUV = createDiceUVs(0);
     const die = BABYLON.MeshBuilder.CreateBox(
@@ -240,47 +241,29 @@ const makeDieCreator = (type: Exclude<DiceType, 'D20'>, physics?: boolean) => {
       scene
     );
     die.isPickable = true;
-    switch (type) {
-      case 'Default':
-      case 'Hands':
-        die.material = diceMat;
-        if (physics) {
-          die.physicsImpostor = new BABYLON.PhysicsImpostor(
-            die,
-            BABYLON.PhysicsImpostor.BoxImpostor,
-            { mass: 2.5, restitution: 0.95, friction: 1.8 },
-            scene
-          );
-        }
-        break;
-      case 'Golden':
-        die.material = diceGoldMat;
-        if (physics) {
+    die.material = diceMat;
+    if (physics) {
+      switch (type) {
+        case 'Golden':
           die.physicsImpostor = new BABYLON.PhysicsImpostor(
             die,
             BABYLON.PhysicsImpostor.BoxImpostor,
             { mass: 4.0, restitution: 0.2, friction: 3.0 },
             scene
           );
-        }
-        break;
+          break;
+        default:
+          die.physicsImpostor = new BABYLON.PhysicsImpostor(
+            die,
+            BABYLON.PhysicsImpostor.BoxImpostor,
+            { mass: 2.5, restitution: 0.95, friction: 1.8 },
+            scene
+          );
+          break;
+      }
     }
 
     die.rotationQuaternion = new BABYLON.Quaternion(0, 1, 0, 0);
-    //let buffer = die.getVerticesData(BABYLON.VertexBuffer.UVKind);
-    //console.log(buffer);
-
-    // make that shit draggable
-    //var pointerDragBehavior = new BABYLON.PointerDragBehavior({
-    //  dragPlaneNormal: new BABYLON.Vector3(0, 1, 0),
-    //});
-    ////Use drag plane in world space
-    //pointerDragBehavior.useObjectOrientationForDragging = false;
-    //pointerDragBehavior.dragDeltaRatio = 1;
-    //pointerDragBehavior.onDragStartObservable.add((event) => {
-    //  killAnimation(die);
-    //});
-    //die.addBehavior(pointerDragBehavior);
     return die;
   };
 };
@@ -344,6 +327,16 @@ export const destroyScene = async () => {
   document.removeEventListener('snapDice', snapListener);
   snapListener = undefined;
 };
+
+const makeDieCreators = (physics: boolean) => {
+  return {
+    Default: makeD6Creator('Default', physics),
+    D20: makeD20Creator(physics),
+    Golden: makeD6Creator('Golden', physics),
+    Hands: makeD6Creator('Hands', physics),
+  } satisfies Record<DiceType, any>;
+};
+
 export const initPreview = async (diceType: DiceType) => {
   if (previewInit) {
     return;
@@ -379,12 +372,7 @@ export const initPreview = async (diceType: DiceType) => {
   );
   light.intensity = 0.8;
 
-  const createDie = {
-    Default: makeDieCreator('Default'),
-    D20: makeD20Creator(),
-    Golden: makeDieCreator('Golden'),
-    Hands: makeDieCreator('Hands'),
-  } satisfies Record<DiceType, any>;
+  const createDie = makeDieCreators(false);
 
   const initDice = async (type: DiceType) => {
     for (let i = 0; i < diceCount; ++i) {
@@ -476,24 +464,6 @@ export const initScene = async () => {
     scene
   );
   light.intensity = 0.8;
-  // light.diffuse = new BABYLON.Color3(0, 0, 0);
-
-  // var light1 = new BABYLON.HemisphericLight(
-  //   'light1',
-  //   new BABYLON.Vector3(0, -1, 0),
-  //   scene
-  // );
-  // light1.intensity = 0.5;
-
-  // var pl = new BABYLON.PointLight('pl', new BABYLON.Vector3(0, 10, 0), scene);
-  // pl.intensity = 0.5;
-  // const light = new BABYLON.HemisphericLight(
-  //   'light',
-  //   new BABYLON.Vector3(-1, 1, 0),
-  //   scene
-  // )
-
-  // light.intensity = 0.5
 
   try {
     scene!.enablePhysics(gravityVector, new BABYLON.AmmoJSPlugin());
@@ -501,14 +471,7 @@ export const initScene = async () => {
     scene!.enablePhysics(gravityVector, new BABYLON.AmmoJSPlugin());
   }
 
-  // make some dice
-  //
-  const createDie = {
-    Default: makeDieCreator('Default'),
-    D20: makeD20Creator(),
-    Golden: makeDieCreator('Golden'),
-    Hands: makeDieCreator('Hands'),
-  } satisfies Record<DiceType, any>;
+  const createDie = makeDieCreators(true);
 
   const initDice = async (type: DiceType, scene: BABYLON.Scene) => {
     for (let i = 0; i < diceCount; ++i) {
@@ -516,8 +479,6 @@ export const initScene = async () => {
         dice[i].dispose();
       }
       dice[i] = await createDie[type](scene);
-      // console.log(await createDie(scene))
-      //dice[i].position = new BABYLON.Vector3(1000 + i, 1000, 1000);
     }
   };
   initDice('Default', scene!);
@@ -574,24 +535,6 @@ export const initScene = async () => {
 
   const walls = [southWall, westWall, northWall, eastWall];
 
-  // const updateWallPhysics = (wall: any) => {
-  //   {
-  //     const { x, y, z } = wall.scaling;
-  //     wall.physicsImpostor.physicsBody.shapes[0].halfExtents.set(
-  //       Math.abs(x / 2),
-  //       Math.abs(y / 2),
-  //       Math.abs(z / 2)
-  //     );
-  //   }
-  //   {
-  //     const { x, y, z } = wall.position;
-  //     wall.physicsImpostor.physicsBody.position.set(x, y, z);
-  //   }
-  //   wall.physicsImpostor.physicsBody.computeAABB();
-  //   wall.physicsImpostor.physicsBody.shapes[0].updateBoundingSphereRadius();
-  //   wall.physicsImpostor.physicsBody.shapes[0].updateConvexPolyhedronRepresentation();
-  //   console.log(wall.physicsImpostor.physicsBody);
-  // };
   walls.forEach((wall) => {
     wall.physicsImpostor = new BABYLON.PhysicsImpostor(
       wall,
@@ -643,7 +586,7 @@ export const initScene = async () => {
 
   // TRANSPARENT BG
   // if you're on acid
-  //scene.autoClear = false;
+  // scene!.autoClear = false;
   scene!.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 
   const directions = [
@@ -998,19 +941,6 @@ export const initScene = async () => {
     }
   });
 };
-
-// const normalizeRadianAngle = (a: number): number => {
-//   while (a < 0) a += Math.PI * 2;
-//   return a;
-// };
-
-// const normalizeVec3 = (a: BABYLON.Vector3): BABYLON.Vector3 => {
-//   return new BABYLON.Vector3(
-//     normalizeRadianAngle(a.x),
-//     normalizeRadianAngle(a.y),
-//     normalizeRadianAngle(a.z)
-//   );
-// };
 
 const closestPi = (a: number): number => {
   let closest = 10000;
