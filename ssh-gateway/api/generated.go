@@ -902,6 +902,7 @@ const (
 	Default DiceType = "Default"
 	Golden  DiceType = "Golden"
 	Hands   DiceType = "Hands"
+	Jumbo   DiceType = "Jumbo"
 )
 
 type Setting string

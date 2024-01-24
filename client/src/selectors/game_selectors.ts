@@ -236,7 +236,7 @@ const defaultOptions: Array<
   }
 > = [
   {
-    unlocks: 'Default',
+    unlocks: 'Jumbo',
     description: 'Standard issue cubes.',
     id: 'howdy',
     name: 'Starter Dice',

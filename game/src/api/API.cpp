@@ -1076,6 +1076,7 @@ namespace API {
         else if (j == "Default") x = DiceType::DEFAULT;
         else if (j == "Golden") x = DiceType::GOLDEN;
         else if (j == "Hands") x = DiceType::HANDS;
+        else if (j == "Jumbo") x = DiceType::JUMBO;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
@@ -1085,6 +1086,7 @@ namespace API {
             case DiceType::DEFAULT: j = "Default"; break;
             case DiceType::GOLDEN: j = "Golden"; break;
             case DiceType::HANDS: j = "Hands"; break;
+            case DiceType::JUMBO: j = "Jumbo"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
@@ -1413,21 +1415,21 @@ namespace nlohmann {
     }
 }
 namespace API {
-std::string Achievement::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void Achievement::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string AchievementData::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void AchievementData::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string Achievement::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Achievement::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

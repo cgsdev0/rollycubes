@@ -446,7 +446,7 @@
       "required": ["description", "id", "image_url", "max_progress", "name"]
     },
     "DiceType": {
-      "enum": ["Default", "D20", "Golden", "Hands"]
+      "enum": ["Default", "D20", "Golden", "Hands", "Jumbo"]
     },
     "DieRoll": {
       "type": "object",

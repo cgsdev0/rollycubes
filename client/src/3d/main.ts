@@ -93,7 +93,14 @@ const createDiceUVs = (fudge: number) => {
   return diceUV;
 };
 
-const diceSize = 0.5;
+const diceSize = (type: DiceType) => {
+  switch (type) {
+    case 'Jumbo':
+      return 1.0;
+    default:
+      return 0.5;
+  }
+};
 var slideIndex = 0;
 var rotIndex = 0;
 
@@ -196,6 +203,7 @@ const makeD6Creator = (type: Exclude<DiceType, 'D20'>, physics: boolean) => {
     if (!diceMat) {
       diceMat = new BABYLON.StandardMaterial(`die-material${matIdx++}`, scene);
       switch (type) {
+        case 'Jumbo':
         case 'Default':
           diceMat.ambientColor = scene.ambientColor;
           diceMat.diffuseTexture = new BABYLON.Texture('/dice.png', scene);
@@ -232,9 +240,9 @@ const makeD6Creator = (type: Exclude<DiceType, 'D20'>, physics: boolean) => {
     const die = BABYLON.MeshBuilder.CreateBox(
       `die${idx++}`,
       {
-        width: diceSize,
-        height: diceSize,
-        depth: diceSize,
+        width: diceSize(type),
+        height: diceSize(type),
+        depth: diceSize(type),
         faceUV: diceUV,
         updatable: true,
       },
@@ -334,6 +342,7 @@ const makeDieCreators = (physics: boolean) => {
     D20: makeD20Creator(physics),
     Golden: makeD6Creator('Golden', physics),
     Hands: makeD6Creator('Hands', physics),
+    Jumbo: makeD6Creator('Jumbo', physics),
   } satisfies Record<DiceType, any>;
 };
 
@@ -773,8 +782,8 @@ export const initScene = async () => {
         //   diceUVBuffers[(6 + roll.value - 1) % 6]
         // )
         // updateUVs(die, localRoll, serverRoll[i])
-        die.position.y = diceSize / 1.2;
-        die.position.x = -i + diceSize;
+        die.position.y = diceSize('Default') / 1.2;
+        die.position.x = -i + diceSize('Default');
         die.position.z = Math.random();
         die.physicsImpostor!.setLinearVelocity(BABYLON.Vector3.Zero());
         die.physicsImpostor!.setAngularVelocity(BABYLON.Vector3.Zero());
@@ -801,13 +810,13 @@ export const initScene = async () => {
     dice.forEach((die, i) => {
       killAnimation(die);
       const firstPosition = new BABYLON.Vector3(
-        midpoint.x + i * diceSize - diceSize / 2,
-        diceSize / 2,
+        midpoint.x + i * diceSize('Default') - diceSize('Default') / 2,
+        diceSize('Default') / 2,
         midpoint.z
       );
       const finalPosition = new BABYLON.Vector3(
-        center.x + i * diceSize,
-        diceSize / 2,
+        center.x + i * diceSize('Default'),
+        diceSize('Default') / 2,
         center.z
       );
       let target = die.rotationQuaternion!.toEulerAngles();

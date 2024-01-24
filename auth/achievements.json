@@ -41,7 +41,8 @@
     "name": "3x Doubles Streak",
     "description": "Get doubles 3 times in a row.",
     "max_progress": 1,
-    "image_url": "https://cdn.rollycubes.com/achievements/3x_doubles.png"
+    "image_url": "https://cdn.rollycubes.com/achievements/3x_doubles.png",
+    "unlocks": "Jumbo"
   },
   "doubles:2": {
     "id": "doubles:2",
