@@ -6,6 +6,7 @@ use axum::{
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use base64::{engine::general_purpose, Engine as _};
+use generated::DiceType;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use twitch_oauth2::{AccessToken, UserToken};
@@ -24,31 +25,6 @@ pub struct AchievementProgress {
     unlocked: Option<chrono::DateTime<chrono::Utc>>,
     rn: Option<i64>,
     rd: Option<i64>,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub enum DiceType {
-    Default,
-    D20,
-    Golden,
-}
-
-impl DiceType {
-    fn int_value(self) -> i32 {
-        match self {
-            DiceType::Default => 0,
-            DiceType::D20 => 1,
-            DiceType::Golden => 2,
-        }
-    }
-    fn from_int(i: i32) -> DiceType {
-        match i {
-            0 => DiceType::Default,
-            1 => DiceType::D20,
-            2 => DiceType::Golden,
-            _ => DiceType::Default,
-        }
-    }
 }
 
 #[derive(Serialize)]
@@ -447,10 +423,10 @@ pub async fn update_user_setting(
             }
             client
                 .execute(
-                    "UPDATE user_settings SET dice_type = $2::INTEGER WHERE user_id = $1::UUID",
+                    "UPDATE user_settings SET dice_type = $2 WHERE user_id = $1::UUID",
                     &[
                         &verified_token.claims.user_id,
-                        &DiceType::int_value(dice_type),
+                        &serde_json::to_string(&dice_type).unwrap(),
                     ],
                 )
                 .await?;
@@ -663,7 +639,7 @@ WHERE id=$1::UUID",
             image_url: row.get("image_url"),
             donor: row.get("donor"),
             dice: DiceSettings {
-                dice_type: DiceType::from_int(row.get::<'_, _, i32>("dice_type")),
+                dice_type: serde_json::from_str(row.get("dice_type")).unwrap(),
             },
             color: ColorSettings {
                 hue: row.get("color_hue"),

@@ -6,5 +6,5 @@
 
 namespace API {
 
-    enum class DiceType : int { D20, DEFAULT, GOLDEN };
+    enum class DiceType : int { D20, DEFAULT, GOLDEN, HANDS };
 }

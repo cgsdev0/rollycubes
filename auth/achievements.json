@@ -62,7 +62,8 @@
     "name": "Just Plain Rude",
     "description": "Reset another player instead of winning.",
     "max_progress": 1,
-    "image_url": "https://cdn.rollycubes.com/achievements/rude.png"
+    "image_url": "https://cdn.rollycubes.com/achievements/rude.png",
+    "unlocks": "Hands"
   },
   "negative": {
     "id": "negative",

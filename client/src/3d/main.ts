@@ -192,13 +192,12 @@ const makeD20Creator = (physics?: boolean) => {
 };
 
 let idx = 0;
-const makeDieCreator = (type: 'normal' | 'gold', physics?: boolean) => {
+const makeDieCreator = (type: Exclude<DiceType, 'D20'>, physics?: boolean) => {
   var diceMat: BABYLON.StandardMaterial;
   var diceGoldMat: BABYLON.StandardMaterial;
   return async (scene: BABYLON.Scene) => {
     if (!diceMat || !diceGoldMat) {
       diceMat = new BABYLON.StandardMaterial('diceMat', scene);
-      diceMat.diffuseTexture = new BABYLON.Texture('/dice.png', scene);
       diceMat.ambientColor = scene.ambientColor;
       diceMat.roughness = 1.0;
       diceMat.specularPower = 5000;
@@ -220,6 +219,14 @@ const makeDieCreator = (type: 'normal' | 'gold', physics?: boolean) => {
       diceGoldMat.emissiveColor = new BABYLON.Color3(0.05, 0.02, 0);
       diceGoldMat.specularPower = 1000;
     }
+    switch (type) {
+      case 'Default':
+        diceMat.diffuseTexture = new BABYLON.Texture('/dice.png', scene);
+        break;
+      case 'Hands':
+        diceMat.diffuseTexture = new BABYLON.Texture('/hands.png', scene);
+        break;
+    }
     const diceUV = createDiceUVs(0);
     const die = BABYLON.MeshBuilder.CreateBox(
       `die${idx++}`,
@@ -234,7 +241,8 @@ const makeDieCreator = (type: 'normal' | 'gold', physics?: boolean) => {
     );
     die.isPickable = true;
     switch (type) {
-      case 'normal':
+      case 'Default':
+      case 'Hands':
         die.material = diceMat;
         if (physics) {
           die.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -245,7 +253,7 @@ const makeDieCreator = (type: 'normal' | 'gold', physics?: boolean) => {
           );
         }
         break;
-      case 'gold':
+      case 'Golden':
         die.material = diceGoldMat;
         if (physics) {
           die.physicsImpostor = new BABYLON.PhysicsImpostor(
@@ -372,10 +380,11 @@ export const initPreview = async (diceType: DiceType) => {
   light.intensity = 0.8;
 
   const createDie = {
-    Default: makeDieCreator('normal'),
+    Default: makeDieCreator('Default'),
     D20: makeD20Creator(),
-    Golden: makeDieCreator('gold'),
-  };
+    Golden: makeDieCreator('Golden'),
+    Hands: makeDieCreator('Hands'),
+  } satisfies Record<DiceType, any>;
 
   const initDice = async (type: DiceType) => {
     for (let i = 0; i < diceCount; ++i) {
@@ -495,10 +504,11 @@ export const initScene = async () => {
   // make some dice
   //
   const createDie = {
-    Default: makeDieCreator('normal', true),
-    D20: makeD20Creator(true),
-    Golden: makeDieCreator('gold', true),
-  };
+    Default: makeDieCreator('Default'),
+    D20: makeD20Creator(),
+    Golden: makeDieCreator('Golden'),
+    Hands: makeDieCreator('Hands'),
+  } satisfies Record<DiceType, any>;
 
   const initDice = async (type: DiceType, scene: BABYLON.Scene) => {
     for (let i = 0; i < diceCount; ++i) {

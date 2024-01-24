@@ -11,7 +11,7 @@ use std::fs;
 use std::time::SystemTime;
 use uuid::Uuid;
 
-use super::user_routes::DiceType;
+use generated::DiceType;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Achievement {

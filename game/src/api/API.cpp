@@ -1075,6 +1075,7 @@ namespace API {
         if (j == "D20") x = DiceType::D20;
         else if (j == "Default") x = DiceType::DEFAULT;
         else if (j == "Golden") x = DiceType::GOLDEN;
+        else if (j == "Hands") x = DiceType::HANDS;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
@@ -1083,6 +1084,7 @@ namespace API {
             case DiceType::D20: j = "D20"; break;
             case DiceType::DEFAULT: j = "Default"; break;
             case DiceType::GOLDEN: j = "Golden"; break;
+            case DiceType::HANDS: j = "Hands"; break;
             default: throw std::runtime_error("This should not happen");
         }
     }
