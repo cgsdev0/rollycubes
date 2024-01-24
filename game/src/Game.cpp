@@ -325,6 +325,11 @@ void Game::skip(HANDLER_ARGS) {
     // TODO: check if enough time has passed
 
     state.players[id].skip_count++;
+    RichTextStream stream;
+    stream << RT::italic
+      << state.players[id]
+      << "'s turn was skipped.";
+    broadcast(log_rich_chat(stream));
     advanceTurn();
     json turn;
     turn["type"] = "update_turn";
@@ -347,6 +352,11 @@ void Game::kick(HANDLER_ARGS) {
     json res;
     res["type"] = "kick";
     res["id"] = id;
+    RichTextStream stream;
+    stream << RT::italic
+      << state.players[id]
+      << " was kicked from the game!";
+    broadcast(log_rich_chat(stream));
     if (turn_token == state.players[id].session) {
         advanceTurn();
         if (state.turn_index > id) {
