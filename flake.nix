@@ -17,8 +17,8 @@
     packages.default = pkgs.stdenv.mkDerivation {
       name = "run";
       src = pkgs.fetchurl {
-        url = "https://github.com/amonks/run/releases/download/v1.0.0-beta.15/run_Linux_x86_64.tar.gz";
-        sha256 = "b5f6abfc3268c0d4c2e7239ab62cd1a08975378a1e37fd61b374b346de34e8bd";
+        url = "https://github.com/amonks/run/releases/download/v1.0.0-beta.23/run_Linux_x86_64.tar.gz";
+        sha256 = "f3b51bd602983a007f85aaba7a7308fc2fbc74f00f43b2cc4fd8f493a9afcf48";
       };
       setSourceRoot = "sourceRoot=`pwd`";
       installPhase = "mkdir -p $out/bin && cp run $out/bin";
