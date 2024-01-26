@@ -403,16 +403,16 @@ pub async fn update_user_setting(
             Ok(())
         }
         UpdateSettingsPayload::DiceType { dice_type } => {
-            let unlocked_by = ACHIEVEMENTS
-                .iter()
-                .find(|v| v.1.unlocks.is_some_and(|u| u == dice_type.into()))
-                .ok_or(RouteError::UserError(
-                    "that dice type is not unlockable".to_string(),
-                ))?
-                .0;
             let unlocked = match dice_type {
                 DiceType::Default => true,
                 _ => {
+                    let unlocked_by = ACHIEVEMENTS
+                        .iter()
+                        .find(|v| v.1.unlocks.is_some_and(|u| u == dice_type.into()))
+                        .ok_or(RouteError::UserError(
+                            "that dice type is not unlockable".to_string(),
+                        ))?
+                        .0;
                     let result = client.query_one(
 "SELECT COUNT(*) FROM user_to_achievement WHERE user_id = $1::UUID AND unlocked IS NOT NULL AND achievement_id = $2",
 &[&verified_token.claims.user_id, &unlocked_by]).await?;
