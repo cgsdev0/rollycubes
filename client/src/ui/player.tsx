@@ -327,7 +327,7 @@ const AImg = styled('img', {
 
 const AchievementPlaceholder = styled('div', {
   borderRadius: 4,
-  border: '1px solid $gray800',
+  border: '1px dashed $gray800',
   width: 48,
   height: 48,
 });
