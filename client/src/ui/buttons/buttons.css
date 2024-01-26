@@ -45,6 +45,7 @@ button.Subtract {
 
 button.Reset {
   background-color: #dc3545 !important;
+  color: white;
 }
 
 button.Victory {
