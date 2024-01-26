@@ -35,7 +35,7 @@ export const settingsReducer = createReducer<SettingsState>(
       : PROD_AUTH_SERVICE,
     showSettings: false,
     showLogin: true,
-    showHelp: false,
+    showHelp: true,
     pubkey: '',
     color: {
       hue: 0,

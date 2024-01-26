@@ -42,9 +42,10 @@ const ChatBar = styled('input', {
 });
 
 const ChatWrapper = styled('div', {
-  overflow: 'hidden',
+  position: 'relative',
   width: '100%',
   height: '100%',
+  overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
   p: {
@@ -60,6 +61,16 @@ const ChatWrapper = styled('div', {
   'a:hover': {
     fontSize: 'inherit',
     textDecoration: 'underline',
+  },
+  '@bp1': {
+    boxSizing: 'border-box',
+    boxShadow:
+      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px inset',
+    border: '1px solid $gray900',
+    borderBottom: 0,
+    borderTop: 0,
+    borderRadius: 8,
+    padding: 12,
   },
 });
 

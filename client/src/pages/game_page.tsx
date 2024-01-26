@@ -1,16 +1,15 @@
+import { destroyScene, initScene } from '3d/main';
 import React from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector, useStore } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import OnboardPage from './onboard_page';
 import { css, styled } from 'stitches.config';
+import { CheatSheet } from 'ui/cheat_sheet';
+import { ConnBanner } from 'ui/conn_banner';
 import Connection from '../connection';
 import {
-  selectHasD20Unlocked,
-  selectHasGoldenUnlocked,
   selectIs3d,
   selectIsReset,
   selectIsSpectator,
-  selectSelfUserId,
   selectSomebodyIsNice,
   selectTurnIndex,
   selectWinner,
@@ -20,21 +19,8 @@ import { Player } from '../types/api';
 import ChatBox from '../ui/chat';
 import GamePanel from '../ui/game_panel';
 import Players from '../ui/players';
-import { useStore } from 'react-redux';
-import { destroyScene, initScene } from '3d/main';
 import { PopText } from '../ui/poptext';
-import { Select, ToggleSwitch } from 'ui/buttons/toggle';
-import { Slider } from 'ui/buttons/slider';
-import { Button } from 'ui/buttons/button';
-import {
-  useDonateMutation,
-  useGetUserByIdQuery,
-  useSetDiceTypeMutation,
-  useSetPubkeyTextMutation,
-  useSetUserColorMutation,
-} from 'api/auth';
-import { TextArea } from 'ui/buttons/textarea';
-import { ConnBanner } from 'ui/conn_banner';
+import OnboardPage from './onboard_page';
 
 interface Props {
   winner?: Player;
@@ -47,6 +33,13 @@ interface Props {
   mode: 'room' | 'spectate';
 }
 
+const MainBody = styled('div', {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  height: '100%',
+  gap: 24,
+});
 const SpectatorTitle = styled('p', {
   position: 'absolute',
   width: '100%',
@@ -59,54 +52,6 @@ const SpectatorTitle = styled('p', {
 const flexColumn = css({
   display: 'flex',
   flexDirection: 'column',
-});
-
-const TwoColumns = styled('div', {
-  '@bp1': {
-    flex: 1,
-    display: 'flex',
-    gap: '3rem',
-    flexDirection: 'row',
-  },
-  '@bp0': {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2rem',
-  },
-});
-const Column = styled('div', {
-  gap: 8,
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const SettingsContainer = styled('div', {
-  gap: 8,
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  flex: 1,
-});
-
-const SaveButtonWrapper = styled('div', {
-  display: 'flex',
-  alignItems: 'flex-end',
-  justifyContent: 'center',
-  '& button': {
-    '@bp1': {
-      maxWidth: '30%',
-    },
-  },
-});
-const PlsDonate = styled('div', {
-  display: 'flex',
-  flexDirection: 'column',
-  maxWidth: 400,
-  marginLeft: 80,
-  gap: 8,
-  '@bp0': {
-    display: 'none',
-  },
 });
 
 const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
@@ -187,7 +132,10 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
         <GamePanel />
         <Players />
       </div>
-      {showHelp ? <Rules /> : <ChatBox />}
+      <MainBody>
+        {showHelp ? <Rules /> : <Rules mobile />}
+        <ChatBox />
+      </MainBody>
       <PopText />
     </React.Fragment>
   );
@@ -196,6 +144,20 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
 const RulesDiv = styled('div', {
   '& p,h1,li,strong': {
     color: '$primary',
+  },
+});
+const RulesRow = styled('div', {
+  position: 'relative',
+  boxSizing: 'border-box',
+  display: 'flex',
+  gap: 24,
+  width: '100%',
+  '& li': {
+    listStyle: 'none',
+    marginLeft: 30,
+  },
+  '& p': {
+    fontStyle: 'italic',
   },
   '@bp0': {
     position: 'absolute',
@@ -207,39 +169,41 @@ const RulesDiv = styled('div', {
     left: -8,
     zIndex: 10,
   },
+  '@bp1': {
+    boxShadow:
+      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px inset',
+    border: '1px solid $gray900',
+    borderBottom: 0,
+    borderTop: 0,
+    borderRadius: 8,
+    padding: 12,
+  },
 });
-const Rules = () => {
+
+const rulesRowDesktop = css({
+  '@bp0': { display: 'none !important' },
+});
+
+const Rules = ({ mobile }: { mobile?: boolean }) => {
   return (
-    <RulesDiv>
-      <h1>Rules</h1>
-      <div>
-        On your turn:
-        <br />
-        <br />
-        <ol style={{ marginLeft: 40 }}>
-          <li>Roll the dice</li>
-          <li>Add the two dice together</li>
-          <li>Add or subtract the sum from your score</li>
-        </ol>
-        <br />
-        First player to reach a winning score wins!
-      </div>
-      <br />
-      <p>Additionally...</p>
-      <br />
-      <ul style={{ marginLeft: 40 }}>
-        <li>
-          <strong>Doubles:</strong> roll again.
-        </li>
-        <li>
-          <strong>Sevens:</strong> split; treat the dice as separate rolls.
-        </li>
-        <li>
-          If you match another player's score, they are <strong>reset</strong>{' '}
-          to 0.
-        </li>
-      </ul>
-    </RulesDiv>
+    <RulesRow className={mobile ? undefined : rulesRowDesktop()}>
+      <CheatSheet />
+      <RulesDiv>
+        <p>If you...</p>
+        <ul>
+          <li>
+            roll <strong>doubles,</strong> roll again.
+          </li>
+          <li>
+            roll a <strong>seven,</strong> split!
+          </li>
+          <li>
+            match someone's score, <strong>reset</strong> them.
+          </li>
+        </ul>
+        <p>First to a winning score wins!</p>
+      </RulesDiv>
+    </RulesRow>
   );
 };
 

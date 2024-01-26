@@ -90,6 +90,8 @@ const container = css({
 
 const innerContainer = css({
   '@bp1': {
+    boxShadow:
+      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px, 8px 10px 10px rgba(0,0,0,0.2)',
     backgroundColor: '$gray800',
     display: 'flex',
     borderRadius: 16,

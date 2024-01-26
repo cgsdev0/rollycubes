@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getAddSubButtonClassSelector } from '../../selectors/game_selectors';
 import { ReduxState } from '../../store';
+import { Button } from './button';
 import './buttons.css';
 
 interface OwnProps {
@@ -29,12 +30,12 @@ const AddSubButton: React.FC<Props> = ({ socket, addClass, subClass, n }) => {
 
   return (
     <React.Fragment>
-      <button onClick={() => onClick('add')} className={`Add${addClass}`}>
+      <Button onClick={() => onClick('add')} className={`Add${addClass}`}>
         +
-      </button>
-      <button onClick={() => onClick('sub')} className={`Subtract${subClass}`}>
+      </Button>
+      <Button onClick={() => onClick('sub')} className={`Subtract${subClass}`}>
         -
-      </button>
+      </Button>
     </React.Fragment>
   );
 };

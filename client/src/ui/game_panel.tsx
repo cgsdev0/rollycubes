@@ -116,7 +116,6 @@ const GamePanel: React.FC<Props & DispatchProp> = ({
   };
   return (
     <div className={gamePanel()}>
-      <ScoreTableComponent />
       <div className={gamePanelInner()}>
         {victory ? <RestartButton /> : null}
         <Dice rolling={rolling} />
@@ -127,87 +126,6 @@ const GamePanel: React.FC<Props & DispatchProp> = ({
         </div>
       </div>
     </div>
-  );
-};
-
-const ScoreTableContainer = styled('div', {
-  border: '1px dotted $primaryDimmed',
-  borderRadius: 6,
-  padding: 6,
-  '@bp1': {
-    transform: 'translateX(-50px)',
-    marginRight: -36,
-  },
-});
-const ScoreTable = styled('table', {
-  tableLayout: 'fixed',
-  borderCollapse: 'collapse',
-  height: 90,
-  '& tr td': {
-    height: 26,
-  },
-  '& tr:last-child td': {
-    borderBottom: 0,
-    height: 19,
-    verticalAlign: 'bottom',
-    paddingBottom: 2,
-  },
-  '& tr td:last-child': {
-    borderRight: 0,
-  },
-  '& tr:last-child': {},
-  '& td': {
-    textAlign: 'center',
-    fontSize: 10,
-    color: '$primaryDimmed',
-    padding: 0,
-    borderBottom: '1px dotted $primaryDimmed',
-    borderRight: '1px dotted $primaryDimmed',
-    '&.blank': {
-      border: 0,
-    },
-  },
-});
-const scoreTableTitle = css({
-  color: '$primaryDimmed',
-  textAlign: 'center',
-  fontSize: 12,
-  marginTop: 19,
-});
-const ScoreTableComponent = () => {
-  return (
-    <ScoreTableContainer
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <ScoreTable style={{ width: 90 }}>
-        <tbody>
-          <tr>
-            <td className="blank" colSpan={2}>
-              &nbsp;
-            </td>
-            <td colSpan={2}>33</td>
-          </tr>
-          <tr>
-            <td className="blank" colSpan={1}>
-              &nbsp;
-            </td>
-            <td colSpan={2}>66</td>
-            <td colSpan={2}>67</td>
-          </tr>
-          <tr>
-            <td colSpan={2}>98</td>
-            <td colSpan={2}>99</td>
-            <td colSpan={2}>100</td>
-          </tr>
-        </tbody>
-      </ScoreTable>
-      <p className={scoreTableTitle()}>Winning Scores</p>
-    </ScoreTableContainer>
   );
 };
 

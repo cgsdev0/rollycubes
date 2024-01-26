@@ -24,7 +24,11 @@ const playerPanel = css({
   gap: 2,
   height: '100%',
   '@bp1': {
+    boxShadow:
+      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px, rgba(0, 0, 0, 0.3) 0px 2px 0px 0px inset',
     width: 336,
+    overflow: 'hidden',
+    border: '1px solid rgba(0,0,0,0.3)',
   },
   paddingTop: 30,
   paddingBottom: 30,

@@ -101,6 +101,7 @@ const Code = styled('span', {
 const SettingsContainer = styled('div', {
   zIndex: 100,
   backgroundColor: '$gray800',
+  boxShadow: 'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset',
   // backgroundColor: 'red',
   position: 'absolute',
   '@bp0': {
@@ -165,14 +166,14 @@ const Sidebar = styled('ul', {
     flexShrink: 0,
   },
   '@bp1': {
+    boxShadow:
+      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px, rgba(0, 0, 0, 0.3) 0px 2px 0px 0px inset',
+    width: 336,
+    overflow: 'hidden',
+    border: '1px solid rgba(0,0,0,0.3)',
     height: '100%',
     borderRadius: 12,
     paddingTop: 20,
-    '& li': {
-      '&:first-child': {
-        borderTop: '1px solid $gray700',
-      },
-    },
     '& .mobileOnly': {
       display: 'none',
     },
@@ -181,10 +182,9 @@ const Sidebar = styled('ul', {
     width: '100%',
     padding: '8px 0',
     cursor: 'pointer',
-    borderBottom: '1px solid $gray700',
   },
   '& .selected': {
-    backgroundColor: '$brand',
+    backgroundColor: '$brandFaded',
   },
   minWidth: 200,
   overflow: 'hidden',
@@ -231,6 +231,7 @@ export const SettingsPage: React.FC<{}> = () => {
         {Object.entries(tabs).map(([tab, info]) => {
           return (
             <li
+              role="button"
               key={tab}
               className={selected === tab ? 'selected' : undefined}
               onClick={() => {

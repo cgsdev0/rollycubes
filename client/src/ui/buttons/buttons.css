@@ -13,10 +13,6 @@ button:focus {
   outline: 0;
 }
 
-button:active {
-  background-color: lightslategray;
-}
-
 .buttonColumn {
   display: flex;
   flex-direction: row;
@@ -34,43 +30,27 @@ button:active {
 }
 
 button.Add {
-  background-color: #007bff;
+  background-color: #007bff !important;
   color: white;
   font-size: 18pt;
   font-weight: bold;
-}
-
-button.Add:active {
-  background-color: lightskyblue;
 }
 
 button.Subtract {
-  background-color: #6c757d;
+  background-color: #6c757d !important;
   color: white;
   font-size: 18pt;
   font-weight: bold;
 }
 
-button.Subtract:active {
-  background-color: #cccccc;
-}
-
 button.Reset {
-  background-color: #dc3545;
-}
-
-button.Reset:active {
-  background-color: #eecccc;
+  background-color: #dc3545 !important;
 }
 
 button.Victory {
-  background-color: #ffc107;
+  background-color: #ffc107 !important;
   position: relative;
   overflow: hidden;
-}
-
-button.Victory:active {
-  background-color: #ffee77;
 }
 
 button.Victory::before {

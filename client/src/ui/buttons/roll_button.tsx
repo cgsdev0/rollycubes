@@ -72,9 +72,9 @@ const RollButton: React.FC<Props> = ({
   if (!myTurn) {
     if (!connected || canSkip) {
       return (
-        <button className={'Reset'} onClick={onSkip}>
+        <Button className={'Reset'} onClick={onSkip}>
           Skip
-        </button>
+        </Button>
       );
     }
     return (
