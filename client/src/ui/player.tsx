@@ -118,9 +118,6 @@ const playerRow = css({
   minHeight: 36,
   '&.highlight': {
     backgroundColor: '$brandFaded',
-    '& span': {
-      color: 'black',
-    },
     boxShadow: '0px 0px 3px 3px $brand, 0px 0px 12px 6px $brand inset',
     '@bp1': {
       borderRadius: 4,
