@@ -245,6 +245,11 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
     .split(' ');
   join_date.shift();
 
+  const unlocked = props.data?.achievements?.filter((ach) => ach.unlocked);
+  let placeholders = 6 - ((unlocked?.length || 6) % 6);
+  if (placeholders === 6 && unlocked?.length) {
+    placeholders = 0;
+  }
   return React.useMemo(
     () => (
       <>
@@ -284,20 +289,21 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
             </RecordDiv>
           </Records>
           <Achievements>
-            {props.data?.achievements
-              ?.filter((ach) => ach.unlocked)
-              .map((ach) => {
-                return (
-                  <AchievementImg
-                    key={ach.id}
-                    unlocked={ach.unlocked}
-                    progress={ach.progress}
-                    rd={ach.rd}
-                    rn={ach.rn}
-                    id={ach.id}
-                  />
-                );
-              })}
+            {unlocked?.map((ach) => {
+              return (
+                <AchievementImg
+                  key={ach.id}
+                  unlocked={ach.unlocked}
+                  progress={ach.progress}
+                  rd={ach.rd}
+                  rn={ach.rn}
+                  id={ach.id}
+                />
+              );
+            })}
+            {new Array(placeholders).fill(0).map((_, i) => (
+              <AchievementPlaceholder key={i} />
+            ))}
           </Achievements>
         </CardBody>
       </>
@@ -318,6 +324,14 @@ const AImg = styled('img', {
   borderRadius: 4,
   border: '1px solid black',
 });
+
+const AchievementPlaceholder = styled('div', {
+  borderRadius: 4,
+  border: '1px solid $gray800',
+  width: 48,
+  height: 48,
+});
+
 const AchievementImg = (props: Achievement) => {
   const achievements =
     useSelector((state: ReduxState) => state.auth.achievements) || {};
