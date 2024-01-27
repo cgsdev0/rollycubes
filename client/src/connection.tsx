@@ -107,7 +107,10 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
           new CustomEvent<any>('roll', {
             detail: {
               rolls: data.rolls,
-              turn_index: this.props.store.getState().game.turn_index,
+              players: this.props.store.getState().game.players.length,
+              turn_index:
+                this.props.store.getState().game.turn_index -
+                (this.props.store.getState().game.self_index || 0),
               dice_type: selectCurrentDiceType(this.props.store.getState()),
             },
           })

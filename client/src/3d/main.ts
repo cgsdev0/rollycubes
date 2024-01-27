@@ -598,18 +598,72 @@ export const initScene = async () => {
   // scene!.autoClear = false;
   scene!.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 
-  const directions = [
-    { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
-    { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
-    { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
-    { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
-  ];
+  const directions = {
+    2: [
+      { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+    ],
+    3: [
+      { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+    ],
+    4: [
+      { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+    ],
+    5: [
+      { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+    ],
+    6: [
+      { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+    ],
+    7: [
+      { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+    ],
+    8: [
+      { name: 'south', v: new BABYLON.Vector3(0, 0, 1), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'west', v: new BABYLON.Vector3(1, 0, 0), u: -1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'north', v: new BABYLON.Vector3(0, 0, 1), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+      { name: 'east', v: new BABYLON.Vector3(1, 0, 0), u: 1 },
+    ],
+  };
+  const wallMap = {
+    south: 0,
+    west: 1,
+    north: 2,
+    east: 3,
+  };
   let lastRollWasDoubles = false;
   const roll = async (
     serverRoll: number[],
     turn_index: number,
+    players: number,
     dice_type: DiceType
   ) => {
+    turn_index += players;
+    const dirs = directions[players as keyof typeof directions];
+    console.log({ turn_index, modded: turn_index % dirs.length });
     lastRollWasDoubles = serverRoll.every((v) => v === serverRoll[0]);
     // console.log(serverRoll);
     if (serverRoll.length === 0) {
@@ -620,11 +674,11 @@ export const initScene = async () => {
     }
     await initDice(dice_type, scene);
     scene.physicsEnabled = false;
-    const direction = directions[turn_index % directions.length];
+    const direction = dirs[turn_index % dirs.length];
     scene.physicsEnabled = true;
     dice.forEach((die) => killAnimation(die));
     //console.log(direction);
-    const wall = walls[directions.indexOf(direction)];
+    const wall = walls[wallMap[direction.name as keyof typeof wallMap]];
     wall.position.y = -40;
     let wallIsOpen = true;
     const positions: any[][] = [[], []];
@@ -894,7 +948,12 @@ export const initScene = async () => {
     scene.physicsEnabled = false;
   };
   rollListener = (e: any) => {
-    roll(e.detail.rolls, e.detail.turn_index, e.detail.dice_type);
+    roll(
+      e.detail.rolls,
+      e.detail.turn_index,
+      e.detail.players,
+      e.detail.dice_type
+    );
   };
   snapListener = (e: any) => {
     snap(e.detail);
