@@ -10,7 +10,7 @@ use generated::DiceType;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use twitch_oauth2::{tokens::UserTokenBuilder, UserToken};
+use twitch_oauth2::{tokens::UserTokenBuilder, CsrfToken, UserToken};
 use uuid::Uuid;
 
 use super::server_routes::ACHIEVEMENTS;
@@ -238,11 +238,12 @@ pub async fn login(
     Json(payload): Json<generated::LoginRequest>,
 ) -> Result<(CookieJar, Json<LoginResponse>), RouteError> {
     let redirect_url = Url::parse(&payload.redirect_uri)?;
-    let builder = UserTokenBuilder::new(
+    let mut builder = UserTokenBuilder::new(
         TWITCH_CLIENT_ID.as_str(),
         TWITCH_CLIENT_SECRET.as_str(),
         redirect_url,
     );
+    builder.set_csrf(CsrfToken::new(payload.state.clone()));
     let http_client = reqwest::Client::new();
     let token = builder
         .get_user_token(

@@ -4,19 +4,34 @@ import { connect } from 'react-redux';
 import { selectAuthService } from './selectors/game_selectors';
 import { ReduxState } from './store';
 
-export const twitchLogin = (authService: string, intent?: string) => () => {
+function dec2hex(dec: number) {
+  return dec.toString(16).padStart(2, '0');
+}
+
+// generateId :: Integer -> String
+function generateId(len?: number) {
+  var arr = new Uint8Array((len || 40) / 2);
+  window.crypto.getRandomValues(arr);
+  return Array.from(arr, dec2hex).join('');
+}
+
+export const twitchLogin = (intent?: string) => () => {
   if (!intent) {
     localStorage.removeItem('intent');
   } else {
     localStorage.setItem('intent', intent);
   }
+  const state = generateId();
+  localStorage.setItem('oauth_state', state);
+  console.log(localStorage.getItem('oauth_state'));
   const redirect = `${document.location.origin}/twitch_oauth`;
   const TWITCH_CLIENT_ID = '6n8p1p8sg3shbg0mwcfrmgzrwmcwh1';
   document.location =
     `https://id.twitch.tv/oauth2/authorize` +
     `?client_id=${TWITCH_CLIENT_ID}` +
     `&redirect_uri=${redirect}` +
-    `&response_type=token`;
+    `&state=${state}` +
+    `&response_type=code`;
 };
 
 const weird = css({

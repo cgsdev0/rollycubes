@@ -3,6 +3,7 @@ import { connect, DispatchProp } from 'react-redux';
 import { selectAuthService } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { LoginRequest } from 'types/api';
 
 interface Props {
   authService: string;
@@ -14,23 +15,33 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
   dispatch,
   authToken,
 }) => {
+  const fuckreact18 = React.useRef(false);
   React.useEffect(() => {
     (async () => {
-      const hash = window.location.hash.replace('#', '');
-      const params = new URLSearchParams(hash);
-      const twitch_access_token = params.get('access_token');
+      if (fuckreact18.current) {
+        return;
+      }
+      fuckreact18.current = true;
+      const params = new URLSearchParams(window.location.search);
+      console.log(params);
+      const code = params.get('code')!;
+      const state = localStorage.getItem('oauth_state')!;
+      console.log({ state, code });
+      localStorage.removeItem('oauth_state');
+      if (state !== params.get('state')) {
+        throw new Error('state doesnt match, aborting');
+      }
+      const body: LoginRequest = {
+        redirect_uri: `${document.location.origin}/twitch_oauth`,
+        code,
+        state,
+      };
       const resp = await window.fetch(
         authService + 'twitch_login_or_register',
         {
           mode: 'cors',
           credentials: 'include',
-          body: JSON.stringify({
-            twitch_access_token,
-            anon_id: document.cookie
-              ?.split(';')
-              .filter((c) => c.startsWith('_session='))[0]
-              ?.split('=')[1],
-          }),
+          body: JSON.stringify(body),
           headers: {
             'Content-Type': 'application/json',
           },

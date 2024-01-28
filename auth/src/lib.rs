@@ -55,6 +55,12 @@ pub enum RouteError {
 
 impl IntoResponse for RouteError {
     fn into_response(self) -> axum::response::Response {
+        match &self {
+            RouteError::UserTokenExchangeError(stuff) => {
+                println!("{}", stuff);
+            }
+            _ => {}
+        }
         let status = match self {
             RouteError::UserError(..) => StatusCode::BAD_REQUEST,
             RouteError::OK => StatusCode::OK,
