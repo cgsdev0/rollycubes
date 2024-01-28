@@ -120,6 +120,25 @@
       },
       "required": ["link"]
     },
+    "LoginRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "anon_id": {
+          "type": "string"
+        },
+        "redirect_uri": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      },
+      "required": ["code", "redirect_uri", "state"]
+    },
     "AuthSettingsRequest": {
       "oneOf": [
         {

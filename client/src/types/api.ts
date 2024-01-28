@@ -232,6 +232,13 @@ export interface AuthDonateResponse {
   link: string;
 }
 
+export interface LoginRequest {
+  anon_id?: string;
+  redirect_uri: string;
+  state: string;
+  code: string;
+}
+
 export interface AchievementProgress {
   achievement_id: string;
   user_id: UserId;

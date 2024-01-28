@@ -10,7 +10,10 @@ use std::sync::Arc;
 use thiserror::Error;
 use tokio_postgres::NoTls;
 use twitch_api::helix::ClientRequestError;
-use twitch_oauth2::tokens::errors::ValidationError;
+use twitch_oauth2::{
+    tokens::errors::{UserTokenExchangeError, ValidationError},
+    url::ParseError,
+};
 use uuid::Uuid;
 
 pub mod generated;
@@ -24,6 +27,10 @@ pub mod routes {
 
 #[derive(Error, Debug)]
 pub enum RouteError {
+    #[error("error exchanging twitch token")]
+    UserTokenExchangeError(#[from] UserTokenExchangeError<reqwest::Error>),
+    #[error("url parse error")]
+    ParseError(#[from] ParseError),
     #[error("jwt error")]
     JwtError(#[from] jsonwebtoken::errors::Error),
     #[error("bb8 problem")]

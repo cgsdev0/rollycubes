@@ -43,6 +43,9 @@ void to_json(json & j, const AuthRefreshTokenResponse & x);
 void from_json(const json & j, AuthDonateResponse & x);
 void to_json(json & j, const AuthDonateResponse & x);
 
+void from_json(const json & j, LoginRequest & x);
+void to_json(json & j, const LoginRequest & x);
+
 void from_json(const json & j, AuthSettingsRequest & x);
 void to_json(json & j, const AuthSettingsRequest & x);
 
@@ -498,6 +501,23 @@ namespace API {
     inline void to_json(json & j, const AuthDonateResponse & x) {
         j = json::object();
         j["link"] = x.link;
+    }
+
+    inline void from_json(const json & j, LoginRequest& x) {
+        x.anon_id = get_stack_optional<std::string>(j, "anon_id");
+        x.code = j.at("code").get<std::string>();
+        x.redirect_uri = j.at("redirect_uri").get<std::string>();
+        x.state = j.at("state").get<std::string>();
+    }
+
+    inline void to_json(json & j, const LoginRequest & x) {
+        j = json::object();
+        if (x.anon_id) {
+            j["anon_id"] = x.anon_id;
+        }
+        j["code"] = x.code;
+        j["redirect_uri"] = x.redirect_uri;
+        j["state"] = x.state;
     }
 
     inline void from_json(const json & j, AuthSettingsRequest& x) {
@@ -1565,6 +1585,15 @@ to_json(j, *this);
 return j.dump();
 }
 void KickMsg::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string LoginRequest::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void LoginRequest::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

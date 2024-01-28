@@ -7,9 +7,10 @@ use axum::{
 use axum_extra::extract::cookie::{Cookie, CookieJar};
 use base64::{engine::general_purpose, Engine as _};
 use generated::DiceType;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use twitch_oauth2::{AccessToken, UserToken};
+use twitch_oauth2::{tokens::UserTokenBuilder, UserToken};
 use uuid::Uuid;
 
 use super::server_routes::ACHIEVEMENTS;
@@ -63,14 +64,16 @@ pub struct User {
     pubkey_text: Option<String>,
 }
 
-#[derive(Deserialize)]
-pub struct LoginPayload {
-    twitch_access_token: String,
-    anon_id: Option<String>,
-}
-
 lazy_static! {
     static ref SQUARE_ACCESS_TOKEN: String = fs::read_to_string("./secrets/.square_access_token")
+        .expect("Should have been able to read the file")
+        .trim()
+        .to_string();
+    static ref TWITCH_CLIENT_SECRET: String = fs::read_to_string("./secrets/.twitch_client_secret")
+        .expect("Should have been able to read the file")
+        .trim()
+        .to_string();
+    static ref TWITCH_CLIENT_ID: String = fs::read_to_string("./secrets/.twitch_client_id")
         .expect("Should have been able to read the file")
         .trim()
         .to_string();
@@ -232,15 +235,26 @@ WHERE id = $1::UUID",
 pub async fn login(
     State(s): State<RouterState>,
     jar: CookieJar,
-    Json(payload): Json<LoginPayload>,
+    Json(payload): Json<generated::LoginRequest>,
 ) -> Result<(CookieJar, Json<LoginResponse>), RouteError> {
-    let token = AccessToken::new(payload.twitch_access_token);
+    let redirect_url = Url::parse(&payload.redirect_uri)?;
+    let builder = UserTokenBuilder::new(
+        TWITCH_CLIENT_ID.as_str(),
+        TWITCH_CLIENT_SECRET.as_str(),
+        redirect_url,
+    );
     let http_client = reqwest::Client::new();
+    let token = builder
+        .get_user_token(
+            &http_client.clone(),
+            payload.state.as_ref(),
+            payload.code.as_ref(),
+        )
+        .await?;
     let twitch_client = twitch_api::HelixClient::with_client(http_client.clone());
     let mut client = s.pool.get().await?;
 
-    let t = UserToken::from_existing(&http_client, token, None, None).await?;
-    // TODO: check this for a match t.client_id().as_str();
+    let t = UserToken::from_existing(&http_client, token.access_token, None, None).await?;
     let user = twitch_client
         .get_user_from_id(&t.user_id, &t)
         .await?

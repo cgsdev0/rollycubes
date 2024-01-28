@@ -26,6 +26,7 @@
 #include "UserData.hpp"
 #include "AuthRefreshTokenResponse.hpp"
 #include "AuthDonateResponse.hpp"
+#include "LoginRequest.hpp"
 #include "Setting.hpp"
 #include "AuthSettingsRequest.hpp"
 #include "AchievementProgressType.hpp"

@@ -19,6 +19,9 @@
 //    authDonateResponse, err := UnmarshalAuthDonateResponse(bytes)
 //    bytes, err = authDonateResponse.Marshal()
 //
+//    loginRequest, err := UnmarshalLoginRequest(bytes)
+//    bytes, err = loginRequest.Marshal()
+//
 //    authSettingsRequest, err := UnmarshalAuthSettingsRequest(bytes)
 //    bytes, err = authSettingsRequest.Marshal()
 //
@@ -187,6 +190,16 @@ func UnmarshalAuthDonateResponse(data []byte) (AuthDonateResponse, error) {
 }
 
 func (r *AuthDonateResponse) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+func UnmarshalLoginRequest(data []byte) (LoginRequest, error) {
+	var r LoginRequest
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *LoginRequest) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
@@ -638,6 +651,13 @@ type AuthRefreshTokenResponse struct {
 
 type AuthDonateResponse struct {
 	Link string `json:"link"`
+}
+
+type LoginRequest struct {
+	AnonID      *string `json:"anon_id,omitempty"`
+	Code        string  `json:"code"`
+	RedirectURI string  `json:"redirect_uri"`
+	State       string  `json:"state"`
 }
 
 type AuthSettingsRequest struct {
