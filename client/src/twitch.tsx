@@ -74,26 +74,15 @@ const twitchButton = css({
     },
   },
 });
-const UnconnectedTwitchButton: React.FC<{
+export const TwitchButton: React.FC<{
   intent: string;
-  authService: string;
-}> = ({ intent, authService }) => {
+}> = ({ intent }) => {
   return (
     <>
-      <button
-        onClick={twitchLogin(authService, intent)}
-        className={twitchButton()}
-      >
+      <button onClick={twitchLogin(intent)} className={twitchButton()}>
         Login With Twitch
         <TwitchIcon />
       </button>
     </>
   );
 };
-
-const mapStateToProps = (state: ReduxState) => {
-  return {
-    authService: selectAuthService(state),
-  };
-};
-export const TwitchButton = connect(mapStateToProps)(UnconnectedTwitchButton);

@@ -13,7 +13,6 @@ import {
   LogoutIcon,
 } from './icons/help';
 import { twitchLogin } from 'twitch';
-import { selectAuthService } from 'selectors/game_selectors';
 
 const FloatingBar = styled('div', {
   width: '100%',
@@ -62,7 +61,6 @@ export const FloatingButtonBar = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const showSettings = searchParams.get('settings');
 
-  const authService = useSelector(selectAuthService);
   return (
     <FloatingBar>
       <InnerBar>
@@ -107,7 +105,7 @@ export const FloatingButtonBar = () => {
                     />
                   ) : null}
                   {authToken === null ? (
-                    <LoginIcon onClick={twitchLogin(authService)} />
+                    <LoginIcon onClick={twitchLogin()} />
                   ) : null}
                 </>
               )}
