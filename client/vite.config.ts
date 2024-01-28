@@ -7,8 +7,8 @@ import path from 'path';
 let http_host = 'http://localhost:3001';
 let ws_host = 'ws://localhost:3001';
 if (process.env.VITE_USE_PROD) {
-  http_host = 'https://rollycubes.com';
-  ws_host = 'wss://rollycubes.com';
+  http_host = 'https://prod.rollycubes.com';
+  ws_host = 'wss://prod.rollycubes.com';
 }
 // https://vitejs.dev/config/
 export default defineConfig({

@@ -4,6 +4,7 @@ import { selectAuthService } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { LoginRequest } from 'types/api';
+import { rewriteHostname } from 'connection';
 
 interface Props {
   authService: string;
@@ -63,7 +64,12 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
         const intent = localStorage.getItem('intent');
         if (intent) localStorage.removeItem('intent');
         if (intent === 'start') {
-          const result = await window.fetch(`/create?public`);
+          const result = await window.fetch(
+            window.location.protocol +
+              '//' +
+              rewriteHostname(window.location.hostname) +
+              `/create?public`
+          );
           if (!result.ok) {
             navigate('/home', { replace: true });
           } else {

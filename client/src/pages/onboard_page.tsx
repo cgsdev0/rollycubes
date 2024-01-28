@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { selectAuthService } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 import { TwitchButton } from '../twitch';
+import { rewriteHostname } from 'connection';
 
 interface Props {
   intent?: string;
@@ -124,7 +125,12 @@ const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
   React.useEffect(() => {
     (async function () {
       if (authToken) {
-        const result = await window.fetch(`/create?public`);
+        const result = await window.fetch(
+          window.location.protocol +
+            '//' +
+            rewriteHostname(window.location.hostname) +
+            `/create?public`
+        );
         const dest = await result.text();
         navigate(`/room/${dest}`, { replace: true });
       }

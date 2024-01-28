@@ -7,9 +7,13 @@ import { Location } from 'react-router-dom';
 import { endpoints, optimisticUpdates } from 'api/auth';
 import { connect } from 'react-redux';
 import { selectCurrentDiceType } from 'selectors/game_selectors';
-import { toast } from 'react-toastify';
-import { Achievement } from 'ui/achievement';
 
+export const rewriteHostname = (hostname: string) => {
+  if (hostname === 'rollycubes.com' || hostname === 'www.rollycubes.com') {
+    return 'prod.rollycubes.com';
+  }
+  return hostname;
+};
 interface Props {
   room: string;
   mode: string;
@@ -140,9 +144,11 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
         userIdStr = '?userId=' + decoded.user_id;
       }
       this.websocket = new WebSocket(
-        `${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${
-          window.location.hostname
-        }${portString}/ws/${this.props.mode}/${this.props.room}${userIdStr}`
+        `${
+          window.location.protocol.endsWith('s:') ? 'wss' : 'ws'
+        }://${rewriteHostname(window.location.hostname)}${portString}/ws/${
+          this.props.mode
+        }/${this.props.room}${userIdStr}`
       );
       this.websocket.addEventListener('close', this.onClose);
       this.websocket.addEventListener('open', this.onOpen);

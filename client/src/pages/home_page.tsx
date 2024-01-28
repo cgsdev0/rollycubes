@@ -1,3 +1,4 @@
+import { rewriteHostname } from 'connection';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -168,9 +169,9 @@ const HomePage = () => {
       }
 
       const innerWs = new WebSocket(
-        `${window.location.protocol.endsWith('s:') ? 'wss' : 'ws'}://${
-          window.location.hostname
-        }${portString}/ws/list`
+        `${
+          window.location.protocol.endsWith('s:') ? 'wss' : 'ws'
+        }://${rewriteHostname(window.location.hostname)}${portString}/ws/list`
       );
 
       innerWs.onopen = () => {
