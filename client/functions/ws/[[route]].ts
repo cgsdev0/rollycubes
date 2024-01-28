@@ -4,7 +4,7 @@ export const onRequest: PagesFunction<{}> = async (context) => {
   if (upgradeHeader || upgradeHeader === 'websocket') {
     const url = new URL(request.url);
     return await fetch(
-      url.protocol + 'beta.rollycubes.com' + url.pathname + (url.search || ''),
+      url.protocol + '//beta.rollycubes.com' + url.pathname + (url.search || ''),
       request
     );
   }
