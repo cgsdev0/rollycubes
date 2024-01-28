@@ -144,6 +144,7 @@ class Game {
     }
     std::uniform_int_distribution<int> dis{1, 6};
     std::chrono::system_clock::time_point updated = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point turn_start_time = std::chrono::system_clock::now();
     std::string turn_token;
     std::vector<BaseAchievement *> achievements;
     API::GameState state;

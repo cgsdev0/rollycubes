@@ -7,6 +7,7 @@
 #include "Loop.h"
 #include "StringUtils.h"
 #include "achievements/All.h"
+using namespace std::chrono_literals;
 
 Game::Game() {
     this->state.victory = false;
@@ -123,6 +124,7 @@ bool Game::allUsed() {
 
 void Game::advanceTurn() {
     clearTurn();
+    this->turn_start_time = std::chrono::system_clock::now();
     if (state.players.size() == 1) {
         turn_token = state.players[0].session;
         state.turn_index = 0;
@@ -324,7 +326,11 @@ void Game::skip(HANDLER_ARGS) {
         throw API::GameError({.error = "out of bounds"});
     if (state.turn_index != id)
         throw API::GameError({.error = "can only skip player if it's their turn"});
-    // TODO: check if enough time has passed
+    auto current = std::chrono::system_clock::now();
+    auto diff = current - this->turn_start_time;
+    if (diff < 15s) {
+        throw API::GameError({.error = "not enough time has passed"});
+    }
 
     state.players[id].skip_count++;
     RichTextStream stream;
