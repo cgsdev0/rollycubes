@@ -1,6 +1,10 @@
 export async function onRequest(request: Request) {
   const upgradeHeader = request.headers.get('Upgrade');
   if (upgradeHeader || upgradeHeader === 'websocket') {
-    return await fetch('wss://beta.rollycubes.com/list', request);
+    const url = new URL(request.url);
+    return await fetch(
+      'wss://beta.rollycubes.com' + url.pathname + (url.search || ''),
+      request
+    );
   }
 }
