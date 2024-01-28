@@ -24,5 +24,6 @@
   "paths": {
     "*": ["types/*"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["functions/**/*"],
 }
