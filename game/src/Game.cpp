@@ -326,11 +326,12 @@ void Game::skip(HANDLER_ARGS) {
         throw API::GameError({.error = "out of bounds"});
     if (state.turn_index != id)
         throw API::GameError({.error = "can only skip player if it's their turn"});
+    if (state.players[id].skip_count >= 4)
+        throw API::GameError({.error = "stop farming them and kick pls jeez"});
     auto current = std::chrono::system_clock::now();
     auto diff = current - this->turn_start_time;
-    if (state.players[id].connected && diff < 15s) {
+    if (state.players[id].connected && diff < 15s)
         throw API::GameError({.error = "not enough time has passed"});
-    }
 
     state.players[id].skip_count++;
     RichTextStream stream;

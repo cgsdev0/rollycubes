@@ -202,6 +202,12 @@ export const selectLatestPopText = createSelector(
   (state) => state.popText.popText[0]
 );
 
+export const selectCurrentSkipCount = createSelector(
+  selectTurnIndex,
+  selectPlayers,
+  (turn, players) => players[turn]?.skip_count || 0
+);
+
 export const selectTurnName = createSelector(
   selectTurnIndex,
   selectPlayers,

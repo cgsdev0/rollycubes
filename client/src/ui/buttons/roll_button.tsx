@@ -2,6 +2,7 @@ import React from 'react';
 import { connect, useSelector } from 'react-redux';
 import { styled } from 'stitches.config';
 import {
+  selectCurrentSkipCount,
   selectHasMultiplePlayers,
   selectIsGameOver,
   selectIsMyTurn,
@@ -48,6 +49,7 @@ const RollButton: React.FC<Props> = ({
   const roll_count = useSelector(
     (state: ReduxState) => state.popText.rollCount
   );
+  const skip_count = useSelector(selectCurrentSkipCount);
   const turn_index = useSelector((state: ReduxState) => state.game.turn_index);
   React.useLayoutEffect(() => {
     setCanSkip(false);
@@ -62,20 +64,28 @@ const RollButton: React.FC<Props> = ({
       state.game.players.at(state.game.turn_index)?.connected
   );
 
-  const onSkip = () => {
+  const on = (type: 'skip' | 'kick') => () => {
     if (socket) {
-      socket.send(JSON.stringify({ type: 'skip', id: turn_index }));
+      socket.send(JSON.stringify({ type, id: turn_index }));
     }
   };
   if (victory) return null;
   if (!hasEnoughPlayers) return <Subtitle>Waiting for players...</Subtitle>;
   if (!myTurn) {
     if (!connected || canSkip) {
-      return (
-        <Button className={'Reset'} onClick={onSkip}>
-          Skip
-        </Button>
-      );
+      if (skip_count >= 4) {
+        return (
+          <Button className={'Reset'} onClick={on('kick')}>
+            Kick
+          </Button>
+        );
+      } else {
+        return (
+          <Button className={'Reset'} onClick={on('skip')}>
+            Skip
+          </Button>
+        );
+      }
     }
     return (
       <Subtitle>
