@@ -182,6 +182,9 @@ const RulesRow = styled('div', {
 
 const rulesRowDesktop = css({
   '@bp0': { display: 'none !important' },
+  '& strong': {
+    color: '$brand',
+  },
 });
 
 const Rules = ({ mobile }: { mobile?: boolean }) => {
@@ -192,10 +195,10 @@ const Rules = ({ mobile }: { mobile?: boolean }) => {
         <p>If you...</p>
         <ul>
           <li>
-            roll <strong>doubles,</strong> roll again.
+            roll <strong>doubles</strong>, roll again.
           </li>
           <li>
-            roll a <strong>seven,</strong> split!
+            roll a <strong>seven</strong>, split!
           </li>
           <li>
             match someone's score, <strong>reset</strong> them.

@@ -22,6 +22,9 @@ const ScoreTable = styled('table', {
   },
   '& tr:last-child': {},
   '& td': {
+    '&:hover': {
+      color: '$primary',
+    },
     textAlign: 'center',
     fontSize: 10,
     color: '$primaryDimmed',
