@@ -45,7 +45,11 @@ const RenderCanvas = styled('canvas', {
 const App = () => {
   // make a cookie DONT FORGET TO SET THE PATH AHHHHHHHHHHHHHHHHHHHH
   if (!document.cookie.includes('_session')) {
-    document.cookie = `_session=${uuidv4()}; Path=/`;
+    if (window.location.hostname.includes('com')) {
+      document.cookie = `_session=${uuidv4()}; Path=/; Domain=.rollycubes.com`;
+    } else {
+      document.cookie = `_session=${uuidv4()}; Path=/`;
+    }
   }
 
   return (
