@@ -64,8 +64,6 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
 
   const store = useStore<ReduxState>();
 
-  const needsToOnboard = authToken === null && showLogin;
-
   const showHelp = useSelector((state: ReduxState) => state.settings.showHelp);
 
   const dispatch = useDispatch();
@@ -81,6 +79,7 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
   const spectating = useSelector(
     (state: ReduxState) => state.game.self_index === undefined
   );
+  const needsToOnboard = authToken === null && showLogin && !spectating;
   // Change to spectator view if lobby is full
   // React.useEffect(() => {
   //   if (mode !== 'spectate' && spectating && !needsToOnboard) {
