@@ -328,7 +328,7 @@ void Game::skip(HANDLER_ARGS) {
         throw API::GameError({.error = "can only skip player if it's their turn"});
     auto current = std::chrono::system_clock::now();
     auto diff = current - this->turn_start_time;
-    if (diff < 15s) {
+    if (state.players[id].connected && diff < 15s) {
         throw API::GameError({.error = "not enough time has passed"});
     }
 
