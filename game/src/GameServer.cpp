@@ -322,7 +322,6 @@ void writeCORS(auto *req, auto *res) {
     res->writeHeader("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS");
     res->writeHeader("Access-Control-Allow-Credentials", "true");
     res->writeHeader("Access-Control-Allow-Headers", "csrf-token, content-type, x-access-token");
-    res->writeHeader("Access-Control-Allow-Origin", "csrf-token, content-type, x-access-token");
   }
 }
 int main(int argc, char **argv) {
