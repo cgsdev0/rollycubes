@@ -142,7 +142,7 @@ func GetRoomList(activeTab int) (*api.RoomListMsg, error) {
 	var resp *http.Response
 	var err error
 	if activeTab == 0 {
-		resp, err = http.Get("https://rollycubes.com/list")
+		resp, err = http.Get("https://prod.rollycubes.com/list")
 	} else {
 		resp, err = http.Get("https://beta.rollycubes.com/list")
 	}
@@ -911,7 +911,7 @@ func startWebsocket(m model, s GameScene) {
 	ctx := m.Common.ctx
 	prodWsUrl := os.Getenv("PROD_WS_URL")
 	if len(prodWsUrl) == 0 {
-		prodWsUrl = "wss://rollycubes.com"
+		prodWsUrl = "wss://prod.rollycubes.com"
 	}
 	betaWsUrl := os.Getenv("BETA_WS_URL")
 	if len(betaWsUrl) == 0 {
@@ -1030,7 +1030,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				log.Println("creating new room")
 				var apiString string
 				if lobbyScene.ActiveTab == 0 {
-					apiString = "https://rollycubes.com/create?public"
+					apiString = "https://prod.rollycubes.com/create?public"
 				} else {
 					apiString = "https://beta.rollycubes.com/create?public"
 				}
