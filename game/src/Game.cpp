@@ -313,6 +313,8 @@ void Game::leave(HANDLER_ARGS) {
 }
 
 void Game::skip(HANDLER_ARGS) {
+    if (state.victory)
+        throw API::GameError({.error = "game is over stop at once"});
     if (!data["id"].is_number())
         throw API::GameError({.error = "pass a number please"});
     uint id = data["id"].get<uint>();
