@@ -325,7 +325,7 @@ const SshKeys = () => {
       <p>You can also play Rolly Cubes from your terminal!</p>
       <p>
         Register your SSH public key below, and then connect via the following
-        command: <Code>ssh rollycubes.com</Code>
+        command: <Code>ssh ssh.rollycubes.com</Code>
       </p>
       <hr />
       <Gated
