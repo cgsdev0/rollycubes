@@ -1,4 +1,5 @@
 #include <chrono>
+#include <set>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -305,6 +306,25 @@ uWS::App::WebSocketBehavior<HomeSocketData> makeHomeWebsocketBehavior(uWS::App *
 }
 
 
+const std::set<std::string> allowed_origins{
+        "https://rollycubes.com",
+        "https://prod.rollycubes.com",
+        "https://beta.rollycubes.com",
+        "https://www.rollycubes.com",
+        "https://rollycubes.live",
+        "http://localhost:3000",
+        "http://localhost:3005"
+};
+void writeCORS(auto *req, auto *res) {
+  std::string origin(req->getHeader("origin"));
+  if(allowed_origins.contains(origin)) {
+    res->writeHeader("Access-Control-Allow-Origin", origin);
+    res->writeHeader("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS");
+    res->writeHeader("Access-Control-Allow-Credentials", "true");
+    res->writeHeader("Access-Control-Allow-Headers", "csrf-token, content-type, x-access-token");
+    res->writeHeader("Access-Control-Allow-Origin", "csrf-token, content-type, x-access-token");
+  }
+}
 int main(int argc, char **argv) {
 
     GameCoordinator coordinator;
@@ -364,11 +384,13 @@ int main(int argc, char **argv) {
            res->end();
        })
         .get("/list", [&](auto *res, auto *req) {
+            writeCORS(req, res);
             res->writeHeader("Content-Type", "application/json");
             res->write(coordinator.list_rooms().toString());
             res->end();
         })
         .get("/create", [&](auto *res, auto *req) {
+            writeCORS(req, res);
             std::string session = getSession(req);
             bool isPrivate = true;
             if (req->getQuery().find("public") != std::string::npos) {

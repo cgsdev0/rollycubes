@@ -126,10 +126,7 @@ const OnboardPage: React.FC<DispatchProp & Props> = (props) => {
     (async function () {
       if (authToken) {
         const result = await window.fetch(
-          window.location.protocol +
-            '//' +
-            rewriteHostname(window.location.hostname) +
-            `/create?public`
+          window.location.protocol + '//' + rewriteHostname() + `/create?public`
         );
         const dest = await result.text();
         navigate(`/room/${dest}`, { replace: true });

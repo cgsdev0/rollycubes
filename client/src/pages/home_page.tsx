@@ -146,10 +146,7 @@ const HomePage = () => {
     if (pressed) return;
     setPressed(true);
     const result = await window.fetch(
-      window.location.protocol +
-        '//' +
-        rewriteHostname(window.location.hostname) +
-        `/create?public`
+      window.location.protocol + '//' + rewriteHostname() + `/create?public`
     );
     if (!result.ok) {
       setPressed(false);
@@ -168,15 +165,10 @@ const HomePage = () => {
         return null;
       }
 
-      let portString = '';
-      if (window.location.port !== '80') {
-        portString = `:${window.location.port}`;
-      }
-
       const innerWs = new WebSocket(
         `${
           window.location.protocol.endsWith('s:') ? 'wss' : 'ws'
-        }://${rewriteHostname(window.location.hostname)}${portString}/ws/list`
+        }://${rewriteHostname()}/ws/list`
       );
 
       innerWs.onopen = () => {

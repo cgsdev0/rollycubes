@@ -8,11 +8,18 @@ import { endpoints, optimisticUpdates } from 'api/auth';
 import { connect } from 'react-redux';
 import { selectCurrentDiceType } from 'selectors/game_selectors';
 
-export const rewriteHostname = (hostname: string) => {
-  if (hostname === 'rollycubes.com' || hostname === 'www.rollycubes.com') {
+export const rewriteHostname = () => {
+  if (
+    window.location.hostname === 'rollycubes.com' ||
+    window.location.hostname === 'www.rollycubes.com'
+  ) {
     return 'prod.rollycubes.com';
   }
-  return hostname;
+  let portString = '';
+  if (window.location.port !== '80') {
+    portString = `:${window.location.port}`;
+  }
+  return window.location.hostname + portString;
 };
 interface Props {
   room: string;
@@ -134,10 +141,6 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
       this.websocket.readyState === WebSocket.CLOSED ||
       this.websocket.readyState === WebSocket.CLOSING
     ) {
-      let portString = '';
-      if (window.location.port !== '80') {
-        portString = `:${window.location.port}`;
-      }
       let userIdStr = '';
       if (this.props.authToken && this.props.mode === 'room') {
         const decoded: DecodedUserJWT = jwt_decode(this.props.authToken);
@@ -146,9 +149,9 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
       this.websocket = new WebSocket(
         `${
           window.location.protocol.endsWith('s:') ? 'wss' : 'ws'
-        }://${rewriteHostname(window.location.hostname)}${portString}/ws/${
-          this.props.mode
-        }/${this.props.room}${userIdStr}`
+        }://${rewriteHostname()}/ws/${this.props.mode}/${
+          this.props.room
+        }${userIdStr}`
       );
       this.websocket.addEventListener('close', this.onClose);
       this.websocket.addEventListener('open', this.onOpen);

@@ -67,7 +67,7 @@ const TwitchOAuthPage: React.FC<DispatchProp & Props> = ({
           const result = await window.fetch(
             window.location.protocol +
               '//' +
-              rewriteHostname(window.location.hostname) +
+              rewriteHostname() +
               `/create?public`
           );
           if (!result.ok) {
