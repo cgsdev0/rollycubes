@@ -145,7 +145,12 @@ const HomePage = () => {
   const onStart = (priv: boolean) => async () => {
     if (pressed) return;
     setPressed(true);
-    const result = await window.fetch(`/create?public`);
+    const result = await window.fetch(
+      window.location.protocol +
+        '//' +
+        rewriteHostname(window.location.hostname) +
+        `/create?public`
+    );
     if (!result.ok) {
       setPressed(false);
     } else {
