@@ -72,9 +72,9 @@ const Players: React.FC<Props> = (props) => {
             navigate(location.pathname.replace('spectate/', 'room/'), {
               replace: true,
             });
-            if (socket) {
-              socket.close();
-            }
+            // if (socket) {
+            //   socket.close();
+            // }
           }}
         >
           Join the game &rarr;

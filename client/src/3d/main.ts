@@ -663,7 +663,6 @@ export const initScene = async () => {
   ) => {
     turn_index += players;
     const dirs = directions[players as keyof typeof directions];
-    console.log({ turn_index, modded: turn_index % dirs.length });
     lastRollWasDoubles = serverRoll.every((v) => v === serverRoll[0]);
     // console.log(serverRoll);
     if (serverRoll.length === 0) {
@@ -831,11 +830,7 @@ export const initScene = async () => {
     (window as any).REDUX_STORE.getState().game.rolls.forEach(
       (roll: any, i: number) => {
         const die = dice[i];
-        // die.updateVerticesData(
-        //   BABYLON.VertexBuffer.UVKind,
-        //   diceUVBuffers[(6 + roll.value - 1) % 6]
-        // )
-        // updateUVs(die, localRoll, serverRoll[i])
+        updateUVs(die, 1, (6 + roll.value - 1) % 6);
         die.position.y = diceSize('Default') / 1.2;
         die.position.x = -i + diceSize('Default');
         die.position.z = Math.random();

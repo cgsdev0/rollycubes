@@ -76,9 +76,7 @@ const GamePage: React.FC<Props> = ({ is3DMode, authToken, mode }) => {
   );
 
   const spectators = useSelector((state: ReduxState) => state.game.spectators);
-  const spectating = useSelector(
-    (state: ReduxState) => state.game.self_index === undefined
-  );
+  const spectating = mode === 'spectate';
   const needsToOnboard = authToken === null && showLogin && !spectating;
   // Change to spectator view if lobby is full
   // React.useEffect(() => {

@@ -166,7 +166,7 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
   }
 
   componentDidUpdate(prev: Props) {
-    if (prev.room !== this.props.room) {
+    if (prev.room !== this.props.room || prev.mode !== this.props.mode) {
       if (this.websocket) {
         this.websocket.close();
       }
