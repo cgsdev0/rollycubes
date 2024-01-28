@@ -52,6 +52,7 @@ async fn main() {
         ]))
         .allow_origin(AllowOrigin::list([
             HeaderValue::from_static("https://rollycubes.com"),
+            HeaderValue::from_static("https://prod.rollycubes.com"),
             HeaderValue::from_static("https://beta.rollycubes.com"),
             HeaderValue::from_static("https://www.rollycubes.com"),
             HeaderValue::from_static("https://rollycubes.live"),
