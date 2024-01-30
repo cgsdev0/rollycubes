@@ -1,12 +1,9 @@
 import { rewriteHostname } from 'connection';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { keyframes, css, styled } from 'stitches.config';
-import { ReduxState } from 'store';
+import { css, keyframes, styled } from 'stitches.config';
 import { Room, RoomListMsg } from 'types/api';
 import { Button } from '../ui/buttons/button';
-import OnboardPage from './onboard_page';
 import itsBoatsLogo from '/itsboats.png';
 
 type NavFn = ReturnType<typeof useNavigate>;
@@ -18,14 +15,6 @@ const scaleUp = keyframes({
 const ButtonRow = styled('div', {
   display: 'flex',
   overflow: 'hidden',
-  '& button': {
-    textTransform: 'uppercase',
-    borderRadius: 100,
-    height: 46,
-    letterSpacing: '0.16em',
-    fontSize: 16,
-    fontFamily: 'Amiko',
-  },
   '& button:first-child': {
     backgroundColor: '$good',
     color: 'white',
@@ -33,23 +22,9 @@ const ButtonRow = styled('div', {
   animation: scaleUp(),
   animationDuration: '0.2s',
 });
-const StartButton = styled('button', {
-  backgroundColor: '$good',
-  flexBasis: 'initial',
-  color: 'white',
-  textTransform: 'uppercase',
-  borderRadius: 100,
-  height: 56,
-  letterSpacing: '0.16em',
-  fontSize: 16,
-  paddingTop: 2,
-  fontFamily: 'Amiko',
-  // '&:hover': {
-  //   backgroundColor: 'blue',
-  // },
-  // '&:active': {
-  //   backgroundColor: 'red',
-  // },
+const StartButton = styled(Button, {
+  backgroundColor: '$good !important',
+  color: 'white !important',
 });
 
 const content = css({
@@ -91,6 +66,7 @@ const gameInfoPanel = css({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-end',
+  boxShadow: '$cutoutTop, $cutoutBottom, $cutoutBorder',
   '@bp1': {
     gap: 115,
     width: 240,

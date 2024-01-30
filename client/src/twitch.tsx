@@ -3,6 +3,7 @@ import { css, styled } from 'stitches.config';
 import { connect } from 'react-redux';
 import { selectAuthService } from './selectors/game_selectors';
 import { ReduxState } from './store';
+import { Button } from 'ui/buttons/button';
 
 function dec2hex(dec: number) {
   return dec.toString(16).padStart(2, '0');
@@ -79,10 +80,10 @@ export const TwitchButton: React.FC<{
 }> = ({ intent }) => {
   return (
     <>
-      <button onClick={twitchLogin(intent)} className={twitchButton()}>
+      <Button onClick={twitchLogin(intent)} className={twitchButton()}>
         Login With Twitch
         <TwitchIcon />
-      </button>
+      </Button>
     </>
   );
 };
