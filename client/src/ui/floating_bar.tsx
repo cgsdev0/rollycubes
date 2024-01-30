@@ -32,8 +32,8 @@ const RightAlign = styled('div', {
 });
 const InnerBar = styled('div', {
   '@bp1': {
-    marginRight: 40,
-    marginLeft: 40,
+    marginRight: 64,
+    marginLeft: 64,
   },
   display: 'flex',
   alignItems: 'center',
