@@ -22,6 +22,7 @@ import { ReduxState } from '../store';
 import { destroyPreview, initPreview } from '3d/main';
 import { toast } from 'react-toastify';
 import { DiceType } from 'types/api';
+import { SettingsContainer } from 'App';
 
 const display_names: Partial<Record<DiceType, string>> = {
   D20: 'Suspicious D20',
@@ -68,7 +69,7 @@ const Gate = styled('section', {
   '@bp1': {
     top: -12,
     left: -12,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 12,
   },
   backdropFilter: 'blur(8px)',
@@ -98,54 +99,6 @@ const Code = styled('span', {
   userSelect: 'all',
 });
 
-const SettingsContainer = styled('div', {
-  zIndex: 100,
-  backgroundColor: '$gray800',
-  boxShadow: 'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset',
-  // backgroundColor: 'red',
-  position: 'absolute',
-  '@bp0': {
-    height: '100%',
-    width: '100%',
-    flexDirection: 'column',
-  },
-  '@bp1': {
-    padding: 48,
-    height: 'calc(100% - 96px - 48px)',
-    width: 'calc(100% - 96px - 48px)',
-    borderRadius: 16,
-    left: 24,
-    top: 24,
-    flexDirection: 'row',
-  },
-  '& main': {
-    height: '100%',
-    '@bp0': {
-      overflowY: 'auto',
-    },
-    '& hr': {
-      border: 0,
-      borderTop: '1px solid $gray700',
-      margin: '12px 0',
-    },
-    '& h1': {
-      margin: 0,
-      marginBottom: 8,
-    },
-    '& p': {
-      userSelect: 'text',
-    },
-    // backgroundColor: 'red',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-    width: '100%',
-  },
-  gap: 24,
-  display: 'flex',
-  flex: 1,
-});
-
 const SaveButtonWrapper = styled('div', {
   display: 'flex',
   width: '100%',
@@ -166,13 +119,11 @@ const Sidebar = styled('ul', {
     flexShrink: 0,
   },
   '@bp1': {
-    boxShadow:
-      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px, rgba(0, 0, 0, 0.3) 0px 2px 0px 0px inset',
+    boxShadow: '$cutoutTop, $cutoutBottom, $cutoutBorder',
     width: 336,
     overflow: 'hidden',
-    border: '1px solid rgba(0,0,0,0.3)',
     height: '100%',
-    borderRadius: 12,
+    borderRadius: 16,
     paddingTop: 20,
     '& .mobileOnly': {
       display: 'none',

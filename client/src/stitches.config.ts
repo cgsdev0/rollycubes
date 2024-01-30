@@ -31,6 +31,11 @@ export const {
       poptext: '#040404',
       brand: '#3acecd',
       brandFaded: '#009999',
+      cutoutBottom: 'rgba(255, 255, 255, 0.12) 0px 3px 3px 0px',
+      cutoutTop: 'rgba(0, 0, 0, 0.2) 0px 8px 3px 0px inset',
+      cutoutBorder: 'rgba(0,0,0,0.3) 0px 0px 0px 1px',
+      indentBottom: 'rgba(255, 255, 255, 0.15) 0px 2px 3px 0px',
+      indentTop: 'rgba(0, 0, 0, 0.2) 0px 3px 3px 0px inset',
     },
   },
   media: {

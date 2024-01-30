@@ -167,12 +167,8 @@ const RulesRow = styled('div', {
     zIndex: 10,
   },
   '@bp1': {
-    boxShadow:
-      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px inset',
-    border: '1px solid $gray900',
-    borderBottom: 0,
-    borderTop: 0,
-    borderRadius: 8,
+    boxShadow: '$indentTop, $indentBottom',
+    borderRadius: 16,
     padding: 12,
   },
 });

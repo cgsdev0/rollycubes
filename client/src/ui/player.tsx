@@ -112,6 +112,16 @@ const playerName = css({
   },
 });
 
+const kick = css({
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  height: '100%',
+  position: 'absolute',
+  top: 0,
+  left: 5,
+});
+
 const playerRow = css({
   display: 'flex',
   justifyContent: 'space-between',
@@ -120,7 +130,14 @@ const playerRow = css({
     backgroundColor: '$brandFaded',
     boxShadow: '0px 0px 3px 3px $brand, 0px 0px 12px 6px $brand inset',
     '@bp1': {
+      paddingLeft: 70,
+      paddingRight: 70,
+      marginLeft: -40,
+      marginRight: -40,
       borderRadius: 4,
+    },
+    [`& .${kick}`]: {
+      left: 45,
     },
   },
   '@bp0': {
@@ -151,16 +168,6 @@ const score = css({
   display: 'flex',
   alignItems: 'center',
   marginBottom: ADJUST_FOR_STUPID_FONT,
-});
-
-const kick = css({
-  display: 'flex',
-  alignItems: 'center',
-  cursor: 'pointer',
-  height: '100%',
-  position: 'absolute',
-  top: 0,
-  left: 5,
 });
 
 const PlayerComponent = (props: Props) => {

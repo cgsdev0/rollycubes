@@ -92,15 +92,20 @@ const container = css({
   },
 });
 
+const boxShadows = [
+  'rgba(255, 255, 255, 0.12) 0px 3px 3px 0px inset',
+  'rgba(0, 0, 0, 0.2) 0px -20px 2px 0px inset',
+  '0px 10px 10px rgba(0,0,0,0.2)',
+];
+
 const innerContainer = css({
   '@bp1': {
-    boxShadow:
-      'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px, 8px 10px 10px rgba(0,0,0,0.2)',
+    boxShadow: boxShadows.join(','),
     backgroundColor: '$gray800',
     display: 'flex',
-    borderRadius: 16,
+    borderRadius: 48,
     margin: 24,
-    padding: 48,
+    padding: '32px 32px 52px 32px',
     height: 'calc(100% - 96px - 48px)',
     justifyContent: 'space-between',
     gap: 24,
@@ -118,6 +123,51 @@ const innerContainer = css({
     width: '100%',
     textAlign: 'left',
   },
+});
+
+export const SettingsContainer = styled(innerContainer, {
+  zIndex: 100,
+  // backgroundColor: 'red',
+  position: 'absolute',
+  '@bp0': {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'column',
+  },
+  '@bp1': {
+    boxShadow: boxShadows.slice(0, 2).join(','),
+    height: 'calc(100% -56px)',
+    width: 'calc(100% - 96px - 16px)',
+    left: 0,
+    top: 0,
+    flexDirection: 'row',
+  },
+  '& main': {
+    height: '100%',
+    '@bp0': {
+      overflowY: 'auto',
+    },
+    '& hr': {
+      border: 0,
+      borderTop: '1px solid $gray700',
+      margin: '12px 0',
+    },
+    '& h1': {
+      margin: 0,
+      marginBottom: 8,
+    },
+    '& p': {
+      userSelect: 'text',
+    },
+    // backgroundColor: 'red',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    width: '100%',
+  },
+  gap: 24,
+  display: 'flex',
+  flex: 1,
 });
 
 const AppInner = () => {
