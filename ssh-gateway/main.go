@@ -411,7 +411,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		if m.Common.zone.Get("roll").InBounds(msg) {
 			if m.Common.ws != nil {
-				msg := api.RollMsg{Type: api.Roll}
+				msg := api.RollMsg{Type: "roll"}
 				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
 				if err != nil {
 					log.Println(err)
@@ -564,7 +564,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			// Update our name
 			if m.Common.ws != nil {
-				msg := api.UpdateNameMsg{Type: api.UpdateName, Name: m.Common.session.User()}
+				msg := api.UpdateNameMsg{Type: "update_name", Name: m.Common.session.User()}
 				err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
 				if err != nil {
 					log.Println(err)
@@ -633,7 +633,7 @@ func (m GameScene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.textInput.Focused() && m.textInput.Value() != "" {
 				val := m.textInput.Value()
 				if m.Common.ws != nil {
-					msg := api.ChatMsg{Type: api.Chat, Msg: val}
+					msg := api.ChatMsg{Type: "chat", Msg: val}
 					err := wsjson.Write(m.Common.ctx, m.Common.ws, msg)
 					if err != nil {
 						log.Println(err)
