@@ -38,7 +38,7 @@ const AchievementTooltip = styled('div', {
   borderRadius: 8,
   padding: 12,
   boxShadow:
-    'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px, 8px 10px 10px rgba(0,0,0,0.2)',
+    'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px, $elevation',
   p: {
     fontSize: 14,
     color: '$primaryDimmed',
@@ -80,7 +80,7 @@ const StyledTooltip = styled('div', {
   zIndex: 10,
   borderRadius: 16,
   boxShadow:
-    'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px, 8px 10px 10px rgba(0,0,0,0.2)',
+    'rgba(255, 255, 255, 0.15) 0px 2px 0px 0px inset, rgba(0, 0, 0, 0.2) 0px 3px 0px 0px, $elevation',
   h1: {
     p: {
       textAlign: 'left',

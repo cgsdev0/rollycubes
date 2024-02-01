@@ -93,9 +93,9 @@ const container = css({
 });
 
 const boxShadows = [
-  'rgba(255, 255, 255, 0.12) 0px 3px 3px 0px inset',
+  'rgba(255, 255, 255, 0.12) 0px 3px 2px 0px inset',
   'rgba(0, 0, 0, 0.2) 0px -20px 2px 0px inset',
-  '0px 10px 10px rgba(0,0,0,0.2)',
+  '$elevation',
 ];
 
 const innerContainer = css({

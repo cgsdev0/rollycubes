@@ -36,6 +36,7 @@ export const {
       cutoutBorder: 'rgba(0,0,0,0.3) 0px 0px 0px 1px',
       indentBottom: 'rgba(255, 255, 255, 0.15) 0px 2px 3px 0px',
       indentTop: 'rgba(0, 0, 0, 0.2) 0px 3px 3px 0px inset',
+      elevation: '0px 6px 10px rgba(0,0,0,0.2)',
     },
   },
   media: {
