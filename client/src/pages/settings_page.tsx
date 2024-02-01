@@ -34,6 +34,9 @@ const display_names: Partial<Record<DiceType, string>> = {
 const NextBtn = styled(Button, {
   position: 'absolute',
   top: '35%',
+  '&:active': {
+    top: 'calc(35% + 2px)',
+  },
   minWidth: 70,
   minHeight: 50,
 });
