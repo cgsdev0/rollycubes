@@ -7,7 +7,7 @@ export const Button = styled('button', {
   backgroundColor: '$gray400',
   textShadow: 'rgba(0, 0, 0, 0.1) 0px 1px 2px',
   boxShadow:
-    'rgba(255, 255, 255, 0.2) 0px 3px 1px 0px inset, rgba(0,0,0,0.3) 0px -5px 1px 0px inset, rgba(0, 0, 0, 0.15) 0px 6px 10px -3px',
+    'rgba(255, 255, 255, 0.2) 0px 2px 1px 0px inset, rgba(0,0,0,0.3) 0px -5px 1px 0px inset, rgba(0, 0, 0, 0.15) 0px 6px 10px -3px',
   paddingBottom: 4,
   paddingLeft: 8,
   paddingRight: 8,
@@ -21,7 +21,7 @@ export const Button = styled('button', {
     height: 45,
     minHeight: 45,
     boxShadow:
-      'rgba(255, 255, 255, 0.2) 0px 3px 1px 0px inset, rgba(0,0,0,0.3) 0px -1px 1px 0px inset, rgba(0, 0, 0, 0.15) 0px 6px 10px -3px',
+      'rgba(255, 255, 255, 0.2) 0px 2px 1px 0px inset, rgba(0,0,0,0.3) 0px -1px 1px 0px inset, rgba(0, 0, 0, 0.15) 0px 6px 10px -3px',
     paddingBottom: 1,
     transition: 'unset',
   },
