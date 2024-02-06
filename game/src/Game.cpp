@@ -556,6 +556,7 @@ void Game::update(HANDLER_ARGS) {
         if (!isDoubles()) {
             if (TARGET_SCORES.count(score)) {
                 // WIN CONDITION
+                metrics->wins[score]->Increment();
                 json win;
                 state.players[winnerId].win_count++;
                 for (uint i = 0; i < state.players.size(); ++i) {

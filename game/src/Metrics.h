@@ -6,6 +6,7 @@
 #include <prometheus/text_serializer.h>
 #include <functional>
 #include <vector>
+#include <map>
 
 struct Metrics {
 
@@ -87,6 +88,17 @@ struct Metrics {
       specific_rolls.push_back(&specific_rolls_family.Add({{"die1", "6"}, {"die2", "5"}, {"total", "11"}}));
       specific_rolls.push_back(&specific_rolls_family.Add({{"die1", "6"}, {"die2", "6"}, {"total", "12"}}));
 
+    auto &wins_family = prometheus::BuildCounter()
+      .Name("wins_total")
+      .Help("Count of a wins")
+      .Register(*registry);
+
+    wins[33] = &wins_family.Add({{"score", "33"}});
+    wins[66] = &wins_family.Add({{"score", "66"}});
+    wins[67] = &wins_family.Add({{"score", "67"}});
+    wins[98] = &wins_family.Add({{"score", "98"}});
+    wins[99] = &wins_family.Add({{"score", "99"}});
+    wins[100] = &wins_family.Add({{"score", "100"}});
   }
 
   prometheus::Gauge *ws_counter;
@@ -95,6 +107,7 @@ struct Metrics {
   prometheus::Counter *rolls;
   prometheus::Counter *restarts;
   std::vector<prometheus::Counter *> specific_rolls;
+  std::map<int, prometheus::Counter *> wins;
 
   private:
   std::shared_ptr<prometheus::Registry> registry;
