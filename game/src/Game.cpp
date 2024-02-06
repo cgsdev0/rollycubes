@@ -470,6 +470,7 @@ void Game::roll(HANDLER_ARGS) {
         state.rolls[i] = dis(gen);
         resp["rolls"].push_back(state.rolls[i]);
     }
+    metrics->specific_rolls[state.rolls[0] * 6 + state.rolls[1]]->Increment();
     state.rolled = true;
 
     // Update statistics
