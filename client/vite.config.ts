@@ -33,6 +33,11 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      '/metrics': {
+        target: http_host,
+        changeOrigin: true,
+        secure: false,
+      },
       '/cookie': {
         target: http_host,
         changeOrigin: true,

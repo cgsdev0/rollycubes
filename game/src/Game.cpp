@@ -391,6 +391,8 @@ void Game::restart(HANDLER_ARGS) {
     if (!state.victory)
         throw API::GameError({.error = "game still in progress"});
 
+    metrics->restarts->Increment();
+
     json res;
     for (auto &player : state.players) {
         player.score = 0;
@@ -459,6 +461,9 @@ void Game::roll(HANDLER_ARGS) {
         throw API::GameError({.error = "now's not the time for that"});
     if (state.players.size() <= 1)
         throw API::GameError({.error = "invite some friends first!"});
+
+    metrics->rolls->Increment();
+
     json resp;
     resp["type"] = "roll";
     for (uint i = 0; i < DICE_COUNT; ++i) {

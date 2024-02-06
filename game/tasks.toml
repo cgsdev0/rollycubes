@@ -7,5 +7,5 @@
 [[task]]
   id = "run"
   type = "long"
-  cmd = "DEV=true ./GameServer"
+  cmd = "DEV=true ./GameServer 2>&1"
   triggers = [ "build" ]

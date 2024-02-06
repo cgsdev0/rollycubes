@@ -65,13 +65,13 @@ const twitchButton = css({
   height: 42,
   width: '100%',
   cursor: 'pointer',
-  backgroundColor: '#9146FF',
-  color: '#FFFFFF',
+  backgroundColor: '#9146FF !important',
+  color: '#FFFFFF !important',
 
   '&:active': {
-    backgroundColor: '#6903ff',
+    backgroundColor: '#6903ff !important',
     '& svg g path': {
-      fill: '#6903ff',
+      fill: '#6903ff !important',
     },
   },
 });

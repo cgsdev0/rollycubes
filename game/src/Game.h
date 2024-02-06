@@ -1,6 +1,7 @@
 #ifndef INCLUDE_GAME_H
 #define INCLUDE_GAME_H
 
+#include "Metrics.h"
 #include "Consts.h"
 #include "achievements/BaseAchievement.h"
 #include "RichTextStream.h"
@@ -18,6 +19,7 @@ typedef std::function<void(std::string)> SendFunc;
 typedef std::function<void(std::string, std::string)> AuthSendFunc;
 typedef std::function<void(std::string, std::string, SendFunc)> AuthSendFunc2;
 
+class GameCoordinator;
 struct HandlerArgs {
     SendFunc send;
     AuthSendFunc reportStats;
@@ -148,6 +150,8 @@ class Game {
     std::string turn_token;
     std::vector<BaseAchievement *> achievements;
     API::GameState state;
+    Metrics *metrics;
+    friend GameCoordinator;
 };
 
 #endif

@@ -162,6 +162,7 @@ class Connection extends React.Component<Props & { store: Store<ReduxState> }> {
   };
 
   componentDidMount() {
+    console.log('mounted');
     this.openSocket();
   }
 

@@ -10,9 +10,12 @@
 #include <unordered_map>
 #include <unordered_set>
 
+class Metrics;
+
 class GameCoordinator {
 
   public:
+    GameCoordinator(Metrics *_metrics) : metrics(_metrics) { }
     std::unordered_map<std::string, Game *> games;
 
     std::unordered_set<std::string>
@@ -26,6 +29,9 @@ class GameCoordinator {
     void save_to_disk();
     std::string createRoom(bool isPrivate, std::string seed = "");
     void queue_eviction(std::string room);
+
+  private:
+    Metrics *metrics;
 };
 
 #endif // INCLUDE_GAME_COORDINATOR_H
