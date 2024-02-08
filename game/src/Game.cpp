@@ -578,7 +578,9 @@ void Game::update(HANDLER_ARGS) {
                         user_id.type = API::UserIdType::USER;
                     }
                     auto idx = std::distance(TARGET_SCORES.begin(), TARGET_SCORES.find(score));
-                    state.players[i].win_hist[idx]++;
+                    if (winnerId == i) {
+                      state.players[i].win_hist[idx]++;
+                    }
                     API::ReportStats stats{
                         .dice_hist = state.players[i].dice_hist,
                         .doubles = state.players[i].doubles_count,
