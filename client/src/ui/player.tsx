@@ -57,6 +57,23 @@ const Achievements = styled('div', {
 const RecordDiv = styled('div', {
   fontSize: 16,
 });
+const Histograms = styled('div', {
+  display: 'flex',
+  justifyContent: 'space-evenly',
+  marginBottom: 20,
+  gap: 4,
+});
+const Histogram = styled('div', {
+  display: 'flex',
+  border: '1px solid black',
+  justifyContent: 'space-evenly',
+  backgroundColor: '$gray800',
+  borderRadius: 4,
+  overflow: 'hidden',
+  height: 50,
+  width: '100%',
+  gap: 1,
+});
 const Records = styled('div', {
   display: 'flex',
   justifyContent: 'space-evenly',
@@ -235,6 +252,81 @@ const PlayerComponent = (props: Props) => {
   );
 };
 
+const StyledBar = styled('div', {
+  backgroundColor: '$brandFaded',
+  borderRadius: 2,
+  width: '100%',
+  alignSelf: 'flex-end',
+  height: '0%',
+  transition: 'height 0.5s',
+  position: 'relative',
+  '&::before': {
+    background:
+      'linear-gradient( 0deg, rgba( 0, 0, 0, 0.3 ) 10%, $brand 140% )',
+    content: '\\00a0',
+    height: '100%',
+    position: 'absolute',
+    width: '100%',
+  },
+});
+const StyledBarCover = styled('div', {
+  backgroundColor: '$gray800',
+  width: '100%',
+  alignSelf: 'flex-end',
+  zIndex: 1000,
+});
+const BarWrapper = styled('div', {
+  height: '100%',
+  width: '100%',
+  display: 'flex',
+});
+const HistogramTooltip = styled('div', {});
+const Bar = ({
+  percent,
+  max,
+  label,
+  header,
+}: {
+  percent: number;
+  max: number;
+  label: string;
+  header: string;
+}) => {
+  const [tooltipVisible, setTooltipVisible] = React.useState(false);
+  const { getTooltipProps, setTooltipRef, setTriggerRef } = usePopperTooltip({
+    visible: tooltipVisible,
+    onVisibleChange: setTooltipVisible,
+  });
+  const [height, setHeight] = React.useState<string | undefined>(undefined);
+  React.useEffect(() => {
+    setHeight(
+      `calc(max(min(${(percent / (max || 1)) * 100}%, calc(100% - 2px)), 2px))`
+    );
+  }, [height, percent, max]);
+  return (
+    <>
+      {tooltipVisible ? (
+        <AchievementTooltip
+          ref={setTooltipRef}
+          {...getTooltipProps({ className: 'tooltip-container' })}
+        >
+          <HistogramTooltip>
+            <header>{header}</header>
+            {label}
+          </HistogramTooltip>
+        </AchievementTooltip>
+      ) : null}
+      <BarWrapper ref={setTriggerRef}>
+        <StyledBar
+          style={{
+            height,
+          }}
+        />
+      </BarWrapper>
+    </>
+  );
+};
+
 const TooltipContents = (props: Props & { data?: UserData }) => {
   const { n, player, data } = props;
   const imageUrl = data?.image_url;
@@ -257,6 +349,8 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
   if (placeholders === 6 && unlocked?.length) {
     placeholders = 0;
   }
+  const dice_max = Math.max(...(props.data?.stats?.dice_hist || [1]));
+  const sum_max = Math.max(...(props.data?.stats?.sum_hist || [1]));
   return React.useMemo(
     () => (
       <>
@@ -271,6 +365,30 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
           {/*<p>
           Doubles: {doubles} / {rolls} rolls ({doubles_rate}%)
         </p>*/}
+          <Histograms>
+            <Histogram>
+              {props.data?.stats?.dice_hist?.map((v, i) => (
+                <Bar
+                  key={i}
+                  percent={v}
+                  max={dice_max}
+                  label={`Happened ${v} times`}
+                  header={`Rolled a ${i + 1}`}
+                />
+              ))}
+            </Histogram>
+            <Histogram>
+              {props.data?.stats?.sum_hist?.slice(1).map((v, i) => (
+                <Bar
+                  key={i}
+                  percent={v}
+                  max={sum_max}
+                  label={`Happened ${v} times`}
+                  header={`Sum of ${i + 2}`}
+                />
+              ))}
+            </Histogram>
+          </Histograms>
           <Records>
             <RecordDiv>
               <p>
