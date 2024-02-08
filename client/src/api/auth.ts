@@ -165,9 +165,22 @@ export const optimisticUpdates = (
       dispatch(
         authApi.util.updateQueryData('getUserById', user_id, (u) => {
           if (!u.stats) {
-            u.stats = { rolls: 0, doubles: 0, wins: 0, games: 0 };
+            u.stats = {
+              rolls: 0,
+              doubles: 0,
+              wins: 0,
+              games: 0,
+              dice_hist: [0, 0, 0, 0, 0, 0],
+              sum_hist: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            };
           }
           u.stats!.rolls += 1;
+          let sum = 0;
+          for (let i = 0; i < data.rolls.length; ++i) {
+            u.stats!.dice_hist[data.rolls[i] - 1] += 1;
+            sum += data.rolls[i];
+          }
+          u.stats!.sum_hist[sum - 1] += 1;
           if (data.rolls.every((roll) => roll === data.rolls[0])) {
             u.stats!.doubles += 1;
           }
@@ -182,7 +195,14 @@ export const optimisticUpdates = (
       dispatch(
         authApi.util.updateQueryData('getUserById', player.user_id, (u) => {
           if (!u.stats) {
-            u.stats = { rolls: 0, doubles: 0, wins: 0, games: 0 };
+            u.stats = {
+              rolls: 0,
+              doubles: 0,
+              wins: 0,
+              games: 0,
+              dice_hist: [0, 0, 0, 0, 0, 0],
+              sum_hist: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            };
           }
           u.stats!.games += 1;
           if (data.id == i) {
