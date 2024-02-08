@@ -28,7 +28,7 @@ const playerPanel = css({
     width: 336,
     overflow: 'hidden',
   },
-  paddingTop: 30,
+  paddingTop: 22,
   paddingBottom: 30,
 });
 

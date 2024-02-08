@@ -38,7 +38,7 @@ const gamePanel = css({
   display: 'flex',
   justifyContent: 'center',
   width: '100%',
-  minHeight: 160,
+  minHeight: 176,
   '@bp0': {
     gap: 16,
   },
