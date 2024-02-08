@@ -114,7 +114,7 @@ pub async fn add_stats(
     let rows = client
         .query(
             "
-SELECT rolls, doubles, games, wins, dice_values, roll_totals FROM player_stats
+SELECT rolls, doubles, games, wins, dice_values, roll_totals, winning_scores FROM player_stats
 WHERE user_id = $1::UUID
 ",
             &[&user_id],
