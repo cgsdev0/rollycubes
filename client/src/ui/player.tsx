@@ -254,20 +254,10 @@ const PlayerComponent = (props: Props) => {
 
 const StyledBar = styled('div', {
   backgroundColor: '$brandFaded',
-  borderRadius: 2,
   width: '100%',
   alignSelf: 'flex-end',
   height: '0%',
   transition: 'height 0.5s',
-  position: 'relative',
-  '&::before': {
-    background:
-      'linear-gradient( 0deg, rgba( 0, 0, 0, 0.3 ) 10%, $brand 140% )',
-    content: '\\00a0',
-    height: '100%',
-    position: 'absolute',
-    width: '100%',
-  },
 });
 const StyledBarCover = styled('div', {
   backgroundColor: '$gray800',
