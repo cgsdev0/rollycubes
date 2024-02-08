@@ -17,8 +17,6 @@ import { settingsReducer } from './reducers/settings';
 import { createReduxHistoryContext } from 'redux-first-history';
 import { createBrowserHistory } from 'history';
 
-export const TARGET_SCORES = [33, 66, 67, 98, 99, 100];
-
 const { createReduxHistory, routerMiddleware, routerReducer } =
   createReduxHistoryContext({ history: createBrowserHistory() });
 

@@ -4,7 +4,8 @@ import {
   createSelectorCreator,
 } from 'reselect';
 import { customTheme, lightTheme } from 'stitches.config';
-import { ReduxState, selectState, TARGET_SCORES } from '../store';
+import { ReduxState, selectState } from '../store';
+import { TARGET_SCORES } from '../constants';
 import { QuerySubState } from '@reduxjs/toolkit/dist/query/core/apiState';
 import { authApi, endpoints } from 'api/auth';
 import { ApiEndpointQuery } from '@reduxjs/toolkit/dist/query/core/module';

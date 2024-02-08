@@ -6,7 +6,8 @@ import {
   selectSelfIndex,
   selectTurnIndex,
 } from '../selectors/game_selectors';
-import { ReduxState, TARGET_SCORES } from '../store';
+import { ReduxState } from '../store';
+import { TARGET_SCORES } from '../constants';
 import { Achievement, AchievementData, Player, UserData } from '../types/api';
 import Avatar from './avatar';
 import { usePopperTooltip } from 'react-popper-tooltip';
