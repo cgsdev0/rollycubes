@@ -7,7 +7,7 @@ import {
   fetchBaseQuery,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
-import { ReduxState } from 'store';
+import { ReduxState, TARGET_SCORES } from 'store';
 import {
   AchievementData,
   AchievementUnlock,
@@ -206,6 +206,12 @@ export const optimisticUpdates = (
               win_hist: [0, 0, 0, 0, 0, 0],
             };
           }
+          u.stats!.win_hist[
+            TARGET_SCORES.findIndex(
+              (score) =>
+                score === state.game.players[state.game.turn_index].score
+            )
+          ]++;
           u.stats!.games += 1;
           if (data.id == i) {
             u.stats!.wins += 1;
