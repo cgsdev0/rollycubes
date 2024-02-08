@@ -701,12 +701,14 @@ namespace API {
     inline void from_json(const json & j, ServerPlayer& x) {
         x.connected = j.at("connected").get<bool>();
         x.crowned = get_stack_optional<bool>(j, "crowned");
+        x.dice_hist = j.at("dice_hist").get<std::vector<int64_t>>();
         x.doubles_count = j.at("doubles_count").get<int64_t>();
         x.name = get_stack_optional<std::string>(j, "name");
         x.roll_count = j.at("roll_count").get<int64_t>();
         x.score = j.at("score").get<int64_t>();
         x.session = j.at("session").get<std::string>();
         x.skip_count = j.at("skip_count").get<int64_t>();
+        x.sum_hist = j.at("sum_hist").get<std::vector<int64_t>>();
         x.turn_count = j.at("turn_count").get<int64_t>();
         x.user_id = get_stack_optional<std::string>(j, "user_id");
         x.win_count = j.at("win_count").get<int64_t>();
@@ -718,6 +720,7 @@ namespace API {
         if (x.crowned) {
             j["crowned"] = x.crowned;
         }
+        j["dice_hist"] = x.dice_hist;
         j["doubles_count"] = x.doubles_count;
         if (x.name) {
             j["name"] = x.name;
@@ -726,6 +729,7 @@ namespace API {
         j["score"] = x.score;
         j["session"] = x.session;
         j["skip_count"] = x.skip_count;
+        j["sum_hist"] = x.sum_hist;
         j["turn_count"] = x.turn_count;
         if (x.user_id) {
             j["user_id"] = x.user_id;
@@ -1443,21 +1447,21 @@ namespace nlohmann {
     }
 }
 namespace API {
-std::string Achievement::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void Achievement::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string AchievementData::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void AchievementData::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string Achievement::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void Achievement::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

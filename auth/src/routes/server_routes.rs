@@ -49,27 +49,11 @@ pub async fn auth_layer<B>(request: Request<B>, next: Next<B>) -> Response {
     (StatusCode::UNAUTHORIZED, "forbidden").into_response()
 }
 
-#[derive(Serialize, Deserialize)]
-#[serde(tag = "type", content = "id")]
-enum UserId {
-    User(Uuid),
-    Anonymous(String),
-}
-
-#[derive(Deserialize)]
-pub struct AddStatsPayload {
-    user_id: UserId,
-    rolls: i32,
-    doubles: i32,
-    games: i32,
-    wins: i32,
-}
-
-async fn find_user_id(s: &RouterState, user: UserId) -> Result<Uuid, RouteError> {
+async fn find_user_id(s: &RouterState, user: generated::UserId) -> Result<Uuid, RouteError> {
     let mut client = s.pool.get().await?;
     match user {
-        UserId::User(id) => Ok(id),
-        UserId::Anonymous(id) => {
+        generated::UserId::User(id) => Ok(id),
+        generated::UserId::Anonymous(id) => {
             // Find the anonymous user
             let rows = client
                 .query(
@@ -107,14 +91,25 @@ SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT
 #[axum::debug_handler]
 pub async fn add_stats(
     State(s): State<RouterState>,
-    Json(mut body): Json<AddStatsPayload>,
+    Json(mut body): Json<generated::ReportStats>,
 ) -> Result<(), RouteError> {
+    println!("{}", serde_json::to_string_pretty(&body).unwrap());
     let client = s.pool.get().await?;
     let user_id = find_user_id(&s, body.user_id).await?;
+    if body.dice_hist.len() != 6 {
+        return Err(RouteError::UserError(
+            "wrong number of args to dice_hist".into(),
+        ));
+    }
+    if body.sum_hist.len() != 12 {
+        return Err(RouteError::UserError(
+            "wrong number of args to sum_hist".into(),
+        ));
+    }
     let rows = client
         .query(
             "
-SELECT rolls, doubles, games, wins FROM player_stats
+SELECT rolls, doubles, games, wins, dice_values, roll_totals FROM player_stats
 WHERE user_id = $1::UUID
 ",
             &[&user_id],
@@ -122,21 +117,33 @@ WHERE user_id = $1::UUID
         .await?;
     if rows.len() > 0 {
         let row = &rows[0];
-        body.rolls += row.get::<_, i32>("rolls");
-        body.doubles += row.get::<_, i32>("doubles");
-        body.games += row.get::<_, i32>("games");
-        body.wins += row.get::<_, i32>("wins");
+        body.rolls += row.get::<_, i64>("rolls");
+        body.doubles += row.get::<_, i64>("doubles");
+        body.games += row.get::<_, i64>("games");
+        body.wins += row.get::<_, i64>("wins");
+        let sum_hist = row.get::<_, Vec<i64>>("roll_totals");
+        let dice_hist = row.get::<_, Vec<i64>>("dice_values");
+        body.sum_hist
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, sum)| *sum += sum_hist[i as usize]);
+        body.dice_hist
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, sum)| *sum += dice_hist[i as usize]);
     }
     client
         .execute(
             "
-INSERT INTO player_stats (rolls, doubles, games, wins, user_id)
-VALUES ($1::INTEGER, $2::INTEGER, $3::INTEGER, $4::INTEGER, $5::UUID)
+INSERT INTO player_stats (rolls, doubles, games, wins, user_id, dice_values, roll_totals)
+VALUES ($1, $2, $3, $4, $5::UUID, $6, $7)
 ON CONFLICT(user_id) DO UPDATE SET
-    rolls = $1::INTEGER,
-    doubles = $2::INTEGER,
-    games = $3::INTEGER,
-    wins = $4::INTEGER
+    rolls = $1,
+    doubles = $2,
+    games = $3,
+    wins = $4,
+    dice_values = $6,
+    roll_totals = $7
 ",
             &[
                 &body.rolls,
@@ -144,6 +151,8 @@ ON CONFLICT(user_id) DO UPDATE SET
                 &body.games,
                 &body.wins,
                 &user_id,
+                &body.dice_hist,
+                &body.sum_hist,
             ],
         )
         .await?;
@@ -162,7 +171,7 @@ pub struct AchievementUnlock {
 
 #[derive(Deserialize)]
 pub struct AchievementProgressPayload {
-    user_id: UserId,
+    user_id: generated::UserId,
     user_index: i32,
     achievement_id: String,
     progress: i32,

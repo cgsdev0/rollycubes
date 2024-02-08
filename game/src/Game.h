@@ -42,6 +42,12 @@ class Game {
         this->state = g;
         for (auto &player : this->state.players) {
             player.connected = false;
+            if (player.sum_hist.size() != 12) {
+              player.sum_hist = {0,0,0,0,0,0,0,0,0,0,0,0};
+            }
+            if (player.dice_hist.size() != 6) {
+              player.dice_hist = {0,0,0,0,0,0};
+            }
         }
         if (this->state.players.size()) {
             turn_token = g.players[g.turn_index].session;

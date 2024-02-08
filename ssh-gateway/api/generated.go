@@ -757,12 +757,14 @@ type GameState struct {
 type ServerPlayer struct {
 	Connected    bool    `json:"connected"`
 	Crowned      *bool   `json:"crowned,omitempty"`
+	DiceHist     []int64 `json:"dice_hist"`
 	DoublesCount int64   `json:"doubles_count"`
 	Name         *string `json:"name,omitempty"`
 	RollCount    int64   `json:"roll_count"`
 	Score        int64   `json:"score"`
 	Session      string  `json:"session"`
 	SkipCount    int64   `json:"skip_count"`
+	SumHist      []int64 `json:"sum_hist"`
 	TurnCount    int64   `json:"turn_count"`
 	UserID       *string `json:"user_id,omitempty"`
 	WinCount     int64   `json:"win_count"`

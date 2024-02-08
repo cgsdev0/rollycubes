@@ -643,7 +643,7 @@ WHERE id=$1::UUID",
 
     if !rows.is_empty() {
         let row = &rows[0];
-        let rolls: Option<i32> = row.get("rolls");
+        let rolls: Option<i64> = row.get("rolls");
         let achievement_id: Option<String> = row.get("achievement_id");
         let user = User {
             pubkey_text: if self_id == Some(user_id) {
@@ -669,20 +669,12 @@ WHERE id=$1::UUID",
                 .get::<'_, _, chrono::NaiveDateTime>("created_date")
                 .and_utc(),
             stats: rolls.map(|_| generated::UserStats {
-                rolls: row.get::<'_, _, i32>("rolls") as i64,
-                games: row.get::<'_, _, i32>("games") as i64,
-                wins: row.get::<'_, _, i32>("wins") as i64,
-                doubles: row.get::<'_, _, i32>("doubles") as i64,
-                dice_hist: row
-                    .get::<'_, _, Vec<i32>>("dice_values")
-                    .iter()
-                    .map(|&a| a as i64)
-                    .collect(),
-                sum_hist: row
-                    .get::<'_, _, Vec<i32>>("roll_totals")
-                    .iter()
-                    .map(|&a| a as i64)
-                    .collect(),
+                rolls: row.get::<'_, _, i64>("rolls"),
+                games: row.get::<'_, _, i64>("games"),
+                wins: row.get::<'_, _, i64>("wins"),
+                doubles: row.get::<'_, _, i64>("doubles"),
+                dice_hist: row.get::<'_, _, Vec<i64>>("dice_values"),
+                sum_hist: row.get::<'_, _, Vec<i64>>("roll_totals"),
             }),
             achievements: achievement_id.map(|_| {
                 rows.iter()

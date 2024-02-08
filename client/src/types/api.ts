@@ -282,6 +282,8 @@ export interface ServerPlayer {
   user_id?: string;
   crowned?: boolean;
   skip_count: number;
+  dice_hist: number[];
+  sum_hist: number[];
 }
 
 export interface AchievementData {

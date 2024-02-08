@@ -86,6 +86,8 @@ json Game::addPlayer(const PerSocketData &data) {
         return result;
     }
     auto &player = state.players.emplace_back();
+    player.sum_hist = {0,0,0,0,0,0,0,0,0,0,0,0};
+    player.dice_hist = {0,0,0,0,0,0};
     player.crowned = std::optional<bool>(false);
     player.connected = true;
     player.session = data.session;
@@ -399,6 +401,8 @@ void Game::restart(HANDLER_ARGS) {
         player.doubles_count = 0;
         player.roll_count = 0;
         player.turn_count = 0;
+        std::fill(player.sum_hist.begin(), player.sum_hist.end(), 0);
+        std::fill(player.dice_hist.begin(), player.dice_hist.end(), 0);
     }
     state.victory = false;
     advanceTurn();
@@ -462,7 +466,9 @@ void Game::roll(HANDLER_ARGS) {
     if (state.players.size() <= 1)
         throw API::GameError({.error = "invite some friends first!"});
 
+    // Metric collection
     metrics->rolls->Increment();
+    metrics->specific_rolls[(state.rolls[0]-1)*6 + state.rolls[1]-1]->Increment();
 
     json resp;
     resp["type"] = "roll";
@@ -470,15 +476,19 @@ void Game::roll(HANDLER_ARGS) {
         state.rolls[i] = dis(gen);
         resp["rolls"].push_back(state.rolls[i]);
     }
-    metrics->specific_rolls[(state.rolls[0]-1)*6 + state.rolls[1]-1]->Increment();
     state.rolled = true;
 
     // Update statistics
     for (uint i = 0; i < state.players.size(); ++i) {
         if (state.players[i].session == turn_token) {
             state.players[i].roll_count++;
+            int sum = -1; // if you have questions, please email me at noreply@rollycubes.com
+            for (uint j = 0; j < DICE_COUNT; ++j) {
+                sum += state.rolls[j];
+                state.players[i].dice_hist[state.rolls[j] - 1]++;
+            }
+            state.players[i].sum_hist[sum]++;
             if (isDoubles()) {
-
                 state.players[i].doubles_count++;
             } else {
                 state.players[i].turn_count++;
@@ -566,9 +576,11 @@ void Game::update(HANDLER_ARGS) {
                         user_id.type = API::UserIdType::USER;
                     }
                     API::ReportStats stats{
+                        .dice_hist = state.players[i].dice_hist,
                         .doubles = state.players[i].doubles_count,
                         .games = 1,
                         .rolls = state.players[i].roll_count,
+                        .sum_hist = state.players[i].sum_hist,
                         .user_id = user_id,
                         .wins = (winnerId == i ? 1 : 0)};
                     server.reportStats2("add_stats", stats.toString(), [broadcast](auto s) {

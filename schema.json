@@ -244,8 +244,7 @@
               "enum": ["Anonymous"]
             },
             "id": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           "additionalProperties": false,
@@ -404,6 +403,18 @@
         },
         "skip_count": {
           "type": "integer"
+        },
+        "dice_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "sum_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
         }
       },
       "additionalProperties": false,
@@ -415,7 +426,9 @@
         "session",
         "skip_count",
         "turn_count",
-        "win_count"
+        "win_count",
+        "dice_hist",
+        "sum_hist"
       ]
     },
     "UserStats": {
