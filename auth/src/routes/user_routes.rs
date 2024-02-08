@@ -628,6 +628,8 @@ SELECT
     games,
     wins,
     donor,
+    dice_values,
+    roll_totals,
     (SELECT user_count FROM total_users) AS rd,
     (SELECT achievement_count FROM users_ach_totals z WHERE z.id=user_to_achievement.achievement_id) AS rn
 FROM users
@@ -671,6 +673,16 @@ WHERE id=$1::UUID",
                 games: row.get::<'_, _, i32>("games") as i64,
                 wins: row.get::<'_, _, i32>("wins") as i64,
                 doubles: row.get::<'_, _, i32>("doubles") as i64,
+                dice_hist: row
+                    .get::<'_, _, Vec<i32>>("dice_values")
+                    .iter()
+                    .map(|&a| a as i64)
+                    .collect(),
+                sum_hist: row
+                    .get::<'_, _, Vec<i32>>("roll_totals")
+                    .iter()
+                    .map(|&a| a as i64)
+                    .collect(),
             }),
             achievements: achievement_id.map(|_| {
                 rows.iter()

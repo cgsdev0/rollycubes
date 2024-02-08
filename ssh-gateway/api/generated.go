@@ -639,10 +639,12 @@ type Dice struct {
 }
 
 type UserStats struct {
-	Doubles int64 `json:"doubles"`
-	Games   int64 `json:"games"`
-	Rolls   int64 `json:"rolls"`
-	WINS    int64 `json:"wins"`
+	DiceHist []int64 `json:"dice_hist"`
+	Doubles  int64   `json:"doubles"`
+	Games    int64   `json:"games"`
+	Rolls    int64   `json:"rolls"`
+	SumHist  []int64 `json:"sum_hist"`
+	WINS     int64   `json:"wins"`
 }
 
 type AuthRefreshTokenResponse struct {
@@ -692,11 +694,13 @@ type AchievementUnlock struct {
 }
 
 type ReportStats struct {
-	Doubles int64  `json:"doubles"`
-	Games   int64  `json:"games"`
-	Rolls   int64  `json:"rolls"`
-	UserID  UserID `json:"user_id"`
-	WINS    int64  `json:"wins"`
+	DiceHist []int64 `json:"dice_hist"`
+	Doubles  int64   `json:"doubles"`
+	Games    int64   `json:"games"`
+	Rolls    int64   `json:"rolls"`
+	SumHist  []int64 `json:"sum_hist"`
+	UserID   UserID  `json:"user_id"`
+	WINS     int64   `json:"wins"`
 }
 
 type AchievementData struct {

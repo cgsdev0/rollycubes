@@ -343,10 +343,30 @@
         },
         "doubles": {
           "type": "integer"
+        },
+        "dice_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "sum_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
         }
       },
       "additionalProperties": false,
-      "required": ["doubles", "games", "rolls", "user_id", "wins"]
+      "required": [
+        "doubles",
+        "games",
+        "rolls",
+        "user_id",
+        "wins",
+        "dice_hist",
+        "sum_hist"
+      ]
     },
     "ServerPlayer": {
       "type": "object",
@@ -412,10 +432,22 @@
         },
         "wins": {
           "type": "integer"
+        },
+        "dice_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "sum_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
         }
       },
       "additionalProperties": false,
-      "required": ["doubles", "games", "rolls", "wins"]
+      "required": ["doubles", "games", "rolls", "wins", "dice_hist", "sum_hist"]
     },
     "Achievement": {
       "type": "object",

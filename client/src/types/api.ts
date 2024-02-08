@@ -222,6 +222,8 @@ export interface UserStats {
   doubles: number;
   games: number;
   wins: number;
+  dice_hist: number[];
+  sum_hist: number[];
 }
 
 export interface AuthRefreshTokenResponse {
@@ -264,6 +266,8 @@ export interface ReportStats {
   wins: number;
   games: number;
   doubles: number;
+  dice_hist: number[];
+  sum_hist: number[];
 }
 
 export interface ServerPlayer {
