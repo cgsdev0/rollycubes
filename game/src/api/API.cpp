@@ -441,6 +441,7 @@ namespace API {
         x.games = j.at("games").get<int64_t>();
         x.rolls = j.at("rolls").get<int64_t>();
         x.sum_hist = j.at("sum_hist").get<std::vector<int64_t>>();
+        x.win_hist = j.at("win_hist").get<std::vector<int64_t>>();
         x.wins = j.at("wins").get<int64_t>();
     }
 
@@ -451,6 +452,7 @@ namespace API {
         j["games"] = x.games;
         j["rolls"] = x.rolls;
         j["sum_hist"] = x.sum_hist;
+        j["win_hist"] = x.win_hist;
         j["wins"] = x.wins;
     }
 
@@ -603,6 +605,7 @@ namespace API {
         x.rolls = j.at("rolls").get<int64_t>();
         x.sum_hist = j.at("sum_hist").get<std::vector<int64_t>>();
         x.user_id = j.at("user_id").get<UserId>();
+        x.win_hist = j.at("win_hist").get<std::vector<int64_t>>();
         x.wins = j.at("wins").get<int64_t>();
     }
 
@@ -614,6 +617,7 @@ namespace API {
         j["rolls"] = x.rolls;
         j["sum_hist"] = x.sum_hist;
         j["user_id"] = x.user_id;
+        j["win_hist"] = x.win_hist;
         j["wins"] = x.wins;
     }
 
@@ -712,6 +716,7 @@ namespace API {
         x.turn_count = j.at("turn_count").get<int64_t>();
         x.user_id = get_stack_optional<std::string>(j, "user_id");
         x.win_count = j.at("win_count").get<int64_t>();
+        x.win_hist = j.at("win_hist").get<std::vector<int64_t>>();
     }
 
     inline void to_json(json & j, const ServerPlayer & x) {
@@ -735,6 +740,7 @@ namespace API {
             j["user_id"] = x.user_id;
         }
         j["win_count"] = x.win_count;
+        j["win_hist"] = x.win_hist;
     }
 
     inline void from_json(const json & j, GameState& x) {
@@ -1447,21 +1453,21 @@ namespace nlohmann {
     }
 }
 namespace API {
-std::string AchievementData::toString() const {
-json j;
-to_json(j, *this);
-return j.dump();
-}
-void AchievementData::fromString(const std::string &s) {
-auto j = json::parse(s);
-from_json(j, *this);
-}
 std::string Achievement::toString() const {
 json j;
 to_json(j, *this);
 return j.dump();
 }
 void Achievement::fromString(const std::string &s) {
+auto j = json::parse(s);
+from_json(j, *this);
+}
+std::string AchievementData::toString() const {
+json j;
+to_json(j, *this);
+return j.dump();
+}
+void AchievementData::fromString(const std::string &s) {
 auto j = json::parse(s);
 from_json(j, *this);
 }

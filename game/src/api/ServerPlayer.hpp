@@ -22,5 +22,6 @@ void fromString(const std::string &str);
         int64_t turn_count;
         std::optional<std::string> user_id;
         int64_t win_count;
+        std::vector<int64_t> win_hist;
     };
 }

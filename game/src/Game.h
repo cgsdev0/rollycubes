@@ -48,6 +48,9 @@ class Game {
             if (player.dice_hist.size() != 6) {
               player.dice_hist = {0,0,0,0,0,0};
             }
+            if (player.win_hist.size() != 6) {
+              player.win_hist = {0,0,0,0,0,0};
+            }
         }
         if (this->state.players.size()) {
             turn_token = g.players[g.turn_index].session;

@@ -17,6 +17,7 @@ void fromString(const std::string &str);
         int64_t rolls;
         std::vector<int64_t> sum_hist;
         UserId user_id;
+        std::vector<int64_t> win_hist;
         int64_t wins;
     };
 }

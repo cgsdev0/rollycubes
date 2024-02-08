@@ -354,6 +354,12 @@
           "items": {
             "type": "integer"
           }
+        },
+        "win_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
         }
       },
       "additionalProperties": false,
@@ -364,7 +370,8 @@
         "user_id",
         "wins",
         "dice_hist",
-        "sum_hist"
+        "sum_hist",
+        "win_hist"
       ]
     },
     "ServerPlayer": {
@@ -415,6 +422,12 @@
           "items": {
             "type": "integer"
           }
+        },
+        "win_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
         }
       },
       "additionalProperties": false,
@@ -428,7 +441,8 @@
         "turn_count",
         "win_count",
         "dice_hist",
-        "sum_hist"
+        "sum_hist",
+        "win_hist"
       ]
     },
     "UserStats": {
@@ -457,10 +471,24 @@
           "items": {
             "type": "integer"
           }
+        },
+        "win_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
         }
       },
       "additionalProperties": false,
-      "required": ["doubles", "games", "rolls", "wins", "dice_hist", "sum_hist"]
+      "required": [
+        "doubles",
+        "games",
+        "rolls",
+        "wins",
+        "dice_hist",
+        "sum_hist",
+        "win_hist"
+      ]
     },
     "Achievement": {
       "type": "object",

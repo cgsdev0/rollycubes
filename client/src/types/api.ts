@@ -224,6 +224,7 @@ export interface UserStats {
   wins: number;
   dice_hist: number[];
   sum_hist: number[];
+  win_hist: number[];
 }
 
 export interface AuthRefreshTokenResponse {
@@ -268,6 +269,7 @@ export interface ReportStats {
   doubles: number;
   dice_hist: number[];
   sum_hist: number[];
+  win_hist: number[];
 }
 
 export interface ServerPlayer {
@@ -284,6 +286,7 @@ export interface ServerPlayer {
   skip_count: number;
   dice_hist: number[];
   sum_hist: number[];
+  win_hist: number[];
 }
 
 export interface AchievementData {

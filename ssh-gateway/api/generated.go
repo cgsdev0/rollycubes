@@ -644,6 +644,7 @@ type UserStats struct {
 	Games    int64   `json:"games"`
 	Rolls    int64   `json:"rolls"`
 	SumHist  []int64 `json:"sum_hist"`
+	WinHist  []int64 `json:"win_hist"`
 	WINS     int64   `json:"wins"`
 }
 
@@ -700,6 +701,7 @@ type ReportStats struct {
 	Rolls    int64   `json:"rolls"`
 	SumHist  []int64 `json:"sum_hist"`
 	UserID   UserID  `json:"user_id"`
+	WinHist  []int64 `json:"win_hist"`
 	WINS     int64   `json:"wins"`
 }
 
@@ -768,6 +770,7 @@ type ServerPlayer struct {
 	TurnCount    int64   `json:"turn_count"`
 	UserID       *string `json:"user_id,omitempty"`
 	WinCount     int64   `json:"win_count"`
+	WinHist      []int64 `json:"win_hist"`
 }
 
 type RoomListMsg struct {

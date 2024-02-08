@@ -88,6 +88,7 @@ json Game::addPlayer(const PerSocketData &data) {
     auto &player = state.players.emplace_back();
     player.sum_hist = {0,0,0,0,0,0,0,0,0,0,0,0};
     player.dice_hist = {0,0,0,0,0,0};
+    player.win_hist = {0,0,0,0,0,0};
     player.crowned = std::optional<bool>(false);
     player.connected = true;
     player.session = data.session;
@@ -403,6 +404,7 @@ void Game::restart(HANDLER_ARGS) {
         player.turn_count = 0;
         std::fill(player.sum_hist.begin(), player.sum_hist.end(), 0);
         std::fill(player.dice_hist.begin(), player.dice_hist.end(), 0);
+        std::fill(player.win_hist.begin(), player.win_hist.end(), 0);
     }
     state.victory = false;
     advanceTurn();
@@ -575,6 +577,8 @@ void Game::update(HANDLER_ARGS) {
                     if (isSignedIn(state.players[i])) {
                         user_id.type = API::UserIdType::USER;
                     }
+                    auto idx = std::distance(TARGET_SCORES.begin(), TARGET_SCORES.find(score));
+                    state.players[i].win_hist[idx]++;
                     API::ReportStats stats{
                         .dice_hist = state.players[i].dice_hist,
                         .doubles = state.players[i].doubles_count,
@@ -582,6 +586,7 @@ void Game::update(HANDLER_ARGS) {
                         .rolls = state.players[i].roll_count,
                         .sum_hist = state.players[i].sum_hist,
                         .user_id = user_id,
+                        .win_hist = state.players[i].win_hist,
                         .wins = (winnerId == i ? 1 : 0)};
                     server.reportStats2("add_stats", stats.toString(), [broadcast](auto s) {
                         std::cout << "AUTH SAYS: " << s << std::endl;

@@ -1,11 +1,12 @@
 import { connect, useSelector } from 'react-redux';
 import { css, styled } from 'stitches.config';
+import useFitText from 'use-fit-text';
 import {
   selectIsSpectator,
   selectSelfIndex,
   selectTurnIndex,
 } from '../selectors/game_selectors';
-import { ReduxState } from '../store';
+import { ReduxState, TARGET_SCORES } from '../store';
 import { Achievement, AchievementData, Player, UserData } from '../types/api';
 import Avatar from './avatar';
 import { usePopperTooltip } from 'react-popper-tooltip';
@@ -341,13 +342,25 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
   }
   const dice_max = Math.max(...(props.data?.stats?.dice_hist || [1]));
   const sum_max = Math.max(...(props.data?.stats?.sum_hist || [1]));
+  const win_max = Math.max(...(props.data?.stats?.win_hist || [1]));
+  const { fontSize, ref } = useFitText({ logLevel: 'error' });
+
   return React.useMemo(
     () => (
       <>
         <h1>
           <Avatar imageUrl={imageUrl} size={80} />
           <div>
-            <p>{player.name || `User${n + 1}`}</p>
+            <p
+              ref={ref}
+              style={{
+                fontSize,
+                width: '210px',
+                opacity: ref.current ? '100%' : '0%',
+              }}
+            >
+              {player.name || `User${n + 1}`}
+            </p>
             <p>Player since {join_date.join(' ')}</p>
           </div>
         </h1>
@@ -375,6 +388,17 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
                   max={sum_max}
                   label={`Happened ${v} times`}
                   header={`Sum of ${i + 2}`}
+                />
+              ))}
+            </Histogram>
+            <Histogram>
+              {props.data?.stats?.win_hist?.map((v, i) => (
+                <Bar
+                  key={i}
+                  percent={v}
+                  max={win_max}
+                  header={`Won with ${TARGET_SCORES[i]}`}
+                  label={`Happened ${v} times`}
                 />
               ))}
             </Histogram>
@@ -423,7 +447,7 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
         </CardBody>
       </>
     ),
-    [data]
+    [data, fontSize, ref.current]
   );
 };
 

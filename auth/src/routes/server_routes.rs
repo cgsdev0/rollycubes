@@ -96,6 +96,11 @@ pub async fn add_stats(
     println!("{}", serde_json::to_string_pretty(&body).unwrap());
     let client = s.pool.get().await?;
     let user_id = find_user_id(&s, body.user_id).await?;
+    if body.win_hist.len() != 6 {
+        return Err(RouteError::UserError(
+            "wrong number of args to win_hist".into(),
+        ));
+    }
     if body.dice_hist.len() != 6 {
         return Err(RouteError::UserError(
             "wrong number of args to dice_hist".into(),
@@ -123,6 +128,7 @@ WHERE user_id = $1::UUID
         body.wins += row.get::<_, i64>("wins");
         let sum_hist = row.get::<_, Vec<i64>>("roll_totals");
         let dice_hist = row.get::<_, Vec<i64>>("dice_values");
+        let win_hist = row.get::<_, Vec<i64>>("winning_scores");
         body.sum_hist
             .iter_mut()
             .enumerate()
@@ -131,19 +137,24 @@ WHERE user_id = $1::UUID
             .iter_mut()
             .enumerate()
             .for_each(|(i, sum)| *sum += dice_hist[i as usize]);
+        body.win_hist
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, sum)| *sum += win_hist[i as usize]);
     }
     client
         .execute(
             "
-INSERT INTO player_stats (rolls, doubles, games, wins, user_id, dice_values, roll_totals)
-VALUES ($1, $2, $3, $4, $5::UUID, $6, $7)
+INSERT INTO player_stats (rolls, doubles, games, wins, user_id, dice_values, roll_totals, winning_scores)
+VALUES ($1, $2, $3, $4, $5::UUID, $6, $7, $8)
 ON CONFLICT(user_id) DO UPDATE SET
     rolls = $1,
     doubles = $2,
     games = $3,
     wins = $4,
     dice_values = $6,
-    roll_totals = $7
+    roll_totals = $7,
+    winning_scores = $8
 ",
             &[
                 &body.rolls,
@@ -153,6 +164,7 @@ ON CONFLICT(user_id) DO UPDATE SET
                 &user_id,
                 &body.dice_hist,
                 &body.sum_hist,
+                &body.win_hist,
             ],
         )
         .await?;

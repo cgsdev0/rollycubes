@@ -172,6 +172,7 @@ export const optimisticUpdates = (
               games: 0,
               dice_hist: [0, 0, 0, 0, 0, 0],
               sum_hist: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              win_hist: [0, 0, 0, 0, 0, 0],
             };
           }
           u.stats!.rolls += 1;
@@ -202,6 +203,7 @@ export const optimisticUpdates = (
               games: 0,
               dice_hist: [0, 0, 0, 0, 0, 0],
               sum_hist: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              win_hist: [0, 0, 0, 0, 0, 0],
             };
           }
           u.stats!.games += 1;
