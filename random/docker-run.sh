@@ -4,5 +4,5 @@
 # commands
 
 #sudo docker build . -t random
-sudo docker run random
+sudo docker run -p 5555:5555 random
 
