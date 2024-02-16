@@ -10,7 +10,7 @@ program server
 
   integer(c_int) :: connection, rc, socket
   type(ipaddr) :: addr, addr_remote
-  character(kind=c_char, len=IPADDR_MAXSTRLEN) :: address_string = ''
+  character(kind=c_char, len=IPADDR_MAXSTRLEN) :: address_string = ""
   character(len=*), parameter :: TCP_SUFFIX = c_carriage_return // c_new_line // c_null_char
 
   integer(c_int64_t) :: NO_DEADLINE = -1
@@ -21,32 +21,38 @@ program server
   integer :: num
   integer(c_size_t) :: len_
 
-  !rc = ipaddr_local(addr, '127.0.0.1' // c_null_char, 5555_c_int, IPADDR_IPV4)
+  !rc = ipaddr_local(addr, "127.0.0.1" // c_null_char, 5555_c_int, IPADDR_IPV4)
 
   ! 127.0.0.1 is not accessible outside of docker, but 0.0.0.0 is
-  rc = ipaddr_local(addr, '0.0.0.0' // c_null_char, 5555_c_int, IPADDR_IPV4)
+  rc = ipaddr_local(addr, "0.0.0.0" // c_null_char, 5555_c_int, IPADDR_IPV4)
 
   call ipaddr_str(addr, address_string)
 
-  print *, 'Listening on socket:'
-  print *, '  IP address: ', address_string
-  print *, '  Port: ', ipaddr_port(addr)
+  write(*,*) "Listening on socket:"
+  write(*,*) "  IP address: ", address_string
+  write(*,*) "  Port: ", ipaddr_port(addr)
 
   socket = tcp_listen(addr, 0_c_int) 
 
   do
     connection = tcp_accept(socket, addr_remote, NO_DEADLINE)
     call ipaddr_str(addr, address_string)
-    print *, 'New connection from ' // trim(address_string)
+    write(*,*) "New connection from " // trim(address_string)
 
-    ! Subtract 1 from len to not count the null terminator
+    ! Subtract 1 from len to not count the null terminator.  TODO: append null
+    ! within arg, use sensible size.  Maybe make helper fns or wrappers
     len_ = len(TCP_SUFFIX) - 1
     connection = suffix_attach(connection, TCP_SUFFIX, 2_c_size_t)
 
+    ! TODO roll our own rng just for lulz
     call random_number(dnum)
+
+    ! TODO: range [1, 6]
     num = int(dnum * huge(num))
+
+    ! TODO: send binary char(s).  Can pack two [1,6] rolls into a single byte
     write(buffer, "(i0)") num
-    print *, 'num = ', num
+    print *, "num = ", num
     str_ = trim(buffer)
     len_ = len(str_)
     rc = msend(connection, str_ // c_null_char, len_, -1_c_int64_t)
