@@ -1,17 +1,37 @@
-program server
+module random_m
 
-  use iso_c_binding, only: c_char, c_int, c_int64_t, c_null_char, c_size_t, &
-                           c_carriage_return, c_new_line
-  use mod_dill, only: ipaddr, ipaddr_local, ipaddr_port, ipaddr_str, &
-                      IPADDR_MAXSTRLEN, IPADDR_IPV4, tcp_accept, tcp_close, &
-                      tcp_listen, msend, suffix_attach, suffix_detach
+    use iso_c_binding
+    use mod_dill
 
+    implicit none
+
+    character, parameter :: nullc = c_null_char
+
+contains
+
+!===============================================================================
+
+function len_sz(str_)
+    character(len = *), intent(in) :: str_
+    integer(c_size_t) :: len_sz
+    len_sz = len(str_)
+end function len_sz
+
+!===============================================================================
+
+end module random_m
+
+!===============================================================================
+
+program random_server
+
+  use random_m
   implicit none
 
   integer(c_int) :: connection, rc, socket
   type(ipaddr) :: addr, addr_remote
   character(kind=c_char, len=IPADDR_MAXSTRLEN) :: address_string = ""
-  character(len=*), parameter :: TCP_SUFFIX = c_carriage_return // c_new_line // c_null_char
+  character(len=*), parameter :: TCP_SUFFIX = c_carriage_return//c_new_line
 
   integer(c_int64_t) :: NO_DEADLINE = -1
 
@@ -19,12 +39,9 @@ program server
   character(len = :), allocatable :: str_
   double precision :: dnum
   integer :: num
-  integer(c_size_t) :: len_
-
-  !rc = ipaddr_local(addr, "127.0.0.1" // c_null_char, 5555_c_int, IPADDR_IPV4)
 
   ! 127.0.0.1 is not accessible outside of docker, but 0.0.0.0 is
-  rc = ipaddr_local(addr, "0.0.0.0" // c_null_char, 5555_c_int, IPADDR_IPV4)
+  rc = ipaddr_local(addr, "0.0.0.0" // nullc, 5555_c_int, IPADDR_IPV4)
 
   call ipaddr_str(addr, address_string)
 
@@ -39,10 +56,9 @@ program server
     call ipaddr_str(addr, address_string)
     write(*,*) "New connection from " // trim(address_string)
 
-    ! Subtract 1 from len to not count the null terminator.  TODO: append null
-    ! within arg, use sensible size.  Maybe make helper fns or wrappers
-    len_ = len(TCP_SUFFIX) - 1
-    connection = suffix_attach(connection, TCP_SUFFIX, 2_c_size_t)
+    ! Subtract 1 from len to not count the null terminator
+    connection = suffix_attach(connection, TCP_SUFFIX//nullc, &
+        len_sz(TCP_SUFFIX))
 
     ! TODO roll our own rng just for lulz
     call random_number(dnum)
@@ -54,11 +70,10 @@ program server
     write(buffer, "(i0)") num
     print *, "num = ", num
     str_ = trim(buffer)
-    len_ = len(str_)
-    rc = msend(connection, str_ // c_null_char, len_, -1_c_int64_t)
+    rc = msend(connection, str_ // nullc, len_sz(str_), -1_c_int64_t)
 
     connection = suffix_detach(connection, -1_c_int64_t)
     rc = tcp_close(connection, -1_c_int64_t)
   end do
 
-end program server
+end program random_server
