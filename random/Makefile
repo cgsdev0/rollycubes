@@ -21,9 +21,7 @@ DemoClient: $(OBJ) src/DemoClient.f90
 .PHONY: all clean
 
 src/libdill:
-	pushd src
-	git clone https://github.com/JeffIrwin/libdill
-	popd
+	git clone https://github.com/JeffIrwin/libdill src/libdill
 
 src/%.o: src/%.f90
 	$(FC) -c $(FCFLAGS) -o $@ $<
