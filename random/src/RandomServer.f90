@@ -70,10 +70,10 @@ program random_server
         write(buffer, "(i0)") num
         print *, "num = ", num
         str_ = trim(buffer)
-        rc = msend(connection, str_//nullc, len_sz(str_), -1_c_int64_t)
+        rc = msend(connection, str_//nullc, len_sz(str_), NO_DEADLINE)
 
-        connection = suffix_detach(connection, -1_c_int64_t)
-        rc = tcp_close(connection, -1_c_int64_t)
+        connection = suffix_detach(connection, NO_DEADLINE)
+        rc = tcp_close(connection, NO_DEADLINE)
     end do
 
 end program random_server
