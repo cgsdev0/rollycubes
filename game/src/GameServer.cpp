@@ -7,6 +7,7 @@
 #include <iostream>
 #include <json.hpp>
 #include <queue>
+#include <random>
 
 #include <regex>
 #include <signal.h>
@@ -15,6 +16,7 @@
 #include <string>
 #include <string_view>
 #include <unistd.h>
+#include <variant>
 
 #include "App.h"
 #include "Consts.h"
@@ -31,6 +33,40 @@
 #include <prometheus/registry.h>
 #include <prometheus/text_serializer.h>
 #include "Metrics.h"
+#include "RngOverTcp.h"
+
+template <typename T>
+concept can_roll = requires(T value)
+{
+    { value.roll() } -> std::convertible_to<std::vector<int>>;
+};
+
+template<can_roll T>
+struct BaseRngServer : public T {};
+
+struct CppRngServer {
+    std::uniform_int_distribution<int> dis{1, 6};
+    std::random_device rd;
+    std::mt19937 gen;
+
+    CppRngServer() {
+        // seed the RNG (once per boot)
+        gen.seed(rd());
+    }
+
+    std::vector<int> roll() {
+        return std::vector{dis(gen), dis(gen)};
+    }
+};
+
+template<can_roll... Ts>
+using CanRollVariant = std::variant<Ts...>;
+
+using RngServer = CanRollVariant<BaseRngServer<FortranRngServer>, BaseRngServer<CppRngServer>>;
+
+auto roll(RngServer& element) {
+    return std::visit([](auto&& el){ return el.roll(); }, element);
+}
 
 // for convenience
 using json = nlohmann::json;
@@ -100,8 +136,7 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
     }
 }
 
-uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer, Metrics &metrics, GameCoordinator &coordinator) {
-
+uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, const JWTVerifier &jwt_verifier, AuthServerRequestQueue &authServer, Metrics &metrics, GameCoordinator &coordinator, RngServer &rng) {
 
     return {/* Settings */
             .compression = uWS::SHARED_COMPRESSOR,
@@ -213,7 +248,9 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                     {.send =
                                          [ws](auto s) { ws->send(s, uWS::OpCode::TEXT); },
                                      .reportStats = [&authServer](auto url, auto json) { authServer.send(url, json); },
-                                     .reportStats2 = [&authServer](auto url, auto json, auto cb) { authServer.send(url, json, cb); }},
+                                     .reportStats2 = [&authServer](auto url, auto json, auto cb) { authServer.send(url, json, cb); },
+                                     .do_a_roll = [&rng]() { return roll(rng); },
+                                    },
                                     data, session);
                                 /*if (data["type"].is_string()) {
                                   if (data["type"] == "leave") {
@@ -351,11 +388,18 @@ int main(int argc, char **argv) {
 
     std::string baseAuthUrl;
 
+    RngServer rng;
+
     if (std::getenv("DEV")) {
         baseAuthUrl = devAuthServerUrl;
+        rng.emplace<BaseRngServer<CppRngServer>>();
     } else {
         baseAuthUrl = authServerUrl;
+        rng.emplace<BaseRngServer<FortranRngServer>>();
     }
+
+    auto rolled = roll(rng);
+    std::cout << rolled[0] << " " << rolled[1]  << std::endl;
 
     bool auth_enabled = true;
     if (std::getenv("NO_AUTH")) {
@@ -401,7 +445,7 @@ int main(int argc, char **argv) {
             }
         })
         .ws<HomeSocketData>("/ws/list", makeHomeWebsocketBehavior(&app, jwt_verifier, authServer, metrics, coordinator))
-        .ws<PerSocketData>("/ws/:mode/:room", makeWebsocketBehavior(&app, jwt_verifier, authServer, metrics, coordinator))
+        .ws<PerSocketData>("/ws/:mode/:room", makeWebsocketBehavior(&app, jwt_verifier, authServer, metrics, coordinator, rng))
         .listen(port, [port](auto *socket) {
             if (socket) {
                 std::cout << "Listening on port " << port << std::endl;

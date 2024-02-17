@@ -23,8 +23,6 @@ Game::Game() {
     // Initialize all achievements
     this->achievements = initAchievements();
 
-    // seed the RNG (one per Game)
-    gen.seed(rd());
 }
 
 Game::~Game() {
@@ -468,17 +466,20 @@ void Game::roll(HANDLER_ARGS) {
     if (state.players.size() <= 1)
         throw API::GameError({.error = "invite some friends first!"});
 
-    // Metric collection
-    metrics->rolls->Increment();
-    metrics->specific_rolls[(state.rolls[0]-1)*6 + state.rolls[1]-1]->Increment();
+
 
     json resp;
     resp["type"] = "roll";
+    auto rolled = server.do_a_roll();
     for (uint i = 0; i < DICE_COUNT; ++i) {
-        state.rolls[i] = dis(gen);
+        state.rolls[i] = rolled[i];
         resp["rolls"].push_back(state.rolls[i]);
     }
     state.rolled = true;
+
+    // Metric collection
+    metrics->rolls->Increment();
+    metrics->specific_rolls[(state.rolls[0]-1)*6 + state.rolls[1]-1]->Increment();
 
     // Update statistics
     for (uint i = 0; i < state.players.size(); ++i) {
