@@ -11,6 +11,7 @@ services:
       - CHANNEL
     external_links:
       - "auth:auth"
+      - "random:random"
 networks:
   default:
     name: rollycubes
