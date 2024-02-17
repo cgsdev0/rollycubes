@@ -3,5 +3,5 @@
 # the only reason that this script exists is because jeff can't remember docker
 # commands
 
-sudo docker run -p 5555:5555 random
+sudo docker run -p 5456:5456 random
 
