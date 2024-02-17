@@ -1,10 +1,9 @@
 FC=gfortran
-FCFLAGS=-Wall -Wextra -std=f2018 -pedantic -fcheck=all
+FCFLAGS=-Wall -Wextra -std=f2018 -pedantic
 
 TARGETS=RandomServer DemoClient
 
-# TODO: rename mod_dill for PascalCase consistency
-SRC=src/mod_dill.f90 
+SRC=src/mod_dill.f90 src/Random.f90
 OBJ=$(SRC:.f90=.o) libdill.a
 
 all: RandomServer DemoClient $(TARGETS)
@@ -35,5 +34,11 @@ libdill.a: libdill
 clean:
 	$(RM) -rf DemoClient RandomServer src/*.o *.mod
 
-# TODO: debug/release option targets
+debug: clean
+debug: FCFLAGS += -g -fcheck=all
+debug: $(TARGETS)
+
+release: clean
+release: FCFLAGS += -O3
+release: $(TARGETS)
 
