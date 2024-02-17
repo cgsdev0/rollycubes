@@ -1,4 +1,4 @@
-src/libdill/
+libdill/
 DemoClient
 RandomServer
 *.mod
