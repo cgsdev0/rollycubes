@@ -10,7 +10,7 @@
 #include <deque>
 #include <functional>
 #include <json.hpp>
-#include <random>
+
 #include <vector>
 
 using json = nlohmann::json;
@@ -18,12 +18,14 @@ using json = nlohmann::json;
 typedef std::function<void(std::string)> SendFunc;
 typedef std::function<void(std::string, std::string)> AuthSendFunc;
 typedef std::function<void(std::string, std::string, SendFunc)> AuthSendFunc2;
+typedef std::function<std::vector<int>()> RollFunc;
 
 class GameCoordinator;
 struct HandlerArgs {
     SendFunc send;
     AuthSendFunc reportStats;
     AuthSendFunc2 reportStats2;
+    RollFunc do_a_roll;
 };
 
 #define HANDLER_ARGS \
@@ -101,8 +103,7 @@ class Game {
 
     int connectedPlayerCount();
 
-    std::random_device rd;
-    std::mt19937 gen;
+
 
     API::WelcomeMsg toWelcomeMsg() {
         std::vector<API::Player> players;
@@ -153,7 +154,6 @@ class Game {
             }
             return stream.str();
     }
-    std::uniform_int_distribution<int> dis{1, 6};
     std::chrono::system_clock::time_point updated = std::chrono::system_clock::now();
     std::chrono::system_clock::time_point turn_start_time = std::chrono::system_clock::now();
     std::string turn_token;
