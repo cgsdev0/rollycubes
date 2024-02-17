@@ -1,7 +1,6 @@
 digraph {
   GameServer -> AuthServer [color="#9900aa"]
-  GameServer -> RandomServer [color="#00aaaa"]
-  RandomServer -> GameServer [color="#00aaaa"]
+  RandomServer -> GameServer [dir="both", color="#00aaaa"]
   Client -> GameServer [dir="both", color="#44aa44"] 
   Client -> AuthServer [color="#9900aa"]
   PostgresDB [shape="cylinder"]
