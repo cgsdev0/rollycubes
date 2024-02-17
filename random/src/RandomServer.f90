@@ -35,10 +35,13 @@ program random_server
 
     integer(c_int64_t) :: NO_DEADLINE = -1
 
-    character :: buffer*32
+    character :: buffer*32, char_
     character(len = :), allocatable :: str_
     double precision :: dnum
-    integer :: num
+
+    integer, parameter :: num_sides = 6
+    integer, parameter :: base = num_sides
+    integer :: num, rolls(2)
 
     ! 127.0.0.1 is not accessible outside of docker, but 0.0.0.0 is
     rc = ipaddr_local(addr, "0.0.0.0"//nullc, 5555_c_int, IPADDR_IPV4)
@@ -62,15 +65,22 @@ program random_server
 
         ! TODO roll our own rng just for lulz
         call random_number(dnum)
+        rolls(1) = int(dnum * num_sides) + 1
+        call random_number(dnum)
+        rolls(2) = int(dnum * num_sides) + 1
 
-        ! TODO: range [1, 6]
-        num = int(dnum * huge(num))
+        ! Pack two [1,6] rolls into a single byte, encoded as base-6
+        num = base * (rolls(1) - 1) + (rolls(2) - 1)
+        print *, "rolls = ", rolls
+        !print *, "num = ", num
+        print *, "sum = ", sum(rolls)
 
-        ! TODO: send binary char(s).  Can pack two [1,6] rolls into a single byte
-        write(buffer, "(i0)") num
-        print *, "num = ", num
-        str_ = trim(buffer)
-        rc = msend(connection, str_//nullc, len_sz(str_), NO_DEADLINE)
+        !write(buffer, "(i0)") num
+        !str_ = trim(buffer)
+        !rc = msend(connection, str_//nullc, len_sz(str_), NO_DEADLINE)
+
+        char_ = achar(num)
+        rc = msend(connection, char_//nullc, len_sz(char_), NO_DEADLINE)
 
         connection = suffix_detach(connection, NO_DEADLINE)
         rc = tcp_close(connection, NO_DEADLINE)
