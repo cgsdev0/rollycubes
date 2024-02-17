@@ -1,9 +1,8 @@
 program client
 
-  use iso_c_binding
-  use mod_dill
-
+  use random_m
   implicit none
+
   integer(c_int) :: rc, connection
   integer(c_size_t) :: message_size, msglen = 64
   type(ipaddr) :: addr
@@ -16,7 +15,7 @@ program client
 
   hist = 0
 
-  rc = ipaddr_remote(addr, '127.0.0.1' // c_null_char, 5555_c_int, IPADDR_IPV4, -1_c_int64_t)
+  rc = ipaddr_remote(addr, ipaddr_//nullc, port, IPADDR_IPV4, -1_c_int64_t)
 
   ! Loop over several rolls of 2 cubes
   do i = 1, 20

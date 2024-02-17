@@ -1,41 +1,3 @@
-module random_m
-
-    use iso_c_binding
-    use mod_dill
-
-    implicit none
-
-    character, parameter :: nullc = c_null_char
-
-contains
-
-!===============================================================================
-
-function len_sz(str_)
-    character(len = *), intent(in) :: str_
-    integer(c_size_t) :: len_sz
-    len_sz = len(str_)
-end function len_sz
-
-!===============================================================================
-
-integer function rand_int(min_, max_)
-    integer, intent(in) :: min_, max_
-
-    double precision :: double_
-
-    ! TODO roll our own rng just for lulz
-    call random_number(double_)
-    rand_int = int(double_ * (max_ - min_ + 1)) + min_
-
-end function rand_int
-
-!===============================================================================
-
-end module random_m
-
-!===============================================================================
-
 program random_server
 
     use random_m
@@ -47,7 +9,6 @@ program random_server
 
     integer, parameter :: num_sides = 6
     integer, parameter :: base = num_sides  ! byte-packing encoding base
-    integer(c_int), parameter :: port = 5555
 
     integer :: num, rolls(2)
     integer(c_int) :: connection, rc, socket
@@ -56,7 +17,7 @@ program random_server
     type(ipaddr) :: addr, addr_remote
 
     ! 127.0.0.1 is not accessible outside of docker, but 0.0.0.0 is
-    rc = ipaddr_local(addr, "0.0.0.0"//nullc, port, IPADDR_IPV4)
+    rc = ipaddr_local(addr, ipaddr_//nullc, port, IPADDR_IPV4)
 
     call ipaddr_str(addr, address_string)
 
