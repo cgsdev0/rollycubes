@@ -31,7 +31,7 @@ struct FortranRngServer {
             error("ERROR opening socket");
             
         }
-        server = gethostbyname("localhost");
+        server = gethostbyname("random");
         if (server == NULL) {
             error("ERROR, no such host");
         }
