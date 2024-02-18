@@ -1,18 +1,11 @@
-#include <chrono>
 #include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <json.hpp>
-#include <queue>
 #include <random>
 #include <set>
 
 #include <regex>
 #include <signal.h>
-#include <sstream>
-#include <streambuf>
 #include <string>
 #include <string_view>
 #include <unistd.h>
@@ -21,13 +14,11 @@
 #include "App.h"
 #include "Consts.h"
 #include "Game.h"
-#include "StringUtils.h"
 
 #include "AuthServerRequestQueue.h"
 #include "GameCoordinator.h"
 #include "JWTVerifier.h"
 #include "MoveOnlyFunction.h"
-#include "api/API.hpp"
 
 #include "Metrics.h"
 #include "RngOverTcp.h"
@@ -150,7 +141,6 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     bool is_verified = true;
                     std::string mode = std::string(req->getParameter(0));
                     std::string room = std::string(req->getParameter(1));
-                    std::cout << "UPGRADE REQUEST ON " << mode << "/" << room << std::endl;
                     std::string user_id = std::string(req->getQuery("userId"));
                     if (user_id.length()) {
                         session = user_id;
@@ -188,7 +178,6 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
 
-                    std::cout << "OPEN REQUEST ON " << userData->room << std::endl;
                     if (userData->session == "guest:") {
                         ws->send("cookie", uWS::OpCode::TEXT);
                         userData->is_verified = false;
