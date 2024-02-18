@@ -9,6 +9,12 @@
 #include "achievements/All.h"
 using namespace std::chrono_literals;
 
+const int ADD_SUB_OFFSET = 37;
+const int LEAVE_OFFSET = ADD_SUB_OFFSET + 6;
+const int KICK_OFFSET = LEAVE_OFFSET + 8;
+const int SKIP_OFFSET = KICK_OFFSET + 8;
+const int JOIN_OFFSET = SKIP_OFFSET + 1;
+
 Game::Game() {
     this->state.victory = false;
     this->state.players.reserve(MAX_PLAYERS);
@@ -22,7 +28,6 @@ Game::Game() {
 
     // Initialize all achievements
     this->achievements = initAchievements();
-
 }
 
 Game::~Game() {
@@ -84,9 +89,9 @@ json Game::addPlayer(const PerSocketData &data) {
         return result;
     }
     auto &player = state.players.emplace_back();
-    player.sum_hist = {0,0,0,0,0,0,0,0,0,0,0,0};
-    player.dice_hist = {0,0,0,0,0,0};
-    player.win_hist = {0,0,0,0,0,0};
+    player.sum_hist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    player.dice_hist = {0, 0, 0, 0, 0, 0};
+    player.win_hist = {0, 0, 0, 0, 0, 0};
     player.crowned = std::optional<bool>(false);
     player.connected = true;
     player.session = data.session;
@@ -98,6 +103,24 @@ json Game::addPlayer(const PerSocketData &data) {
     result["type"] = "join";
     result["id"] = state.players.size() - 1;
 
+    int idx;
+    auto it = std::find(user_palette.cbegin(), user_palette.cend(), data.session);
+    if (it != user_palette.cend()) {
+        idx = it - user_palette.cbegin();
+        this->events.push_back(std::byte(idx + JOIN_OFFSET));
+    } else if (user_palette.size() >= 63) {
+        // what do we do here?
+        // copilot?
+        // help??
+        // oh
+        // ...
+        // i dont have copilot
+        // that would probably explain it
+        this->events.push_back(std::byte(64 + JOIN_OFFSET));
+    } else {
+        this->events.push_back(std::byte(user_palette.size() + JOIN_OFFSET));
+        user_palette.push_back(data.session);
+    }
     // This is our first player joining
     if (state.players.size() == 1) {
         clearTurn();
@@ -157,7 +180,7 @@ bool Game::isPlayerConnected(std::string id) const {
     return false;
 }
 
-json Game::reconnectPlayer(std::string id, std::string old_id, const PerSocketData& data) {
+json Game::reconnectPlayer(std::string id, std::string old_id, const PerSocketData &data) {
     json result;
     bool has_old_id = (id != old_id);
     for (uint i = 0; i < state.players.size(); ++i) {
@@ -194,7 +217,7 @@ int Game::connectedPlayerCount() {
 
 #define ACTION(x)                 \
     {                             \
-#x, std::mem_fn(&Game::x) \
+        #x, std::mem_fn(&Game::x) \
     }
 
 static const std::unordered_map<
@@ -213,6 +236,51 @@ void Game::processEvent(const API::ServerPlayer *player, SendFunc &broadcast, Ha
     if (isSignedIn(*player)) {
         user_id.type = API::UserIdType::USER;
     };
+    // TODO: lol
+    if (!this->was_persisted || true) {
+        // Serialize match events
+        if (data["type"] == "roll") {
+            int a = (state.rolls[0] - 1);
+            int b = (state.rolls[1] - 1) * 6;
+            this->events.push_back(std::byte(a + b + 1));
+        } else if (data["type"] == "add")
+            this->events.push_back(std::byte(ADD_SUB_OFFSET));
+        else if (data["type"] == "sub")
+            this->events.push_back(std::byte(ADD_SUB_OFFSET + 1));
+        else if (data["type"] == "add_nth") {
+            int n = data["n"];
+            this->events.push_back(std::byte(ADD_SUB_OFFSET + 2 + n));
+        } else if (data["type"] == "sub_nth") {
+            int n = data["n"];
+            this->events.push_back(std::byte(ADD_SUB_OFFSET + 4 + n));
+        } else if (data["type"] == "leave") {
+            uint index = 0;
+            for (uint i = 0; i < prev.players.size(); ++i) {
+                if (prev.players[i].session == player->session) {
+                    index = i;
+                    break;
+                }
+            }
+            this->events.push_back(std::byte(LEAVE_OFFSET + index));
+        } else if (data["type"] == "kick") {
+            uint index = data["id"];
+            this->events.push_back(std::byte(KICK_OFFSET + index));
+        } else if (data["type"] == "skip") {
+            this->events.push_back(std::byte(SKIP_OFFSET));
+        }
+
+        if (state.victory && !prev.victory) {
+            // send the bytes to the server
+            std::cout << "PRETEND I AM SENDING THIS TO THE SERVER" << std::endl;
+            for (auto &b : this->user_palette) {
+                std::cout << b << std::endl;
+            }
+            for (auto &b : this->events) {
+                std::cout << (int)b << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
     for (auto achievement : this->achievements) {
         auto progress = achievement->processEvent(data, prev, state, player->session);
         if (progress <= 0) continue;
@@ -337,8 +405,8 @@ void Game::skip(HANDLER_ARGS) {
     state.players[id].skip_count++;
     RichTextStream stream;
     stream << RT::italic
-      << state.players[id]
-      << "'s turn was skipped.";
+           << state.players[id]
+           << "'s turn was skipped.";
     broadcast(log_rich_chat(stream));
     advanceTurn();
     json turn;
@@ -357,15 +425,15 @@ void Game::kick(HANDLER_ARGS) {
     if (id >= state.players.size())
         throw API::GameError({.error = "out of bounds"});
     if (state.players[id].skip_count < 2)
-        throw API::GameError({.error = "cmon give them a chance at least" });
+        throw API::GameError({.error = "cmon give them a chance at least"});
 
     json res;
     res["type"] = "kick";
     res["id"] = id;
     RichTextStream stream;
     stream << RT::italic
-      << state.players[id]
-      << " was kicked from the game!";
+           << state.players[id]
+           << " was kicked from the game!";
     broadcast(log_rich_chat(stream));
     if (turn_token == state.players[id].session) {
         advanceTurn();
@@ -393,9 +461,14 @@ void Game::restart(HANDLER_ARGS) {
         throw API::GameError({.error = "game still in progress"});
 
     metrics->restarts->Increment();
+    this->was_persisted = false;
+    this->events.clear();
+    this->user_palette.clear();
 
     json res;
     for (auto &player : state.players) {
+        this->events.push_back(std::byte(user_palette.size() + JOIN_OFFSET));
+        this->user_palette.push_back(player.session);
         player.score = 0;
         player.doubles_count = 0;
         player.roll_count = 0;
@@ -410,14 +483,14 @@ void Game::restart(HANDLER_ARGS) {
     res["id"] = state.turn_index;
     broadcast(res.dump());
     for (uint i = 0; i < state.players.size(); ++i) {
-      if (state.players[i].session == session) {
-        RichTextStream stream;
-        stream << RT::italic
-          << state.players[i]
-          << " started a new game.";
-        broadcast(log_rich_chat(stream));
-        break;
-      }
+        if (state.players[i].session == session) {
+            RichTextStream stream;
+            stream << RT::italic
+                   << state.players[i]
+                   << " started a new game.";
+            broadcast(log_rich_chat(stream));
+            break;
+        }
     }
 }
 
@@ -466,8 +539,6 @@ void Game::roll(HANDLER_ARGS) {
     if (state.players.size() <= 1)
         throw API::GameError({.error = "invite some friends first!"});
 
-
-
     json resp;
     resp["type"] = "roll";
     auto rolled = server.do_a_roll();
@@ -479,7 +550,7 @@ void Game::roll(HANDLER_ARGS) {
 
     // Metric collection
     metrics->rolls->Increment();
-    metrics->specific_rolls[(state.rolls[0]-1)*6 + state.rolls[1]-1]->Increment();
+    metrics->specific_rolls[(state.rolls[0] - 1) * 6 + state.rolls[1] - 1]->Increment();
 
     // Update statistics
     for (uint i = 0; i < state.players.size(); ++i) {
@@ -580,7 +651,7 @@ void Game::update(HANDLER_ARGS) {
                     }
                     auto idx = std::distance(TARGET_SCORES.begin(), TARGET_SCORES.find(score));
                     if (winnerId == i) {
-                      state.players[i].win_hist[idx]++;
+                        state.players[i].win_hist[idx]++;
                     }
                     API::ReportStats stats{
                         .dice_hist = state.players[i].dice_hist,
@@ -607,8 +678,8 @@ void Game::update(HANDLER_ARGS) {
                 broadcast(win.dump());
                 RichTextStream stream;
                 stream << RT::italic
-                  << state.players[winnerId]
-                  << " won the game with a " + std::to_string(score) + "!";
+                       << state.players[winnerId]
+                       << " won the game with a " + std::to_string(score) + "!";
                 broadcast(log_rich_chat(stream));
             } else {
                 for (uint i = 0; i < state.players.size(); ++i) {
@@ -625,15 +696,15 @@ void Game::update(HANDLER_ARGS) {
                         broadcast(update.dump());
                         RichTextStream stream;
                         stream << RT::italic
-                          << state.players[state.turn_index]
-                          << " reset "
-                          << state.players[i]
-                          << " to "
-                          << RT::color("red")
-                          << "zero"
-                          << RT::reset
-                          << RT::italic
-                          << "!";
+                               << state.players[state.turn_index]
+                               << " reset "
+                               << state.players[i]
+                               << " to "
+                               << RT::color("red")
+                               << "zero"
+                               << RT::reset
+                               << RT::italic
+                               << "!";
                         broadcast(log_rich_chat(stream));
                         break;
                     }

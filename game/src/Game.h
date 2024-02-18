@@ -1,15 +1,15 @@
 #ifndef INCLUDE_GAME_H
 #define INCLUDE_GAME_H
 
-#include "Metrics.h"
 #include "Consts.h"
-#include "achievements/BaseAchievement.h"
+#include "Metrics.h"
 #include "RichTextStream.h"
+#include "achievements/BaseAchievement.h"
 
 #include <chrono>
-#include <deque>
 #include <functional>
 #include <json.hpp>
+#include <string>
 
 #include <vector>
 
@@ -45,13 +45,13 @@ class Game {
         for (auto &player : this->state.players) {
             player.connected = false;
             if (player.sum_hist.size() != 12) {
-              player.sum_hist = {0,0,0,0,0,0,0,0,0,0,0,0};
+                player.sum_hist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             }
             if (player.dice_hist.size() != 6) {
-              player.dice_hist = {0,0,0,0,0,0};
+                player.dice_hist = {0, 0, 0, 0, 0, 0};
             }
             if (player.win_hist.size() != 6) {
-              player.win_hist = {0,0,0,0,0,0};
+                player.win_hist = {0, 0, 0, 0, 0, 0};
             }
         }
         if (this->state.players.size()) {
@@ -68,7 +68,7 @@ class Game {
     int getPlayerId(const std::string &id);
 
     json disconnectPlayer(std::string id);
-    json reconnectPlayer(std::string id, std::string old_id, const PerSocketData& data);
+    json reconnectPlayer(std::string id, std::string old_id, const PerSocketData &data);
     bool isPlayerConnected(std::string id) const;
 
     void advanceTurn();
@@ -103,8 +103,6 @@ class Game {
 
     int connectedPlayerCount();
 
-
-
     API::WelcomeMsg toWelcomeMsg() {
         std::vector<API::Player> players;
         for (const auto &player : this->state.players) {
@@ -114,7 +112,7 @@ class Game {
             }
             auto uid = std::optional<std::string>{user_id};
             if (!user_id.length()) {
-              uid = std::nullopt;
+                uid = std::nullopt;
             }
             players.emplace_back(player.connected, player.crowned, player.name, player.score, player.skip_count, uid, player.win_count);
         }
@@ -137,22 +135,22 @@ class Game {
     }
 
     int64_t incrSpectators() {
-      return ++this->state.spectators;
+        return ++this->state.spectators;
     }
 
     int64_t decrSpectators() {
-      return --this->state.spectators;
+        return --this->state.spectators;
     }
 
     void processEvent(const API::ServerPlayer *player, SendFunc &broadcast, HandlerArgs *server, const json &data, const API::GameState &prev);
 
   private:
-    std::string log_rich_chat(const RichTextStream& stream) {
-            state.rich_chat_log.insert(state.rich_chat_log.begin(), stream.obj());
-            if (state.rich_chat_log.size() > MAX_CHAT_LOG) {
-                state.rich_chat_log.pop_back();
-            }
-            return stream.str();
+    std::string log_rich_chat(const RichTextStream &stream) {
+        state.rich_chat_log.insert(state.rich_chat_log.begin(), stream.obj());
+        if (state.rich_chat_log.size() > MAX_CHAT_LOG) {
+            state.rich_chat_log.pop_back();
+        }
+        return stream.str();
     }
     std::chrono::system_clock::time_point updated = std::chrono::system_clock::now();
     std::chrono::system_clock::time_point turn_start_time = std::chrono::system_clock::now();
@@ -160,6 +158,9 @@ class Game {
     std::vector<BaseAchievement *> achievements;
     API::GameState state;
     Metrics *metrics;
+    std::vector<std::byte> events;
+    std::vector<std::string> user_palette;
+    bool was_persisted = false;
     friend GameCoordinator;
 };
 

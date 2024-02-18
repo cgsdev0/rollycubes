@@ -61,6 +61,7 @@ void GameCoordinator::load_persistence() {
         state.fromString(room.value().dump());
         Game *g = new Game(state);
         g->metrics = metrics;
+        g->was_persisted = true;
         games.insert({room.key(), g});
 
         // // All rehydrated games start with 0 players, so we can schedule an eviction.

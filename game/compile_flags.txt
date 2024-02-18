@@ -1,3 +1,4 @@
+-xc++
 -std=c++20
 -Iincludes
 -IuWebSockets/src

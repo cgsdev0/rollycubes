@@ -7,8 +7,8 @@
 namespace API {
 
     struct ServerPlayer {
-std::string toString() const;
-void fromString(const std::string &str);
+        std::string toString() const;
+        void fromString(const std::string &str);
         bool connected;
         std::optional<bool> crowned;
         std::vector<int64_t> dice_hist;
@@ -24,4 +24,4 @@ void fromString(const std::string &str);
         int64_t win_count;
         std::vector<int64_t> win_hist;
     };
-}
+} // namespace API
