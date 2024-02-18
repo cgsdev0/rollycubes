@@ -1,5 +1,4 @@
 #include <chrono>
-#include <set>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -8,6 +7,7 @@
 #include <json.hpp>
 #include <queue>
 #include <random>
+#include <set>
 
 #include <regex>
 #include <signal.h>
@@ -29,19 +29,20 @@
 #include "MoveOnlyFunction.h"
 #include "api/API.hpp"
 
+#include "Metrics.h"
+#include "RngOverTcp.h"
 #include <prometheus/counter.h>
 #include <prometheus/registry.h>
 #include <prometheus/text_serializer.h>
-#include "Metrics.h"
-#include "RngOverTcp.h"
+
+#define DONT_REUSE_THE_FUCKING_PORT_LINUX 1
 
 template <typename T>
-concept can_roll = requires(T value)
-{
+concept can_roll = requires(T value) {
     { value.roll() } -> std::convertible_to<std::vector<int>>;
 };
 
-template<can_roll T>
+template <can_roll T>
 struct BaseRngServer : public T {};
 
 struct CppRngServer {
@@ -59,13 +60,13 @@ struct CppRngServer {
     }
 };
 
-template<can_roll... Ts>
+template <can_roll... Ts>
 using CanRollVariant = std::variant<Ts...>;
 
 using RngServer = CanRollVariant<BaseRngServer<FortranRngServer>, BaseRngServer<CppRngServer>>;
 
-auto roll(RngServer& element) {
-    return std::visit([](auto&& el){ return el.roll(); }, element);
+auto roll(RngServer &element) {
+    return std::visit([](auto &&el) { return el.roll(); }, element);
 }
 
 // for convenience
@@ -93,25 +94,25 @@ void connectNewPlayer(uWS::App *app, uWS::WebSocket<false, true, PerSocketData> 
         // Connecting to a valid game
         Game *g = it->second;
 
-        auto welcome = [g, userData, ws, app, &coordinator](){
-          auto msg = g->toWelcomeMsg();
-          msg.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
-          ws->send(msg.toString(), uWS::OpCode::TEXT);
-          ws->subscribe(userData->room);
-          if (userData->spectator) {
-            API::SpectatorsMsg spec;
-            spec.count = g->incrSpectators();
-            ws->publish(userData->room, spec.toString(), uWS::OpCode::TEXT);
-          } else {
-            app->publish("home/list", coordinator.list_rooms().toString(), uWS::OpCode::TEXT);
-          }
+        auto welcome = [g, userData, ws, app, &coordinator]() {
+            auto msg = g->toWelcomeMsg();
+            msg.id = (userData->spectator) ? -1 : g->getPlayerId(userData->session);
+            ws->send(msg.toString(), uWS::OpCode::TEXT);
+            ws->subscribe(userData->room);
+            if (userData->spectator) {
+                API::SpectatorsMsg spec;
+                spec.count = g->incrSpectators();
+                ws->publish(userData->room, spec.toString(), uWS::OpCode::TEXT);
+            } else {
+                app->publish("home/list", coordinator.list_rooms().toString(), uWS::OpCode::TEXT);
+            }
         };
         if (!userData->spectator) {
             if (!(g->hasPlayer(userData->session) || g->hasPlayer(userData->session_from_cookie))) {
                 json resp = g->addPlayer(*userData);
                 if (resp.is_null()) {
                     // room is full
-                    std::string err = API::GameError({.error = "room full" }).toString();
+                    std::string err = API::GameError({.error = "room full"}).toString();
                     ws->send(err, uWS::OpCode::TEXT);
                     userData->spectator = true;
                     welcome();
@@ -149,6 +150,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     bool is_verified = true;
                     std::string mode = std::string(req->getParameter(0));
                     std::string room = std::string(req->getParameter(1));
+                    std::cout << "UPGRADE REQUEST ON " << mode << "/" << room << std::endl;
                     std::string user_id = std::string(req->getQuery("userId"));
                     if (user_id.length()) {
                         session = user_id;
@@ -186,6 +188,7 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     PerSocketData *userData =
                         (PerSocketData *)ws->getUserData();
 
+                    std::cout << "OPEN REQUEST ON " << userData->room << std::endl;
                     if (userData->session == "guest:") {
                         ws->send("cookie", uWS::OpCode::TEXT);
                         userData->is_verified = false;
@@ -245,11 +248,12 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                                         // ws->send(s, uWS::OpCode::TEXT);
                                         app->publish(room, s, uWS::OpCode::TEXT);
                                     },
-                                    {.send =
-                                         [ws](auto s) { ws->send(s, uWS::OpCode::TEXT); },
-                                     .reportStats = [&authServer](auto url, auto json) { authServer.send(url, json); },
-                                     .reportStats2 = [&authServer](auto url, auto json, auto cb) { authServer.send(url, json, cb); },
-                                     .do_a_roll = [&rng]() { return roll(rng); },
+                                    {
+                                        .send =
+                                            [ws](auto s) { ws->send(s, uWS::OpCode::TEXT); },
+                                        .reportStats = [&authServer](auto url, auto json) { authServer.send(url, json); },
+                                        .reportStats2 = [&authServer](auto url, auto json, auto cb) { authServer.send(url, json, cb); },
+                                        .do_a_roll = [&rng]() { return roll(rng); },
                                     },
                                     data, session);
                                 /*if (data["type"].is_string()) {
@@ -306,10 +310,10 @@ uWS::App::WebSocketBehavior<PerSocketData> makeWebsocketBehavior(uWS::App *app, 
                     if (it != coordinator.games.end()) {
                         Game *g = it->second;
                         if (userData->spectator) {
-                          API::SpectatorsMsg spec;
-                          spec.count = g->decrSpectators();
-                          ws->publish(userData->room, spec.toString(), uWS::OpCode::TEXT);
-                          return;
+                            API::SpectatorsMsg spec;
+                            spec.count = g->decrSpectators();
+                            ws->publish(userData->room, spec.toString(), uWS::OpCode::TEXT);
+                            return;
                         }
                         json resp = g->disconnectPlayer(session);
                         if (!resp.is_null()) {
@@ -333,28 +337,25 @@ uWS::App::WebSocketBehavior<HomeSocketData> makeHomeWebsocketBehavior(uWS::App *
                 [&, app](auto *ws) {
                     ws->subscribe("home/list");
                     ws->send(coordinator.list_rooms().toString(), uWS::OpCode::TEXT);
-                }
-            };
+                }};
 }
 
-
 const std::set<std::string> allowed_origins{
-        "https://rollycubes.com",
-        "https://prod.rollycubes.com",
-        "https://beta.rollycubes.com",
-        "https://www.rollycubes.com",
-        "https://rollycubes.live",
-        "http://localhost:3000",
-        "http://localhost:3005"
-};
+    "https://rollycubes.com",
+    "https://prod.rollycubes.com",
+    "https://beta.rollycubes.com",
+    "https://www.rollycubes.com",
+    "https://rollycubes.live",
+    "http://localhost:3000",
+    "http://localhost:3005"};
 void writeCORS(auto *req, auto *res) {
-  std::string origin(req->getHeader("origin"));
-  if(allowed_origins.contains(origin)) {
-    res->writeHeader("Access-Control-Allow-Origin", origin);
-    res->writeHeader("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS");
-    res->writeHeader("Access-Control-Allow-Credentials", "true");
-    res->writeHeader("Access-Control-Allow-Headers", "csrf-token, content-type, x-access-token");
-  }
+    std::string origin(req->getHeader("origin"));
+    if (allowed_origins.contains(origin)) {
+        res->writeHeader("Access-Control-Allow-Origin", origin);
+        res->writeHeader("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS");
+        res->writeHeader("Access-Control-Allow-Credentials", "true");
+        res->writeHeader("Access-Control-Allow-Headers", "csrf-token, content-type, x-access-token");
+    }
 }
 int main(int argc, char **argv) {
 
@@ -399,7 +400,7 @@ int main(int argc, char **argv) {
     }
 
     auto rolled = roll(rng);
-    std::cout << rolled[0] << " " << rolled[1]  << std::endl;
+    std::cout << rolled[0] << " " << rolled[1] << std::endl;
 
     bool auth_enabled = true;
     if (std::getenv("NO_AUTH")) {
@@ -434,9 +435,9 @@ int main(int argc, char **argv) {
             bool isPrivate = true;
             if (req->getQuery().find("public") != std::string::npos) {
                 isPrivate = false;
-              metrics.game_counter_public->Increment();
+                metrics.game_counter_public->Increment();
             } else {
-              metrics.game_counter_private->Increment();
+                metrics.game_counter_private->Increment();
             }
             if (session == "") {
                 res->end();
@@ -446,7 +447,20 @@ int main(int argc, char **argv) {
         })
         .ws<HomeSocketData>("/ws/list", makeHomeWebsocketBehavior(&app, jwt_verifier, authServer, metrics, coordinator))
         .ws<PerSocketData>("/ws/:mode/:room", makeWebsocketBehavior(&app, jwt_verifier, authServer, metrics, coordinator, rng))
-        .listen(port, [port](auto *socket) {
+        // This 1 makes it so that the port is not reusable
+        // because it SUCKS ASS when the port is reusable and you
+        // don't realize the port is reusable and then you have a bad day
+        // because an old zombie process of the server is running somewhere
+        // on your machine and you don't reboot very frequently and people told
+        // you to try rebooting but you didnt because that's just a meme people
+        // say, they don't actually mean it (usually), but in this case it would
+        // have been a good idea, and anyways yeah just make it 1 instead of 0
+        // and you should be fine ok bye
+        //
+        // p.s. chatpgt says:
+        // Remember to reboot periodically as advised, as it can mitigate such issues.
+        // Make the adjustment and proceed confidently.
+        .listen(port, DONT_REUSE_THE_FUCKING_PORT_LINUX, [port](auto *socket) {
             if (socket) {
                 std::cout << "Listening on port " << port << std::endl;
             }
