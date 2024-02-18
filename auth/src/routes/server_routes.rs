@@ -93,7 +93,6 @@ pub async fn add_stats(
     State(s): State<RouterState>,
     Json(mut body): Json<generated::ReportStats>,
 ) -> Result<(), RouteError> {
-    println!("{}", serde_json::to_string_pretty(&body).unwrap());
     let client = s.pool.get().await?;
     let user_id = find_user_id(&s, body.user_id).await?;
     if body.win_hist.len() != 6 {

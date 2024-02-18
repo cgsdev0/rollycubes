@@ -292,20 +292,19 @@ WHERE
     } else {
         // Check if we should promote an anonymous user
         let transaction = client.transaction().await?;
-        let id = if let Some(session) = payload.anon_id {
-            println!("GOT SESSION: {}", session);
+        let session2 = jar.get("_session");
+        let id = if let Some(session) = session2 {
             let rows = transaction
                 .query(
                     "
 SELECT user_id FROM anon_identity WHERE anon_id = $1::TEXT",
-                    &[&format!("{}{}", "guest:", session)],
+                    &[&format!("{}{}", "guest:", session.value())],
                 )
                 .await?;
             if rows.is_empty() {
                 Uuid::new_v4()
             } else {
                 let new_id = rows[0].get::<'_, _, Uuid>("user_id");
-                println!("GOT ID: {}", new_id);
                 transaction
                     .execute(
                         "
