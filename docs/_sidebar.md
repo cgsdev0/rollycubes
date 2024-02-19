@@ -1,2 +1,0 @@
-* [Home](/)
-* [WebSocket API](/gen)

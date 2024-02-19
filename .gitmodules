@@ -1,3 +1,0 @@
-[submodule "game/prometheus-cpp"]
-	path = game/prometheus-cpp
-	url = https://github.com/jupp0r/prometheus-cpp.git

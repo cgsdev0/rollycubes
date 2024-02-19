@@ -1,6 +1,0 @@
--xc++
--std=c++20
--Iincludes
--IuWebSockets/src
--IuWebSockets/uSockets/src
--Iprometheus-cpp/core/include
