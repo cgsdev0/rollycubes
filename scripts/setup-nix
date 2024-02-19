@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -eux
+
+cd "${0%/*}/.."
+
+nix develop -c bash << MEOW
+npm install;
+pushd auth;
+cargo install cargo-watch;
+cargo build;
+popd;
+pushd client;
+npm install;
+popd;
+pushd game;
+make -j2
+popd
+git submodule init;
+git submodule update;
+pushd game/prometheus-cpp;
+git submodule init;
+git submodule update;
+MEOW

@@ -1,0 +1,10 @@
+[[task]]
+  id = "run"
+  type = "long"
+  cmd = "cargo watch -x run"
+  dependencies = [ "db" ]
+
+[[task]]
+  id = "db"
+  type = "short"
+  cmd = "nc -zv localhost 5432 || (cd devdb; docker-compose up -d)"

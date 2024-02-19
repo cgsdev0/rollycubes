@@ -1,0 +1,10 @@
+[[task]]
+  id = "dev"
+  type = "long"
+  dependencies = [ "auth/run", "game/run", "client/run" ]
+
+[[task]]
+  id = "gateway"
+  type = "long"
+  cmd = "cd ssh-gateway; go run ."
+  watch = [ "ssh-gateway/**/*.go" ]

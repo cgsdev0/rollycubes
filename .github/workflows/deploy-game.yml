@@ -1,0 +1,72 @@
+name: Deploy Game
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Channel'
+        required: true
+        default: 'beta'
+        type: choice
+        options:
+        - prod
+        - beta
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    environment:
+      name: ${{ github.event.inputs.channel }}
+      url: ${{ fromJson('{"prod":"https://rollycubes.com","beta":"https://beta.rollycubes.com"}')[github.event.inputs.channel] }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
+
+    - name: Log in to the Container registry
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: game
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.channel }}
+
+    - name: Build client
+      run: npm install && npm run build
+      working-directory: client
+
+
+    # Deploy it
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.DO_SSH_KEY }}
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - name: remove the existing client
+      run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} rm -rf /root/client/${{ github.event.inputs.channel }}/*"
+    - name: copy the new client
+      run: "scp -P 22222 -r client/build/* root@${{ secrets.DO_SERVER_IP }}:/root/client/${{ github.event.inputs.channel }}/"
+    - name: copy the game server
+      run: "scp -P 22222 game/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/game/${{ github.event.inputs.channel }}"
+    - name: start the new server
+      run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'CHANNEL=${{ github.event.inputs.channel }} docker-compose -f game/${{ github.event.inputs.channel }}/docker-compose.yml pull && CHANNEL=${{ github.event.inputs.channel }} docker-compose -f game/${{ github.event.inputs.channel }}/docker-compose.yml up -d'\""

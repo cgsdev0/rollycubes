@@ -1,0 +1,11 @@
+[[task]]
+  id = "run"
+  type = "long"
+  env = { "NODE_OPTIONS" = "--no-network-family-autoselection" }
+  cmd = "npm run start"
+
+[[task]]
+  id = "prod"
+  type = "long"
+  env = { "NODE_OPTIONS" = "--no-network-family-autoselection" }
+  cmd = "VITE_USE_PROD=true npm run no-auth"

@@ -1,0 +1,32 @@
+version: '3'
+services:
+  auth:
+    image: ghcr.io/cgsdev0/rollycubes-auth
+    restart: always
+    environment:
+      DB_HOST: "db"
+      RUST_LOG: "debug"
+    depends_on:
+      - "postgres"
+    links:
+      - "postgres:db"
+    volumes:
+      - ../secrets/:/secrets
+  postgres:
+    image: "postgres:9.6.1"
+    restart: always
+    environment:
+      POSTGRES_USER: "test"
+      POSTGRES_PASSWORD: "test"
+      POSTGRES_DB: "test"
+
+    volumes:
+      - postgres-data-auth:/var/lib/postgresql/data
+
+networks:
+  default:
+    name: rollycubes
+    external: true
+
+volumes:
+  postgres-data-auth:

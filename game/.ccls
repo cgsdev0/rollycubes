@@ -1,0 +1,7 @@
+gcc
+%cpp -std=c++20
+%h -x
+%h c++-header
+-Iincludes
+-IuWebSockets/src
+-IuWebSockets/uSockets/src

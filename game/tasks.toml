@@ -1,0 +1,11 @@
+[[task]]
+  id = "build"
+  type = "short"
+  cmd = "make -j 8 || echo 'it didnt build haha'"
+  watch = [ "**/*.cpp",  "**/*.h" ]
+
+[[task]]
+  id = "run"
+  type = "long"
+  cmd = "DEV=true ./GameServer 2>&1"
+  triggers = [ "build" ]

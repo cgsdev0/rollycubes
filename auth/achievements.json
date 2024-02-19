@@ -1,0 +1,97 @@
+{
+  "astronaut:1": {
+    "id": "astronaut:1",
+    "name": "Astronaut",
+    "description": "Win with a score of 100.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/astronaut.png",
+    "unlocks": "D20"
+  },
+  "getting_started": {
+    "id": "getting_started",
+    "name": "Getting Started",
+    "description": "You rolled your first dice!",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/getting_started.png"
+  },
+  "win_games:1": {
+    "id": "win_games:1",
+    "name": "Beginner's Luck",
+    "description": "Win a game.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/beginners_luck.png"
+  },
+  "win_games:2": {
+    "id": "win_games:2",
+    "name": "good job",
+    "description": "Win 10 games.",
+    "max_progress": 10,
+    "image_url": "https://cdn.rollycubes.com/achievements/good_job.png"
+  },
+  "win_games:3": {
+    "id": "win_games:3",
+    "name": "Addicted",
+    "description": "Win 100 games.",
+    "max_progress": 100,
+    "image_url": "https://cdn.rollycubes.com/achievements/addicted.png",
+    "unlocks": "Golden"
+  },
+  "doubles:1": {
+    "id": "doubles:1",
+    "name": "3x Doubles Streak",
+    "description": "Get doubles 3 times in a row.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/3x_doubles.png",
+    "unlocks": "Jumbo"
+  },
+  "doubles:2": {
+    "id": "doubles:2",
+    "name": "5x Doubles Streak",
+    "description": "Get doubles 5 times in a row.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/5x_doubles.png"
+  },
+  "doubles:3": {
+    "id": "doubles:3",
+    "name": "7x Doubles Streak",
+    "description": "Get doubles 7 times in a row.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/7x_doubles.png"
+  },
+  "rude": {
+    "id": "rude",
+    "name": "Just Plain Rude",
+    "description": "Reset another player instead of winning.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/rude.png",
+    "unlocks": "Hands"
+  },
+  "negative": {
+    "id": "negative",
+    "name": "Maybe Read the Rules...",
+    "description": "Reach a negative score.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/negative.png"
+  },
+  "thief": {
+    "id": "thief",
+    "name": "Roll Thief",
+    "description": "Get the roll the player after you needed to win.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/thief.png"
+  },
+  "oops": {
+    "id": "oops",
+    "name": "Oops...",
+    "description": "Miss an opportunity to win the game.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/oops.png"
+  },
+  "perfect": {
+    "id": "perfect",
+    "name": "Perfect Game",
+    "description": "Win a game in a single turn.",
+    "max_progress": 1,
+    "image_url": "https://cdn.rollycubes.com/achievements/perfect.png"
+  }
+}

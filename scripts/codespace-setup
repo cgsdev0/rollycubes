@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -eux
+
+cd "${0%/*}/.."
+
+# Install nix
+if ! ls /nix &> /dev/null; then
+  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux \
+    --extra-conf "sandbox = false" \
+    --init none \
+    --no-confirm
+  export PATH="${PATH}:/nix/var/nix/profiles/default/bin"
+  echo 'export PATH="${PATH}:/nix/var/nix/profiles/default/bin"' > ~/.bashrc
+fi
+
+sudo -i /workspaces/rollycubes/scripts/setup-nix
+
+echo 'sudo -i nix develop' > ~/.bashrc

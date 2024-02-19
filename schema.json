@@ -1,0 +1,1119 @@
+{
+  "definitions": {
+    "ServerMsg": {
+      "type": "object",
+      "oneOf": [
+        { "$ref": "#/definitions/RoomListMsg" },
+        { "$ref": "#/definitions/RefetchPlayerMsg" },
+        { "$ref": "#/definitions/WelcomeMsg" },
+        { "$ref": "#/definitions/RestartMsg" },
+        { "$ref": "#/definitions/SpectatorsMsg" },
+        { "$ref": "#/definitions/WinMsg" },
+        { "$ref": "#/definitions/RollMsg" },
+        { "$ref": "#/definitions/RollAgainMsg" },
+        { "$ref": "#/definitions/JoinMsg" },
+        { "$ref": "#/definitions/DisconnectMsg" },
+        { "$ref": "#/definitions/ReconnectMsg" },
+        { "$ref": "#/definitions/KickMsg" },
+        { "$ref": "#/definitions/ChatMsg" },
+        { "$ref": "#/definitions/RichTextMsg" },
+        { "$ref": "#/definitions/UpdateTurnMsg" },
+        { "$ref": "#/definitions/UpdateNameMsg" },
+        { "$ref": "#/definitions/UpdateMsg" }
+      ]
+    },
+    "Dice": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/DiceType"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["type"]
+    },
+    "Color": {
+      "type": "object",
+      "properties": {
+        "hue": {
+          "type": "number"
+        },
+        "sat": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["hue", "sat"]
+    },
+    "UserData": {
+      "type": "object",
+      "properties": {
+        "achievements": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Achievement"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "color": {
+          "$ref": "#/definitions/Color"
+        },
+        "created_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "dice": {
+          "$ref": "#/definitions/Dice"
+        },
+        "donor": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": ["null", "string"]
+        },
+        "pubkey_text": {
+          "type": ["null", "string"]
+        },
+        "stats": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/UserStats"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["color", "created_date", "dice", "donor", "id", "username"]
+    },
+    "AuthRefreshTokenResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "access_token": {
+          "type": "string"
+        }
+      },
+      "required": ["access_token"]
+    },
+    "AuthDonateResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "link": {
+          "type": "string"
+        }
+      },
+      "required": ["link"]
+    },
+    "LoginRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "anon_id": {
+          "type": "string"
+        },
+        "redirect_uri": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      },
+      "required": ["code", "redirect_uri", "state"]
+    },
+    "AuthSettingsRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "setting": {
+              "type": "string",
+              "default": "Color",
+              "enum": ["Color"]
+            },
+            "color": {
+              "$ref": "#/definitions/Color"
+            }
+          },
+          "required": ["setting", "color"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "setting": {
+              "type": "string",
+              "default": "DiceType",
+              "enum": ["DiceType"]
+            },
+            "dice_type": {
+              "$ref": "#/definitions/DiceType"
+            }
+          },
+          "required": ["setting", "dice_type"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "setting": {
+              "type": "string",
+              "default": "Pubkey",
+              "enum": ["Pubkey"]
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": ["setting", "text"]
+        }
+      ]
+    },
+    "Player": {
+      "type": "object",
+      "properties": {
+        "connected": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "score": {
+          "type": "integer"
+        },
+        "win_count": {
+          "type": "integer"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "crowned": {
+          "type": "boolean"
+        },
+        "skip_count": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["connected", "score", "skip_count", "win_count"]
+    },
+    "UserId": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "default": "User",
+              "enum": ["User"]
+            },
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "additionalProperties": false,
+          "required": ["id", "type"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "default": "Anonymous",
+              "enum": ["Anonymous"]
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": ["id", "type"]
+        }
+      ]
+    },
+    "AchievementProgress": {
+      "type": "object",
+      "properties": {
+        "achievement_id": {
+          "type": "string"
+        },
+        "user_id": {
+          "$ref": "#/definitions/UserId"
+        },
+        "user_index": {
+          "type": "integer"
+        },
+        "progress": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string",
+          "default": "achievement_progress",
+          "enum": ["achievement_progress"]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "achievement_id",
+        "progress",
+        "type",
+        "user_id",
+        "user_index"
+      ]
+    },
+    "AchievementUnlock": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": ["null", "string"]
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "user_index": {
+          "type": "integer"
+        },
+        "max_progress": {
+          "type": "integer"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "type": {
+          "type": "string",
+          "default": "achievement_unlock",
+          "enum": ["achievement_unlock"]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "id",
+        "image_url",
+        "max_progress",
+        "name",
+        "type",
+        "user_id",
+        "user_index"
+      ]
+    },
+    "ReportStats": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "$ref": "#/definitions/UserId"
+        },
+        "rolls": {
+          "type": "integer"
+        },
+        "wins": {
+          "type": "integer"
+        },
+        "games": {
+          "type": "integer"
+        },
+        "doubles": {
+          "type": "integer"
+        },
+        "dice_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "sum_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "win_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "doubles",
+        "games",
+        "rolls",
+        "user_id",
+        "wins",
+        "dice_hist",
+        "sum_hist",
+        "win_hist"
+      ]
+    },
+    "ServerPlayer": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "type": "string"
+        },
+        "turn_count": {
+          "type": "integer"
+        },
+        "roll_count": {
+          "type": "integer"
+        },
+        "doubles_count": {
+          "type": "integer"
+        },
+        "connected": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "score": {
+          "type": "integer"
+        },
+        "win_count": {
+          "type": "integer"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "crowned": {
+          "type": "boolean"
+        },
+        "skip_count": {
+          "type": "integer"
+        },
+        "dice_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "sum_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "win_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "connected",
+        "doubles_count",
+        "roll_count",
+        "score",
+        "session",
+        "skip_count",
+        "turn_count",
+        "win_count",
+        "dice_hist",
+        "sum_hist",
+        "win_hist"
+      ]
+    },
+    "UserStats": {
+      "type": "object",
+      "properties": {
+        "rolls": {
+          "type": "integer"
+        },
+        "doubles": {
+          "type": "integer"
+        },
+        "games": {
+          "type": "integer"
+        },
+        "wins": {
+          "type": "integer"
+        },
+        "dice_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "sum_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "win_hist": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "doubles",
+        "games",
+        "rolls",
+        "wins",
+        "dice_hist",
+        "sum_hist",
+        "win_hist"
+      ]
+    },
+    "Achievement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "progress": {
+          "type": "integer"
+        },
+        "unlocked": {
+          "type": "string"
+        },
+        "rn": {
+          "type": ["null", "integer"]
+        },
+        "rd": {
+          "type": ["null", "integer"]
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "progress", "rd", "rn", "unlocked"]
+    },
+    "AchievementData": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "image_url": {
+          "type": ["null", "string"]
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "max_progress": {
+          "type": "integer"
+        },
+        "unlocks": {
+          "$ref": "#/definitions/DiceType"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["description", "id", "image_url", "max_progress", "name"]
+    },
+    "DiceType": {
+      "enum": ["Default", "D20", "Golden", "Hands", "Jumbo"]
+    },
+    "DieRoll": {
+      "type": "object",
+      "properties": {
+        "used": {
+          "type": "boolean"
+        },
+        "value": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["used", "value"]
+    },
+    "GameError": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "error",
+          "enum": ["error"]
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["error", "type"]
+    },
+    "Redirect": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "redirect",
+          "enum": ["redirect"]
+        },
+        "room": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["room", "type"]
+    },
+    "Room": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "host_name": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date"
+        },
+        "player_count": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["code", "host_name", "last_updated", "player_count"]
+    },
+    "IGameState": {
+      "type": "object",
+      "properties": {
+        "players": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Player"
+          }
+        },
+        "richChatLog": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RichTextMsg" }
+        },
+        "chatLog": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "turn_index": {
+          "type": "integer"
+        },
+        "rolls": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "used": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        },
+        "rolled": {
+          "type": "boolean"
+        },
+        "victory": {
+          "type": "boolean"
+        },
+        "privateSession": {
+          "type": "boolean"
+        },
+        "spectators": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "richChatLog",
+        "chatLog",
+        "players",
+        "privateSession",
+        "rolled",
+        "rolls",
+        "spectators",
+        "turn_index",
+        "used",
+        "victory"
+      ]
+    },
+    "GameState": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "game_state",
+          "enum": ["game_state"]
+        },
+        "players": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServerPlayer"
+          }
+        },
+        "richChatLog": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RichTextMsg" }
+        },
+        "chatLog": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "turn_index": {
+          "type": "integer"
+        },
+        "rolls": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "used": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        },
+        "rolled": {
+          "type": "boolean"
+        },
+        "victory": {
+          "type": "boolean"
+        },
+        "privateSession": {
+          "type": "boolean"
+        },
+        "spectators": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "richChatLog",
+        "chatLog",
+        "players",
+        "privateSession",
+        "rolled",
+        "rolls",
+        "spectators",
+        "turn_index",
+        "type",
+        "used",
+        "victory"
+      ]
+    },
+    "RoomListMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "room_list",
+          "enum": ["room_list"]
+        },
+        "rooms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Room"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["rooms"]
+    },
+    "RefetchPlayerMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "refetch_player",
+          "enum": ["refetch_player"]
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["type", "user_id"]
+    },
+    "WelcomeMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "welcome",
+          "enum": ["welcome"]
+        },
+        "id": {
+          "type": "integer"
+        },
+        "players": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Player"
+          }
+        },
+        "richChatLog": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RichTextMsg" }
+        },
+        "chatLog": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "turn_index": {
+          "type": "integer"
+        },
+        "rolls": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "used": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        },
+        "rolled": {
+          "type": "boolean"
+        },
+        "victory": {
+          "type": "boolean"
+        },
+        "privateSession": {
+          "type": "boolean"
+        },
+        "spectators": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "richChatLog",
+        "chatLog",
+        "id",
+        "players",
+        "privateSession",
+        "rolled",
+        "rolls",
+        "spectators",
+        "turn_index",
+        "type",
+        "used",
+        "victory"
+      ]
+    },
+    "RestartMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "restart",
+          "enum": ["restart"]
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "type"]
+    },
+    "SpectatorsMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "spectators",
+          "enum": ["spectators"]
+        },
+        "count": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["count", "type"]
+    },
+    "WinMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "win",
+          "enum": ["win"]
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "type"]
+    },
+    "RollMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "roll",
+          "enum": ["roll"]
+        },
+        "rolls": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["rolls", "type"]
+    },
+    "RollAgainMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "roll_again",
+          "enum": ["roll_again"]
+        }
+      },
+      "additionalProperties": false,
+      "required": ["type"]
+    },
+    "JoinMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "join",
+          "enum": ["join"]
+        },
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "type"]
+    },
+    "DisconnectMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "disconnect",
+          "enum": ["disconnect"]
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "type"]
+    },
+    "ReconnectMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "reconnect",
+          "enum": ["reconnect"]
+        },
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "type"]
+    },
+    "KickMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "kick",
+          "enum": ["kick"]
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "type"]
+    },
+    "RichTextChunk": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "rt_text",
+          "enum": ["rt_text", "rt_username"]
+        },
+        "text": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "color": {
+          "type": "string"
+        },
+        "alignment": {
+          "type": "string",
+          "enum": ["left", "right", "center"]
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["bold", "italic", "underline", "strikethrough"]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["text", "type"]
+    },
+    "RichTextMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "chat_v2",
+          "enum": ["chat_v2"]
+        },
+        "msg": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/definitions/RichTextChunk" }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": ["msg", "type"]
+    },
+    "ChatMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "chat",
+          "enum": ["chat"]
+        },
+        "msg": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["msg", "type"]
+    },
+    "UpdateTurnMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "update_turn",
+          "enum": ["update_turn"]
+        },
+        "id": {
+          "type": "integer"
+        },
+        "skip": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "type"]
+    },
+    "UpdateNameMsg": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "update_name",
+          "enum": ["update_name"]
+        },
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "name", "type"]
+    },
+    "UpdateMsg": {
+      "description": "TODO: add descriptions to these things",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "update",
+          "enum": ["update"]
+        },
+        "id": {
+          "type": "integer"
+        },
+        "score": {
+          "type": "integer"
+        },
+        "used": {
+          "type": "array",
+          "items": {
+            "type": "boolean"
+          }
+        },
+        "reset": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["id", "score", "type"]
+    }
+  }
+}

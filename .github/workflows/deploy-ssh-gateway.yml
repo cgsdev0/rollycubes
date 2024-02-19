@@ -1,0 +1,45 @@
+name: Deploy SSH Gateway
+
+on:
+  workflow_dispatch
+
+env:
+  REGISTRY: ghcr.io
+  CHANNEL: latest
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: docker/setup-buildx-action@v2
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: ssh-gateway
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-ssh-gateway:${{ env.CHANNEL }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.DO_SSH_KEY }}
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} mkdir -p /root/ssh-gateway"
+    - run: "scp -P 22222 ssh-gateway/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/ssh-gateway/."
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'docker-compose -f ssh-gateway/docker-compose.yml pull && docker-compose -f ssh-gateway/docker-compose.yml --env-file secrets/.env up -d'\""

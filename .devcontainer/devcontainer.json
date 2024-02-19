@@ -1,0 +1,8 @@
+{
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "updateContentCommand": "bash -c '/workspaces/${localWorkspaceFolderBasename}/scripts/codespace-setup 2>&1 | tee /workspaces/${localWorkspaceFolderBasename}/.setup-log.log'",
+  "postCreateCommand": "bash -c '/workspaces/${localWorkspaceFolderBasename}/scripts/create-dev-keys &>> /workspaces/${localWorkspaceFolderBasename}/.setup-log.log'; git pull origin main --rebase",
+  "forwardPorts": [3000]
+}

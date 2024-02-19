@@ -1,0 +1,76 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.8.2",
+    "@stitches/react": "^1.2.8",
+    "babylonjs": "^5.57.0",
+    "babylonjs-loaders": "^5.57.0",
+    "jwt-decode": "^3.1.2",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-linkify": "^1.0.0-alpha",
+    "react-popper-tooltip": "4.4.2",
+    "react-redux": "^8.0.1",
+    "react-router": "^6.3.0",
+    "react-router-dom": "^6.3.0",
+    "react-toastify": "^8.1.1",
+    "react-transition-group": "^4.4.2",
+    "redux": "^4.2.0",
+    "redux-first-history": "^5.1.1",
+    "regenerator-runtime": "^0.13.9",
+    "reselect": "^4.1.5",
+    "use-fit-text": "^2.4.0",
+    "uuid": "^8.3.2"
+  },
+  "scripts": {
+    "start": "VITE_LOCAL_AUTH=true vite --host",
+    "no-auth": "vite --host",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
+    "docs": "typedoc --plugin typedoc-plugin-markdown src/types/server_messages.ts src/types/store_types.ts --out ../docs/gen --publicPath '/gen/' && rm ../docs/gen/README.md && sed -i 's@\\[client\\](/gen/README.md)@\\[home\\](/)@' $(find ../docs/gen -type f)"
+  },
+  "eslintConfig": {
+    "extends": "react-app",
+    "rules": {
+      "import/no-anonymous-default-export": "off"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240117.0",
+    "@types/jest": "24.0.18",
+    "@types/jwt-decode": "^3.1.0",
+    "@types/node": "^20.4.2",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "^18.0.4",
+    "@types/react-linkify": "^1.0.1",
+    "@types/react-redux": "^7.1.2",
+    "@types/react-router-dom": "^4.3.5",
+    "@types/react-transition-group": "^4.4.4",
+    "@types/reselect": "^2.2.0",
+    "@types/uuid": "^8.3.1",
+    "@vitejs/plugin-react": "^4.0.3",
+    "http-proxy-middleware": "^2.0.6",
+    "prettier": "^2.8.4",
+    "typedoc": "^0.24.8",
+    "typedoc-plugin-markdown": "^3.15.3",
+    "typescript": "^4.9.5",
+    "vite": "^4.4.4",
+    "vite-aliases": "^0.11.2",
+    "vite-plugin-svgr": "^3.2.0",
+    "vite-tsconfig-paths": "^4.2.0"
+  }
+}

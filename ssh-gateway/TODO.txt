@@ -1,0 +1,7 @@
+- keyboard shortcuts for actions
+- animations
+- kick people / see disconnected
+
+LOW PRIORITY
+- handle case where "already connected" error
+- help menu at the bottom

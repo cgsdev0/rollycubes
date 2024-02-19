@@ -1,0 +1,20 @@
+.achievement {
+    display: flex;
+    align-items: center;
+}
+
+.achievement img {
+    margin-right: 12px;
+}
+
+.achievement p {
+    margin: 4px;
+}
+
+.achievement .header {
+    color: #aaa;
+}
+
+.achievement .name {
+    font-weight: bold;
+}

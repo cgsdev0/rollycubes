@@ -1,0 +1,169 @@
+.bigDiceText {
+    height: 98px;
+    width: 98px;
+    text-align: center;
+    line-height: 98px;
+    font-size: 32pt;
+    font-weight: bold;
+    border-width: 1px;
+    border-color: #ccc;
+    border-style: solid;
+    border-radius: 8px;
+    margin: 4px;
+  }
+.dice {
+    background: url(./dice.png) left top;
+    height: 106px;
+    width: 106px;
+  }
+
+  .diceBox {
+      display: flex;
+      justify-content: center;
+      flex-direction: row;
+      min-width: 160px;
+  }
+
+
+.rolled1 {
+    background-position: 0px 0px;
+}
+
+.rolled2 {
+    background-position: 525px 0px;
+}
+
+.rolled3 {
+    background-position: 420px 0px;
+}
+
+.rolled4 {
+    background-position: 315px 0px;
+}
+
+.rolled5 {
+    background-position: 210px 0px;
+}
+
+.rolled6 {
+    background-position: 105px 0px;
+}
+
+.Lrolling1 {
+    background-position: 0px 0px;
+    animation: Lroll1 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Lrolling2 {
+    background-position: 525px 0px;
+    animation: Lroll2 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Lrolling3 {
+    background-position: 420px 0px;
+    animation: Lroll3 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Lrolling4 {
+    background-position: 315px 0px;
+    animation: Lroll4 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Lrolling5 {
+    background-position: 210px 0px;
+    animation: Lroll5 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Lrolling6 {
+    background-position: 105px 0px;
+    animation: Lroll6 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Rrolling1 {
+    background-position: 0px 0px;
+    animation: Rroll1 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Rrolling2 {
+    background-position: 525px 0px;
+    animation: Rroll2 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Rrolling3 {
+    background-position: 420px 0px;
+    animation: Rroll3 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Rrolling4 {
+    background-position: 315px 0px;
+    animation: Rroll4 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Rrolling5 {
+    background-position: 210px 0px;
+    animation: Rroll5 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+.Rrolling6 {
+    background-position: 105px 0px;
+    animation: Rroll6 2s steps(6);
+    animation-timing-function: ease-out;
+}
+
+
+@keyframes Lroll1 {
+    100% { background-position: 0px -2520px; }
+ }
+ @keyframes Lroll2 {
+    100% { background-position: 525px -2520px; }
+ }
+
+ @keyframes Lroll3 {
+    100% { background-position: 420px -2520px; }
+ }
+
+ @keyframes Lroll4 {
+    100% { background-position: 315px -2520px; }
+ }
+
+ @keyframes Lroll5 {
+    100% { background-position: 210px -2520px; }
+ }
+
+ @keyframes Lroll6 {
+    100% { background-position: 105px -2520px; }
+ }
+
+ @keyframes Rroll1 {
+    100% { background-position: 0px 2520px; }
+ }
+ @keyframes Rroll2 {
+    100% { background-position: 525px 2520px; }
+ }
+
+ @keyframes Rroll3 {
+    100% { background-position: 420px 2520px; }
+ }
+
+ @keyframes Rroll4 {
+    100% { background-position: 315px 2520px; }
+ }
+
+ @keyframes Rroll5 {
+    100% { background-position: 210px 2520px; }
+ }
+
+ @keyframes Rroll6 {
+    100% { background-position: 105px 2520px; }
+ }

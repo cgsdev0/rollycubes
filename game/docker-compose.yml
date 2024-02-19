@@ -1,0 +1,23 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  game-server:
+    restart: always
+    hostname: "game-server-${CHANNEL}"
+    image: "ghcr.io/cgsdev0/rollycubes:${CHANNEL}"
+    volumes:
+      - ../../secrets:/secrets
+      - data:/data
+    environment:
+      - CHANNEL
+    external_links:
+      - "auth:auth"
+      - "random:random"
+networks:
+  default:
+    name: rollycubes
+    external: true
+
+volumes:
+  data:
+    name: ${CHANNEL}gamedata
+    external: true

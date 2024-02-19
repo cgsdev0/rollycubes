@@ -1,0 +1,48 @@
+name: Deploy Random
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}-random
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Log in to the Container registry
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      with:
+        context: random
+        push: true
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+    # Deploy it
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.DO_SSH_KEY }}
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - name: copy the random server
+      run: "scp -P 22222 random/docker-compose.yml root@${{ secrets.DO_SERVER_IP }}:/root/random"
+    - name: start the new server
+      run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'docker-compose -f random/docker-compose.yml pull && docker-compose -f random/docker-compose.yml up -d'\""

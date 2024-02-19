@@ -1,0 +1,42 @@
+server {
+	server_name auth.rollycubes.live;
+
+        error_page   504  @error_page;
+        error_page   502  @error_page;
+
+        location     @error_page {
+            root /var/www/stream;
+            add_header Cache-Control no-cache;
+            try_files /offline.html /offline.html;
+        }
+
+	location / {
+            proxy_set_header Host $host;
+            proxy_pass http://vpn.cgs.dev:3031;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "Upgrade";
+            proxy_redirect off;
+            proxy_connect_timeout   1;
+            proxy_read_timeout      240;
+            proxy_intercept_errors  on;
+	}
+
+    listen 443 ssl; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    ssl_certificate /etc/letsencrypt/live/auth.rollycubes.live/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/auth.rollycubes.live/privkey.pem; # managed by Certbot
+}
+
+server {
+    if ($host = auth.rollycubes.live) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen [::]:80;
+    listen 80;
+    server_name auth.rollycubes.live;
+    return 404; # managed by Certbot
+}

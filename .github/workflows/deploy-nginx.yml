@@ -1,0 +1,24 @@
+name: Deploy Nginx
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.DO_SSH_KEY }}
+        known_hosts: ${{ secrets.DO_KNOWN_HOSTS }}
+
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} bash -c \"'rm -rf /root/nginx; mkdir -p /root/nginx'\""
+    - run: "scp -P 22222 -r nginx/* root@${{ secrets.DO_SERVER_IP }}:/root/nginx/."
+    - run: "ssh -p 22222 root@${{ secrets.DO_SERVER_IP }} docker-compose -f nginx/docker-compose.yml up -d"

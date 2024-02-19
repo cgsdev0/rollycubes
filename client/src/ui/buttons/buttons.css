@@ -1,0 +1,82 @@
+button {
+  flex-basis: 100%;
+  background-color: lightgray;
+  border: 0;
+  margin: 0px 5px;
+  border-radius: 8px;
+  font-family: 'Montserrat';
+  font-size: 20px;
+  font-weight: bold;
+}
+
+button:focus {
+  outline: 0;
+}
+
+.buttonColumn {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  flex-grow: 1;
+  align-content: stretch;
+  flex-basis: 100%;
+}
+
+.topButton {
+  min-height: 40px;
+  max-height: 40px;
+  z-index: 40;
+}
+
+button.Add {
+  background-color: #007bff !important;
+  color: white;
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+button.Subtract {
+  background-color: #6c757d !important;
+  color: white;
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+button.Reset {
+  background-color: #dc3545 !important;
+  color: white;
+}
+
+button.Victory {
+  background-color: #ffc107 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+button.Victory::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background: white;
+  opacity: 0.3;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, white, white 70%, transparent 20px);
+  transform-origin: left bottom;
+  animation: shine 2s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% {
+    transform: skewX(-45deg) translateX(-150%);
+  }
+  80% {
+    transform: skewX(-45deg) translateX(150%);
+  }
+  100% {
+    transform: skewX(-45deg) translateX(150%);
+  }
+}

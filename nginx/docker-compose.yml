@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
+    env_file:
+      - ./nginx-certbot.env
+    environment:
+      CERTBOT_EMAIL: rollycubes@cgs.dev
+    ports:
+      - 80:80
+      - 443:443
+    external_links:
+      - "auth:auth"
+      - "game-server-prod:game-server-prod"
+      - "game-server-beta:game-server-beta"
+    volumes:
+      - nginx_secrets:/etc/letsencrypt
+      - ./config:/etc/nginx/user_conf.d
+      - ../client/beta:/var/www/client/beta
+      - ../client/prod:/var/www/client/prod
+
+volumes:
+  nginx_secrets:
+networks:
+  default:
+    name: rollycubes
+    external: true

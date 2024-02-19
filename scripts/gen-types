@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+cd "${0%/*}/.."
+
+mkdir -p game/src/api
+mkdir -p ssh-gateway/api
+rm game/src/api/*
+rm ssh-gateway/api/generated.go
+
+./node_modules/.bin/quicktype \
+  -o game/src/api/API.hpp \
+  --code-format with-struct \
+  --no-boost \
+  --source-style multi-source \
+  --lang c++ \
+  --hide-null-optional \
+  --namespace API \
+  --src-lang schema "./schema.json#/definitions/"
+
+./node_modules/.bin/quicktype \
+  -o ssh-gateway/api/generated.go \
+  --lang golang \
+  --src-lang schema "./schema.json#/definitions/"
+
+# it turns out quicktype is not good at most things
+./node_modules/.bin/json2ts schema.json --unreachableDefinitions -o client/src/types/api.ts
+
+# avert your eyes, this next part is a crime
+
+pushd game/src/api &> /dev/null
+
+# remove refs to json and helper; we want these contained to the .cpp file
+find . -type f \
+  | grep -v Generators.hpp \
+  | grep -v helper.hpp \
+  | xargs -L1 sed -i -E '/json|helper.hpp|^\/\//d'
+
+# delete the pragma once in Generators.hpp
+sed -i -E '/pragma|^\/\//d' Generators.hpp
+
+# HACK: auto initialize type fields
+find . -type f \
+  | xargs -L1 basename \
+  | cut -d'.' -f1 \
+  | xargs -I {} sed -i 's/{}Type type;/{}Type type = static_cast<{}Type>(0);/g' {}.hpp
+
+mv Generators.hpp API.cpp
+
+# Replace all of the imports
+sed -i '/#include/d' API.cpp
+sed -i '1s/^/#include "API.hpp"\n/' API.cpp
+sed -i '1s/^/#include "helper.hpp"\n/' API.cpp
+sed -i '1s/^/#include "json.hpp"\n/' API.cpp
+sed -i '1s/^/#include <optional>\n/' API.cpp
+
+# Add our interface to all structs
+grep "struct.*{" * -l \
+  | grep -vE 'helper\.hpp|API\.cpp' \
+  | xargs sed -i '/struct.*{/a std::string toString() const;\nvoid fromString(const std::string &str);'
+
+structs=$(grep "struct.*{" * \
+  | grep -v "adl_serializer" \
+  | grep -v "^helper.hpp" \
+  | cut -d':' -f2 \
+  | sed 's/.*struct \(.*\) {/\1/')
+
+echo "namespace API {" >> API.cpp
+for struct in $structs; do
+  echo "std::string $struct::toString() const {" >> API.cpp
+  echo "json j;" >> API.cpp
+  echo "to_json(j, *this);" >> API.cpp
+  echo "return j.dump();" >> API.cpp
+  echo "}" >> API.cpp
+  echo "void $struct::fromString(const std::string &s) {" >> API.cpp
+  echo "auto j = json::parse(s);" >> API.cpp
+  echo "from_json(j, *this);" >> API.cpp
+  echo "}" >> API.cpp
+done
+echo "}" >> API.cpp
+
+sed -i '1s/^/#include <vector>\n/' API.hpp
+sed -i '1s/^/#include <memory>\n/' API.hpp
+
+popd &> /dev/null
+
+
+pushd client/src/types &> /dev/null
+sed -i '/^ \* This interface was referenced by /d' api.ts
+sed -i '/^ \* via the `definition` /d' api.ts
+# quick and easy sed loop mechanism
+sed -i ':a;N;$!ba;s/\/\*\*\n \*\///g' api.ts
+
+
+popd &> /dev/null
+
+pushd ssh-gateway/api &> /dev/null
+sed -i 's/package main/package api/' generated.go

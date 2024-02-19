@@ -1,0 +1,18 @@
+version: '3'
+services:
+  ssh-gateway:
+    image: ghcr.io/cgsdev0/rollycubes-ssh-gateway
+    restart: always
+    environment:
+      - PROD_WS_URL=ws://game-server-prod:3001
+    volumes:
+      - ../secrets/:/go/secrets
+    ports:
+      - "22:3022"
+    external_links:
+      - "game-server-prod:game-server-prod"
+
+networks:
+  default:
+    name: rollycubes
+    external: true

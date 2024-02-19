@@ -1,0 +1,8 @@
+---
+AllowShortIfStatementsOnASingleLine: 'true'
+ColumnLimit: '0'
+IndentCaseLabels: 'false'
+IndentWidth: '4'
+NamespaceIndentation: All
+
+...

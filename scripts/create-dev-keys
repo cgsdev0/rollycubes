@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+cd "${0%/*}/.."
+
+PRESHARED_KEY=$(head -c 48 /dev/urandom | base64)
+
+mkdir -p auth/secrets
+mkdir -p game/secrets
+
+echo "$PRESHARED_KEY" > .pre-shared-key
+echo "$PRESHARED_KEY" > auth/secrets/.pre-shared-key
+echo "$PRESHARED_KEY" > game/secrets/.pre-shared-key
+
+if [[ ! -f auth/secrets/.id ]]; then
+    ssh-keygen -f auth/secrets/.id -N '' -m PEM -t rsa -b 4096
+
+    cd auth/secrets
+    openssl rsa -in .id -pubout -outform PEM -out .id.pub
+fi

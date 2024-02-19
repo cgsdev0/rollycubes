@@ -1,0 +1,10 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  game-server:
+    restart: always
+    hostname: "random"
+    image: "ghcr.io/cgsdev0/rollycubes-random"
+networks:
+  default:
+    name: rollycubes
+    external: true
