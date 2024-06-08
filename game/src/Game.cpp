@@ -730,6 +730,7 @@ void Game::update(HANDLER_ARGS) {
                     update["score"] = 0;
                     update["reset"] = true;
                     broadcast(update.dump());
+                    RichTextStream stream;
                     stream << RT::italic
                                << state.players[state.turn_index]
                                << " reset "
