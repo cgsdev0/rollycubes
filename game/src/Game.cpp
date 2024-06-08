@@ -730,6 +730,17 @@ void Game::update(HANDLER_ARGS) {
                     update["score"] = 0;
                     update["reset"] = true;
                     broadcast(update.dump());
+                    stream << RT::italic
+                               << state.players[state.turn_index]
+                               << " reset "
+                               << state.players[i]
+                               << " to "
+                               << RT::color("red")
+                               << "zero"
+                               << RT::reset
+                               << RT::italic
+                               << "!";
+                    broadcast(log_rich_chat(stream));
                     break;
                 }
             }
