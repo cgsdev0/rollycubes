@@ -336,7 +336,21 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
     .split(' ');
   join_date.shift();
 
-  const unlocked = props.data?.achievements?.filter((ach) => ach.unlocked);
+  const filtered = props.data?.achievements?.filter((ach) => ach.unlocked);
+
+  // De-dupe overlapping achievements by key
+  const mapping: Record<string, { data: Achievement; idx: number }> = {};
+  filtered?.forEach((ach) => {
+    const [key, sidx] = ach.id.split(':');
+    const idx = Number.parseInt(sidx);
+    if (mapping.hasOwnProperty(key)) {
+      if (mapping[key].idx > idx) return;
+    }
+    mapping[key] = { data: ach, idx };
+  });
+
+  const unlocked = Object.values(mapping).map((m) => m.data);
+
   let placeholders = 6 - ((unlocked?.length || 6) % 6);
   if (placeholders === 6 && unlocked?.length) {
     placeholders = 0;
