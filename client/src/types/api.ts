@@ -202,6 +202,7 @@ export interface UserData {
   created_date: string;
   dice: Dice;
   donor: boolean;
+  badges: string[];
   id: string;
   image_url?: null | string;
   pubkey_text?: null | string;

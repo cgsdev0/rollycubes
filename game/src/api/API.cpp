@@ -458,6 +458,7 @@ namespace API {
 
     inline void from_json(const json & j, UserData& x) {
         x.achievements = get_stack_optional<std::vector<Achievement>>(j, "achievements");
+        x.badges = j.at("badges").get<std::vector<std::string>>();
         x.color = j.at("color").get<Color>();
         x.created_date = j.at("created_date").get<std::string>();
         x.dice = j.at("dice").get<Dice>();
@@ -474,6 +475,7 @@ namespace API {
         if (x.achievements) {
             j["achievements"] = x.achievements;
         }
+        j["badges"] = x.badges;
         j["color"] = x.color;
         j["created_date"] = x.created_date;
         j["dice"] = x.dice;

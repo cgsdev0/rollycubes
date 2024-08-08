@@ -18,6 +18,7 @@ namespace API {
 std::string toString() const;
 void fromString(const std::string &str);
         std::optional<std::vector<Achievement>> achievements;
+        std::vector<std::string> badges;
         Color color;
         std::string created_date;
         Dice dice;

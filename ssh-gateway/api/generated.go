@@ -610,6 +610,7 @@ type Room struct {
 
 type UserData struct {
 	Achievements []Achievement `json:"achievements"`
+	Badges       []string      `json:"badges"`
 	Color        Color         `json:"color"`
 	CreatedDate  string        `json:"created_date"`
 	Dice         Dice          `json:"dice"`

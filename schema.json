@@ -3,23 +3,57 @@
     "ServerMsg": {
       "type": "object",
       "oneOf": [
-        { "$ref": "#/definitions/RoomListMsg" },
-        { "$ref": "#/definitions/RefetchPlayerMsg" },
-        { "$ref": "#/definitions/WelcomeMsg" },
-        { "$ref": "#/definitions/RestartMsg" },
-        { "$ref": "#/definitions/SpectatorsMsg" },
-        { "$ref": "#/definitions/WinMsg" },
-        { "$ref": "#/definitions/RollMsg" },
-        { "$ref": "#/definitions/RollAgainMsg" },
-        { "$ref": "#/definitions/JoinMsg" },
-        { "$ref": "#/definitions/DisconnectMsg" },
-        { "$ref": "#/definitions/ReconnectMsg" },
-        { "$ref": "#/definitions/KickMsg" },
-        { "$ref": "#/definitions/ChatMsg" },
-        { "$ref": "#/definitions/RichTextMsg" },
-        { "$ref": "#/definitions/UpdateTurnMsg" },
-        { "$ref": "#/definitions/UpdateNameMsg" },
-        { "$ref": "#/definitions/UpdateMsg" }
+        {
+          "$ref": "#/definitions/RoomListMsg"
+        },
+        {
+          "$ref": "#/definitions/RefetchPlayerMsg"
+        },
+        {
+          "$ref": "#/definitions/WelcomeMsg"
+        },
+        {
+          "$ref": "#/definitions/RestartMsg"
+        },
+        {
+          "$ref": "#/definitions/SpectatorsMsg"
+        },
+        {
+          "$ref": "#/definitions/WinMsg"
+        },
+        {
+          "$ref": "#/definitions/RollMsg"
+        },
+        {
+          "$ref": "#/definitions/RollAgainMsg"
+        },
+        {
+          "$ref": "#/definitions/JoinMsg"
+        },
+        {
+          "$ref": "#/definitions/DisconnectMsg"
+        },
+        {
+          "$ref": "#/definitions/ReconnectMsg"
+        },
+        {
+          "$ref": "#/definitions/KickMsg"
+        },
+        {
+          "$ref": "#/definitions/ChatMsg"
+        },
+        {
+          "$ref": "#/definitions/RichTextMsg"
+        },
+        {
+          "$ref": "#/definitions/UpdateTurnMsg"
+        },
+        {
+          "$ref": "#/definitions/UpdateNameMsg"
+        },
+        {
+          "$ref": "#/definitions/UpdateMsg"
+        }
       ]
     },
     "Dice": {
@@ -30,7 +64,9 @@
         }
       },
       "additionalProperties": false,
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "Color": {
       "type": "object",
@@ -43,7 +79,10 @@
         }
       },
       "additionalProperties": false,
-      "required": ["hue", "sat"]
+      "required": [
+        "hue",
+        "sat"
+      ]
     },
     "UserData": {
       "type": "object",
@@ -74,14 +113,26 @@
         "donor": {
           "type": "boolean"
         },
+        "badges": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "id": {
           "type": "string"
         },
         "image_url": {
-          "type": ["null", "string"]
+          "type": [
+            "null",
+            "string"
+          ]
         },
         "pubkey_text": {
-          "type": ["null", "string"]
+          "type": [
+            "null",
+            "string"
+          ]
         },
         "stats": {
           "anyOf": [
@@ -98,7 +149,15 @@
         }
       },
       "additionalProperties": false,
-      "required": ["color", "created_date", "dice", "donor", "id", "username"]
+      "required": [
+        "color",
+        "created_date",
+        "dice",
+        "donor",
+        "id",
+        "username",
+        "badges"
+      ]
     },
     "AuthRefreshTokenResponse": {
       "type": "object",
@@ -108,7 +167,9 @@
           "type": "string"
         }
       },
-      "required": ["access_token"]
+      "required": [
+        "access_token"
+      ]
     },
     "AuthDonateResponse": {
       "type": "object",
@@ -118,7 +179,9 @@
           "type": "string"
         }
       },
-      "required": ["link"]
+      "required": [
+        "link"
+      ]
     },
     "LoginRequest": {
       "type": "object",
@@ -137,7 +200,11 @@
           "type": "string"
         }
       },
-      "required": ["code", "redirect_uri", "state"]
+      "required": [
+        "code",
+        "redirect_uri",
+        "state"
+      ]
     },
     "AuthSettingsRequest": {
       "oneOf": [
@@ -148,13 +215,18 @@
             "setting": {
               "type": "string",
               "default": "Color",
-              "enum": ["Color"]
+              "enum": [
+                "Color"
+              ]
             },
             "color": {
               "$ref": "#/definitions/Color"
             }
           },
-          "required": ["setting", "color"]
+          "required": [
+            "setting",
+            "color"
+          ]
         },
         {
           "type": "object",
@@ -163,13 +235,18 @@
             "setting": {
               "type": "string",
               "default": "DiceType",
-              "enum": ["DiceType"]
+              "enum": [
+                "DiceType"
+              ]
             },
             "dice_type": {
               "$ref": "#/definitions/DiceType"
             }
           },
-          "required": ["setting", "dice_type"]
+          "required": [
+            "setting",
+            "dice_type"
+          ]
         },
         {
           "type": "object",
@@ -178,13 +255,18 @@
             "setting": {
               "type": "string",
               "default": "Pubkey",
-              "enum": ["Pubkey"]
+              "enum": [
+                "Pubkey"
+              ]
             },
             "text": {
               "type": "string"
             }
           },
-          "required": ["setting", "text"]
+          "required": [
+            "setting",
+            "text"
+          ]
         }
       ]
     },
@@ -215,7 +297,12 @@
         }
       },
       "additionalProperties": false,
-      "required": ["connected", "score", "skip_count", "win_count"]
+      "required": [
+        "connected",
+        "score",
+        "skip_count",
+        "win_count"
+      ]
     },
     "UserId": {
       "anyOf": [
@@ -225,7 +312,9 @@
             "type": {
               "type": "string",
               "default": "User",
-              "enum": ["User"]
+              "enum": [
+                "User"
+              ]
             },
             "id": {
               "type": "string",
@@ -233,7 +322,10 @@
             }
           },
           "additionalProperties": false,
-          "required": ["id", "type"]
+          "required": [
+            "id",
+            "type"
+          ]
         },
         {
           "type": "object",
@@ -241,14 +333,19 @@
             "type": {
               "type": "string",
               "default": "Anonymous",
-              "enum": ["Anonymous"]
+              "enum": [
+                "Anonymous"
+              ]
             },
             "id": {
               "type": "string"
             }
           },
           "additionalProperties": false,
-          "required": ["id", "type"]
+          "required": [
+            "id",
+            "type"
+          ]
         }
       ]
     },
@@ -270,7 +367,9 @@
         "type": {
           "type": "string",
           "default": "achievement_progress",
-          "enum": ["achievement_progress"]
+          "enum": [
+            "achievement_progress"
+          ]
         }
       },
       "additionalProperties": false,
@@ -289,7 +388,10 @@
           "type": "string"
         },
         "image_url": {
-          "type": ["null", "string"]
+          "type": [
+            "null",
+            "string"
+          ]
         },
         "name": {
           "type": "string"
@@ -310,7 +412,9 @@
         "type": {
           "type": "string",
           "default": "achievement_unlock",
-          "enum": ["achievement_unlock"]
+          "enum": [
+            "achievement_unlock"
+          ]
         }
       },
       "additionalProperties": false,
@@ -503,14 +607,26 @@
           "type": "string"
         },
         "rn": {
-          "type": ["null", "integer"]
+          "type": [
+            "null",
+            "integer"
+          ]
         },
         "rd": {
-          "type": ["null", "integer"]
+          "type": [
+            "null",
+            "integer"
+          ]
         }
       },
       "additionalProperties": false,
-      "required": ["id", "progress", "rd", "rn", "unlocked"]
+      "required": [
+        "id",
+        "progress",
+        "rd",
+        "rn",
+        "unlocked"
+      ]
     },
     "AchievementData": {
       "type": "object",
@@ -519,7 +635,10 @@
           "type": "string"
         },
         "image_url": {
-          "type": ["null", "string"]
+          "type": [
+            "null",
+            "string"
+          ]
         },
         "id": {
           "type": "string"
@@ -535,10 +654,22 @@
         }
       },
       "additionalProperties": false,
-      "required": ["description", "id", "image_url", "max_progress", "name"]
+      "required": [
+        "description",
+        "id",
+        "image_url",
+        "max_progress",
+        "name"
+      ]
     },
     "DiceType": {
-      "enum": ["Default", "D20", "Golden", "Hands", "Jumbo"]
+      "enum": [
+        "Default",
+        "D20",
+        "Golden",
+        "Hands",
+        "Jumbo"
+      ]
     },
     "DieRoll": {
       "type": "object",
@@ -551,7 +682,10 @@
         }
       },
       "additionalProperties": false,
-      "required": ["used", "value"]
+      "required": [
+        "used",
+        "value"
+      ]
     },
     "GameError": {
       "type": "object",
@@ -559,14 +693,19 @@
         "type": {
           "type": "string",
           "default": "error",
-          "enum": ["error"]
+          "enum": [
+            "error"
+          ]
         },
         "error": {
           "type": "string"
         }
       },
       "additionalProperties": false,
-      "required": ["error", "type"]
+      "required": [
+        "error",
+        "type"
+      ]
     },
     "Redirect": {
       "type": "object",
@@ -574,14 +713,19 @@
         "type": {
           "type": "string",
           "default": "redirect",
-          "enum": ["redirect"]
+          "enum": [
+            "redirect"
+          ]
         },
         "room": {
           "type": "string"
         }
       },
       "additionalProperties": false,
-      "required": ["room", "type"]
+      "required": [
+        "room",
+        "type"
+      ]
     },
     "Room": {
       "type": "object",
@@ -601,7 +745,12 @@
         }
       },
       "additionalProperties": false,
-      "required": ["code", "host_name", "last_updated", "player_count"]
+      "required": [
+        "code",
+        "host_name",
+        "last_updated",
+        "player_count"
+      ]
     },
     "IGameState": {
       "type": "object",
@@ -614,7 +763,9 @@
         },
         "richChatLog": {
           "type": "array",
-          "items": { "$ref": "#/definitions/RichTextMsg" }
+          "items": {
+            "$ref": "#/definitions/RichTextMsg"
+          }
         },
         "chatLog": {
           "type": "array",
@@ -670,7 +821,9 @@
         "type": {
           "type": "string",
           "default": "game_state",
-          "enum": ["game_state"]
+          "enum": [
+            "game_state"
+          ]
         },
         "players": {
           "type": "array",
@@ -680,7 +833,9 @@
         },
         "richChatLog": {
           "type": "array",
-          "items": { "$ref": "#/definitions/RichTextMsg" }
+          "items": {
+            "$ref": "#/definitions/RichTextMsg"
+          }
         },
         "chatLog": {
           "type": "array",
@@ -737,7 +892,9 @@
         "type": {
           "type": "string",
           "default": "room_list",
-          "enum": ["room_list"]
+          "enum": [
+            "room_list"
+          ]
         },
         "rooms": {
           "type": "array",
@@ -747,7 +904,9 @@
         }
       },
       "additionalProperties": false,
-      "required": ["rooms"]
+      "required": [
+        "rooms"
+      ]
     },
     "RefetchPlayerMsg": {
       "type": "object",
@@ -755,14 +914,19 @@
         "type": {
           "type": "string",
           "default": "refetch_player",
-          "enum": ["refetch_player"]
+          "enum": [
+            "refetch_player"
+          ]
         },
         "user_id": {
           "type": "string"
         }
       },
       "additionalProperties": false,
-      "required": ["type", "user_id"]
+      "required": [
+        "type",
+        "user_id"
+      ]
     },
     "WelcomeMsg": {
       "type": "object",
@@ -770,7 +934,9 @@
         "type": {
           "type": "string",
           "default": "welcome",
-          "enum": ["welcome"]
+          "enum": [
+            "welcome"
+          ]
         },
         "id": {
           "type": "integer"
@@ -783,7 +949,9 @@
         },
         "richChatLog": {
           "type": "array",
-          "items": { "$ref": "#/definitions/RichTextMsg" }
+          "items": {
+            "$ref": "#/definitions/RichTextMsg"
+          }
         },
         "chatLog": {
           "type": "array",
@@ -841,14 +1009,19 @@
         "type": {
           "type": "string",
           "default": "restart",
-          "enum": ["restart"]
+          "enum": [
+            "restart"
+          ]
         },
         "id": {
           "type": "integer"
         }
       },
       "additionalProperties": false,
-      "required": ["id", "type"]
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "SpectatorsMsg": {
       "type": "object",
@@ -856,14 +1029,19 @@
         "type": {
           "type": "string",
           "default": "spectators",
-          "enum": ["spectators"]
+          "enum": [
+            "spectators"
+          ]
         },
         "count": {
           "type": "integer"
         }
       },
       "additionalProperties": false,
-      "required": ["count", "type"]
+      "required": [
+        "count",
+        "type"
+      ]
     },
     "WinMsg": {
       "type": "object",
@@ -871,14 +1049,19 @@
         "type": {
           "type": "string",
           "default": "win",
-          "enum": ["win"]
+          "enum": [
+            "win"
+          ]
         },
         "id": {
           "type": "integer"
         }
       },
       "additionalProperties": false,
-      "required": ["id", "type"]
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "RollMsg": {
       "type": "object",
@@ -886,7 +1069,9 @@
         "type": {
           "type": "string",
           "default": "roll",
-          "enum": ["roll"]
+          "enum": [
+            "roll"
+          ]
         },
         "rolls": {
           "type": "array",
@@ -896,7 +1081,10 @@
         }
       },
       "additionalProperties": false,
-      "required": ["rolls", "type"]
+      "required": [
+        "rolls",
+        "type"
+      ]
     },
     "RollAgainMsg": {
       "type": "object",
@@ -904,11 +1092,15 @@
         "type": {
           "type": "string",
           "default": "roll_again",
-          "enum": ["roll_again"]
+          "enum": [
+            "roll_again"
+          ]
         }
       },
       "additionalProperties": false,
-      "required": ["type"]
+      "required": [
+        "type"
+      ]
     },
     "JoinMsg": {
       "type": "object",
@@ -916,7 +1108,9 @@
         "type": {
           "type": "string",
           "default": "join",
-          "enum": ["join"]
+          "enum": [
+            "join"
+          ]
         },
         "id": {
           "type": "integer"
@@ -929,7 +1123,10 @@
         }
       },
       "additionalProperties": false,
-      "required": ["id", "type"]
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "DisconnectMsg": {
       "type": "object",
@@ -937,14 +1134,19 @@
         "type": {
           "type": "string",
           "default": "disconnect",
-          "enum": ["disconnect"]
+          "enum": [
+            "disconnect"
+          ]
         },
         "id": {
           "type": "integer"
         }
       },
       "additionalProperties": false,
-      "required": ["id", "type"]
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "ReconnectMsg": {
       "type": "object",
@@ -952,7 +1154,9 @@
         "type": {
           "type": "string",
           "default": "reconnect",
-          "enum": ["reconnect"]
+          "enum": [
+            "reconnect"
+          ]
         },
         "id": {
           "type": "integer"
@@ -965,7 +1169,10 @@
         }
       },
       "additionalProperties": false,
-      "required": ["id", "type"]
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "KickMsg": {
       "type": "object",
@@ -973,14 +1180,19 @@
         "type": {
           "type": "string",
           "default": "kick",
-          "enum": ["kick"]
+          "enum": [
+            "kick"
+          ]
         },
         "id": {
           "type": "integer"
         }
       },
       "additionalProperties": false,
-      "required": ["id", "type"]
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "RichTextChunk": {
       "type": "object",
@@ -988,7 +1200,10 @@
         "type": {
           "type": "string",
           "default": "rt_text",
-          "enum": ["rt_text", "rt_username"]
+          "enum": [
+            "rt_text",
+            "rt_username"
+          ]
         },
         "text": {
           "type": "string"
@@ -1002,18 +1217,30 @@
         },
         "alignment": {
           "type": "string",
-          "enum": ["left", "right", "center"]
+          "enum": [
+            "left",
+            "right",
+            "center"
+          ]
         },
         "modifiers": {
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["bold", "italic", "underline", "strikethrough"]
+            "enum": [
+              "bold",
+              "italic",
+              "underline",
+              "strikethrough"
+            ]
           }
         }
       },
       "additionalProperties": false,
-      "required": ["text", "type"]
+      "required": [
+        "text",
+        "type"
+      ]
     },
     "RichTextMsg": {
       "type": "object",
@@ -1021,20 +1248,29 @@
         "type": {
           "type": "string",
           "default": "chat_v2",
-          "enum": ["chat_v2"]
+          "enum": [
+            "chat_v2"
+          ]
         },
         "msg": {
           "type": "array",
           "items": {
             "oneOf": [
-              { "type": "string" },
-              { "$ref": "#/definitions/RichTextChunk" }
+              {
+                "type": "string"
+              },
+              {
+                "$ref": "#/definitions/RichTextChunk"
+              }
             ]
           }
         }
       },
       "additionalProperties": false,
-      "required": ["msg", "type"]
+      "required": [
+        "msg",
+        "type"
+      ]
     },
     "ChatMsg": {
       "type": "object",
@@ -1042,14 +1278,19 @@
         "type": {
           "type": "string",
           "default": "chat",
-          "enum": ["chat"]
+          "enum": [
+            "chat"
+          ]
         },
         "msg": {
           "type": "string"
         }
       },
       "additionalProperties": false,
-      "required": ["msg", "type"]
+      "required": [
+        "msg",
+        "type"
+      ]
     },
     "UpdateTurnMsg": {
       "type": "object",
@@ -1057,7 +1298,9 @@
         "type": {
           "type": "string",
           "default": "update_turn",
-          "enum": ["update_turn"]
+          "enum": [
+            "update_turn"
+          ]
         },
         "id": {
           "type": "integer"
@@ -1067,7 +1310,10 @@
         }
       },
       "additionalProperties": false,
-      "required": ["id", "type"]
+      "required": [
+        "id",
+        "type"
+      ]
     },
     "UpdateNameMsg": {
       "type": "object",
@@ -1075,7 +1321,9 @@
         "type": {
           "type": "string",
           "default": "update_name",
-          "enum": ["update_name"]
+          "enum": [
+            "update_name"
+          ]
         },
         "name": {
           "type": "string"
@@ -1085,7 +1333,11 @@
         }
       },
       "additionalProperties": false,
-      "required": ["id", "name", "type"]
+      "required": [
+        "id",
+        "name",
+        "type"
+      ]
     },
     "UpdateMsg": {
       "description": "TODO: add descriptions to these things",
@@ -1094,7 +1346,9 @@
         "type": {
           "type": "string",
           "default": "update",
-          "enum": ["update"]
+          "enum": [
+            "update"
+          ]
         },
         "id": {
           "type": "integer"
@@ -1113,7 +1367,11 @@
         }
       },
       "additionalProperties": false,
-      "required": ["id", "score", "type"]
+      "required": [
+        "id",
+        "score",
+        "type"
+      ]
     }
   }
 }
