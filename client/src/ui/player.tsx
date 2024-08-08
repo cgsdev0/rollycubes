@@ -112,12 +112,21 @@ const StyledTooltip = styled('div', {
     fontSize: 32,
     display: 'flex',
     alignItems: 'center',
-    'p:last-child': {
+    'p:nth-child(2)': {
       fontSize: 14,
       fontWeight: 'normal',
     },
   },
 });
+
+const BadgeRow = styled('div', {
+  lineHeight: 0,
+  height: 20,
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+});
+
 const playerName = css({
   textWrap: 'nowrap',
   overflow: 'hidden',
@@ -272,7 +281,10 @@ const BarWrapper = styled('div', {
   width: '100%',
   display: 'flex',
 });
-const HistogramTooltip = styled('div', {});
+const HistogramTooltip = styled('div', {
+  lineHeight: 'initial',
+  fontSize: 16,
+});
 const Bar = ({
   percent,
   max,
@@ -319,6 +331,38 @@ const Bar = ({
   );
 };
 
+const BadgeImg = (props: { id: string }) => {
+  const [tooltipVisible, setTooltipVisible] = React.useState(false);
+  const { getTooltipProps, setTooltipRef, setTriggerRef } = usePopperTooltip({
+    visible: tooltipVisible,
+    onVisibleChange: setTooltipVisible,
+  });
+  const badges = useSelector((state: ReduxState) => state.auth.badges) || {};
+  const badge = badges[props.id];
+  return (
+    <>
+      {tooltipVisible ? (
+        <AchievementTooltip
+          ref={setTooltipRef}
+          {...getTooltipProps({ className: 'tooltip-container' })}
+        >
+          <HistogramTooltip>
+            <header>{badge?.name}</header>
+            <p>{badge?.description}</p>
+          </HistogramTooltip>
+        </AchievementTooltip>
+      ) : null}
+      <BImg
+        ref={setTriggerRef}
+        width={16}
+        height={16}
+        src={badge?.image_url}
+        alt={badge?.description}
+      />
+    </>
+  );
+};
+
 const TooltipContents = (props: Props & { data?: UserData }) => {
   const { n, player, data } = props;
   const imageUrl = data?.image_url;
@@ -338,6 +382,7 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
 
   const filtered = props.data?.achievements?.filter((ach) => ach.unlocked);
 
+  const badges = props.data?.badges;
   // De-dupe overlapping achievements by key
   const mapping: Record<string, { data: Achievement; idx: number }> = {};
   filtered?.forEach((ach) => {
@@ -377,6 +422,11 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
               {player.name || `User${n + 1}`}
             </p>
             <p>Player since {join_date.join(' ')}</p>
+            <BadgeRow>
+              {badges?.map((b) => (
+                <BadgeImg id={b} />
+              ))}
+            </BadgeRow>
           </div>
         </h1>
         <CardBody>
@@ -477,6 +527,9 @@ const AImg = styled('img', {
   imageRendering: 'pixelated',
   borderRadius: 4,
   border: '1px solid black',
+});
+const BImg = styled('img', {
+  imageRendering: 'pixelated',
 });
 
 const AchievementPlaceholder = styled('div', {

@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { AchievementList } from 'api/auth';
+import { AchievementList, BadgeList } from 'api/auth';
 import decode from 'jwt-decode';
 
 interface TokenUserData {
@@ -12,6 +12,7 @@ export interface AuthState {
   authToken?: string | null;
   userData?: TokenUserData;
   achievements?: AchievementList;
+  badges?: BadgeList;
 }
 
 export interface AuthenticateAction {
@@ -24,10 +25,18 @@ export interface GotAchievementsAction {
   achievements: AchievementList;
 }
 
+export interface GotBadgesAction {
+  type: 'GOT_BADGES';
+  badges: BadgeList;
+}
+
 export const authReducer = createReducer<AuthState>({}, (builder) => {
   builder
     .addCase('GOT_ACHIEVEMENTS', (state, action: GotAchievementsAction) => {
       state.achievements = action.achievements;
+    })
+    .addCase('GOT_BADGES', (state, action: GotBadgesAction) => {
+      state.badges = action.badges;
     })
     .addCase('AUTHENTICATE', (state, action: AuthenticateAction) => {
       try {

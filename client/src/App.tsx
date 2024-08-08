@@ -1,6 +1,7 @@
 import { useWindowSize } from 'hooks/window_size';
 import { GenericErrorPage } from 'pages/tab_error_page';
 import { AchievementProvider } from 'providers/achievements';
+import { BadgeProvider } from 'providers/badges';
 import { AuthProvider } from 'providers/auth';
 import { StrictMode } from 'react';
 import { Provider, useSelector } from 'react-redux';
@@ -195,9 +196,11 @@ const AppInner = () => {
       <div className={theme}>
         <AuthProvider>
           <AchievementProvider>
-            <Router history={history}>
-              <Routed />
-            </Router>
+            <BadgeProvider>
+              <Router history={history}>
+                <Routed />
+              </Router>
+            </BadgeProvider>
           </AchievementProvider>
         </AuthProvider>
       </div>

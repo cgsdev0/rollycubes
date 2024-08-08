@@ -34,6 +34,15 @@ interface AuthAPIUser {
 
 export type AchievementList = Record<string, AchievementData>;
 
+export interface BadgeData {
+  description: string;
+  image_url: string;
+  id: string;
+  name: string;
+}
+
+export type BadgeList = Record<string, BadgeData>;
+
 interface RefreshTokenResponse {
   access_token: string;
 }
@@ -84,6 +93,9 @@ export const authApi = createApi({
     }),
     getAchievementList: builder.query<AchievementList, void>({
       query: () => ({ url: 'server/achievements', mode: 'cors' }),
+    }),
+    getBadgeList: builder.query<AchievementList, void>({
+      query: () => ({ url: 'server/badges', mode: 'cors' }),
     }),
     getUserById: builder.query<UserData, string>({
       query: (id: string) => ({ url: `users/${id}`, mode: 'cors' }),
@@ -138,6 +150,7 @@ export const {
   useGetRefreshTokenQuery,
   useGetSelfUserDataQuery,
   useGetAchievementListQuery,
+  useGetBadgeListQuery,
   useGetUserByIdQuery,
   useSetUserColorMutation,
   useDonateMutation,

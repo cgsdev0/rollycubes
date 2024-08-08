@@ -78,6 +78,7 @@ async fn main() {
         .route("/add_stats", post(server_routes::add_stats))
         .route("/public_key", get(server_routes::public_key))
         .route("/achievements", get(server_routes::achievements))
+        .route("/badges", get(server_routes::badges))
         .route(
             "/achievement_progress",
             post(server_routes::achievement_progress),
