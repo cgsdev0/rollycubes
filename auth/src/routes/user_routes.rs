@@ -59,6 +59,7 @@ pub struct User {
     color: ColorSettings,
     created_date: chrono::DateTime<chrono::Utc>,
     achievements: Option<Vec<AchievementProgress>>,
+    badges: Vec<String>,
     stats: Option<generated::UserStats>,
     donor: bool,
     pubkey_text: Option<String>,
@@ -645,6 +646,11 @@ WHERE id=$1::UUID",
         let row = &rows[0];
         let rolls: Option<i64> = row.get("rolls");
         let achievement_id: Option<String> = row.get("achievement_id");
+
+        let mut badges = vec![];
+        if row.get("donor") {
+            badges.push("premium".to_string());
+        }
         let user = User {
             pubkey_text: if self_id == Some(user_id) {
                 Some(row.get("pubkey_text"))
@@ -677,6 +683,7 @@ WHERE id=$1::UUID",
                 sum_hist: row.get::<'_, _, Vec<i64>>("roll_totals"),
                 win_hist: row.get::<'_, _, Vec<i64>>("winning_scores"),
             }),
+            badges,
             achievements: achievement_id.map(|_| {
                 rows.iter()
                     .map(|r| AchievementProgress {

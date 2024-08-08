@@ -14,6 +14,14 @@ use uuid::Uuid;
 use generated::DiceType;
 
 #[derive(Serialize, Deserialize, Clone)]
+pub struct Badge {
+    pub id: String,
+    pub name: String,
+    pub image_url: String,
+    pub description: String,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Achievement {
     pub id: String,
     pub name: String,
@@ -31,6 +39,8 @@ lazy_static! {
         .to_string();
     pub static ref ACHIEVEMENTS: HashMap<String, Achievement> =
         serde_json::from_str(include_str!("../../achievements.json")).unwrap();
+    pub static ref BADGES: HashMap<String, Badge> =
+        serde_json::from_str(include_str!("../../badges.json")).unwrap();
 }
 
 pub async fn auth_layer<B>(request: Request<B>, next: Next<B>) -> Response {
@@ -200,9 +210,7 @@ pub async fn achievement_progress(
         ));
     }
     let Some(a) = ACHIEVEMENTS.get(&body.achievement_id) else {
-        return Err(RouteError::UserError(
-            "invalid achievement id".to_string(),
-        ));
+        return Err(RouteError::UserError("invalid achievement id".to_string()));
     };
     let client = s.pool.get().await?;
     let current_time = SystemTime::now();
@@ -277,4 +285,9 @@ pub async fn public_key(State(s): State<RouterState>) -> Json<PublicKeyResp> {
 #[axum::debug_handler]
 pub async fn achievements() -> Json<HashMap<String, Achievement>> {
     Json(ACHIEVEMENTS.clone())
+}
+
+#[axum::debug_handler]
+pub async fn badges() -> Json<HashMap<String, Badge>> {
+    Json(BADGES.clone())
 }

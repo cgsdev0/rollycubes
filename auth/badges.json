@@ -1,0 +1,8 @@
+{
+  "premium": {
+    "id": "premium",
+    "name": "Premium",
+    "description": "This user has upgraded to premium.",
+    "image_url": "https://cdn.rollycubes.com/badges/premium.gif"
+  }
+}
