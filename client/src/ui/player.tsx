@@ -16,6 +16,7 @@ import { usePopperTooltip } from 'react-popper-tooltip';
 import { KickIcon } from './icons/kick';
 import React from 'react';
 import { useGetUserByIdQuery } from 'api/auth';
+import { BadgeImg } from './badge';
 
 interface Props {
   player: Player;
@@ -28,7 +29,7 @@ interface Props {
 
 const ADJUST_FOR_STUPID_FONT = -5;
 
-const AchievementTooltip = styled('div', {
+export const AchievementTooltip = styled('div', {
   display: 'flex',
   alignItems: 'center',
   gap: 12,
@@ -331,38 +332,6 @@ const Bar = ({
   );
 };
 
-const BadgeImg = (props: { id: string }) => {
-  const [tooltipVisible, setTooltipVisible] = React.useState(false);
-  const { getTooltipProps, setTooltipRef, setTriggerRef } = usePopperTooltip({
-    visible: tooltipVisible,
-    onVisibleChange: setTooltipVisible,
-  });
-  const badges = useSelector((state: ReduxState) => state.auth.badges) || {};
-  const badge = badges[props.id];
-  return (
-    <>
-      {tooltipVisible ? (
-        <AchievementTooltip
-          ref={setTooltipRef}
-          {...getTooltipProps({ className: 'tooltip-container' })}
-        >
-          <HistogramTooltip>
-            <header>{badge?.name}</header>
-            <p>{badge?.description}</p>
-          </HistogramTooltip>
-        </AchievementTooltip>
-      ) : null}
-      <BImg
-        ref={setTriggerRef}
-        width={16}
-        height={16}
-        src={badge?.image_url}
-        alt={badge?.description}
-      />
-    </>
-  );
-};
-
 const TooltipContents = (props: Props & { data?: UserData }) => {
   const { n, player, data } = props;
   const imageUrl = data?.image_url;
@@ -424,7 +393,7 @@ const TooltipContents = (props: Props & { data?: UserData }) => {
             <p>Player since {join_date.join(' ')}</p>
             <BadgeRow>
               {badges?.map((b) => (
-                <BadgeImg id={b} />
+                <BadgeImg id={b} key={b} />
               ))}
             </BadgeRow>
           </div>
@@ -528,10 +497,6 @@ const AImg = styled('img', {
   borderRadius: 4,
   border: '1px solid black',
 });
-const BImg = styled('img', {
-  imageRendering: 'pixelated',
-});
-
 const AchievementPlaceholder = styled('div', {
   borderRadius: 4,
   border: '1px dashed $gray900',

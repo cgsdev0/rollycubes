@@ -8,6 +8,7 @@ import { RichTextChunk, RichTextMsg } from 'types/api';
 import { selectIsSpectator } from '../selectors/game_selectors';
 import { ReduxState } from '../store';
 import '../textmods.css';
+import { BadgeImg } from './badge';
 
 interface Props {
   socket?: WebSocket;
@@ -67,6 +68,14 @@ const ChatWrapper = styled('div', {
     boxShadow: '$indentTop, $indentBottom',
     borderRadius: 16,
     padding: 12,
+  },
+});
+
+const Badge = styled('span', {
+  marginRight: '0.15em',
+  cursor: 'pointer',
+  '& img': {
+    verticalAlign: 'baseline',
   },
 });
 
@@ -201,16 +210,29 @@ const ChatChunk = (props: RichTextChunk) => {
         </span>
       );
     case 'rt_username':
+      let badge: string | undefined;
+      if (data?.badges?.length) {
+        badge = data.badges[0];
+      }
       return (
-        <span
-          className={props.modifiers?.map((mod) => `-textmod-${mod}`).join(' ')}
-          style={{
-            color: color,
-            fontWeight: props.user_id ? 'bold' : undefined,
-          }}
-        >
-          {props.text}
-        </span>
+        <>
+          {badge ? (
+            <Badge>
+              <BadgeImg id={badge} click />
+            </Badge>
+          ) : null}
+          <span
+            className={props.modifiers
+              ?.map((mod) => `-textmod-${mod}`)
+              .join(' ')}
+            style={{
+              color: color,
+              fontWeight: props.user_id ? 'bold' : undefined,
+            }}
+          >
+            {props.text}
+          </span>
+        </>
       );
   }
 };
