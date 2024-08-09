@@ -648,6 +648,10 @@ WHERE id=$1::UUID",
         let achievement_id: Option<String> = row.get("achievement_id");
 
         let mut badges = vec![];
+        let username: String = row.get("username");
+        if username == "badcop_" {
+            badges.push("admin".to_string());
+        }
         if row.get("donor") {
             badges.push("premium".to_string());
         }

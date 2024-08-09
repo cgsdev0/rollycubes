@@ -4,5 +4,11 @@
     "name": "Premium",
     "description": "This user has upgraded to premium.",
     "image_url": "https://cdn.rollycubes.com/badges/premium.gif"
+  },
+  "admin": {
+    "id": "admin",
+    "name": "Admin",
+    "description": "This user helps run the website.",
+    "image_url": "https://cdn.rollycubes.com/badges/admin.png"
   }
 }
