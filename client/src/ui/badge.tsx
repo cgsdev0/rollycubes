@@ -1,21 +1,9 @@
-import { connect, useSelector } from 'react-redux';
-import { css, styled } from 'stitches.config';
-import useFitText from 'use-fit-text';
-import {
-  selectIsSpectator,
-  selectSelfIndex,
-  selectTurnIndex,
-} from '../selectors/game_selectors';
+import { useSelector } from 'react-redux';
+import { styled } from 'stitches.config';
 import { ReduxState } from '../store';
-import { TARGET_SCORES } from '../constants';
-import { Achievement, AchievementData, Player, UserData } from '../types/api';
-import Avatar from './avatar';
 import { usePopperTooltip } from 'react-popper-tooltip';
 
-// TODO: remove
-import { KickIcon } from './icons/kick';
 import React from 'react';
-import { useGetUserByIdQuery } from 'api/auth';
 import { AchievementTooltip } from './player';
 
 const BImg = styled('img', {
@@ -51,8 +39,8 @@ export const BadgeImg = (props: { id: string; click?: boolean }) => {
       ) : null}
       <BImg
         ref={setTriggerRef}
-        width={16}
-        height={16}
+        width={15}
+        height={15}
         src={badge?.image_url}
         alt={badge?.description}
       />
