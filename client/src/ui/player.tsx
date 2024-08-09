@@ -126,6 +126,7 @@ const BadgeRow = styled('div', {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
+  gap: 2,
 });
 
 const playerName = css({
